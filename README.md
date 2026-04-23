@@ -1,0 +1,108 @@
+# AI Infra LLM Wiki
+
+这是一个面向 AI infra 程序员的个人知识库，采用 `raw -> wiki -> schema` 的工作流。
+
+- `raw/`：原始资料层，只读不写
+- `wiki/`：由 LLM 持续编译和维护的知识层
+- `AGENTS.md`：schema 规则层，约束 LLM 如何 ingest / query / lint
+- `output/`：研究输出、对比分析、幻灯片、可视化
+- `inbox/`：待处理资料与待回答问题
+- `scripts/`：辅助脚本
+
+## 核心理念
+
+这不是“每次问问题时临时去检索原文”的 RAG 项目，而是先把知识编译成可增长的 Markdown wiki。新增论文、博文、repo、数据集、图片或代码后，LLM 会更新来源摘要页、实体页、概念页、索引和日志，让知识真正累积下来。
+
+## 三层结构
+
+### Raw
+
+保存未经编译的原始资料：
+
+- `raw/articles/`
+- `raw/papers/`
+- `raw/repos/`
+- `raw/datasets/`
+- `raw/images/`
+- `raw/code/`
+
+### Wiki
+
+保存由 LLM 维护的知识页面：
+
+- `wiki/sources/`
+- `wiki/entities/`
+- `wiki/concepts/`
+- `wiki/index.md`
+- `wiki/log.md`
+
+### Obsidian Frontend
+
+Obsidian 是这个知识库的阅读与导航前端。建议把以下页面固定放到书签或首页：
+
+- `00 Home.md`
+- `Obsidian Workflow.md`
+- `wiki/index.md`
+- `wiki/log.md`
+
+### Schema
+
+`AGENTS.md` 规定：
+
+- 页面结构与命名方式
+- ingest / query / lint 的工作流
+- 如何处理冲突、缺口、版本差异和回填
+
+## 你要的 Ingest 风格
+
+这套仓库按“先讨论、再落盘”的方式设计：
+
+1. 你执行 `python3 scripts/ingest.py raw/...`
+2. LLM 先完整阅读原始资料
+3. 先和你确认 `2-3` 条摘要以及值得关注的论断
+4. 得到确认后，再创建 `wiki/sources/` 页面
+5. 再精确更新相关 `wiki/entities/`、`wiki/concepts/`
+6. 标注冲突，更新交叉引用、`wiki/index.md` 和 `wiki/log.md`
+
+也就是说，`ingest.py` 不是让 LLM 直接闷头写，而是把这套操作流程显式写进任务模板。
+
+## 三个核心动作
+
+### Ingest
+
+```bash
+python3 scripts/ingest.py raw/papers/flashattention-3.pdf
+python3 scripts/ingest.py raw/repos/vllm/README.md
+```
+
+### Query
+
+```bash
+python3 scripts/query.py "对比 vLLM、SGLang 和 TensorRT-LLM 的推理架构权衡"
+```
+
+### Lint
+
+```bash
+python3 scripts/lint.py
+```
+
+## 推荐工作流
+
+1. 用网页剪藏、手工收集或 git clone 把资料放入 `raw/`
+2. 用 `scripts/ingest.py` 发起一轮摄入
+3. 先读 LLM 给出的摘要和重点判断
+4. 你确认关注点后，再让 LLM 更新 wiki 页面
+5. 通过 `scripts/query.py` 发起研究问题
+6. 把高价值输出回填到 `wiki/`
+7. 定期运行 `scripts/lint.py`
+
+## Obsidian 优化
+
+这个 Vault 已经针对 Obsidian 做了三类优化：
+
+- 主页导航：`00 Home.md`
+- 协作说明：`Obsidian Workflow.md`
+- 模板目录：`Templates/`
+
+后续如果你在 Obsidian 里配合 Claudian 或其他 AI 插件使用，AI 更容易直接按当前 Vault 结构产出笔记，而不是随意散落文件。
