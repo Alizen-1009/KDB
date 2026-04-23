@@ -182,6 +182,7 @@
   },
   "active": "51665e49b050cd0b",
   "lastOpenFiles": [
+    "output/code/__pycache__/openai_calll.cpython-312.pyc",
     "output/code/openai_calll.py",
     "wiki/entities/vLLM Team.md",
     "output/reports/面试经验.md",
@@ -218,7 +219,6 @@
     "wiki/concepts/CUDA Kernel.md",
     "wiki/index.md",
     "wiki/concepts/Sparsity Allocation.md",
-    "raw/papers/2603.15031v1.pdf",
     "未命名.canvas"
   ]
 }
