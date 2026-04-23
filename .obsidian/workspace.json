@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "output/reports/Gemma 开源代码结构导读.md",
+                "file": "output/reports/推理系统专题面试稿.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Gemma 开源代码结构导读"
+              "title": "推理系统专题面试稿"
             }
           }
         ]
@@ -180,8 +180,20 @@
       "bases:新建数据库": false
     }
   },
-  "active": "d08fe34e64a648de",
+  "active": "51665e49b050cd0b",
   "lastOpenFiles": [
+    "output/code/openai_calll.py",
+    "wiki/entities/vLLM Team.md",
+    "output/reports/面试经验.md",
+    "output/reports/字节二面高压题拆解.md",
+    "wiki/concepts/持久批处理.md",
+    "wiki/sources/Model Runner V2 A Modular and Faster Core for vLLM.md",
+    "output/reports/大模型系统面试题全答.md",
+    "output/reports/大模型系统面试题全答补充.md",
+    "output/reports/大模型系统面试题地图.md",
+    "output/README.md",
+    "raw/articles/Model Runner V2 A Modular and Faster Core for vLLM.md",
+    "output/reports/Gemma 开源代码结构导读.md",
     "output/reports/推理系统专题面试稿.md",
     "output/code/__pycache__/bytedance_pressure_round_modules.cpython-312.pyc",
     "output/code/__pycache__",
@@ -192,13 +204,8 @@
     "raw/code/__pycache__",
     "raw/code/bytedance_pressure_round_modules.py",
     "raw/code/test_bytedance_pressure_round_modules.py",
-    "output/reports/字节二面高压题拆解.md",
     "output/reports/AI Infra面试题全答（二）.md",
-    "output/reports/大模型系统面试题全答补充.md",
-    "output/reports/大模型系统面试题全答.md",
     "output/reports/多卡与推理系统面试梳理.md",
-    "output/reports/面试经验.md",
-    "output/reports/大模型系统面试题地图.md",
     "raw/articles/美团一面：请介绍 vLLM PageAttention.md",
     "wiki/sources/美团一面：请介绍 vLLM PageAttention.md",
     "Obsidian Workflow.md",
@@ -211,13 +218,6 @@
     "wiki/concepts/CUDA Kernel.md",
     "wiki/index.md",
     "wiki/concepts/Sparsity Allocation.md",
-    "raw/articles/秋招CUDA手撕题复盘（附代码）.md",
-    "wiki/concepts/Histogram.md",
-    "wiki/concepts/RMSNorm.md",
-    "wiki/concepts/Grid-stride Loop.md",
-    "wiki/concepts/Block Reduce.md",
-    "wiki/sources/秋招CUDA手撕题复盘（附代码）.md",
-    "raw/articles/Kimi新作《Attention Residuals》：对Transformer中残差结构的调整.md",
     "raw/papers/2603.15031v1.pdf",
     "未命名.canvas"
   ]

@@ -2,6 +2,16 @@
 
 按时间记录 ingest、query、lint 等操作，帮助 LLM 与人类共同追踪知识库的演化过程。
 
+## [2026-04-23] ingest | Model Runner V2 A Modular and Faster Core for vLLM
+
+- 读取原始资料：`raw/articles/Model Runner V2 A Modular and Faster Core for vLLM.md`
+- 创建来源页：`wiki/sources/Model Runner V2 A Modular and Faster Core for vLLM.md`
+- 创建概念页：`wiki/concepts/持久批处理.md`
+- 创建实体页：`wiki/entities/vLLM Team.md`
+- 更新实体页：`wiki/entities/vLLM.md`
+- 更新概念页：`wiki/concepts/Continuous Batching.md`
+- 未发现与现有 wiki 的直接冲突；本次主要把 `vLLM` 条目从 `PagedAttention / Continuous Batching` 扩展到执行核心重构视角，补入了 `MRV2`、`GPU-native input preparation` 和 `async-first` 这条主线
+
 ## [2026-04-23] query | 推理系统专题面试稿
 
 - 读取索引页：`wiki/index.md`

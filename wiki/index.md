@@ -12,15 +12,15 @@
 
 ## 资源统计
 
-- 原始文章：14
+- 原始文章：15
 - 原始论文：3
 - 原始仓库：1
 - 原始数据集：0
 - 原始图片：0
 - 原始代码：2
-- 来源文件：17
-- 实体文件：13
-- 概念文件：53
+- 来源文件：18
+- 实体文件：14
+- 概念文件：54
 - 报告文件：9
 - 幻灯片文件：0
 
@@ -37,6 +37,7 @@
 - [[../wiki/entities/Stanford CS336|Stanford CS336]]
 - [[../wiki/entities/TensorRT-LLM|TensorRT-LLM]]
 - [[../wiki/entities/kason_zhang|kason_zhang]]
+- [[../wiki/entities/vLLM Team|vLLM Team]]
 - [[../wiki/entities/vLLM|vLLM]]
 - [[../wiki/entities/特里斯丹井底之娃 往上爬|特里斯丹井底之娃 往上爬]]
 
@@ -87,6 +88,7 @@
 - [[../wiki/concepts/ZeRO|ZeRO]]
 - [[../wiki/concepts/mHC|mHC]]
 - [[../wiki/concepts/内存合并访问|内存合并访问]]
+- [[../wiki/concepts/持久批处理|持久批处理]]
 - [[../wiki/concepts/数据并行|数据并行]]
 - [[../wiki/concepts/数据缩放定律|数据缩放定律]]
 - [[../wiki/concepts/流水线并行|流水线并行]]
@@ -103,6 +105,7 @@
 - [[../wiki/sources/Gemma 4 核心技术深度解析：PLE、Shared KV Cache 与全模态架构|Gemma 4 核心技术深度解析：PLE、Shared KV Cache 与全模态架构]]
 - [[../wiki/sources/Kimi新作《Attention Residuals》：对Transformer中残差结构的调整|Kimi新作《Attention Residuals》：对Transformer中残差结构的调整]]
 - [[../wiki/sources/LLM推理优化核心技术|LLM推理优化核心技术]]
+- [[../wiki/sources/Model Runner V2 A Modular and Faster Core for vLLM|Model Runner V2 A Modular and Faster Core for vLLM]]
 - [[../wiki/sources/engram_demo_v1|engram_demo_v1]]
 - [[../wiki/sources/mHC: Manifold-Constrained Hyper-Connections|mHC: Manifold-Constrained Hyper-Connections]]
 - [[../wiki/sources/你一定要知道：CUDA优化六要|你一定要知道：CUDA优化六要]]
