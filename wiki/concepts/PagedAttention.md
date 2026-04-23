@@ -1,0 +1,50 @@
+# PagedAttention
+
+## 定义
+
+把 KV Cache 按固定大小分页并通过索引表访问的显存管理与注意力执行方式，用于减少碎片并提升动态调度能力。
+
+## 它解决什么问题
+
+- 降低 KV Cache 的显存碎片问题
+- 支持动态增长、共享和更灵活的批处理
+- 避免传统按 `max_seq_len` 连续预分配导致的大量预留槽位和难复用空间浪费
+
+## 核心机制
+
+- 将 KV 张量切成固定大小 page
+- 通过映射表而不是连续物理地址来定位 page
+- 让请求生命周期和显存布局解耦
+- 支持 prefix sharing、copy-on-write 和更适合动态请求流的块级管理
+- 从运行时视角看，它通常可拆成三层对象：逻辑上的 `logical KV blocks`、显存中的 `physical KV blocks`，以及维护两者映射和填充状态的 `block table`
+- `prefill` 先把 prompt 对应的 KV 写入若干逻辑块并映射到物理块；`decode` 再通过 `block table` 读取历史 KV，并把新 token 追加到已有块或新分配的块中
+- 当多个序列共享同一前缀时，不同序列的 `block table` 可以同时指向同一批 prefix 物理块；只有在后续写入分叉时，才通过 `Copy-on-Write` 复制出新块
+
+## 关键权衡
+
+- 提高显存利用率和动态调度灵活性
+- 需要额外的页表与运行时管理复杂度
+- 把“连续地址访问”变成“块表寻址”，因此 kernel 与调度器都要适配这种间接访问模式
+
+## 相关实体
+
+- [[../entities/vLLM]]
+
+## 相关来源
+
+- [[../sources/LLM推理优化核心技术]]
+- [[../sources/斯坦福CS336 Lecture 10 - Inference systems and optimization]]
+- [[../sources/美团一面：请介绍 vLLM PageAttention]]
+
+## 相关概念
+
+- [[Continuous Batching]]
+- [[KV Cache]]
+- [[Prefix Caching]]
+- [[缓存感知路由]]
+
+## 研究备注
+
+- 后续可补 vLLM 具体的 page/block 抽象、调度器配合方式与碎片率收益
+- 现有来源已经能支撑一版比较好的面试回答：不仅能说“像虚拟内存”，还可以把 `block table`、`prefill/decode` 和块填充过程讲出来
+- 在 Beam Search 或 prefix sharing 场景下，`Copy-on-Write` 是高频追问点：它的价值不只是正确性，还在于避免 beam 或共享前缀的 KV cache 线性膨胀

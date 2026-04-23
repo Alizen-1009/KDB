@@ -1,0 +1,144 @@
+# AI Infra 知识库索引
+
+该页面由 `scripts/update_index.py` 自动生成。
+
+## 入口
+
+- [[../00 Home|Vault Home]]
+- [[../AGENTS|AGENTS]]
+- [[log|操作日志]]
+- [[../inbox/README|Inbox]]
+- [[../output/README|Output]]
+
+## 资源统计
+
+- 原始文章：14
+- 原始论文：3
+- 原始仓库：1
+- 原始数据集：0
+- 原始图片：0
+- 原始代码：2
+- 来源文件：17
+- 实体文件：13
+- 概念文件：53
+- 报告文件：9
+- 幻灯片文件：0
+
+## 实体页面
+
+- [[../wiki/entities/DeepSeek-AI|DeepSeek-AI]]
+- [[../wiki/entities/Engram|Engram]]
+- [[../wiki/entities/Gemma 4|Gemma 4]]
+- [[../wiki/entities/Google DeepMind|Google DeepMind]]
+- [[../wiki/entities/Moonshot AI|Moonshot AI]]
+- [[../wiki/entities/NCCL|NCCL]]
+- [[../wiki/entities/Nvidia Dynamo|Nvidia Dynamo]]
+- [[../wiki/entities/SGLang|SGLang]]
+- [[../wiki/entities/Stanford CS336|Stanford CS336]]
+- [[../wiki/entities/TensorRT-LLM|TensorRT-LLM]]
+- [[../wiki/entities/kason_zhang|kason_zhang]]
+- [[../wiki/entities/vLLM|vLLM]]
+- [[../wiki/entities/特里斯丹井底之娃 往上爬|特里斯丹井底之娃 往上爬]]
+
+## 概念页面
+
+- [[../wiki/concepts/Attention Residuals|Attention Residuals]]
+- [[../wiki/concepts/Bank Conflict|Bank Conflict]]
+- [[../wiki/concepts/Benchmarking|Benchmarking]]
+- [[../wiki/concepts/Block Reduce|Block Reduce]]
+- [[../wiki/concepts/CUDA Kernel|CUDA Kernel]]
+- [[../wiki/concepts/Chinchilla Scaling|Chinchilla Scaling]]
+- [[../wiki/concepts/Conditional Memory|Conditional Memory]]
+- [[../wiki/concepts/Continuous Batching|Continuous Batching]]
+- [[../wiki/concepts/Critical Batch Size|Critical Batch Size]]
+- [[../wiki/concepts/Double-Wide MLP|Double-Wide MLP]]
+- [[../wiki/concepts/Dual RoPE|Dual RoPE]]
+- [[../wiki/concepts/FSDP|FSDP]]
+- [[../wiki/concepts/FlashAttention|FlashAttention]]
+- [[../wiki/concepts/GPU执行模型|GPU执行模型]]
+- [[../wiki/concepts/Grid-stride Loop|Grid-stride Loop]]
+- [[../wiki/concepts/Histogram|Histogram]]
+- [[../wiki/concepts/Hyper-Connections|Hyper-Connections]]
+- [[../wiki/concepts/KV Cache|KV Cache]]
+- [[../wiki/concepts/Occupancy|Occupancy]]
+- [[../wiki/concepts/Online Softmax|Online Softmax]]
+- [[../wiki/concepts/PD分离|PD分离]]
+- [[../wiki/concepts/PagedAttention|PagedAttention]]
+- [[../wiki/concepts/Per-Layer Embeddings|Per-Layer Embeddings]]
+- [[../wiki/concepts/PreNorm Dilution|PreNorm Dilution]]
+- [[../wiki/concepts/Prefix Caching|Prefix Caching]]
+- [[../wiki/concepts/Profiling|Profiling]]
+- [[../wiki/concepts/RMSNorm|RMSNorm]]
+- [[../wiki/concepts/RoPE|RoPE]]
+- [[../wiki/concepts/Roofline 模型|Roofline 模型]]
+- [[../wiki/concepts/Scaling Laws|Scaling Laws]]
+- [[../wiki/concepts/Sequence Parallelism|Sequence Parallelism]]
+- [[../wiki/concepts/Shared KV Cache|Shared KV Cache]]
+- [[../wiki/concepts/Sparsity Allocation|Sparsity Allocation]]
+- [[../wiki/concepts/Speculative Decoding|Speculative Decoding]]
+- [[../wiki/concepts/Tail Effect|Tail Effect]]
+- [[../wiki/concepts/Tensor Parallelism|Tensor Parallelism]]
+- [[../wiki/concepts/Tiling|Tiling]]
+- [[../wiki/concepts/Torch Compile|Torch Compile]]
+- [[../wiki/concepts/Torch Distributed|Torch Distributed]]
+- [[../wiki/concepts/Triton|Triton]]
+- [[../wiki/concepts/Warp Divergence|Warp Divergence]]
+- [[../wiki/concepts/Warp Shuffle Reduce|Warp Shuffle Reduce]]
+- [[../wiki/concepts/ZeRO|ZeRO]]
+- [[../wiki/concepts/mHC|mHC]]
+- [[../wiki/concepts/内存合并访问|内存合并访问]]
+- [[../wiki/concepts/数据并行|数据并行]]
+- [[../wiki/concepts/数据缩放定律|数据缩放定律]]
+- [[../wiki/concepts/流水线并行|流水线并行]]
+- [[../wiki/concepts/混合注意力|混合注意力]]
+- [[../wiki/concepts/算子融合|算子融合]]
+- [[../wiki/concepts/缓存感知路由|缓存感知路由]]
+- [[../wiki/concepts/重计算|重计算]]
+- [[../wiki/concepts/集合通信|集合通信]]
+
+## 来源摘要
+
+- [[../wiki/sources/Conditional Memory via Scalable Lookup: A New Axis of Sparsity for Large Language Models|Conditional Memory via Scalable Lookup: A New Axis of Sparsity for Large Language Models]]
+- [[../wiki/sources/Flash Attention 详细解释推演与Pytorch代码实现|Flash Attention 详细解释推演与Pytorch代码实现]]
+- [[../wiki/sources/Gemma 4 核心技术深度解析：PLE、Shared KV Cache 与全模态架构|Gemma 4 核心技术深度解析：PLE、Shared KV Cache 与全模态架构]]
+- [[../wiki/sources/Kimi新作《Attention Residuals》：对Transformer中残差结构的调整|Kimi新作《Attention Residuals》：对Transformer中残差结构的调整]]
+- [[../wiki/sources/LLM推理优化核心技术|LLM推理优化核心技术]]
+- [[../wiki/sources/engram_demo_v1|engram_demo_v1]]
+- [[../wiki/sources/mHC: Manifold-Constrained Hyper-Connections|mHC: Manifold-Constrained Hyper-Connections]]
+- [[../wiki/sources/你一定要知道：CUDA优化六要|你一定要知道：CUDA优化六要]]
+- [[../wiki/sources/十分钟读懂旋转编码（RoPE）|十分钟读懂旋转编码（RoPE）]]
+- [[../wiki/sources/斯坦福CS336 Lecture 10 - Inference systems and optimization|斯坦福CS336 Lecture 10 - Inference systems and optimization]]
+- [[../wiki/sources/斯坦福CS336 Lecture 5 - GPUs|斯坦福CS336 Lecture 5 - GPUs]]
+- [[../wiki/sources/斯坦福CS336 Lecture 6 - Benchmarking, Profiling, and Kernel Writing|斯坦福CS336 Lecture 6 - Benchmarking, Profiling, and Kernel Writing]]
+- [[../wiki/sources/斯坦福CS336 Lecture 7 - Parallelism basics|斯坦福CS336 Lecture 7 - Parallelism basics]]
+- [[../wiki/sources/斯坦福CS336 Lecture 8 - Distributed communication and training code|斯坦福CS336 Lecture 8 - Distributed communication and training code]]
+- [[../wiki/sources/斯坦福CS336 Lecture 9 - Scaling laws basics|斯坦福CS336 Lecture 9 - Scaling laws basics]]
+- [[../wiki/sources/秋招CUDA手撕题复盘（附代码）|秋招CUDA手撕题复盘（附代码）]]
+- [[../wiki/sources/美团一面：请介绍 vLLM PageAttention|美团一面：请介绍 vLLM PageAttention]]
+
+## 最近日志
+
+- [2026-04-22] ingest | engram_demo_v1
+- [2026-04-22] ingest | Conditional Memory via Scalable Lookup: A New Axis of Sparsity for Large Language Models
+- [2026-04-22] ingest | 你一定要知道：CUDA优化六要
+- [2026-04-22] ingest | 十分钟读懂旋转编码（RoPE）
+- [2026-04-14] ingest | Flash Attention 详细解释推演与Pytorch代码实现
+- [2026-04-13] ingest | 斯坦福CS336 Lecture 10 - Inference systems and optimization
+- [2026-04-13] ingest | 斯坦福CS336 Lecture 9 - Scaling laws basics
+- [2026-04-13] ingest | 斯坦福CS336 Lecture 8 - Distributed communication and training code
+
+## 报告
+
+- [[../output/reports/AI Infra面试题全答（二）|AI Infra面试题全答（二）]]
+- [[../output/reports/Gemma 开源代码结构导读|Gemma 开源代码结构导读]]
+- [[../output/reports/多卡与推理系统面试梳理|多卡与推理系统面试梳理]]
+- [[../output/reports/大模型系统面试题全答|大模型系统面试题全答]]
+- [[../output/reports/大模型系统面试题全答补充|大模型系统面试题全答补充]]
+- [[../output/reports/大模型系统面试题地图|大模型系统面试题地图]]
+- [[../output/reports/字节二面高压题拆解|字节二面高压题拆解]]
+- [[../output/reports/推理系统专题面试稿|推理系统专题面试稿]]
+- [[../output/reports/面试经验|面试经验]]
+
+## 幻灯片
+
+- 暂无
