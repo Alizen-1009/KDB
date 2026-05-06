@@ -12,16 +12,16 @@
 
 ## 资源统计
 
-- 原始文章：15
+- 原始文章：21
 - 原始论文：3
 - 原始仓库：1
 - 原始数据集：0
 - 原始图片：0
 - 原始代码：2
-- 来源文件：18
+- 来源文件：23
 - 实体文件：14
-- 概念文件：54
-- 报告文件：9
+- 概念文件：58
+- 报告文件：10
 - 幻灯片文件：0
 
 ## 实体页面
@@ -48,6 +48,7 @@
 - [[../wiki/concepts/Benchmarking|Benchmarking]]
 - [[../wiki/concepts/Block Reduce|Block Reduce]]
 - [[../wiki/concepts/CUDA Kernel|CUDA Kernel]]
+- [[../wiki/concepts/CUDA内存层次|CUDA内存层次]]
 - [[../wiki/concepts/Chinchilla Scaling|Chinchilla Scaling]]
 - [[../wiki/concepts/Conditional Memory|Conditional Memory]]
 - [[../wiki/concepts/Continuous Batching|Continuous Batching]]
@@ -88,11 +89,14 @@
 - [[../wiki/concepts/ZeRO|ZeRO]]
 - [[../wiki/concepts/mHC|mHC]]
 - [[../wiki/concepts/内存合并访问|内存合并访问]]
+- [[../wiki/concepts/动态共享内存|动态共享内存]]
 - [[../wiki/concepts/持久批处理|持久批处理]]
 - [[../wiki/concepts/数据并行|数据并行]]
 - [[../wiki/concepts/数据缩放定律|数据缩放定律]]
 - [[../wiki/concepts/流水线并行|流水线并行]]
 - [[../wiki/concepts/混合注意力|混合注意力]]
+- [[../wiki/concepts/混合精度训练与推理|混合精度训练与推理]]
+- [[../wiki/concepts/确定性推理|确定性推理]]
 - [[../wiki/concepts/算子融合|算子融合]]
 - [[../wiki/concepts/缓存感知路由|缓存感知路由]]
 - [[../wiki/concepts/重计算|重计算]]
@@ -100,16 +104,21 @@
 
 ## 来源摘要
 
+- [[../wiki/sources/Attention Residuals|Attention Residuals]]
+- [[../wiki/sources/CUDA优化维度框架|CUDA优化维度框架]]
+- [[../wiki/sources/CUDA内存层次与动态共享内存问答整理|CUDA内存层次与动态共享内存问答整理]]
 - [[../wiki/sources/Conditional Memory via Scalable Lookup: A New Axis of Sparsity for Large Language Models|Conditional Memory via Scalable Lookup: A New Axis of Sparsity for Large Language Models]]
 - [[../wiki/sources/Flash Attention 详细解释推演与Pytorch代码实现|Flash Attention 详细解释推演与Pytorch代码实现]]
 - [[../wiki/sources/Gemma 4 核心技术深度解析：PLE、Shared KV Cache 与全模态架构|Gemma 4 核心技术深度解析：PLE、Shared KV Cache 与全模态架构]]
 - [[../wiki/sources/Kimi新作《Attention Residuals》：对Transformer中残差结构的调整|Kimi新作《Attention Residuals》：对Transformer中残差结构的调整]]
 - [[../wiki/sources/LLM推理优化核心技术|LLM推理优化核心技术]]
+- [[../wiki/sources/LLM提速利器：投机推理的原理与常见方案|LLM提速利器：投机推理的原理与常见方案]]
 - [[../wiki/sources/Model Runner V2 A Modular and Faster Core for vLLM|Model Runner V2 A Modular and Faster Core for vLLM]]
 - [[../wiki/sources/engram_demo_v1|engram_demo_v1]]
 - [[../wiki/sources/mHC: Manifold-Constrained Hyper-Connections|mHC: Manifold-Constrained Hyper-Connections]]
 - [[../wiki/sources/你一定要知道：CUDA优化六要|你一定要知道：CUDA优化六要]]
 - [[../wiki/sources/十分钟读懂旋转编码（RoPE）|十分钟读懂旋转编码（RoPE）]]
+- [[../wiki/sources/推理的非确定性运算及vLLMSGLang控制方式|推理的非确定性运算及vLLMSGLang控制方式]]
 - [[../wiki/sources/斯坦福CS336 Lecture 10 - Inference systems and optimization|斯坦福CS336 Lecture 10 - Inference systems and optimization]]
 - [[../wiki/sources/斯坦福CS336 Lecture 5 - GPUs|斯坦福CS336 Lecture 5 - GPUs]]
 - [[../wiki/sources/斯坦福CS336 Lecture 6 - Benchmarking, Profiling, and Kernel Writing|斯坦福CS336 Lecture 6 - Benchmarking, Profiling, and Kernel Writing]]
@@ -121,14 +130,14 @@
 
 ## 最近日志
 
-- [2026-04-22] ingest | engram_demo_v1
-- [2026-04-22] ingest | Conditional Memory via Scalable Lookup: A New Axis of Sparsity for Large Language Models
-- [2026-04-22] ingest | 你一定要知道：CUDA优化六要
-- [2026-04-22] ingest | 十分钟读懂旋转编码（RoPE）
-- [2026-04-14] ingest | Flash Attention 详细解释推演与Pytorch代码实现
-- [2026-04-13] ingest | 斯坦福CS336 Lecture 10 - Inference systems and optimization
-- [2026-04-13] ingest | 斯坦福CS336 Lecture 9 - Scaling laws basics
-- [2026-04-13] ingest | 斯坦福CS336 Lecture 8 - Distributed communication and training code
+- [2026-05-06] ingest | CUDA内存层次与动态共享内存问答整理
+- [2026-05-06] ingest | Attention Residuals
+- [2026-04-30] ingest | LLM提速利器：投机推理的原理与常见方案
+- [2026-04-29] ingest | 推理的非确定性运算及vLLMSGLang控制方式
+- [2026-04-28] ingest | CUDA优化维度框架
+- [2026-04-28] query | 算子与GPU优化、推理优化补充
+- [2026-04-23] ingest | Model Runner V2 A Modular and Faster Core for vLLM
+- [2026-04-23] query | 推理系统专题面试稿
 
 ## 报告
 
@@ -140,6 +149,7 @@
 - [[../output/reports/大模型系统面试题地图|大模型系统面试题地图]]
 - [[../output/reports/字节二面高压题拆解|字节二面高压题拆解]]
 - [[../output/reports/推理系统专题面试稿|推理系统专题面试稿]]
+- [[../output/reports/算子与GPU优化、推理优化补充|算子与GPU优化、推理优化补充]]
 - [[../output/reports/面试经验|面试经验]]
 
 ## 幻灯片

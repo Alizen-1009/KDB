@@ -14,11 +14,15 @@
 - GPU 通常通过大量 block 分发到多个 SM 上保持并发
 - 当剩余 block 太少时，最后一波只能占用部分 SM
 - 如果 block 太大、block 数太少或问题规模不合适，就更容易出现 tail effect
+- 一个实用估算框架是先算“满载一波”可并行的 block 数，例如 `SM 数 × 每 SM 驻留 Block 数`
+- 如果总 block 数只比一波满载略多，最后一波很可能只占用很少一部分 SM；若总 block 数远大于满载容量，尾部利用率虽低，但对总时长的影响可能有限
+- 除了调 `grid/block`，还可以通过 `persistent kernel` 让固定数量 block 从全局任务池持续取活，减少尾部波次不均
 
 ## 关键权衡
 
 - 增加 block 数有助于改善尾部利用率，但过小 block 也可能降低单 block 效率
 - launch 配置要同时平衡单 block 工作量、occupancy 和 SM 覆盖率
+- `CUDA Graphs` 更直接解决的是 launch overhead，但当 workload 被拆成很多小 kernel 时，它也能减少“尾部之外的提交成本”
 
 ## 相关实体
 
@@ -27,6 +31,7 @@
 ## 相关来源
 
 - [[../sources/你一定要知道：CUDA优化六要]]
+- [[../sources/CUDA优化维度框架]]
 
 ## 相关概念
 

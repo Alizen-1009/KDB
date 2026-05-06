@@ -21,10 +21,17 @@
 - `Generation / Decode`：逐 token 生成，attention 更容易变成 memory-bound
 - 因此 KV Cache 一方面减少重算，另一方面也会把大量推理优化重新聚焦到显存容量和带宽上
 
+## 大小估算
+
+- 如果忽略分页、对齐和实现细节，`KV Cache` 大小通常近似与 `batch size`、`sequence length`、`num_layers`、`num_kv_heads`、`head_dim` 和 `dtype bytes` 线性相关
+- 一个常见的粗略公式是：`KV Cache bytes ≈ 2 * B * S * L * H_kv * D_head * bytes_per_elem`
+- 前面的 `2` 对应同时保存 `K` 和 `V`
+
 ## 关键权衡
 
 - 计算复杂度下降，但显存占用显著上升
 - 缓存越大越能减少重算，但也越容易触发显存压力和淘汰策略
+- 它把 decode 的主要成本从“重算整段序列”转成“读历史缓存并追加新状态”，因此布局、分页与缓存精度会直接影响吞吐
 
 ## 分层理解
 
@@ -57,5 +64,5 @@
 
 ## 研究备注
 
-- 后续可补充 KV Cache 的大小估算公式、不同模型结构下的存储开销与 offloading 策略
+- 后续可补不同模型结构下的存储开销与 offloading 策略，以及 `FP8/量化 KV Cache` 的质量边界
 - 新增来源补强了一个更运行时的视角：KV cache 不只是“存历史 K/V”，还涉及逻辑块、物理块和映射表如何配合动态增长

@@ -15,6 +15,7 @@
 - 标准残差路径默认把历史输出按固定权重直接并入当前表示
 - 当层数加深时，累加项不断变多，单层新增信息在总和中的相对占比下降
 - 对 PreNorm 架构而言，这会和 hidden-state 幅度增长一起出现，进而影响训练稳定性与层间贡献分布
+- `Attention Residuals` 论文的实验观察是：baseline 的 hidden-state magnitude 随深度单调增长，早期层梯度更大；Block AttnRes 通过 block 边界处的选择性聚合，让输出幅度呈受限的周期性模式，梯度分布也更均匀
 
 ## 关键权衡
 
@@ -28,6 +29,7 @@
 
 ## 相关来源
 
+- [[../sources/Attention Residuals]]
 - [[../sources/Kimi新作《Attention Residuals》：对Transformer中残差结构的调整]]
 
 ## 相关概念

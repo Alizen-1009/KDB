@@ -35,7 +35,7 @@ def recent_log_items(log_path: Path, limit: int = 8) -> list[str]:
     for line in log_path.read_text(encoding="utf-8", errors="ignore").splitlines():
         if line.startswith("## ["):
             entries.append(f"- {line.removeprefix('## ').strip()}")
-    return list(reversed(entries[-limit:]))
+    return entries[:limit]
 
 
 def main() -> None:

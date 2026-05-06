@@ -2,6 +2,93 @@
 
 按时间记录 ingest、query、lint 等操作，帮助 LLM 与人类共同追踪知识库的演化过程。
 
+## [2026-05-06] ingest | CUDA内存层次与动态共享内存问答整理
+
+- 创建原始资料：`raw/articles/CUDA内存层次与动态共享内存问答整理.md`
+- 创建来源页：`wiki/sources/CUDA内存层次与动态共享内存问答整理.md`
+- 创建概念页：`wiki/concepts/CUDA内存层次.md`
+- 创建概念页：`wiki/concepts/动态共享内存.md`
+- 更新概念页：`wiki/concepts/CUDA Kernel.md`
+- 更新概念页：`wiki/concepts/GPU执行模型.md`
+- 更新概念页：`wiki/concepts/Occupancy.md`
+- 更新概念页：`wiki/concepts/Bank Conflict.md`
+- 更新概念页：`wiki/concepts/内存合并访问.md`
+- 更新索引页：`wiki/index.md`
+- 未发现与现有 wiki 的直接冲突；本次主要把 CUDA kernel launch 第三个参数、`extern __shared__`、静态/动态 shared memory、CUDA memory hierarchy、SM 示意图边界和 occupancy 直觉整理为可追溯页面
+
+## [2026-05-06] ingest | Attention Residuals
+
+- 读取原始资料：`raw/papers/2603.15031v1.pdf`
+- 参考已有相关来源页：`wiki/sources/Kimi新作《Attention Residuals》：对Transformer中残差结构的调整.md`
+- 创建来源页：`wiki/sources/Attention Residuals.md`
+- 更新概念页：`wiki/concepts/Attention Residuals.md`
+- 更新概念页：`wiki/concepts/PreNorm Dilution.md`
+- 更新概念页：`wiki/concepts/流水线并行.md`
+- 更新概念页：`wiki/concepts/Scaling Laws.md`
+- 更新实体页：`wiki/entities/Moonshot AI.md`
+- 更新索引页：`wiki/index.md`
+- 未发现与现有 wiki 的直接冲突；本次主要把 `Attention Residuals` 论文本体作为一手来源单独入库，并补入 depth-wise linear/softmax attention 视角、pseudo-query 零初始化、RMSNorm key、cross-stage caching、two-phase computation 与 scaling-law 实验边界
+
+## [2026-04-30] ingest | LLM提速利器：投机推理的原理与常见方案
+
+- 读取原始资料：`raw/articles/LLM提速利器：投机推理的原理与常见方案.md`
+- 创建来源页：`wiki/sources/LLM提速利器：投机推理的原理与常见方案.md`
+- 更新概念页：`wiki/concepts/Speculative Decoding.md`
+- 更新实体页：`wiki/entities/vLLM.md`
+- 未发现与现有 wiki 的直接冲突；本次主要把 `Speculative Decoding` 从“draft-target 基本定义”扩展到“方案分类 / 框架代价 / vLLM 使用面”视角
+
+## [2026-04-29] ingest | 推理的非确定性运算及vLLMSGLang控制方式
+
+- 读取原始资料：`raw/articles/推理的非确定性运算及vLLMSGLang控制方式.md`
+- 创建来源页：`wiki/sources/推理的非确定性运算及vLLMSGLang控制方式.md`
+- 创建概念页：`wiki/concepts/确定性推理.md`
+- 更新概念页：`wiki/concepts/Continuous Batching.md`
+- 更新实体页：`wiki/entities/vLLM.md`
+- 更新实体页：`wiki/entities/SGLang.md`
+- 未发现与现有 wiki 的直接冲突；本次主要补入了“推理系统为何即使固定 seed 也可能不复现”以及 `vLLM / SGLang` 在确定性推理上的工程控制方式
+
+## [2026-04-28] ingest | CUDA优化维度框架
+
+- 读取原始资料：`raw/articles/CUDA优化维度框架.md`
+- 创建来源页：`wiki/sources/CUDA优化维度框架.md`
+- 更新概念页：`wiki/concepts/内存合并访问.md`
+- 更新概念页：`wiki/concepts/Bank Conflict.md`
+- 更新概念页：`wiki/concepts/Occupancy.md`
+- 更新概念页：`wiki/concepts/Tiling.md`
+- 更新概念页：`wiki/concepts/Warp Divergence.md`
+- 更新概念页：`wiki/concepts/Tail Effect.md`
+- 更新概念页：`wiki/concepts/CUDA Kernel.md`
+- 更新概念页：`wiki/concepts/GPU执行模型.md`
+- 更新概念页：`wiki/concepts/Profiling.md`
+- 未发现与现有 wiki 的直接冲突；本次主要把既有 CUDA 条目从“性能原则”进一步推进到“诊断规则 / 数值估算 / profiler 信号”视角
+
+## [2026-04-28] query | 算子与GPU优化、推理优化补充
+
+- 读取索引页：`wiki/index.md`
+- 读取日志页：`wiki/log.md`
+- 读取概念页：`wiki/concepts/CUDA Kernel.md`
+- 读取概念页：`wiki/concepts/算子融合.md`
+- 读取概念页：`wiki/concepts/Profiling.md`
+- 读取概念页：`wiki/concepts/FlashAttention.md`
+- 读取概念页：`wiki/concepts/KV Cache.md`
+- 读取概念页：`wiki/concepts/Occupancy.md`
+- 读取概念页：`wiki/concepts/Roofline 模型.md`
+- 读取概念页：`wiki/concepts/Tiling.md`
+- 读取概念页：`wiki/concepts/PagedAttention.md`
+- 读取来源页：`wiki/sources/斯坦福CS336 Lecture 5 - GPUs.md`
+- 读取来源页：`wiki/sources/斯坦福CS336 Lecture 6 - Benchmarking, Profiling, and Kernel Writing.md`
+- 读取来源页：`wiki/sources/你一定要知道：CUDA优化六要.md`
+- 读取来源页：`wiki/sources/LLM推理优化核心技术.md`
+- 生成查询报告：`output/reports/算子与GPU优化、推理优化补充.md`
+- 创建概念页：`wiki/concepts/混合精度训练与推理.md`
+- 更新概念页：`wiki/concepts/Profiling.md`
+- 更新概念页：`wiki/concepts/CUDA Kernel.md`
+- 更新概念页：`wiki/concepts/算子融合.md`
+- 更新概念页：`wiki/concepts/FlashAttention.md`
+- 更新概念页：`wiki/concepts/KV Cache.md`
+- 参考外部资料：`NVIDIA Mixed Precision / Nsight Systems / Nsight Compute 官方文档` 与 `FlashAttention` 论文链接
+- 本次输出围绕 `特定 shape 调优 / 算子融合 / 混合精度 / Nsight 工具链 / KV Cache / FlashAttention` 形成了一份可面试复述、也可回链到 wiki 的专题报告；未发现与现有 wiki 的直接冲突
+
 ## [2026-04-23] ingest | Model Runner V2 A Modular and Faster Core for vLLM
 
 - 读取原始资料：`raw/articles/Model Runner V2 A Modular and Faster Core for vLLM.md`

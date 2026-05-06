@@ -27,6 +27,7 @@
 ## 相关来源
 
 - [[../sources/斯坦福CS336 Lecture 9 - Scaling laws basics]]
+- [[../sources/Attention Residuals]]
 - [[../sources/Kimi新作《Attention Residuals》：对Transformer中残差结构的调整]]
 
 ## 相关概念
@@ -39,3 +40,4 @@
 
 - 后续可补 scaling laws 在 pretraining loss、下游能力和对齐后行为上的差异
 - `Attention Residuals` 是一个比较直观的案例：官方材料把 `Block AttnRes` 的收益表述为“达到 baseline 约 1.25x compute 的 loss 水平”，说明 scaling law 也可以被用来评估架构改动是否真正带来 compute-efficient 增益
+- 论文本体的拟合设置是五个 MoE 模型尺度、相同训练超参、8192 token context，并使用 `L = A * C^-alpha` 形式拟合 validation loss 与 compute；这个结论应限定在该训练配方和模型族内理解

@@ -21,6 +21,7 @@
 
 ## 相关来源
 
+- [[../sources/Attention Residuals]]
 - [[../sources/Kimi新作《Attention Residuals》：对Transformer中残差结构的调整]]
 
 ## 冲突与备注
