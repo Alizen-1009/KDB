@@ -35,6 +35,7 @@
 - [[../sources/你一定要知道：CUDA优化六要]]
 - [[../sources/CUDA优化维度框架]]
 - [[../sources/CUDA内存层次与动态共享内存问答整理]]
+- [[../sources/多卡GPU监控与SM执行模型面试整理]]
 
 ## 相关概念
 
@@ -48,3 +49,4 @@
 
 - 后续可补 occupancy calculator、寄存器 spilling 与 block size sweep 的具体分析方法
 - `Nsight Compute` 的 Occupancy 面板通常能直接提示当前是线程数、寄存器还是 shared memory 在卡住并发
+- `SM Active`、`SM Issue` 与 `Occupancy` 不等价：`SM Active` 关注 SM 是否有 warp 驻留，`SM Issue` 关注 warp scheduler 是否在发射指令，`Occupancy` 关注可驻留 warp 数占理论上限的比例。LLM 推理中，decode 小 batch 可能 SM Active/Occupancy 都不高；复杂 fused attention kernel 可能 occupancy 不满但数据复用好；KV cache memory-bound 场景可能 occupancy 足够但 SM Issue/Tensor Active 上不去。

@@ -14,6 +14,7 @@
 - 对已经完成 prefill 的 token 保存 K/V 表示
 - 后续 decode 只为新 token 计算查询并与历史缓存交互
 - 将单步注意力的重算模式从“重读整段序列”转向“复用历史状态”
+- 在 Gemma 4 `MTP Drafter` 中，KV cache 还可以跨 target model 与 drafter 复用：drafter 不必完整处理 prompt 建立自己的 KV，而是通过 cross-attention 使用目标模型已计算好的 KV cache
 
 ## 推理阶段视角
 
@@ -53,6 +54,8 @@
 - [[../sources/Gemma 4 核心技术深度解析：PLE、Shared KV Cache 与全模态架构]]
 - [[../sources/斯坦福CS336 Lecture 10 - Inference systems and optimization]]
 - [[../sources/美团一面：请介绍 vLLM PageAttention]]
+- [[../sources/多卡GPU监控与SM执行模型面试整理]]
+- [[../sources/Gemma 4：Drafter 详解]]
 
 ## 相关概念
 
@@ -61,8 +64,11 @@
 - [[PagedAttention]]
 - [[Speculative Decoding]]
 - [[Shared KV Cache]]
+- [[MTP Drafter]]
 
 ## 研究备注
 
 - 后续可补不同模型结构下的存储开销与 offloading 策略，以及 `FP8/量化 KV Cache` 的质量边界
 - 新增来源补强了一个更运行时的视角：KV cache 不只是“存历史 K/V”，还涉及逻辑块、物理块和映射表如何配合动态增长
+- 从硬件指标看，decode 阶段常因 KV cache 读写变成 memory-bound：这时可能出现 `DRAM Bandwidth` 较高、`Tensor Active` 不高，而不是单纯的低精度或 Tensor Core 退化问题。
+- 需要区分两类“共享”：Gemma 4 目标模型内部的 `Shared KV Cache` 是层间共享；MTP drafter 里的 KV cache sharing 是 target model 与 drafter 之间的复用。

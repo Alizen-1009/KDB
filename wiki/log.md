@@ -2,6 +2,81 @@
 
 按时间记录 ingest、query、lint 等操作，帮助 LLM 与人类共同追踪知识库的演化过程。
 
+## [2026-05-07] ingest | Gemma 4：Drafter 详解
+
+- 复制原始图片：`raw/images/Gemma 4 Drafter 详解/`
+- 创建原始资料：`raw/articles/Gemma 4：Drafter 详解.md`
+- 创建来源页：`wiki/sources/Gemma 4：Drafter 详解.md`
+- 创建概念页：`wiki/concepts/MTP Drafter.md`
+- 更新实体页：`wiki/entities/Gemma 4.md`
+- 更新概念页：`wiki/concepts/Speculative Decoding.md`
+- 更新概念页：`wiki/concepts/KV Cache.md`
+- 更新概念页：`wiki/concepts/Shared KV Cache.md`
+- 更新概念页：`wiki/concepts/Per-Layer Embeddings.md`
+- 本次 ingest 将小红书 19 张截图整理为 raw article，并把 Gemma 4 `MTP Drafter` 作为独立概念入库；核对备注指出：`最高 3x`、target activation 复用、KV cache 共享和 E2B/E4B efficient embedder 与 Google 官方文章一致，但具体数值规格仍需按模型配置核实
+
+## [2026-05-07] ingest | vLLM v0 与 vLLM v1 调度架构差异截图整理
+
+- 创建原始资料：`raw/articles/vLLM v0 与 vLLM v1 调度架构差异截图整理.md`
+- 创建来源页：`wiki/sources/vLLM v0 与 vLLM v1 调度架构差异截图整理.md`
+- 创建概念页：`wiki/concepts/vLLM V1 统一调度器.md`
+- 更新实体页：`wiki/entities/vLLM.md`
+- 更新概念页：`wiki/concepts/Continuous Batching.md`
+- 更新概念页：`wiki/concepts/PagedAttention.md`
+- 本次 ingest 将用户提供的三张截图转写为 raw article，并把 `vLLM v0/v1` 调度差异整理成可复用概念页；核对备注指出：v0 开启 chunked prefill 后也可混合 prefill/decode，v1 的 `token quota` 应理解为每步动态 token 分配，且多 GPU 能力不能简化为只支持数据并行
+
+## [2026-05-07] query | 量化剪枝推理瓶颈Nsight与异构集群面试整理
+
+- 读取索引页：`wiki/index.md`
+- 读取概念页：`wiki/concepts/Roofline 模型.md`
+- 读取概念页：`wiki/concepts/PD分离.md`
+- 读取既有报告：`output/reports/算子与GPU优化、推理优化补充.md`
+- 读取既有报告：`output/reports/多卡GPU监控与SM执行模型面试整理.md`
+- 参考外部资料：`GPTQ / AWQ / SmoothQuant / LLM.int8 / Marlin` 论文，NVIDIA Hopper/A100 官方资料，以及 H20 公开规格报道
+- 创建查询报告：`output/reports/量化剪枝推理瓶颈Nsight与异构集群面试整理.md`
+- 创建来源页：`wiki/sources/量化剪枝推理瓶颈Nsight与异构集群面试整理.md`
+- 本次输出围绕量化、GPTQ/AWQ、剪枝/稀疏/蒸馏、推理瓶颈 roofline、Nsight 多卡分析、Marlin、PD 分离以及 A100/H20 异构集群差异形成一份面试专题稿；H20 规格和实习 PD 分离细节标记为待用户按真实环境核实
+- 追加补充：数据预加载与 Paddle Fluid Dataset 抽象、Agent 沙箱秒级启动设计、推理显存优化优先级、TTFT 优化和投机解码；`Fluid` 与沙箱 GPU 隔离细节标记为待按实际面试上下文核实
+
+## [2026-05-07] ingest | 多卡GPU监控与SM执行模型面试整理
+
+- 整理查询报告：`output/reports/多卡GPU监控与SM执行模型面试整理.md`
+- 创建来源页：`wiki/sources/多卡GPU监控与SM执行模型面试整理.md`
+- 更新概念页：`wiki/concepts/Profiling.md`
+- 更新概念页：`wiki/concepts/GPU执行模型.md`
+- 更新概念页：`wiki/concepts/Occupancy.md`
+- 更新概念页：`wiki/concepts/Warp Divergence.md`
+- 更新概念页：`wiki/concepts/混合精度训练与推理.md`
+- 更新概念页：`wiki/concepts/KV Cache.md`
+- 更新概念页：`wiki/concepts/Continuous Batching.md`
+- 本次 ingest 将连续两轮面试问答整理为可长期保存的 Obsidian 报告，并建立到 GPU profiling、SM/warp 执行模型、混合精度推理和 KV cache 的交叉引用；未发现与现有 wiki 的直接冲突
+
+## [2026-05-07] query | SM、线程束与 LLM 推理指标关系
+
+- 读取索引页：`wiki/index.md`
+- 读取概念页：`wiki/concepts/GPU执行模型.md`
+- 读取概念页：`wiki/concepts/Occupancy.md`
+- 读取概念页：`wiki/concepts/Warp Divergence.md`
+- 读取概念页：`wiki/concepts/CUDA内存层次.md`
+- 读取概念页：`wiki/concepts/FlashAttention.md`
+- 读取概念页：`wiki/concepts/KV Cache.md`
+- 更新概念页：`wiki/concepts/GPU执行模型.md`
+- 更新概念页：`wiki/concepts/Occupancy.md`
+- 更新概念页：`wiki/concepts/Warp Divergence.md`
+- 本次 query 围绕 `SM / warp / occupancy / SM Active / SM Issue` 的区别，以及它们如何映射到 LLM prefill、decode、GEMM、FlashAttention、KV cache 和变长序列场景展开
+
+## [2026-05-07] query | 多卡集群 GPU 指标监测与 LLM 推理退化诊断
+
+- 读取索引页：`wiki/index.md`
+- 读取日志页：`wiki/log.md`
+- 读取概念页：`wiki/concepts/Profiling.md`
+- 读取概念页：`wiki/concepts/GPU执行模型.md`
+- 读取概念页：`wiki/concepts/混合精度训练与推理.md`
+- 读取概念页：`wiki/concepts/Roofline 模型.md`
+- 读取既有报告：`output/reports/算子与GPU优化、推理优化补充.md`
+- 更新概念页：`wiki/concepts/Profiling.md`
+- 本次 query 围绕多卡 GPU 指标监控、`nvidia-smi` 显存口径、`Tensor Active / FP32 pipe active / BF16 pipe active` 的解释，以及 LLM 推理是否因 dtype、shape、layout 不匹配退化到低效 kernel 路径展开
+
 ## [2026-05-06] ingest | CUDA内存层次与动态共享内存问答整理
 
 - 创建原始资料：`raw/articles/CUDA内存层次与动态共享内存问答整理.md`

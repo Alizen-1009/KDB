@@ -12,16 +12,16 @@
 
 ## 资源统计
 
-- 原始文章：21
+- 原始文章：23
 - 原始论文：3
 - 原始仓库：1
 - 原始数据集：0
-- 原始图片：0
+- 原始图片：19
 - 原始代码：2
-- 来源文件：23
+- 来源文件：27
 - 实体文件：14
-- 概念文件：58
-- 报告文件：10
+- 概念文件：60
+- 报告文件：12
 - 幻灯片文件：0
 
 ## 实体页面
@@ -62,6 +62,7 @@
 - [[../wiki/concepts/Histogram|Histogram]]
 - [[../wiki/concepts/Hyper-Connections|Hyper-Connections]]
 - [[../wiki/concepts/KV Cache|KV Cache]]
+- [[../wiki/concepts/MTP Drafter|MTP Drafter]]
 - [[../wiki/concepts/Occupancy|Occupancy]]
 - [[../wiki/concepts/Online Softmax|Online Softmax]]
 - [[../wiki/concepts/PD分离|PD分离]]
@@ -88,6 +89,7 @@
 - [[../wiki/concepts/Warp Shuffle Reduce|Warp Shuffle Reduce]]
 - [[../wiki/concepts/ZeRO|ZeRO]]
 - [[../wiki/concepts/mHC|mHC]]
+- [[../wiki/concepts/vLLM V1 统一调度器|vLLM V1 统一调度器]]
 - [[../wiki/concepts/内存合并访问|内存合并访问]]
 - [[../wiki/concepts/动态共享内存|动态共享内存]]
 - [[../wiki/concepts/持久批处理|持久批处理]]
@@ -110,14 +112,17 @@
 - [[../wiki/sources/Conditional Memory via Scalable Lookup: A New Axis of Sparsity for Large Language Models|Conditional Memory via Scalable Lookup: A New Axis of Sparsity for Large Language Models]]
 - [[../wiki/sources/Flash Attention 详细解释推演与Pytorch代码实现|Flash Attention 详细解释推演与Pytorch代码实现]]
 - [[../wiki/sources/Gemma 4 核心技术深度解析：PLE、Shared KV Cache 与全模态架构|Gemma 4 核心技术深度解析：PLE、Shared KV Cache 与全模态架构]]
+- [[../wiki/sources/Gemma 4：Drafter 详解|Gemma 4：Drafter 详解]]
 - [[../wiki/sources/Kimi新作《Attention Residuals》：对Transformer中残差结构的调整|Kimi新作《Attention Residuals》：对Transformer中残差结构的调整]]
 - [[../wiki/sources/LLM推理优化核心技术|LLM推理优化核心技术]]
 - [[../wiki/sources/LLM提速利器：投机推理的原理与常见方案|LLM提速利器：投机推理的原理与常见方案]]
 - [[../wiki/sources/Model Runner V2 A Modular and Faster Core for vLLM|Model Runner V2 A Modular and Faster Core for vLLM]]
 - [[../wiki/sources/engram_demo_v1|engram_demo_v1]]
 - [[../wiki/sources/mHC: Manifold-Constrained Hyper-Connections|mHC: Manifold-Constrained Hyper-Connections]]
+- [[../wiki/sources/vLLM v0 与 vLLM v1 调度架构差异截图整理|vLLM v0 与 vLLM v1 调度架构差异截图整理]]
 - [[../wiki/sources/你一定要知道：CUDA优化六要|你一定要知道：CUDA优化六要]]
 - [[../wiki/sources/十分钟读懂旋转编码（RoPE）|十分钟读懂旋转编码（RoPE）]]
+- [[../wiki/sources/多卡GPU监控与SM执行模型面试整理|多卡GPU监控与SM执行模型面试整理]]
 - [[../wiki/sources/推理的非确定性运算及vLLMSGLang控制方式|推理的非确定性运算及vLLMSGLang控制方式]]
 - [[../wiki/sources/斯坦福CS336 Lecture 10 - Inference systems and optimization|斯坦福CS336 Lecture 10 - Inference systems and optimization]]
 - [[../wiki/sources/斯坦福CS336 Lecture 5 - GPUs|斯坦福CS336 Lecture 5 - GPUs]]
@@ -127,22 +132,24 @@
 - [[../wiki/sources/斯坦福CS336 Lecture 9 - Scaling laws basics|斯坦福CS336 Lecture 9 - Scaling laws basics]]
 - [[../wiki/sources/秋招CUDA手撕题复盘（附代码）|秋招CUDA手撕题复盘（附代码）]]
 - [[../wiki/sources/美团一面：请介绍 vLLM PageAttention|美团一面：请介绍 vLLM PageAttention]]
+- [[../wiki/sources/量化剪枝推理瓶颈Nsight与异构集群面试整理|量化剪枝推理瓶颈Nsight与异构集群面试整理]]
 
 ## 最近日志
 
+- [2026-05-07] ingest | Gemma 4：Drafter 详解
+- [2026-05-07] ingest | vLLM v0 与 vLLM v1 调度架构差异截图整理
+- [2026-05-07] query | 量化剪枝推理瓶颈Nsight与异构集群面试整理
+- [2026-05-07] ingest | 多卡GPU监控与SM执行模型面试整理
+- [2026-05-07] query | SM、线程束与 LLM 推理指标关系
+- [2026-05-07] query | 多卡集群 GPU 指标监测与 LLM 推理退化诊断
 - [2026-05-06] ingest | CUDA内存层次与动态共享内存问答整理
 - [2026-05-06] ingest | Attention Residuals
-- [2026-04-30] ingest | LLM提速利器：投机推理的原理与常见方案
-- [2026-04-29] ingest | 推理的非确定性运算及vLLMSGLang控制方式
-- [2026-04-28] ingest | CUDA优化维度框架
-- [2026-04-28] query | 算子与GPU优化、推理优化补充
-- [2026-04-23] ingest | Model Runner V2 A Modular and Faster Core for vLLM
-- [2026-04-23] query | 推理系统专题面试稿
 
 ## 报告
 
 - [[../output/reports/AI Infra面试题全答（二）|AI Infra面试题全答（二）]]
 - [[../output/reports/Gemma 开源代码结构导读|Gemma 开源代码结构导读]]
+- [[../output/reports/多卡GPU监控与SM执行模型面试整理|多卡GPU监控与SM执行模型面试整理]]
 - [[../output/reports/多卡与推理系统面试梳理|多卡与推理系统面试梳理]]
 - [[../output/reports/大模型系统面试题全答|大模型系统面试题全答]]
 - [[../output/reports/大模型系统面试题全答补充|大模型系统面试题全答补充]]
@@ -150,6 +157,7 @@
 - [[../output/reports/字节二面高压题拆解|字节二面高压题拆解]]
 - [[../output/reports/推理系统专题面试稿|推理系统专题面试稿]]
 - [[../output/reports/算子与GPU优化、推理优化补充|算子与GPU优化、推理优化补充]]
+- [[../output/reports/量化剪枝推理瓶颈Nsight与异构集群面试整理|量化剪枝推理瓶颈Nsight与异构集群面试整理]]
 - [[../output/reports/面试经验|面试经验]]
 
 ## 幻灯片

@@ -32,6 +32,7 @@
 
 - [[../sources/你一定要知道：CUDA优化六要]]
 - [[../sources/CUDA优化维度框架]]
+- [[../sources/多卡GPU监控与SM执行模型面试整理]]
 
 ## 相关概念
 
@@ -41,3 +42,4 @@
 ## 研究备注
 
 - 后续可补 causal mask、ragged batch 和稀疏路由在 GPU 上引入分支分歧的案例
+- LLM 中容易出现 warp divergence 的位置包括 attention 的 causal/window mask、ragged batch 边界、变长序列、MoE 稀疏路由和采样逻辑。推理引擎通常通过 padding/bucketing、sequence packing、专用 attention kernel、warp/block 级规则划分来降低热点路径上的分歧。

@@ -15,6 +15,7 @@
 - 每次 decode step 后都允许新请求加入、旧请求退出
 - 对 attention 和非 attention 计算采用不同 batching 策略，以适应不同长度的 ragged requests
 - 在 `vLLM` 的 `MRV2` 语境里，`Continuous Batching` 不再只是调度器策略，还和 `持久批处理`、GPU-side input preparation、async scheduling 紧密耦合，目的是减少每一步的 host-side bookkeeping 和 CPU/GPU 同步
+- 在 `vLLM V1` 语境里，continuous batching 可以和统一 token-level scheduler 放在一起理解：调度器每步决定每个请求处理多少 token，使长 prompt 的 chunked prefill 可以和 decode token 更自然地交错执行
 
 ## 关键权衡
 
@@ -33,6 +34,8 @@
 - [[../sources/斯坦福CS336 Lecture 10 - Inference systems and optimization]]
 - [[../sources/Model Runner V2 A Modular and Faster Core for vLLM]]
 - [[../sources/推理的非确定性运算及vLLMSGLang控制方式]]
+- [[../sources/多卡GPU监控与SM执行模型面试整理]]
+- [[../sources/vLLM v0 与 vLLM v1 调度架构差异截图整理]]
 
 ## 相关概念
 
@@ -40,6 +43,7 @@
 - [[KV Cache]]
 - [[持久批处理]]
 - [[确定性推理]]
+- [[vLLM V1 统一调度器]]
 
 ## 研究备注
 
@@ -47,3 +51,5 @@
 - 面试里一个高频追问是“为什么 continuous batching 不等于无脑做大 batch”：关键原因是吞吐提升和 P99 延迟之间常常存在冲突，需要设置 `max_batch_size` 与 `max_wait_time` 等约束
 - `MRV2` 提醒了一个容易被忽略的点：光有 iteration-level scheduling 还不够，如果输入准备、采样和状态更新仍主要依赖 CPU，小模型或高端 GPU 场景下 host-side overhead 仍可能成为瓶颈
 - 新来源补充了一个反直觉但重要的视角：`Continuous Batching` 不只是吞吐优化，它也可能改变同一请求所处的 batch 上下文，从而触发不同数值路径
+- 从 SM 利用角度看，continuous batching 的价值之一是缓解 decode 单步 batch 太小导致的 SM Active/Occupancy 不足，但它仍要和 KV cache 布局、P99 延迟和调度开销一起权衡。
+- 面试里可以把 vLLM v1 的统一调度器理解成 continuous batching 的进一步架构化：它不只是在 decode iteration 之间插入请求，而是把每个调度步要处理的 prompt/output token 数变成统一决策。

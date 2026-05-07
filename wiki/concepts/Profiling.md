@@ -31,6 +31,7 @@
 
 - [[../sources/斯坦福CS336 Lecture 6 - Benchmarking, Profiling, and Kernel Writing]]
 - [[../sources/CUDA优化维度框架]]
+- [[../sources/多卡GPU监控与SM执行模型面试整理]]
 
 ## 相关概念
 
@@ -45,3 +46,4 @@
 - `Nsight Systems` 更适合先看 `GPU gap / memcpy / NCCL overlap / stream 并发 / SM Active / DRAM Bandwidth` 这类粗粒度信号
 - `Nsight Compute` 更适合看 `achieved occupancy`、`warp stall`、`Tensor Core` 利用率、`L2/DRAM throughput`、coalescing 和 `bank conflict`
 - 若问题明显落在访存和 block 配置层面，这份来源补了几个很实用的第一轮信号：`sectors / requests` 看 coalescing、Occupancy 面板看资源瓶颈、shared memory 访存模式看 bank conflict、grid 大小与尾部波次关系看 [[Tail Effect]]
+- 诊断 LLM 推理退化时，`nvidia-smi` 的显存数只能作为进程/驱动视角的容量信号；更关键的是把 `SM Active / Tensor Active / FP32 或 BF16 pipe active / DRAM Bandwidth / NCCL 或 NVLink` 与 prefill、decode 阶段对应起来，判断是否从 Tensor Core 低精度路径退回到 CUDA core/FP32 路径，或因 shape、dtype、layout 不匹配没有命中高效 kernel。

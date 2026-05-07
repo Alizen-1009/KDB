@@ -30,12 +30,15 @@
 ## 相关来源
 
 - [[../sources/Gemma 4 核心技术深度解析：PLE、Shared KV Cache 与全模态架构]]
+- [[../sources/Gemma 4：Drafter 详解]]
 
 ## 相关概念
 
 - [[Double-Wide MLP]]
 - [[混合注意力]]
+- [[MTP Drafter]]
 
 ## 研究备注
 
 - Gemma 4 的源码里，PLE 注入位置在 attention 残差和 feedforward 残差之后，作为额外一段层内残差路径，而不是直接替代输入 embedding
+- `MTP Drafter` 使用 target activations 与 drafter token embedding 的组合输入，但这和目标模型本体的 PLE 不是同一个机制；两者都体现了 Gemma 4 系列对“额外 embedding/activation 通道”的依赖

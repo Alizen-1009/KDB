@@ -19,6 +19,7 @@
 - 从运行时视角看，它通常可拆成三层对象：逻辑上的 `logical KV blocks`、显存中的 `physical KV blocks`，以及维护两者映射和填充状态的 `block table`
 - `prefill` 先把 prompt 对应的 KV 写入若干逻辑块并映射到物理块；`decode` 再通过 `block table` 读取历史 KV，并把新 token 追加到已有块或新分配的块中
 - 当多个序列共享同一前缀时，不同序列的 `block table` 可以同时指向同一批 prefix 物理块；只有在后续写入分叉时，才通过 `Copy-on-Write` 复制出新块
+- 在 `vLLM V1` 的统一调度语境里，PagedAttention/KV block 管理仍是 token-level scheduler 能工作的底层条件：调度器决定本轮处理多少 token，KV cache manager 则决定这些 token 对应的 block 是否可分配、复用或需要触发抢占/重计算。
 
 ## 关键权衡
 
@@ -35,6 +36,7 @@
 - [[../sources/LLM推理优化核心技术]]
 - [[../sources/斯坦福CS336 Lecture 10 - Inference systems and optimization]]
 - [[../sources/美团一面：请介绍 vLLM PageAttention]]
+- [[../sources/vLLM v0 与 vLLM v1 调度架构差异截图整理]]
 
 ## 相关概念
 
@@ -42,6 +44,7 @@
 - [[KV Cache]]
 - [[Prefix Caching]]
 - [[缓存感知路由]]
+- [[vLLM V1 统一调度器]]
 
 ## 研究备注
 
