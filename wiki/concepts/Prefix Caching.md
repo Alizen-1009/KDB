@@ -14,11 +14,13 @@
 - 以序列起点开始匹配请求前缀
 - 命中部分直接复用已有 KV
 - 只对第一个新 token 之后的内容继续做 prefill 或 decode
+- 在 `SGLang` 中，[[RadixAttention]] 用 radix tree 系统化保存 prompt 与生成结果的 KV cache，使 program 分支和共享系统 prompt 也能自动做前缀复用
 
 ## 关键权衡
 
 - 命中率高度依赖 prompt 结构
 - 只能复用公共前缀，到第一个不相同 token 就停止
+- 运行时缓存结构越复杂，越需要配合驱逐策略和缓存感知调度，否则显存占用可能吞掉收益
 
 ## 相关实体
 
@@ -28,12 +30,15 @@
 ## 相关来源
 
 - [[../sources/LLM推理优化核心技术]]
+- [[../sources/SGLang：LLM推理引擎发展新方向]]
 
 ## 相关概念
 
 - [[KV Cache]]
+- [[RadixAttention]]
 - [[缓存感知路由]]
 
 ## 研究备注
 
 - 非前缀缓存仍是研究热点，后续可补 `CacheBlend`、`LMCache` 等实现
+- 需要区分通用 `Prefix Caching` 概念与 `RadixAttention` 这类具体 runtime 组织方式

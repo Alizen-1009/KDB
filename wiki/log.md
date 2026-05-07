@@ -2,6 +2,35 @@
 
 按时间记录 ingest、query、lint 等操作，帮助 LLM 与人类共同追踪知识库的演化过程。
 
+## [2026-05-07] ingest | SGLang 与 vLLM 区别截图整理
+
+- 创建原始资料：`raw/articles/SGLang 与 vLLM 区别截图整理.md`
+- 创建来源页：`wiki/sources/SGLang 与 vLLM 区别截图整理.md`
+- 创建概念页：`wiki/concepts/SGLang 与 vLLM 对比.md`
+- 更新实体页：`wiki/entities/SGLang.md`
+- 更新实体页：`wiki/entities/vLLM.md`
+- 更新概念页：`wiki/concepts/LLM Programs.md`
+- 更新概念页：`wiki/concepts/RadixAttention.md`
+- 更新概念页：`wiki/concepts/PagedAttention.md`
+- 更新索引页：`wiki/index.md`
+- 本次 ingest 将用户提供的 `SGLang vs vLLM` 截图整理为可复用对比口径：图片大方向正确，但需避免把二者简化成“vLLM=简单问答、SGLang=Agent”。补充边界包括：`vLLM` 也支持多类复杂 serving 能力，`SGLang` 也可作为 production-level serving runtime；`RadixAttention` 和 structured output 的收益均依赖任务结构、缓存命中和约束形式
+
+## [2026-05-07] ingest | SGLang：LLM推理引擎发展新方向
+
+- 读取原始资料：`raw/articles/SGLang：LLM推理引擎发展新方向.md`
+- 创建来源页：`wiki/sources/SGLang：LLM推理引擎发展新方向.md`
+- 创建概念页：`wiki/concepts/LLM Programs.md`
+- 创建概念页：`wiki/concepts/RadixAttention.md`
+- 创建概念页：`wiki/concepts/Constrained Decoding.md`
+- 更新实体页：`wiki/entities/SGLang.md`
+- 更新实体页：`wiki/entities/vLLM.md`
+- 更新实体页：`wiki/entities/TensorRT-LLM.md`
+- 更新概念页：`wiki/concepts/KV Cache.md`
+- 更新概念页：`wiki/concepts/Prefix Caching.md`
+- 更新概念页：`wiki/concepts/Speculative Decoding.md`
+- 更新索引页：`wiki/index.md`
+- 未发现与现有 wiki 的直接冲突；本次主要把 `SGLang` 从普通 serving engine 扩展到 `LLM Programs runtime` 视角，并补入 `RadixAttention`、压缩 FSM constrained decoding 与 API speculative execution。`SGLang V2` 性能接近或超过 `TensorRT-LLM` 的说法保留为来源声称，待官方 benchmark 或本地复现实验核实
+
 ## [2026-05-07] ingest | Gemma 4：Drafter 详解
 
 - 复制原始图片：`raw/images/Gemma 4 Drafter 详解/`

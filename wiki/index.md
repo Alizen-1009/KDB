@@ -12,15 +12,15 @@
 
 ## 资源统计
 
-- 原始文章：23
+- 原始文章：25
 - 原始论文：3
 - 原始仓库：1
 - 原始数据集：0
 - 原始图片：19
 - 原始代码：2
-- 来源文件：27
+- 来源文件：29
 - 实体文件：14
-- 概念文件：60
+- 概念文件：64
 - 报告文件：12
 - 幻灯片文件：0
 
@@ -51,6 +51,7 @@
 - [[../wiki/concepts/CUDA内存层次|CUDA内存层次]]
 - [[../wiki/concepts/Chinchilla Scaling|Chinchilla Scaling]]
 - [[../wiki/concepts/Conditional Memory|Conditional Memory]]
+- [[../wiki/concepts/Constrained Decoding|Constrained Decoding]]
 - [[../wiki/concepts/Continuous Batching|Continuous Batching]]
 - [[../wiki/concepts/Critical Batch Size|Critical Batch Size]]
 - [[../wiki/concepts/Double-Wide MLP|Double-Wide MLP]]
@@ -62,6 +63,7 @@
 - [[../wiki/concepts/Histogram|Histogram]]
 - [[../wiki/concepts/Hyper-Connections|Hyper-Connections]]
 - [[../wiki/concepts/KV Cache|KV Cache]]
+- [[../wiki/concepts/LLM Programs|LLM Programs]]
 - [[../wiki/concepts/MTP Drafter|MTP Drafter]]
 - [[../wiki/concepts/Occupancy|Occupancy]]
 - [[../wiki/concepts/Online Softmax|Online Softmax]]
@@ -72,8 +74,10 @@
 - [[../wiki/concepts/Prefix Caching|Prefix Caching]]
 - [[../wiki/concepts/Profiling|Profiling]]
 - [[../wiki/concepts/RMSNorm|RMSNorm]]
+- [[../wiki/concepts/RadixAttention|RadixAttention]]
 - [[../wiki/concepts/RoPE|RoPE]]
 - [[../wiki/concepts/Roofline 模型|Roofline 模型]]
+- [[../wiki/concepts/SGLang 与 vLLM 对比|SGLang 与 vLLM 对比]]
 - [[../wiki/concepts/Scaling Laws|Scaling Laws]]
 - [[../wiki/concepts/Sequence Parallelism|Sequence Parallelism]]
 - [[../wiki/concepts/Shared KV Cache|Shared KV Cache]]
@@ -117,6 +121,8 @@
 - [[../wiki/sources/LLM推理优化核心技术|LLM推理优化核心技术]]
 - [[../wiki/sources/LLM提速利器：投机推理的原理与常见方案|LLM提速利器：投机推理的原理与常见方案]]
 - [[../wiki/sources/Model Runner V2 A Modular and Faster Core for vLLM|Model Runner V2 A Modular and Faster Core for vLLM]]
+- [[../wiki/sources/SGLang 与 vLLM 区别截图整理|SGLang 与 vLLM 区别截图整理]]
+- [[../wiki/sources/SGLang：LLM推理引擎发展新方向|SGLang：LLM推理引擎发展新方向]]
 - [[../wiki/sources/engram_demo_v1|engram_demo_v1]]
 - [[../wiki/sources/mHC: Manifold-Constrained Hyper-Connections|mHC: Manifold-Constrained Hyper-Connections]]
 - [[../wiki/sources/vLLM v0 与 vLLM v1 调度架构差异截图整理|vLLM v0 与 vLLM v1 调度架构差异截图整理]]
@@ -136,14 +142,14 @@
 
 ## 最近日志
 
+- [2026-05-07] ingest | SGLang 与 vLLM 区别截图整理
+- [2026-05-07] ingest | SGLang：LLM推理引擎发展新方向
 - [2026-05-07] ingest | Gemma 4：Drafter 详解
 - [2026-05-07] ingest | vLLM v0 与 vLLM v1 调度架构差异截图整理
 - [2026-05-07] query | 量化剪枝推理瓶颈Nsight与异构集群面试整理
 - [2026-05-07] ingest | 多卡GPU监控与SM执行模型面试整理
 - [2026-05-07] query | SM、线程束与 LLM 推理指标关系
 - [2026-05-07] query | 多卡集群 GPU 指标监测与 LLM 推理退化诊断
-- [2026-05-06] ingest | CUDA内存层次与动态共享内存问答整理
-- [2026-05-06] ingest | Attention Residuals
 
 ## 报告
 

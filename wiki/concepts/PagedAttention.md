@@ -26,6 +26,7 @@
 - 提高显存利用率和动态调度灵活性
 - 需要额外的页表与运行时管理复杂度
 - 把“连续地址访问”变成“块表寻址”，因此 kernel 与调度器都要适配这种间接访问模式
+- 和 [[RadixAttention]] 对比时，`PagedAttention` 不是“复杂任务编排”机制，而是底层 KV cache 显存管理机制；它可以支撑 prefix sharing 和动态 batch，但抽象重心仍在 serving runtime。
 
 ## 相关实体
 
@@ -37,6 +38,7 @@
 - [[../sources/斯坦福CS336 Lecture 10 - Inference systems and optimization]]
 - [[../sources/美团一面：请介绍 vLLM PageAttention]]
 - [[../sources/vLLM v0 与 vLLM v1 调度架构差异截图整理]]
+- [[../sources/SGLang 与 vLLM 区别截图整理]]
 
 ## 相关概念
 
@@ -45,9 +47,12 @@
 - [[Prefix Caching]]
 - [[缓存感知路由]]
 - [[vLLM V1 统一调度器]]
+- [[SGLang 与 vLLM 对比]]
+- [[RadixAttention]]
 
 ## 研究备注
 
 - 后续可补 vLLM 具体的 page/block 抽象、调度器配合方式与碎片率收益
 - 现有来源已经能支撑一版比较好的面试回答：不仅能说“像虚拟内存”，还可以把 `block table`、`prefill/decode` 和块填充过程讲出来
 - 在 Beam Search 或 prefix sharing 场景下，`Copy-on-Write` 是高频追问点：它的价值不只是正确性，还在于避免 beam 或共享前缀的 KV cache 线性膨胀
+- 截图中关于 `PagedAttention` 降低碎片率的方向是对的，但具体百分比需要回到论文原文核对，不宜脱离 benchmark 直接复述

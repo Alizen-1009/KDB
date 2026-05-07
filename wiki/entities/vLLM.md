@@ -19,6 +19,8 @@
 - 新增来源还补入了 `vLLM` 在可复现性上的一条工程主线：除了给采样设置 `seed`，还可以通过关闭 `V1 multiprocessing`、开启 `Batch Invariance` 等方式减少调度与 kernel 路径带来的非确定性；但这通常会带来性能回退，且支持范围有限。
 - 新来源补充了 `vLLM` 在 speculative decoding 上的使用面：它不仅支持小 draft model，也支持 `ngram / suffix / MTP / EAGLE` 等多类 speculative 配置，但不同版本和并行策略存在能力边界。
 - 新增截图整理补足了 `vLLM v0 -> vLLM v1` 的调度架构变化：v1 以 `{request_id: num_tokens}` 形式统一 prompt/output token 的每步调度决策，更自然地支持 chunked prefill、prefix caching 和 speculative decoding；但 `token quota`、chunked prefill 默认行为和优先级调度能力都需要按具体版本核实。
+- 新来源 `SGLang：LLM推理引擎发展新方向` 把 `vLLM` 放在推理框架演化史中讨论：它因 `PagedAttention`、PyTorch 生态易用性、开源社区和多硬件支持成为现象级系统，但也可能像早期 `Caffe` 一样在新使用范式和硬件压力下继续被重构。
+- 新增截图整理校正了一个常见误解：`vLLM` 的抽象重心偏 serving engine，但这不等于它只能做单轮简单问答；它也在支持 prefix caching、structured output、speculative decoding、多模态等能力。
 
 ## 相关概念
 
@@ -30,6 +32,8 @@
 - [[确定性推理]]
 - [[Speculative Decoding]]
 - [[vLLM V1 统一调度器]]
+- [[LLM Programs]]
+- [[SGLang 与 vLLM 对比]]
 
 ## 相关来源
 
@@ -40,6 +44,8 @@
 - [[../sources/推理的非确定性运算及vLLMSGLang控制方式]]
 - [[../sources/LLM提速利器：投机推理的原理与常见方案]]
 - [[../sources/vLLM v0 与 vLLM v1 调度架构差异截图整理]]
+- [[../sources/SGLang：LLM推理引擎发展新方向]]
+- [[../sources/SGLang 与 vLLM 区别截图整理]]
 
 ## 冲突与备注
 
@@ -49,3 +55,5 @@
 - 关于 `Batch Invariance` 的支持模型、硬件条件和性能代价，目前库里仍主要来自经验文章摘要，后续宜补官方文档核实
 - 关于 speculative decoding 的方法矩阵和版本限制，目前库里仍主要来自经验文章整理；若后续要写 `vLLM vs SGLang` 对比，宜再补官方文档
 - 关于 `vLLM v0/v1` 调度差异，应避免把 v0 简化成“完全不能混合 prefill/decode”，也避免把 v1 说成“prefill/decode 在计算上完全相同”；更准确的边界是调度表示从阶段中心转向 token budget 中心
+- 新来源对 `vLLM` 的“Caffe 类比”是作者判断，不是技术事实；可作为框架演化视角保留，但不宜直接当作性能或生命周期结论
+- 对比 `SGLang` 时，应把差异落到抽象层和负载结构：`vLLM` 更偏高吞吐 serving，`SGLang` 更偏 LLM Programs runtime；不要写成能力互斥

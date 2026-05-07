@@ -11,13 +11,14 @@
             "id": "5765a90760201ff2",
             "type": "leaf",
             "state": {
-              "type": "bases",
+              "type": "markdown",
               "state": {
-                "file": "未命名.base",
-                "viewName": "表格"
+                "file": "raw/articles/SGLang：LLM推理引擎发展新方向.md",
+                "mode": "source",
+                "source": false
               },
-              "icon": "lucide-table",
-              "title": "未命名"
+              "icon": "lucide-file",
+              "title": "SGLang：LLM推理引擎发展新方向"
             }
           }
         ]
@@ -52,7 +53,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "面试",
+                "query": "tag:clippings",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -73,7 +74,8 @@
               "title": "书签"
             }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "horizontal",
@@ -179,10 +181,19 @@
       "bases:新建数据库": false
     }
   },
-  "active": "5765a90760201ff2",
+  "active": "972a601aa74c40b9",
   "lastOpenFiles": [
-    "output/reports/多卡与推理系统面试梳理.md",
+    "wiki/concepts/SGLang 与 vLLM 对比.md",
+    "wiki/sources/SGLang 与 vLLM 区别截图整理.md",
+    "raw/articles/SGLang 与 vLLM 区别截图整理.md",
+    "wiki/concepts/Constrained Decoding.md",
+    "wiki/concepts/RadixAttention.md",
+    "wiki/concepts/LLM Programs.md",
+    "wiki/sources/SGLang：LLM推理引擎发展新方向.md",
     "未命名.base",
+    "raw/articles/SGLang：LLM推理引擎发展新方向.md",
+    "Clippings",
+    "output/reports/多卡与推理系统面试梳理.md",
     "wiki/concepts/vLLM V1 统一调度器.md",
     "wiki/sources/vLLM v0 与 vLLM v1 调度架构差异截图整理.md",
     "raw/articles/vLLM v0 与 vLLM v1 调度架构差异截图整理.md",
@@ -200,14 +211,6 @@
     "raw/articles/CUDA优化维度框架.md",
     "raw/articles/CUDA内存层次与动态共享内存问答整理.md",
     "raw/articles/推理长序列利器：ChunkedPrefill&FlashDecoding原理详解.md",
-    "raw/articles/推理的非确定性运算及vLLMSGLang控制方式.md",
-    "raw/articles/斯坦福CS336 Lecture 5 - GPUs.md",
-    "raw/articles/十分钟读懂旋转编码（RoPE）.md",
-    "raw/articles/秋招CUDA手撕题复盘（附代码）.md",
-    "wiki/concepts/Tail Effect.md",
-    "wiki/concepts/Hyper-Connections.md",
-    "wiki/concepts/Chinchilla Scaling.md",
-    "wiki/concepts/Attention Residuals.md",
     "raw/papers/2603.15031v1.pdf",
     "output/code/__pycache__/openai_calll.cpython-312.pyc",
     "output/code/openai_calll.py",
@@ -216,7 +219,6 @@
     "output/code/test_bytedance_pressure_round_modules.py",
     "output/code/bytedance_pressure_round_modules.py",
     "output/code",
-    "raw/code/__pycache__/bytedance_pressure_round_modules.cpython-312.pyc",
     "Pasted image 20260423103357.png",
     "未命名.canvas"
   ]
