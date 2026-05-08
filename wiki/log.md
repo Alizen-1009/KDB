@@ -2,6 +2,16 @@
 
 按时间记录 ingest、query、lint 等操作，帮助 LLM 与人类共同追踪知识库的演化过程。
 
+## [2026-05-08] ingest | PageAttention代码走读
+
+- 读取原始资料：`raw/articles/PageAttention代码走读.md`
+- 创建来源页：`wiki/sources/PageAttention代码走读.md`
+- 更新概念页：`wiki/concepts/PagedAttention.md`
+- 更新概念页：`wiki/concepts/KV Cache.md`
+- 更新实体页：`wiki/entities/vLLM.md`
+- 更新索引页：`wiki/index.md`
+- 本次 ingest 将 `PageAttention代码走读` 原文与对话校正整理为可复用笔记：补入 prefill/decode 路径差异、`logical block / physical block / block table / slot_mapping`、decode kernel 中 `query` 与 `num_generation_tokens` 的含义、softmax 维度、K/V cache layout 差异、warp/thread group 分工和 `Copy-on-Write`。原文标题使用 `PageAttention`，wiki 概念页统一使用 `PagedAttention`；版本相关函数名和 kernel 参数标记为待按具体 commit 核实
+
 ## [2026-05-07] ingest | SGLang 与 vLLM 区别截图整理
 
 - 创建原始资料：`raw/articles/SGLang 与 vLLM 区别截图整理.md`

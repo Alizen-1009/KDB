@@ -21,6 +21,22 @@
 - 当多个序列共享同一前缀时，不同序列的 `block table` 可以同时指向同一批 prefix 物理块；只有在后续写入分叉时，才通过 `Copy-on-Write` 复制出新块
 - 在 `vLLM V1` 的统一调度语境里，PagedAttention/KV block 管理仍是 token-level scheduler 能工作的底层条件：调度器决定本轮处理多少 token，KV cache manager 则决定这些 token 对应的 block 是否可分配、复用或需要触发抢占/重计算。
 
+## 代码实现视角
+
+- `PagedAttention` 主要作用在 decode 阶段：每个 active sequence 本轮通常只有一个新 query，但它要 attend 到整个历史 KV cache。
+- `query` 的常见形状可理解为 `[num_generation_tokens, num_heads, head_size]`，其中 `num_generation_tokens` 是当前调度步要处理的新 token 总数；普通 decode 中它通常约等于 active sequence 数。
+- attention softmax 是对历史 token 维度做的：对某个 sequence、某个 head，先得到 `scores = q @ K_history.T`，形状是 `[context_len]`，然后 `softmax(scores)` 仍是 `[context_len]`。
+- decode kernel 可粗略理解为：一个 CUDA thread block 负责一个 sequence 的一个 head；block 内多个 warps/thread groups 通过 block table 遍历 KV cache blocks，完成 `q · k`、softmax 和 `softmax(scores) @ V`。
+- `CUDA thread block` 和 `KV cache block` 不是同一个概念：前者是 GPU 执行调度单位，后者是 KV cache 中长度为 `block_size` 的 token 槽位。
+- `slot_mapping` 主要服务写入路径：新 token 的 K/V 通过它找到应写入的 physical block 和 offset，再由 `reshape_and_cache` 一类逻辑写入 paged cache。
+
+## Kernel 细节备注
+
+- K cache 和 V cache 的 layout 通常不同，因为 QK 阶段和 PV 阶段访问方向不同：K 阶段偏向读取“某个 token 的 head_dim chunk”做 `q · k`，V 阶段偏向固定 head_dim 后沿 token 维读取多个 V 值做加权和。
+- `THREAD_GROUP_SIZE` 描述一个 token 的 `q · k` 由多少 threads 合作完成；`NUM_TOKENS_PER_THREAD_GROUP` 描述同一个 thread group 要顺序处理多少个 token，它们不是同一个维度。
+- 因此 `NUM_ELEMS_PER_THREAD = HEAD_SIZE / THREAD_GROUP_SIZE` 表示单个 `q · k` 内每个 thread 负责多少 head_dim 元素，不需要乘 `NUM_TOKENS_PER_THREAD_GROUP`；后者对应外层 token loop。
+- K 阶段让一个 thread group 合作读取 16B chunk，是为了让 group 协作处理一个 token 的一段 K 向量；V 阶段常见每个 thread 读取 16B，则是因为 V cache layout 与访问模式不同。
+
 ## 关键权衡
 
 - 提高显存利用率和动态调度灵活性
@@ -39,6 +55,7 @@
 - [[../sources/美团一面：请介绍 vLLM PageAttention]]
 - [[../sources/vLLM v0 与 vLLM v1 调度架构差异截图整理]]
 - [[../sources/SGLang 与 vLLM 区别截图整理]]
+- [[../sources/PageAttention代码走读]]
 
 ## 相关概念
 
@@ -49,6 +66,9 @@
 - [[vLLM V1 统一调度器]]
 - [[SGLang 与 vLLM 对比]]
 - [[RadixAttention]]
+- [[CUDA Kernel]]
+- [[Online Softmax]]
+- [[Warp Shuffle Reduce]]
 
 ## 研究备注
 
@@ -56,3 +76,4 @@
 - 现有来源已经能支撑一版比较好的面试回答：不仅能说“像虚拟内存”，还可以把 `block table`、`prefill/decode` 和块填充过程讲出来
 - 在 Beam Search 或 prefix sharing 场景下，`Copy-on-Write` 是高频追问点：它的价值不只是正确性，还在于避免 beam 或共享前缀的 KV cache 线性膨胀
 - 截图中关于 `PagedAttention` 降低碎片率的方向是对的，但具体百分比需要回到论文原文核对，不宜脱离 benchmark 直接复述
+- `PageAttention代码走读` 补入的是一个 2023 年源码实现视角；函数名、cache layout 和 kernel 参数需要结合具体 `vLLM` commit 核实

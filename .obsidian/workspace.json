@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "raw/articles/SGLang：LLM推理引擎发展新方向.md",
+                "file": "raw/articles/PageAttention代码走读.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "SGLang：LLM推理引擎发展新方向"
+              "title": "PageAttention代码走读"
             }
           }
         ]
@@ -74,8 +74,7 @@
               "title": "书签"
             }
           }
-        ],
-        "currentTab": 1
+        ]
       }
     ],
     "direction": "horizontal",
@@ -181,8 +180,13 @@
       "bases:新建数据库": false
     }
   },
-  "active": "972a601aa74c40b9",
+  "active": "5765a90760201ff2",
   "lastOpenFiles": [
+    "wiki/sources/PageAttention代码走读.md",
+    "wiki/sources/PagedAttention代码走读.md",
+    "raw/articles/PagedAttention代码走读.md",
+    "raw/articles/SGLang：LLM推理引擎发展新方向.md",
+    "raw/articles/PageAttention代码走读.md",
     "wiki/concepts/SGLang 与 vLLM 对比.md",
     "wiki/sources/SGLang 与 vLLM 区别截图整理.md",
     "raw/articles/SGLang 与 vLLM 区别截图整理.md",
@@ -191,7 +195,6 @@
     "wiki/concepts/LLM Programs.md",
     "wiki/sources/SGLang：LLM推理引擎发展新方向.md",
     "未命名.base",
-    "raw/articles/SGLang：LLM推理引擎发展新方向.md",
     "Clippings",
     "output/reports/多卡与推理系统面试梳理.md",
     "wiki/concepts/vLLM V1 统一调度器.md",
@@ -207,10 +210,6 @@
     "raw/articles/Model Runner V2 A Modular and Faster Core for vLLM.md",
     "wiki/sources/多卡GPU监控与SM执行模型面试整理.md",
     "raw/articles/LLM推理优化核心技术.md",
-    "raw/articles/Flash Attention 详细解释推演与Pytorch代码实现.md",
-    "raw/articles/CUDA优化维度框架.md",
-    "raw/articles/CUDA内存层次与动态共享内存问答整理.md",
-    "raw/articles/推理长序列利器：ChunkedPrefill&FlashDecoding原理详解.md",
     "raw/papers/2603.15031v1.pdf",
     "output/code/__pycache__/openai_calll.cpython-312.pyc",
     "output/code/openai_calll.py",

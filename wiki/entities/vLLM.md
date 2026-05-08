@@ -21,6 +21,7 @@
 - 新增截图整理补足了 `vLLM v0 -> vLLM v1` 的调度架构变化：v1 以 `{request_id: num_tokens}` 形式统一 prompt/output token 的每步调度决策，更自然地支持 chunked prefill、prefix caching 和 speculative decoding；但 `token quota`、chunked prefill 默认行为和优先级调度能力都需要按具体版本核实。
 - 新来源 `SGLang：LLM推理引擎发展新方向` 把 `vLLM` 放在推理框架演化史中讨论：它因 `PagedAttention`、PyTorch 生态易用性、开源社区和多硬件支持成为现象级系统，但也可能像早期 `Caffe` 一样在新使用范式和硬件压力下继续被重构。
 - 新增截图整理校正了一个常见误解：`vLLM` 的抽象重心偏 serving engine，但这不等于它只能做单轮简单问答；它也在支持 prefix caching、structured output、speculative decoding、多模态等能力。
+- 新增 `PageAttention代码走读` 从源码实现角度补充了 decode kernel 视角：`vLLM` 通过 `block table` 间接读取 paged KV cache，kernel 对每个 sequence/head 遍历历史 KV blocks，并在历史 token 维度完成 attention softmax。
 
 ## 相关概念
 
@@ -46,6 +47,7 @@
 - [[../sources/vLLM v0 与 vLLM v1 调度架构差异截图整理]]
 - [[../sources/SGLang：LLM推理引擎发展新方向]]
 - [[../sources/SGLang 与 vLLM 区别截图整理]]
+- [[../sources/PageAttention代码走读]]
 
 ## 冲突与备注
 
@@ -57,3 +59,4 @@
 - 关于 `vLLM v0/v1` 调度差异，应避免把 v0 简化成“完全不能混合 prefill/decode”，也避免把 v1 说成“prefill/decode 在计算上完全相同”；更准确的边界是调度表示从阶段中心转向 token budget 中心
 - 新来源对 `vLLM` 的“Caffe 类比”是作者判断，不是技术事实；可作为框架演化视角保留，但不宜直接当作性能或生命周期结论
 - 对比 `SGLang` 时，应把差异落到抽象层和负载结构：`vLLM` 更偏高吞吐 serving，`SGLang` 更偏 LLM Programs runtime；不要写成能力互斥
+- `PagedAttention` 的具体 kernel 名称、cache layout 和线程组织属于版本相关实现细节；长期笔记中应保留机制层结论，并在精确引用时补具体 commit

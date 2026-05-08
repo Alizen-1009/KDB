@@ -43,6 +43,13 @@
 
 这三者都和 KV Cache 有关，但作用层级分别是模型层、请求层和系统调度层。
 
+## Layout 与访问模式
+
+- 在 `PagedAttention` 代码走读中，K cache 与 V cache layout 不同，是因为两段计算的访存方向不同。
+- QK 阶段需要对每个历史 token 读取 K 的 head_dim chunk，并与当前 query 做 dot product，因此 K cache 常排成便于 thread group 协作读取 16B chunk 的形式。
+- PV 阶段需要对固定 head_dim 沿历史 token 维度做 `softmax(scores) @ V`，因此 V cache 更偏向让一个 block 内同一 head_dim 的多个 token 连续。
+- 这里的 `layout` 指逻辑张量维度如何映射到物理内存顺序；它不改变 attention 数学，只影响 kernel 的访存效率。
+
 ## 相关实体
 
 - [[../entities/vLLM]]
@@ -59,6 +66,7 @@
 - [[../sources/多卡GPU监控与SM执行模型面试整理]]
 - [[../sources/Gemma 4：Drafter 详解]]
 - [[../sources/SGLang：LLM推理引擎发展新方向]]
+- [[../sources/PageAttention代码走读]]
 
 ## 相关概念
 
@@ -69,6 +77,7 @@
 - [[Speculative Decoding]]
 - [[Shared KV Cache]]
 - [[MTP Drafter]]
+- [[CUDA Kernel]]
 
 ## 研究备注
 

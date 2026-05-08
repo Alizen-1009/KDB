@@ -12,13 +12,13 @@
 
 ## 资源统计
 
-- 原始文章：25
+- 原始文章：26
 - 原始论文：3
 - 原始仓库：1
 - 原始数据集：0
 - 原始图片：19
 - 原始代码：2
-- 来源文件：29
+- 来源文件：30
 - 实体文件：14
 - 概念文件：64
 - 报告文件：12
@@ -121,6 +121,7 @@
 - [[../wiki/sources/LLM推理优化核心技术|LLM推理优化核心技术]]
 - [[../wiki/sources/LLM提速利器：投机推理的原理与常见方案|LLM提速利器：投机推理的原理与常见方案]]
 - [[../wiki/sources/Model Runner V2 A Modular and Faster Core for vLLM|Model Runner V2 A Modular and Faster Core for vLLM]]
+- [[../wiki/sources/PageAttention代码走读|PageAttention代码走读]]
 - [[../wiki/sources/SGLang 与 vLLM 区别截图整理|SGLang 与 vLLM 区别截图整理]]
 - [[../wiki/sources/SGLang：LLM推理引擎发展新方向|SGLang：LLM推理引擎发展新方向]]
 - [[../wiki/sources/engram_demo_v1|engram_demo_v1]]
@@ -142,6 +143,7 @@
 
 ## 最近日志
 
+- [2026-05-08] ingest | PageAttention代码走读
 - [2026-05-07] ingest | SGLang 与 vLLM 区别截图整理
 - [2026-05-07] ingest | SGLang：LLM推理引擎发展新方向
 - [2026-05-07] ingest | Gemma 4：Drafter 详解
@@ -149,7 +151,6 @@
 - [2026-05-07] query | 量化剪枝推理瓶颈Nsight与异构集群面试整理
 - [2026-05-07] ingest | 多卡GPU监控与SM执行模型面试整理
 - [2026-05-07] query | SM、线程束与 LLM 推理指标关系
-- [2026-05-07] query | 多卡集群 GPU 指标监测与 LLM 推理退化诊断
 
 ## 报告
 
