@@ -18,25 +18,44 @@
 - 由于 `Q_m` 与 `K_n` 各自旋转后做内积，attention score 中会自然出现与 `m - n` 相关的项
 - 工程实现通常不会显式构造旋转矩阵，而是通过 `cos/sin` 广播或复数乘法高效完成
 
+## 实现细节
+
+- 多维 RoPE 可理解为块对角旋转矩阵：每个 `2D` 子空间独立旋转，整体仍是正交变换
+- 数学说明常把相邻维度配成 `(x_0,x_1)、(x_2,x_3)`；常见实现也会把前半维和后半维配成 `(x_i, x_{i+d/2})`
+- `rotate_half(x)` 的作用是构造与 `sin` 相乘的交换/取负分量，使 `(x * cos) + (rotate_half(x) * sin)` 等价于二维旋转
+- `cos/sin` 通常按最大位置和旋转维度预计算或缓存，前向时按 `position_ids` lookup/broadcast 到 `Q/K`
+- 具体维度配对方式会影响代码张量布局，但只要配对和 `cos/sin` 拼接一致，数学上仍对应一组二维平面旋转
+
 ## 关键权衡
 
 - 相比加性绝对位置编码，RoPE 更直接服务于相对位置建模，也更适合很多 decoder-only 模型
 - 它没有额外的大位置参数表，但长上下文下仍然会面临频率设计和外推稳定性问题
 - 实际长上下文能力不仅取决于“有没有 RoPE”，还取决于 `rope_theta`、scaling 方式，以及是否采用 `partial_rotary_factor`
+- 视觉和视频场景可扩展为二维或三维 RoPE，但需要处理轴向位置、模态区分、样本边界和频率分配
+- 在压缩 attention 或 `MQA/KV 共享` 中，RoPE 不能无脑作用到共享 KV 表示；否则可能污染 V 路径，或在压缩前聚合时混合多个 token 的位置相位
 
 ## 相关实体
 
+- [[../entities/DeepSeek-AI]]
+- [[../entities/DeepSeek V4]]
 - [[../entities/Gemma 4]]
+- [[../entities/Qwen VL]]
 
 ## 相关来源
 
 - [[../sources/十分钟读懂旋转编码（RoPE）]]
+- [[../sources/彻底搞懂RoPE计算原理：从1D到3D]]
+- [[../sources/DeepSeekV4中RoPE设计解析]]
 
 ## 相关概念
 
+- [[CSA-HCA|CSA/HCA]]
 - [[Dual RoPE]]
+- [[M-RoPE]]
 - [[混合注意力]]
 
 ## 研究备注
 
-- 当前页面先覆盖基础 RoPE 机制；后续可继续拆出 `RoPE scaling`、`YaRN`、`NTK-aware RoPE`、`LongRoPE` 等长上下文变体
+- 当前页面覆盖基础 RoPE 机制、常见实现配对和多维扩展入口；后续可继续拆出 `RoPE scaling`、`YaRN`、`NTK-aware RoPE`、`LongRoPE` 等长上下文变体
+- 对“远程衰减”和“长度外推”的表述应保持谨慎：它们是 RoPE 的重要直觉和经验现象，但真实长上下文效果还依赖训练长度、频率缩放和 attention 实现
+- DeepSeek V4 解析补充了一个压缩 attention 语境：压缩 KV 更倾向于压缩后按块标定位置再旋转；若 V 路径被旋转，则可能需要输出逆旋转来消除绝对位置项

@@ -30,6 +30,17 @@
 - 在 causal mask 场景下，`外 Q 内 KV` 的执行顺序还更自然支持对未来块提前停止
 - 这种收益在 `prefill` 阶段通常更明显，因为长序列 attention 的大头更接近中间矩阵 IO，而 `decode` 阶段则更容易被缓存读写主导
 
+## 与 PagedAttention V1 的区别
+
+- `PagedAttention V1` 在 decode 场景中常以一个 CUDA thread block 计算一个 `sequence + head` 的输出行，并把这一行的 `QK^T` logits 放入 shared memory 后做 softmax。
+- `FlashAttention` 更强调二维 tile-wise 数据流：在 `Q/K/V` 分块间维护在线 softmax 状态，避免完整 score/probability 矩阵物化。
+- 因此二者可以放在不同层面理解：`PagedAttention` 的核心是 paged KV cache 管理和 decode kernel 间接寻址，`FlashAttention` 的核心是 exact attention 的 IO-aware tiling 与 online softmax。
+
+## 与 FlashMLA 的关系
+
+- [[FlashMLA]] 可视为 FlashAttention 思路在 DeepSeek [[MLA]] decode 后端上的特化：同样强调减少 HBM 往返和中间矩阵物化，但输入/cache 形态变成 latent KV、paged cache 与变长序列 metadata。
+- 因此不要把 FlashMLA 简化为“直接套用 FlashAttention”；它还要处理 MLA 的矩阵吸收、latent cache layout、Split-KV 合并和 Hopper-specific kernel 优化。
+
 ## 关键权衡
 
 - 能显著降低 memory traffic 并提升长序列吞吐
@@ -46,6 +57,8 @@
 
 - [[../sources/斯坦福CS336 Lecture 5 - GPUs]]
 - [[../sources/Flash Attention 详细解释推演与Pytorch代码实现]]
+- [[../sources/vLLM皇冠上的明珠：深入浅出理解PagedAttention CUDA实现]]
+- [[../sources/陈巍：DeepSeek 开源Day（1）-FlashMLA 深入分析（收录于：DeepSeek技术详解系列）]]
 
 ## 相关概念
 
@@ -54,8 +67,11 @@
 - [[算子融合]]
 - [[重计算]]
 - [[Roofline 模型]]
+- [[PagedAttention]]
+- [[FlashMLA]]
 
 ## 研究备注
 
 - 不要把 FlashAttention 简化成“更快的 softmax”；更准确的说法是“围绕 IO 瓶颈重排 exact attention 的数据流”
 - 后续可补 FlashAttention v1/v2/v3 的实现差异，以及它和推理引擎中 attention kernel 设计的关系
+- 和 `PagedAttention V1` 对比时，应避免说成二者互斥：vLLM 语境下 prefill/decode 可能使用不同 attention backend，区别主要来自阶段、KV cache 管理和并行划分。

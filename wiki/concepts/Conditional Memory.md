@@ -13,7 +13,9 @@
 ## 核心机制
 
 - 从输入局部上下文构造确定性检索键，例如压缩后的后缀 `N-gram`
-- 通过哈希或其它固定寻址机制，只检索常数个记忆槽位
+- 通过哈希或其它固定寻址机制，把巨大 `N-gram` 空间压到有限 memory slots；查找形式类似 `idx = hash(compressed_ngram) % table_size`
+- 记忆表本身类似超大 embedding table，是模型参数的一部分；训练时被命中的 rows 参与反向传播并被更新，推理时只做确定性数组索引
+- 因为每个 token 只计算固定数量的 hash / head，并只读取固定数量的 rows，所以单 token memory lookup 是 `O(1)`，不是按表大小线性扫描
 - 用当前 hidden state 对检索结果做 context-aware gating，抑制碰撞噪声与语义不匹配
 - 将门控后的记忆结果作为残差支路注入主干，而不是替代 attention / FFN / MoE
 - 在官方 demo 中，这条路径被具体实现为：`CompressedTokenizer -> NgramHashMapping -> MultiHeadEmbedding -> gate -> ShortConv -> residual`
@@ -23,6 +25,7 @@
 - 能把静态模式与动态推理解耦，但需要维护巨大的静态表和潜在的哈希碰撞
 - 更适合处理局部、稳定、可查表的知识或模式，不能替代需要深层推理的动态计算
 - 真正释放价值往往依赖系统共设计，例如表分片、异步预取和多级缓存
+- 和普通 token embedding 相比，优势是 key 能表达局部上下文；代价是 `N-gram` 空间爆炸，必须依赖压缩、哈希和碰撞抑制。
 
 ## 相关实体
 
@@ -39,4 +42,4 @@
 
 ## 研究备注
 
-- 后续可继续补它与 `MoE`、`RAG`、`KV Cache`、`Prefix Caching` 的边界对比，以及 demo 中 token 压缩、质数哈希表和门控实现对系统设计的启发
+- 后续可继续补它与 `MoE`、普通 token embedding、`RAG`、`KV Cache`、`Prefix Caching` 的边界对比，以及 demo 中 token 压缩、质数哈希表和门控实现对系统设计的启发

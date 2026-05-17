@@ -22,6 +22,7 @@
 - 新来源 `SGLang：LLM推理引擎发展新方向` 把 `vLLM` 放在推理框架演化史中讨论：它因 `PagedAttention`、PyTorch 生态易用性、开源社区和多硬件支持成为现象级系统，但也可能像早期 `Caffe` 一样在新使用范式和硬件压力下继续被重构。
 - 新增截图整理校正了一个常见误解：`vLLM` 的抽象重心偏 serving engine，但这不等于它只能做单轮简单问答；它也在支持 prefix caching、structured output、speculative decoding、多模态等能力。
 - 新增 `PageAttention代码走读` 从源码实现角度补充了 decode kernel 视角：`vLLM` 通过 `block table` 间接读取 paged KV cache，kernel 对每个 sequence/head 遍历历史 KV blocks，并在历史 token 维度完成 attention softmax。
+- 新增 `vLLM皇冠上的明珠：深入浅出理解PagedAttention CUDA实现` 从 CUDA 并行算法角度补充 `PAv1`：每个 thread block 负责一个 `sequence/head` 输出行，warp/thread group 分摊 paged KV cache 的 QK 与 PV 两段计算，并指出 PAv1 与 FlashAttention/FlashDecoding 的任务切分差异。
 
 ## 相关概念
 
@@ -48,6 +49,7 @@
 - [[../sources/SGLang：LLM推理引擎发展新方向]]
 - [[../sources/SGLang 与 vLLM 区别截图整理]]
 - [[../sources/PageAttention代码走读]]
+- [[../sources/vLLM皇冠上的明珠：深入浅出理解PagedAttention CUDA实现]]
 
 ## 冲突与备注
 
@@ -60,3 +62,4 @@
 - 新来源对 `vLLM` 的“Caffe 类比”是作者判断，不是技术事实；可作为框架演化视角保留，但不宜直接当作性能或生命周期结论
 - 对比 `SGLang` 时，应把差异落到抽象层和负载结构：`vLLM` 更偏高吞吐 serving，`SGLang` 更偏 LLM Programs runtime；不要写成能力互斥
 - `PagedAttention` 的具体 kernel 名称、cache layout 和线程组织属于版本相关实现细节；长期笔记中应保留机制层结论，并在精确引用时补具体 commit
+- `PAv1` 适用条件、`PAv2` 切换启发式、以及 MQA/GQA 下是否重复读取 KV cache，均可能随 vLLM 版本和 backend 改动；引用时应落到具体源码版本。

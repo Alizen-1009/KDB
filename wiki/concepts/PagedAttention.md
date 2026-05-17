@@ -29,6 +29,7 @@
 - decode kernel 可粗略理解为：一个 CUDA thread block 负责一个 sequence 的一个 head；block 内多个 warps/thread groups 通过 block table 遍历 KV cache blocks，完成 `q · k`、softmax 和 `softmax(scores) @ V`。
 - `CUDA thread block` 和 `KV cache block` 不是同一个概念：前者是 GPU 执行调度单位，后者是 KV cache 中长度为 `block_size` 的 token 槽位。
 - `slot_mapping` 主要服务写入路径：新 token 的 K/V 通过它找到应写入的 physical block 和 offset，再由 `reshape_and_cache` 一类逻辑写入 paged cache。
+- 在 `PAv1` 的一种实现解释中，grid 维度可理解为 `(num_heads, num_seqs)`，每个 thread block 计算一个输出行；warp 负责遍历若干 KV page，thread group 负责单个历史 token 的 `q · k` 局部计算。
 
 ## Kernel 细节备注
 
@@ -36,6 +37,7 @@
 - `THREAD_GROUP_SIZE` 描述一个 token 的 `q · k` 由多少 threads 合作完成；`NUM_TOKENS_PER_THREAD_GROUP` 描述同一个 thread group 要顺序处理多少个 token，它们不是同一个维度。
 - 因此 `NUM_ELEMS_PER_THREAD = HEAD_SIZE / THREAD_GROUP_SIZE` 表示单个 `q · k` 内每个 thread 负责多少 head_dim 元素，不需要乘 `NUM_TOKENS_PER_THREAD_GROUP`；后者对应外层 token loop。
 - K 阶段让一个 thread group 合作读取 16B chunk，是为了让 group 协作处理一个 token 的一段 K 向量；V 阶段常见每个 thread 读取 16B，则是因为 V cache layout 与访问模式不同。
+- `PAv1` 和 [[FlashAttention]] 的主要差异不在数学公式，而在任务划分和中间状态管理：PAv1 常保留当前输出行的完整 `QK^T` logits 并在 block 内 softmax；FlashAttention 更强调对 `Q/K/V` 做 tile-wise 流式计算，并用 [[Online Softmax]] 避免完整 score/probability 矩阵物化。
 
 ## 关键权衡
 
@@ -56,6 +58,7 @@
 - [[../sources/vLLM v0 与 vLLM v1 调度架构差异截图整理]]
 - [[../sources/SGLang 与 vLLM 区别截图整理]]
 - [[../sources/PageAttention代码走读]]
+- [[../sources/vLLM皇冠上的明珠：深入浅出理解PagedAttention CUDA实现]]
 
 ## 相关概念
 
@@ -77,3 +80,4 @@
 - 在 Beam Search 或 prefix sharing 场景下，`Copy-on-Write` 是高频追问点：它的价值不只是正确性，还在于避免 beam 或共享前缀的 KV cache 线性膨胀
 - 截图中关于 `PagedAttention` 降低碎片率的方向是对的，但具体百分比需要回到论文原文核对，不宜脱离 benchmark 直接复述
 - `PageAttention代码走读` 补入的是一个 2023 年源码实现视角；函数名、cache layout 和 kernel 参数需要结合具体 `vLLM` commit 核实
+- `vLLM皇冠上的明珠：深入浅出理解PagedAttention CUDA实现` 对 `PAv1` 的适用条件、`MQA/GQA` 读取复用不足和长序列并行度不足的说法都应按具体版本核实；长期笔记中保留为版本相关实现备注。

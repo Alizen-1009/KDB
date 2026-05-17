@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "raw/articles/PageAttention代码走读.md",
+                "file": "wiki/concepts/MLA.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "PageAttention代码走读"
+              "title": "MLA"
             }
           }
         ]
@@ -182,11 +182,20 @@
   },
   "active": "5765a90760201ff2",
   "lastOpenFiles": [
+    "raw/articles/陈巍：DeepSeek 开源Day（1）-FlashMLA 深入分析（收录于：DeepSeek技术详解系列）.md",
+    "wiki/entities/陈巍.md",
+    "wiki/concepts/FlashMLA.md",
+    "wiki/sources/陈巍：DeepSeek 开源Day（1）-FlashMLA 深入分析（收录于：DeepSeek技术详解系列）.md",
+    "raw/articles/vLLM皇冠上的明珠：深入浅出理解PagedAttention CUDA实现.md",
+    "wiki/entities/方佳瑞.md",
+    "wiki/sources/vLLM皇冠上的明珠：深入浅出理解PagedAttention CUDA实现.md",
+    "raw/articles/PageAttention代码走读.md",
+    "raw/articles/DeepSeekV4中RoPE设计解析.md",
+    "raw/articles/彻底搞懂RoPE计算原理：从1D到3D.md",
     "wiki/sources/PageAttention代码走读.md",
     "wiki/sources/PagedAttention代码走读.md",
     "raw/articles/PagedAttention代码走读.md",
     "raw/articles/SGLang：LLM推理引擎发展新方向.md",
-    "raw/articles/PageAttention代码走读.md",
     "wiki/concepts/SGLang 与 vLLM 对比.md",
     "wiki/sources/SGLang 与 vLLM 区别截图整理.md",
     "raw/articles/SGLang 与 vLLM 区别截图整理.md",
@@ -201,15 +210,6 @@
     "wiki/sources/vLLM v0 与 vLLM v1 调度架构差异截图整理.md",
     "raw/articles/vLLM v0 与 vLLM v1 调度架构差异截图整理.md",
     "wiki/sources/量化剪枝推理瓶颈Nsight与异构集群面试整理.md",
-    "output/reports/量化剪枝推理瓶颈Nsight与异构集群面试整理.md",
-    "output/reports/大模型系统面试题全答补充.md",
-    "output/reports/大模型系统面试题全答.md",
-    "output/reports/大模型系统面试题地图.md",
-    "output/reports/多卡GPU监控与SM执行模型面试整理.md",
-    "wiki/sources/推理的非确定性运算及vLLMSGLang控制方式.md",
-    "raw/articles/Model Runner V2 A Modular and Faster Core for vLLM.md",
-    "wiki/sources/多卡GPU监控与SM执行模型面试整理.md",
-    "raw/articles/LLM推理优化核心技术.md",
     "raw/papers/2603.15031v1.pdf",
     "output/code/__pycache__/openai_calll.cpython-312.pyc",
     "output/code/openai_calll.py",

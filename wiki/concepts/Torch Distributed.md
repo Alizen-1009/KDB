@@ -38,3 +38,4 @@ PyTorch 提供的分布式训练与通信接口层，用于组织多进程、多
 ## 研究备注
 
 - 后续可补 `gloo`、`nccl` 等 backend 的适用边界，以及 PyTorch 分布式 API 向 DeviceMesh / DTensor 的演化
+- DDP 面试常从 `torchrun -> init_process_group -> DDP wrapper -> autograd hook all-reduce` 这条链路追问，详见 [[DDP]]。

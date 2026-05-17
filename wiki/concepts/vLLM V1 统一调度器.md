@@ -57,6 +57,7 @@
 - [[Prefix Caching]]
 - [[Speculative Decoding]]
 - [[持久批处理]]
+- [[Chunked Prefill]]
 
 ## 研究备注
 

@@ -15,6 +15,12 @@
 - 低 intensity 区域通常由带宽主导，表现为 memory bound
 - 高 intensity 区域更接近计算上限，表现为 compute bound
 
+## LLM Attention 粗估
+
+- 对 decode 阶段的标准 `MHA`，单个新 token 需要读取历史 `K/V cache` 并做 `QK` 与 `PV`；忽略 softmax、metadata 与 cache miss 时，算术强度大约是 `4 * H * S * D / (2 * H * S * D * bytes)`，即 `FP16/BF16` 下约 `1 FLOP/byte`。
+- `GQA/MQA` 通过减少 `KV heads` 提高同一份 `K/V` 被多个 query heads 复用的次数，粗略 intensity 会随 `H_q / H_kv` 增大，但 decode attention 通常仍偏 memory-bound。
+- [[MLA]] 这类 latent KV 结构显著压缩每个历史 token 需要从 HBM 读取的缓存量；如果实现能让 latent cache 在多个 heads 间高效复用，FLOPs 不会按同等比例下降，算术强度可能上升到接近甚至跨过硬件 ridge point，因此有机会从 memory-bound 转向 compute-bound。
+
 ## 关键权衡
 
 - 它能给出高层优化方向，但不能直接替代对具体 kernel 的底层 profiling
@@ -27,13 +33,16 @@
 ## 相关来源
 
 - [[../sources/斯坦福CS336 Lecture 5 - GPUs]]
+- [[../sources/MLA与DP Attention面试整理]]
 
 ## 相关概念
 
 - [[算子融合]]
 - [[重计算]]
 - [[Tiling]]
+- [[MLA]]
+- [[KV Cache]]
 
 ## 研究备注
 
-- 后续可加入和 LLM 常见算子如 matmul、attention、layernorm 的 intensity 估算例子
+- 这些 attention intensity 估算只适合作为面试和 roofline 直觉：真实数值会受 dtype、KV layout、分页、batch size、kernel 是否使用 Tensor Core、是否能跨 head 复用 latent cache 等因素影响。

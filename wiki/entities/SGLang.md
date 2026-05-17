@@ -17,6 +17,7 @@
 - 新来源 `SGLang：LLM推理引擎发展新方向` 进一步把它定位为面向 [[LLM Programs]] 的 runtime：前端用嵌入 Python 的 DSL 表达多次 LLM 调用、分支、合并和结构化输出，后端通过 [[RadixAttention]]、[[Constrained Decoding]] 与 API speculative execution 优化执行。
 - 该来源还转述了 `SGLang V2` 在部分 H100 Llama3 serving benchmark 中接近甚至超过 `TensorRT-LLM`、明显快于 `vLLM` 的结果；但作者没有实测，应作为“来源声称 / 待复现”的性能备注。
 - 新增截图整理把 `SGLang vs vLLM` 的常见二分法校正为：`SGLang` 更偏可编程 runtime 和复杂 LLM workflow，但它同样是 production-level serving framework；不能简单理解成“只适合 Agent”。
+- 官方文档语境里，SGLang 对 DeepSeek/MLA serving 还强调 [[DP Attention]]：通过 attention 侧数据并行减少 TP 下 latent KV cache 重复，提升可承载 batch size 和吞吐。
 
 ## 相关概念
 
@@ -28,6 +29,7 @@
 - [[Speculative Decoding]]
 - [[缓存感知路由]]
 - [[确定性推理]]
+- [[DP Attention]]
 
 ## 相关来源
 
@@ -35,6 +37,7 @@
 - [[../sources/推理的非确定性运算及vLLMSGLang控制方式]]
 - [[../sources/SGLang：LLM推理引擎发展新方向]]
 - [[../sources/SGLang 与 vLLM 区别截图整理]]
+- [[../sources/MLA与DP Attention面试整理]]
 
 ## 冲突与备注
 

@@ -16,12 +16,20 @@
 - 将单步注意力的重算模式从“重读整段序列”转向“复用历史状态”
 - 在 Gemma 4 `MTP Drafter` 中，KV cache 还可以跨 target model 与 drafter 复用：drafter 不必完整处理 prompt 建立自己的 KV，而是通过 cross-attention 使用目标模型已计算好的 KV cache
 - 在 `SGLang` 的 [[RadixAttention]] 语境中，KV cache 还会被保留在 radix tree 中，用于 program 分支、共享系统 prompt 或生成结果前缀的运行时复用
+- 在 [[FlashMLA]] 语境中，KV cache 以 MLA latent cache 与 paged cache metadata 形式参与 decode kernel；优化重点不只是少存，还包括如何按 block table、变长序列和 Split-KV 高效读取历史状态
 
 ## 推理阶段视角
 
 - `Prefill`：对整个 prompt 并行编码，通常更容易接近 compute-bound
 - `Generation / Decode`：逐 token 生成，attention 更容易变成 memory-bound
 - 因此 KV Cache 一方面减少重算，另一方面也会把大量推理优化重新聚焦到显存容量和带宽上
+
+## Attention 结构与算术强度
+
+- 标准 `MHA` 在 decode 时每个 query head 都读取自己的历史 `K/V`，`QK` 和 `PV` 的 FLOPs 与 KV cache 读流量都随 `H * S * D_head` 线性增长；`FP16/BF16` 下粗略只有约 `1 FLOP/byte`，所以常见瓶颈是 HBM 带宽。
+- `GQA/MQA` 减少 `KV heads`，让多个 query heads 共享同一份 `K/V`，本质上是在提高 KV cache 的复用率；它会提高 arithmetic intensity，但通常仍要结合 batch、context length 和 kernel 实现判断是否摆脱 memory-bound。
+- [[MLA]] 把历史 `K/V` 缓存在更低维的 latent 表示里，显著减少每个历史 token 的 HBM 读取量；如果 attention score/value 路径仍保留较多按 head 计算，且 kernel 能有效复用 latent cache，就可能让 decode attention 的瓶颈从读 KV cache 转向实际计算吞吐。
+- 在共享或压缩 KV 的结构中，位置编码还会影响 cache 语义：若直接对共享 KV 做 RoPE，V 也可能携带位置相位；[[MLA]] 通过额外小型 RoPE K cache 解耦，[[CSA-HCA|CSA/HCA]] 则需要处理压缩块位置标定和输出逆旋转。
 
 ## 大小估算
 
@@ -48,6 +56,7 @@
 - 在 `PagedAttention` 代码走读中，K cache 与 V cache layout 不同，是因为两段计算的访存方向不同。
 - QK 阶段需要对每个历史 token 读取 K 的 head_dim chunk，并与当前 query 做 dot product，因此 K cache 常排成便于 thread group 协作读取 16B chunk 的形式。
 - PV 阶段需要对固定 head_dim 沿历史 token 维度做 `softmax(scores) @ V`，因此 V cache 更偏向让一个 block 内同一 head_dim 的多个 token 连续。
+- 从 `PAv1` 的 CUDA 并行视角看，K cache layout 还服务于让 warp 内不同 thread group 处理不同历史 token，并由代表线程并行写入 shared memory 中的 logits；V cache layout 则更强调读路径，与 shared memory 中的 softmax 权重做局部 dot 后再归约。
 - 这里的 `layout` 指逻辑张量维度如何映射到物理内存顺序；它不改变 attention 数学，只影响 kernel 的访存效率。
 
 ## 相关实体
@@ -67,6 +76,10 @@
 - [[../sources/Gemma 4：Drafter 详解]]
 - [[../sources/SGLang：LLM推理引擎发展新方向]]
 - [[../sources/PageAttention代码走读]]
+- [[../sources/vLLM皇冠上的明珠：深入浅出理解PagedAttention CUDA实现]]
+- [[../sources/MLA与DP Attention面试整理]]
+- [[../sources/DeepSeekV4中RoPE设计解析]]
+- [[../sources/陈巍：DeepSeek 开源Day（1）-FlashMLA 深入分析（收录于：DeepSeek技术详解系列）]]
 
 ## 相关概念
 
@@ -78,6 +91,10 @@
 - [[Shared KV Cache]]
 - [[MTP Drafter]]
 - [[CUDA Kernel]]
+- [[MLA]]
+- [[FlashMLA]]
+- [[DP Attention]]
+- [[CSA-HCA|CSA/HCA]]
 
 ## 研究备注
 
