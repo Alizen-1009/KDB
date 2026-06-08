@@ -2,6 +2,14 @@
 
 按时间记录 ingest、query、lint 等操作，帮助 LLM 与人类共同追踪知识库的演化过程。
 
+## [2026-06-08] ingest | 还在手写CUDA内核？CODA来了！LLM和新手也能让Transformer跑出光速
+
+- 读取原始资料：`raw/articles/还在手写CUDA内核？CODA来了！LLM和新手也能让Transformer跑出光速.md`
+- 创建来源页：`wiki/sources/还在手写CUDA内核？CODA来了！LLM和新手也能让Transformer跑出光速.md`
+- 创建概念页：`wiki/concepts/CODA.md`
+- 更新概念页：`wiki/concepts/算子融合.md`、`wiki/concepts/CUDA Kernel.md`、`wiki/concepts/RMSNorm.md`、`wiki/concepts/Triton.md`、`wiki/concepts/Torch Compile.md`
+- 本次 ingest 将 CODA 整理为“围绕 GEMM epilogue 的代数重写 + 融合抽象”：它不是简单把相邻 PyTorch op 拼大，而是利用 Transformer 中部分 memory-bound 小操作的代数性质，将 RMSNorm、SwiGLU、RoPE、残差、交叉熵等重写进 `GEMM + epilogue` 程序，减少中间张量 HBM 往返。文章中的 `1.6x-1.8x` backward 加速和 `5%-20%` Transformer 层前向加速均标记为待按原论文、代码仓库和 benchmark 配置核实。
+
 ## [2026-05-17] query | Engram O(1) 查表与静态记忆表理解
 
 - 读取实体页：`wiki/entities/Engram.md`

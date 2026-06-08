@@ -19,13 +19,14 @@
 - 对很多 `memory-bound` kernel，一个很实用的排障顺序是：先看 [[内存合并访问]]，再看 [[Bank Conflict]] / [[Tiling]]，随后检查 [[Occupancy]]、[[Warp Divergence]] 和 [[Tail Effect]]
 - 如果 workload 长期只落在少数固定 shape 上，还可以把 tile、线程映射、数据布局和 epilogue 固化成 shape-specialized kernel，再结合 autotune 去逼近该 shape 簇的局部最优
 - 在工程面试和手写题语境里，很多 kernel 又会进一步收束成少量可复用模板，如 [[Warp Shuffle Reduce]]、[[Block Reduce]] 和 [[Grid-stride Loop]]
+- [[CODA]] 把这种 `epilogue` 视角推进到 Transformer block 层面：固定优化过的 GEMM mainloop，把 RMSNorm、SwiGLU、RoPE、残差等局部操作重写进 GEMM epilogue，减少中间张量落 HBM。
 
 ## 常见算子分类
 
 - `Pointwise / Elementwise`：每个元素独立，如 add、mul、SiLU、bias、mask；通常 memory-bound，重点是 coalesced load/store、vectorized load、融合和减少 launch。
 - `Reduction`：多元素聚合成少量结果，如 sum、max、norm、softmax 的行归约；重点是 warp/block 归约、shared memory、数值稳定和跨 block 二阶段归约。
 - `Scan / Prefix`：前缀和、前缀最大等带顺序依赖的并行扫描；重点是分层 scan、warp primitive 和跨 block 合并。
-- `GEMM / Matmul`：矩阵乘和线性层；通常 compute-bound 或复用受限，重点是 [[Tiling]]、Tensor Core、layout、对齐、pipeline 和 epilogue fusion。
+- `GEMM / Matmul`：矩阵乘和线性层；通常 compute-bound 或复用受限，重点是 [[Tiling]]、Tensor Core、layout、对齐、pipeline 和 epilogue fusion；CODA 这类方法进一步把部分 Transformer 小算子表达成 `GEMM + epilogue` 程序。
 - `Attention`：QK、softmax、PV 的复合数据流；重点是 tiling、[[Online Softmax]]、避免 score/probability 矩阵落 HBM，以及 varlen/ragged batch 的调度。
 - `MLA backend`：以 [[FlashMLA]] 为代表，重点是 latent KV cache layout、paged cache metadata、Split-KV、变长序列调度和 Hopper/SM90 特化能力。
 - `Gather / Scatter / Indexing`：间接寻址、KV block table、embedding lookup、[[MoE]] token dispatch；常受访存随机性和负载不均限制，重点是数据重排、coalescing、分桶和减少原子冲突。
@@ -63,6 +64,7 @@
 - [[../sources/秋招CUDA手撕题复盘（附代码）]]
 - [[../sources/CUDA内存层次与动态共享内存问答整理]]
 - [[../sources/陈巍：DeepSeek 开源Day（1）-FlashMLA 深入分析（收录于：DeepSeek技术详解系列）]]
+- [[../sources/还在手写CUDA内核？CODA来了！LLM和新手也能让Transformer跑出光速]]
 
 ## 相关概念
 
@@ -82,6 +84,7 @@
 - [[Tiling]]
 - [[MoE]]
 - [[FlashMLA]]
+- [[CODA]]
 
 ## 研究备注
 
@@ -89,3 +92,4 @@
 - 后续可补 CUDA C++、CUTLASS、PyTorch extension 与自定义 op 之间的关系，以及常见 kernel 优化 checklist 的 profiler 对应信号
 - 现有来源已经覆盖“性能原则”和“面试模板”两条线；后续可以继续补 `compute-bound kernel`，把 `GEMM / Tensor Core / FlashAttention` 接进来
 - FlashMLA 相关性能数字和 SM90 细节应回到官方实现与 benchmark 核实，不宜脱离硬件配置和具体 commit 独立引用。
+- CODA 相关论文和 repo 尚未 ingest；当前仅根据二手文章记录其 epilogue 编程抽象和待核实 benchmark。

@@ -12,15 +12,15 @@
 
 ## 资源统计
 
-- 原始文章：31
+- 原始文章：32
 - 原始论文：3
 - 原始仓库：1
 - 原始数据集：0
 - 原始图片：19
-- 原始代码：2
-- 来源文件：35
+- 原始代码：1
+- 来源文件：36
 - 实体文件：19
-- 概念文件：72
+- 概念文件：73
 - 报告文件：12
 - 幻灯片文件：0
 
@@ -52,6 +52,7 @@
 - [[../wiki/concepts/Bank Conflict|Bank Conflict]]
 - [[../wiki/concepts/Benchmarking|Benchmarking]]
 - [[../wiki/concepts/Block Reduce|Block Reduce]]
+- [[../wiki/concepts/CODA|CODA]]
 - [[../wiki/concepts/CSA-HCA|CSA-HCA]]
 - [[../wiki/concepts/CUDA Kernel|CUDA Kernel]]
 - [[../wiki/concepts/CUDA内存层次|CUDA内存层次]]
@@ -156,11 +157,13 @@
 - [[../wiki/sources/斯坦福CS336 Lecture 9 - Scaling laws basics|斯坦福CS336 Lecture 9 - Scaling laws basics]]
 - [[../wiki/sources/秋招CUDA手撕题复盘（附代码）|秋招CUDA手撕题复盘（附代码）]]
 - [[../wiki/sources/美团一面：请介绍 vLLM PageAttention|美团一面：请介绍 vLLM PageAttention]]
+- [[../wiki/sources/还在手写CUDA内核？CODA来了！LLM和新手也能让Transformer跑出光速|还在手写CUDA内核？CODA来了！LLM和新手也能让Transformer跑出光速]]
 - [[../wiki/sources/量化剪枝推理瓶颈Nsight与异构集群面试整理|量化剪枝推理瓶颈Nsight与异构集群面试整理]]
 - [[../wiki/sources/陈巍：DeepSeek 开源Day（1）-FlashMLA 深入分析（收录于：DeepSeek技术详解系列）|陈巍：DeepSeek 开源Day（1）-FlashMLA 深入分析（收录于：DeepSeek技术详解系列）]]
 
 ## 最近日志
 
+- [2026-06-08] ingest | 还在手写CUDA内核？CODA来了！LLM和新手也能让Transformer跑出光速
 - [2026-05-17] query | Engram O(1) 查表与静态记忆表理解
 - [2026-05-17] ingest | 陈巍：DeepSeek 开源Day（1）-FlashMLA 深入分析（收录于：DeepSeek技术详解系列）
 - [2026-05-15] query | DP Attention 具体执行逻辑
@@ -168,7 +171,6 @@
 - [2026-05-15] query | MLA 公式与推理加速机制
 - [2026-05-14] ingest | vLLM皇冠上的明珠：深入浅出理解PagedAttention CUDA实现
 - [2026-05-14] query | PagedAttention CUDA 计算流程
-- [2026-05-12] query | PagedAttention K/V cache layout
 
 ## 报告
 

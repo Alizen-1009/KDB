@@ -16,23 +16,28 @@
 - 用 [[Block Reduce]] 或 [[Warp Shuffle Reduce]] 汇总得到均方根统计量
 - 计算 `rsqrtf(sum / D + eps)` 得到缩放因子
 - 再对原向量执行逐元素缩放，并乘可学习参数
+- [[CODA]] 讨论了 `GEMM-RMSNorm-GEMM` 的代数重写：由于 RMSNorm 的缩放因子是每行共享标量，可将其应用延后到后续 GEMM 的 epilogue；前序 GEMM epilogue 只计算 partial RMS，再由轻量规约合并。
 
 ## 关键权衡
 
 - 相比 `LayerNorm`，实现更简单、访存和计算也更轻
 - 是否带偏置项、参数命名以及具体融合形式会因框架和模型实现而异
 - 在手写 kernel 时，通常要同时兼顾归约效率和最后一遍逐元素写回的访存模式
+- 将 RMSNorm 融入 GEMM epilogue 可以减少中间张量落 HBM，但必须保持数值等价边界，并核实重排后的误差、dtype 和反向传播实现。
 
 ## 相关来源
 
 - [[../sources/秋招CUDA手撕题复盘（附代码）]]
+- [[../sources/还在手写CUDA内核？CODA来了！LLM和新手也能让Transformer跑出光速]]
 
 ## 相关概念
 
 - [[CUDA Kernel]]
 - [[Block Reduce]]
 - [[Warp Shuffle Reduce]]
+- [[CODA]]
 
 ## 研究备注
 
 - 这篇来源把 `RMSNorm` 放在面试高频题语境里；后续可补它在 `LLaMA`、`Gemma`、`Qwen` 等模型里的工程位置与融合实现
+- CODA 来源中的 RMSNorm 重写是二手文章转述，后续应按原论文公式和代码确认 partial RMS 的合并方式与 backward kernel。
