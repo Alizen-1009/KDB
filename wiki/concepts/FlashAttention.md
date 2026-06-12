@@ -68,6 +68,7 @@
 - [[重计算]]
 - [[Roofline 模型]]
 - [[PagedAttention]]
+- [[Flash Decoding]]
 - [[FlashMLA]]
 
 ## 研究备注
@@ -75,3 +76,4 @@
 - 不要把 FlashAttention 简化成“更快的 softmax”；更准确的说法是“围绕 IO 瓶颈重排 exact attention 的数据流”
 - 后续可补 FlashAttention v1/v2/v3 的实现差异，以及它和推理引擎中 attention kernel 设计的关系
 - 和 `PagedAttention V1` 对比时，应避免说成二者互斥：vLLM 语境下 prefill/decode 可能使用不同 attention backend，区别主要来自阶段、KV cache 管理和并行划分。
+- [[Flash Decoding]] 可以视为 decode 场景下沿 `KV/context` 维扩展并行度的 FlashAttention-family 思路；关键不是近似计算，而是 Split-KV 后用 online softmax / log-sum-exp 正确合并局部结果。

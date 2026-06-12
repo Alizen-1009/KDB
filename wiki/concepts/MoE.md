@@ -8,7 +8,7 @@
 
 - 在不让每个 token 经过全部参数的前提下扩大模型容量
 - 让不同 expert 学到不同 token / 语义 / 任务模式
-- 在多卡系统中配合 `Expert Parallelism` 把 expert 权重分散到不同设备
+- 在多卡系统中配合 [[Expert Parallelism]] 把 expert 权重分散到不同设备
 
 ## 算子计算流程
 
@@ -52,6 +52,98 @@ Y[t] = sum_{i=1..K} topk_weight[t, i] * Expert_{topk_idx[t, i]}(X[t])
 8. `Reshape and residual`
    - 把 `Y` reshape 回 `[B, S, D]`。
    - 在 Transformer block 中，它通常走 FFN 残差路径：`hidden = hidden + MoE(norm(hidden))`。
+
+## Qwen3.5-MoE 形状口径
+
+以 `Qwen3_5MoeForConditionalGeneration` 的 MoE block 为例，文本侧 `hidden_size` 是语言模型主干每个 token 的向量宽度；decoder layer 输入输出、attention 输出、MoE 输入输出、最终 `lm_head` 输入都围绕 `[B, S, hidden_size]`。
+
+给定一个文本侧 `hidden_size=4096`、`num_experts=512`、`num_experts_per_tok=10`、`moe_intermediate_size=1024`、`shared_expert_intermediate_size=1024` 的 config，单层 MoE 的计算可以按下面理解：
+
+- Router 输入：`X_flat: [T, 4096]`
+- Router logits：`[T, 512]`
+- Top-k 结果：`selected_experts: [T, 10]`、`routing_weights: [T, 10]`
+- 每个 routed expert 是一个 SwiGLU FFN：`4096 -> 2 * 1024 -> 4096`
+- shared expert 也是一个始终计算的 SwiGLU FFN：`4096 -> 1024 -> 4096`
+- MoE block 输出：`Y: [B, S, 4096]`
+
+因此这个 config 中每个 token 激活的是 `10` 个路由专家加 `1` 个 shared expert，而不是把 `512` 个专家全部计算一遍。`moe_intermediate_size` 只控制单个 routed expert 内部 FFN 的扩展宽度；它不是主干 hidden 维度，也不是所有专家拼起来后的维度。
+
+视觉侧要单独看：`vision_config.hidden_size=1152` 是视觉 encoder 内部 patch token 的宽度；`vision_config.intermediate_size=4304` 是视觉 MLP 的中间宽度；`vision_config.out_hidden_size=4096` 才是视觉特征 merge 后对齐到语言模型 hidden space 的宽度。
+
+### TP8 下的 MoE shape
+
+下面只讨论 tensor parallel，不讨论 expert parallel。也就是说，每个 TP rank 负责同一批 expert 权重的一个张量切片，而不是只放一部分 expert。
+
+设 `TP=8`，`T=B*S`。若不启用 sequence parallel，MoE 输入通常在每个 TP rank 上都是完整 token hidden：
+
+```text
+X_flat: [T, 4096]
+```
+
+router 通常复制在每个 TP rank：
+
+```text
+router_weight:  [512, 4096]
+router_logits:  [T, 512]
+topk_idx:       [T, 10]
+topk_weight:    [T, 10]
+```
+
+routed expert 的完整权重为：
+
+```text
+gate_up_proj: [512, 2048, 4096]   # 512 experts, 2 * 1024 intermediate, 4096 input
+down_proj:    [512, 4096, 1024]
+```
+
+TP8 后，每个 rank 上的专家权重切片为：
+
+```text
+gate_up_proj_local: [512, 256, 4096]   # 2 * (1024 / 8)
+down_proj_local:    [512, 4096, 128]   # 1024 / 8
+```
+
+对某个 expert `e`，假设它在本 step 收到 `n_e` 个 token：
+
+```text
+X_e:              [n_e, 4096]
+gate_up_local:    [n_e, 256]
+gate_local:       [n_e, 128]
+up_local:         [n_e, 128]
+ffn_mid_local:    [n_e, 128]
+down_partial:     [n_e, 4096]
+```
+
+`down_partial` 需要在 TP group 内 all-reduce，得到该 expert 对这些 token 的完整输出：
+
+```text
+expert_out_e: [n_e, 4096]
+```
+
+shared expert 的完整权重为：
+
+```text
+gate_proj: [1024, 4096]
+up_proj:   [1024, 4096]
+down_proj: [4096, 1024]
+```
+
+TP8 后每个 rank：
+
+```text
+gate_proj_local: [128, 4096]
+up_proj_local:   [128, 4096]
+down_proj_local: [4096, 128]
+```
+
+shared expert 的本地中间激活是 `[T, 128]`，down 后得到 `[T, 4096]` partial，再 all-reduce 成 `[T, 4096]`。最终：
+
+```text
+Y = routed_expert_out + shared_expert_out
+Y: [T, 4096] -> [B, S, 4096]
+```
+
+如果启用 sequence parallel，上述权重切片不变，但 `T` 会变成本 rank 负责的 `T_local`；实现还需要在 layernorm、router、dispatch 或专家计算前后处理 token 维的 gather / scatter。
 
 ## 算子视角的性能形态
 
@@ -128,6 +220,7 @@ for e in experts:
 
 - [[CUDA Kernel]]
 - [[Tensor Parallelism]]
+- [[Expert Parallelism]]
 - [[DP Attention]]
 - [[Sparsity Allocation]]
 - [[Warp Divergence]]
@@ -145,5 +238,5 @@ for e in experts:
 
 ## 研究备注
 
-- 后续可继续补独立的 `Expert Parallelism` 页面，把 MoE 中的 token dispatch / gather、EPLB、all-to-all overlap 和 serving 并行拓扑拆开。
+- 后续可继续把 MoE 中的 token dispatch / gather、EPLB、all-to-all overlap 和 serving 并行拓扑拆开到更具体的实现页。
 - 不同模型的 router 细节差异很大，例如是否有 shared expert、expert bias、aux-loss-free load balancing、grouped top-k 或 capacity 限制，具体实现应按模型源码核实。

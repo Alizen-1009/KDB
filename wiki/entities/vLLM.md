@@ -23,6 +23,10 @@
 - 新增截图整理校正了一个常见误解：`vLLM` 的抽象重心偏 serving engine，但这不等于它只能做单轮简单问答；它也在支持 prefix caching、structured output、speculative decoding、多模态等能力。
 - 新增 `PageAttention代码走读` 从源码实现角度补充了 decode kernel 视角：`vLLM` 通过 `block table` 间接读取 paged KV cache，kernel 对每个 sequence/head 遍历历史 KV blocks，并在历史 token 维度完成 attention softmax。
 - 新增 `vLLM皇冠上的明珠：深入浅出理解PagedAttention CUDA实现` 从 CUDA 并行算法角度补充 `PAv1`：每个 thread block 负责一个 `sequence/head` 输出行，warp/thread group 分摊 paged KV cache 的 QK 与 PV 两段计算，并指出 PAv1 与 FlashAttention/FlashDecoding 的任务切分差异。
+- 新来源 `RTP-LLM` 将 `vLLM` 作为模型加载、TTFT、推测解码和多模态吞吐的对比基线；这些对比应限定在原文给出的模型、硬件、并行配置和框架版本下。
+- 新来源 `vllm并行策略之DCP` 补充了 `vLLM` 的 decode context parallel 口径：DCP 复用 TP group，通过 `--decode-context-parallel-size` 在 decode 阶段沿 `seq_len` 维分片 KV cache，适合 `MLA/MQA/GQA` 这类 `num_kv_heads` 较小、纯 TP 容易复制 KV cache 的场景。
+- `vLLM` 的 `--enforce-eager` 与 `cudagraph_mode=NONE` 不完全等价：前者是运行在 eager mode 的总开关，会关闭 `torch.compile` 集成和 CUDA Graphs；后者只关闭 CUDA Graphs，仍可能保留 `torch.compile` / vLLM compile 的其他路径。
+- `Look Ma, No Bubbles!` 将 vLLM 作为 Llama-3.2-1B、batch size 1、BF16 低延迟 decode baseline，指出在该极窄场景中许多短 kernel 边界会限制可用 HBM 带宽；该结论不能直接外推到高并发 serving。
 
 ## 相关概念
 
@@ -36,6 +40,11 @@
 - [[vLLM V1 统一调度器]]
 - [[LLM Programs]]
 - [[SGLang 与 vLLM 对比]]
+- [[分层 KV Cache]]
+- [[Decode Context Parallel]]
+- [[Chunked Prefill]]
+- [[Torch Compile]]
+- [[Megakernel]]
 
 ## 相关来源
 
@@ -50,6 +59,9 @@
 - [[../sources/SGLang 与 vLLM 区别截图整理]]
 - [[../sources/PageAttention代码走读]]
 - [[../sources/vLLM皇冠上的明珠：深入浅出理解PagedAttention CUDA实现]]
+- [[../sources/RTP-LLM]]
+- [[../sources/vllm并行策略之DCP(Decode Context Parallel)]]
+- [[../sources/Look Ma, No Bubbles! Designing a Low-Latency Megakernel for Llama-1B]]
 
 ## 冲突与备注
 
@@ -63,3 +75,7 @@
 - 对比 `SGLang` 时，应把差异落到抽象层和负载结构：`vLLM` 更偏高吞吐 serving，`SGLang` 更偏 LLM Programs runtime；不要写成能力互斥
 - `PagedAttention` 的具体 kernel 名称、cache layout 和线程组织属于版本相关实现细节；长期笔记中应保留机制层结论，并在精确引用时补具体 commit
 - `PAv1` 适用条件、`PAv2` 切换启发式、以及 MQA/GQA 下是否重复读取 KV cache，均可能随 vLLM 版本和 backend 改动；引用时应落到具体源码版本。
+- RTP-LLM 文章中的横向比较属于来源 benchmark 声称，不宜覆盖既有 `vLLM` 条目中关于 PagedAttention、MRV2、统一调度器等机制层总结。
+- DCP 来源中的 CUDA backend 支持、PCP 状态、`dcp_all2all` 通信和 Chunked Prefill / Prefix Cache 兼容性都应按具体 vLLM 版本、PR 或官方文档复核。
+- `cudagraph_mode=NONE` 只表示不 capture/replay CUDA Graph；如果排查的是 `torch.compile` / Dynamo / Inductor / vLLM compile 本身的问题，应使用 `--enforce-eager` 或进一步设置 compilation mode，而不是只关 CUDA Graphs。
+- `Look Ma, No Bubbles!` 中关于 vLLM H100 带宽利用率和相对 megakernel 的性能差距，均应作为来源 benchmark 声称引用，并保留 prompt 长度、生成长度、dtype、硬件和 baseline 配置。

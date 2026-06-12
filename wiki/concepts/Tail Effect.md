@@ -17,6 +17,7 @@
 - 一个实用估算框架是先算“满载一波”可并行的 block 数，例如 `SM 数 × 每 SM 驻留 Block 数`
 - 如果总 block 数只比一波满载略多，最后一波很可能只占用很少一部分 SM；若总 block 数远大于满载容量，尾部利用率虽低，但对总时长的影响可能有限
 - 除了调 `grid/block`，还可以通过 `persistent kernel` 让固定数量 block 从全局任务池持续取活，减少尾部波次不均
+- 在多个短 kernel 串联的 LLM decode 中，tail effect 会在每个 kernel 边界重复出现；`Look Ma, No Bubbles!` 来源举例称 Llama-1B down projection 若有 `512` 个 block 而 B200 有 `148` 个 SM，最后一波可能留下大量空闲 SM。
 
 ## 关键权衡
 
@@ -32,13 +33,16 @@
 
 - [[../sources/你一定要知道：CUDA优化六要]]
 - [[../sources/CUDA优化维度框架]]
+- [[../sources/Look Ma, No Bubbles! Designing a Low-Latency Megakernel for Llama-1B]]
 
 ## 相关概念
 
 - [[CUDA Kernel]]
 - [[GPU执行模型]]
 - [[Occupancy]]
+- [[Megakernel]]
 
 ## 研究备注
 
 - 后续可补不同 block size / grid size 对 tail effect 的 profiler 截图示例
+- Megakernel 来源把 tail effect 从单 kernel 调优问题扩展为端到端 latency 问题：当一次 forward 被拆成约百个短 kernel 时，每个边界的尾部和启动停顿会累计成明显的 memory pipeline bubble。

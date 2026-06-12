@@ -20,6 +20,7 @@
 - `Constant Memory` 适合 warp 内读取相同常量地址；地址分散时收益下降
 - `Texture / Read-only Cache` 适合某些只读、空间局部性较强的访问模式
 - `Host Memory` 是 CPU 侧内存；pinned host memory 更适合异步 H2D / D2H 拷贝
+- [[Megakernel]] 来源提供了一个 shared memory 资源管理案例：把 H100 每个 SM 的部分 shared memory 切成固定页，instruction 显式申请/释放 page，用于在前一段计算收尾时尽早加载下一段权重。
 
 ## 关键权衡
 
@@ -38,6 +39,7 @@
 - [[../sources/斯坦福CS336 Lecture 5 - GPUs]]
 - [[../sources/你一定要知道：CUDA优化六要]]
 - [[../sources/CUDA优化维度框架]]
+- [[../sources/Look Ma, No Bubbles! Designing a Low-Latency Megakernel for Llama-1B]]
 
 ## 相关概念
 
@@ -48,7 +50,9 @@
 - [[Bank Conflict]]
 - [[内存合并访问]]
 - [[Tiling]]
+- [[Megakernel]]
 
 ## 研究备注
 
 - 后续可补不同 NVIDIA 架构中 L1/shared memory 配置、register file 大小、L2 容量和 cache policy 的差异
+- Megakernel 来源中的 shared memory paging 是特定实现策略，不等同于 CUDA 提供的通用 shared memory 分页机制；引用时应说明这是作者在 kernel 内部的资源管理抽象。

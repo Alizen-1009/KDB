@@ -20,6 +20,7 @@
 - 如果 workload 长期只落在少数固定 shape 上，还可以把 tile、线程映射、数据布局和 epilogue 固化成 shape-specialized kernel，再结合 autotune 去逼近该 shape 簇的局部最优
 - 在工程面试和手写题语境里，很多 kernel 又会进一步收束成少量可复用模板，如 [[Warp Shuffle Reduce]]、[[Block Reduce]] 和 [[Grid-stride Loop]]
 - [[CODA]] 把这种 `epilogue` 视角推进到 Transformer block 层面：固定优化过的 GEMM mainloop，把 RMSNorm、SwiGLU、RoPE、残差等局部操作重写进 GEMM epilogue，减少中间张量落 HBM。
+- [[Megakernel]] 把另一个极端案例补进来：在 Llama-1B、batch size 1 decode 这类短小 memory-bound workload 中，性能损失可能主要来自大量 kernel 边界本身，因此可以把整次 forward 放进一个长期运行的 kernel，用内部 instruction schedule、shared memory paging 和显式同步减少 `memory pipeline bubbles`。
 
 ## 常见算子分类
 
@@ -65,6 +66,7 @@
 - [[../sources/CUDA内存层次与动态共享内存问答整理]]
 - [[../sources/陈巍：DeepSeek 开源Day（1）-FlashMLA 深入分析（收录于：DeepSeek技术详解系列）]]
 - [[../sources/还在手写CUDA内核？CODA来了！LLM和新手也能让Transformer跑出光速]]
+- [[../sources/Look Ma, No Bubbles! Designing a Low-Latency Megakernel for Llama-1B]]
 
 ## 相关概念
 
@@ -85,6 +87,8 @@
 - [[MoE]]
 - [[FlashMLA]]
 - [[CODA]]
+- [[Megakernel]]
+- [[Programmatic Dependent Launch]]
 
 ## 研究备注
 
@@ -93,3 +97,4 @@
 - 现有来源已经覆盖“性能原则”和“面试模板”两条线；后续可以继续补 `compute-bound kernel`，把 `GEMM / Tensor Core / FlashAttention` 接进来
 - FlashMLA 相关性能数字和 SM90 细节应回到官方实现与 benchmark 核实，不宜脱离硬件配置和具体 commit 独立引用。
 - CODA 相关论文和 repo 尚未 ingest；当前仅根据二手文章记录其 epilogue 编程抽象和待核实 benchmark。
+- Megakernel 适合作为“kernel 边界本身成为瓶颈”的特化案例；其 H100/B200 性能数字应绑定到 Llama-3.2-1B、batch size 1、BF16、prompt/generation 长度和 baseline 配置。

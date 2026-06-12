@@ -38,6 +38,7 @@
 - 因此 `NUM_ELEMS_PER_THREAD = HEAD_SIZE / THREAD_GROUP_SIZE` 表示单个 `q · k` 内每个 thread 负责多少 head_dim 元素，不需要乘 `NUM_TOKENS_PER_THREAD_GROUP`；后者对应外层 token loop。
 - K 阶段让一个 thread group 合作读取 16B chunk，是为了让 group 协作处理一个 token 的一段 K 向量；V 阶段常见每个 thread 读取 16B，则是因为 V cache layout 与访问模式不同。
 - `PAv1` 和 [[FlashAttention]] 的主要差异不在数学公式，而在任务划分和中间状态管理：PAv1 常保留当前输出行的完整 `QK^T` logits 并在 block 内 softmax；FlashAttention 更强调对 `Q/K/V` 做 tile-wise 流式计算，并用 [[Online Softmax]] 避免完整 score/probability 矩阵物化。
+- [[Flash Decoding]] 可理解为在 decode 场景沿 `KV/context` 维做 Split-KV 并行，再合并局部 softmax 统计；它解决的是长上下文小 batch 下并行度不足的问题，和 PagedAttention 的分页管理可以组合。
 
 ## 关键权衡
 
@@ -71,6 +72,7 @@
 - [[RadixAttention]]
 - [[CUDA Kernel]]
 - [[Online Softmax]]
+- [[Flash Decoding]]
 - [[Warp Shuffle Reduce]]
 
 ## 研究备注

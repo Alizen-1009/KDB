@@ -16,6 +16,7 @@
 - 将高层算子一路追到实际触发的底层 kernel
 - 实战里通常分两层：`Nsight Systems` 先看系统级时间线与 GPU/CPU 断流，`Nsight Compute` 再看热点 kernel 的微观瓶颈
 - 为了避免采到无关阶段，往往会结合 benchmark、warmup 和 `NVTX` 标注只截取关键区间
+- 对低延迟 LLM decode，还需要看端到端时间线中 kernel 边界是否造成 GPU gap、尾部低 SM Active、权重加载断流和 launch / graph replay 开销；这些信号可能不会体现在单个热点 kernel 的 Nsight Compute 指标里。
 
 ## 关键权衡
 
@@ -32,6 +33,7 @@
 - [[../sources/斯坦福CS336 Lecture 6 - Benchmarking, Profiling, and Kernel Writing]]
 - [[../sources/CUDA优化维度框架]]
 - [[../sources/多卡GPU监控与SM执行模型面试整理]]
+- [[../sources/Look Ma, No Bubbles! Designing a Low-Latency Megakernel for Llama-1B]]
 
 ## 相关概念
 
@@ -39,6 +41,8 @@
 - [[CUDA Kernel]]
 - [[Occupancy]]
 - [[Triton]]
+- [[Tail Effect]]
+- [[Megakernel]]
 
 ## 研究备注
 
@@ -47,3 +51,4 @@
 - `Nsight Compute` 更适合看 `achieved occupancy`、`warp stall`、`Tensor Core` 利用率、`L2/DRAM throughput`、coalescing 和 `bank conflict`
 - 若问题明显落在访存和 block 配置层面，这份来源补了几个很实用的第一轮信号：`sectors / requests` 看 coalescing、Occupancy 面板看资源瓶颈、shared memory 访存模式看 bank conflict、grid 大小与尾部波次关系看 [[Tail Effect]]
 - 诊断 LLM 推理退化时，`nvidia-smi` 的显存数只能作为进程/驱动视角的容量信号；更关键的是把 `SM Active / Tensor Active / FP32 或 BF16 pipe active / DRAM Bandwidth / NCCL 或 NVLink` 与 prefill、decode 阶段对应起来，判断是否从 Tensor Core 低精度路径退回到 CUDA core/FP32 路径，或因 shape、dtype、layout 不匹配没有命中高效 kernel。
+- Megakernel 来源提醒：当系统由大量短 kernel 组成时，Nsight Systems 的 timeline gap、kernel launch 数量、CUDA Graph replay 后仍存在的空隙，可能是比某个单 kernel kernel-level stall 更先要解释的端到端瓶颈。

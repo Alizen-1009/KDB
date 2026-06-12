@@ -45,11 +45,12 @@
 - 它通常不是单纯减少 FLOPs，而是把 HBM bytes 降得更多，使 `FLOPs / byte` 上升。
 - 在长上下文、大 batch、KV cache 压力大的 serving 场景中，MLA 可能降低 latency 或提高吞吐；当 HBM 瓶颈被缓解后，瓶颈可能迁移到 compute-bound。
 
-## 和 DP Attention 的关系
+## 和系统并行策略的关系
 
 - `MLA` 是模型结构，目标是减少单 token 的 KV cache 成本。
 - [[DP Attention]] 是系统并行策略，目标是在多 GPU serving 中避免 latent KV cache 被普通 TP attention 重复保存。
-- 两者经常在 DeepSeek/MLA serving 中配合出现，但作用层级不同。
+- [[Decode Context Parallel]] 也是系统并行策略；`vllm并行策略之DCP` 将 MLA decode 视为 DCP 的典型适用场景之一，因为 MLA decode 可呈现接近 MQA 的单 KV head 形态，纯 TP 容易复制 KV cache。
+- 这些策略经常在 DeepSeek/MLA serving 中配合出现，但作用层级不同。
 
 ## 关键权衡
 
@@ -67,6 +68,7 @@
 - [[../sources/MLA与DP Attention面试整理]]
 - [[../sources/DeepSeekV4中RoPE设计解析]]
 - [[../sources/陈巍：DeepSeek 开源Day（1）-FlashMLA 深入分析（收录于：DeepSeek技术详解系列）]]
+- [[../sources/vllm并行策略之DCP(Decode Context Parallel)]]
 
 ## 相关概念
 
@@ -77,6 +79,7 @@
 - [[Tensor Parallelism]]
 - [[FlashAttention]]
 - [[FlashMLA]]
+- [[Decode Context Parallel]]
 
 ## 研究备注
 

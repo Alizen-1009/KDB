@@ -17,6 +17,8 @@
 - 多个 `SM` 彼此独立调度不同 block，从而形成大规模吞吐并行
 - 很多性能现象都能还原到这套层级上：`warp` 决定 [[Warp Divergence]] 是否发生，`block` 决定 shared memory 复用与 [[Bank Conflict]] 布局，`SM` 资源上限决定 [[Occupancy]] 与 [[Tail Effect]]
 - SM 结构图里的 warp scheduler、dispatch unit、register file、执行单元、L1/shared memory 等属于硬件实现细节；具体数量和容量随 GPU 架构变化，不能直接当作所有 CUDA GPU 的通用图
+- CUDA kernel 之间通常存在严格顺序边界：后一个 kernel 的 block 不会在前一个 kernel 的所有 block 完成前开始执行。这个语义简化了数据依赖管理，但在许多短 kernel 串联时会放大 launch overhead、tail effect 和 load bubble。
+- [[Megakernel]] 通过在单个 kernel 内部自行调度 SM instruction 和同步依赖，绕开部分 kernel 间全局边界，但也把依赖正确性责任交给实现者。
 
 ## 关键权衡
 
@@ -34,6 +36,7 @@
 - [[../sources/CUDA优化维度框架]]
 - [[../sources/CUDA内存层次与动态共享内存问答整理]]
 - [[../sources/多卡GPU监控与SM执行模型面试整理]]
+- [[../sources/Look Ma, No Bubbles! Designing a Low-Latency Megakernel for Llama-1B]]
 
 ## 相关概念
 
@@ -46,8 +49,11 @@
 - [[Tail Effect]]
 - [[Tiling]]
 - [[FlashAttention]]
+- [[Megakernel]]
+- [[Programmatic Dependent Launch]]
 
 ## 研究备注
 
 - 后续可补具体到 NVIDIA GPU 的 SM 资源组成、occupancy 和 warp scheduler 细节；若记录具体数值，需要绑定到 A100/H100 等明确硬件实体
 - 面向 LLM 推理时，`thread / warp / block / SM` 可直接映射到 kernel 质量判断：prefill 中的大 GEMM 和 FlashAttention 需要足够 block/warp 去填满 SM 并命中 Tensor Core；decode 阶段常因 batch 小、KV cache 读写多而更容易出现 SM Active 不高或 DRAM 带宽先打满。不要只看“GPU 利用率”，应结合 `SM Active / SM Issue / Tensor Active / Occupancy / DRAM Bandwidth` 判断是算力没喂饱、访存受限、shape 太碎，还是通信或调度断流。
+- Megakernel 来源适合补一类 Nsight Systems 时间线案例：很多短 kernel 之间的空隙、尾部低 SM Active 和权重加载不连续，可能比单个 kernel 的 micro-optimization 更影响低延迟 decode。

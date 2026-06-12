@@ -18,6 +18,8 @@
 - 该来源还转述了 `SGLang V2` 在部分 H100 Llama3 serving benchmark 中接近甚至超过 `TensorRT-LLM`、明显快于 `vLLM` 的结果；但作者没有实测，应作为“来源声称 / 待复现”的性能备注。
 - 新增截图整理把 `SGLang vs vLLM` 的常见二分法校正为：`SGLang` 更偏可编程 runtime 和复杂 LLM workflow，但它同样是 production-level serving framework；不能简单理解成“只适合 Agent”。
 - 官方文档语境里，SGLang 对 DeepSeek/MLA serving 还强调 [[DP Attention]]：通过 attention 侧数据并行减少 TP 下 latent KV cache 重复，提升可承载 batch size 和吞吐。
+- 新来源 `RTP-LLM` 将 `SGLang` 作为模型加载、TTFT、推测解码和多模态吞吐的对比基线；这些结果应视为特定 benchmark/生产流量下的来源声称。
+- `Look Ma, No Bubbles!` 将 SGLang 作为 Llama-3.2-1B、batch size 1、BF16 低延迟 decode baseline，指出 megakernel 在该特定场景中能进一步减少 kernel 边界带来的 pipeline bubble。
 
 ## 相关概念
 
@@ -30,6 +32,8 @@
 - [[缓存感知路由]]
 - [[确定性推理]]
 - [[DP Attention]]
+- [[分层 KV Cache]]
+- [[Megakernel]]
 
 ## 相关来源
 
@@ -38,6 +42,8 @@
 - [[../sources/SGLang：LLM推理引擎发展新方向]]
 - [[../sources/SGLang 与 vLLM 区别截图整理]]
 - [[../sources/MLA与DP Attention面试整理]]
+- [[../sources/RTP-LLM]]
+- [[../sources/Look Ma, No Bubbles! Designing a Low-Latency Megakernel for Llama-1B]]
 
 ## 冲突与备注
 
@@ -45,3 +51,5 @@
 - 当前条目对 `deterministic inference` 的理解仍偏功能层摘要；若后续需要比较 `SGLang vs vLLM` 的确定性实现差异，建议再补官方文档或代码路径
 - `RadixAttention` 与普通 [[Prefix Caching]] 应区分：前者强调 radix tree runtime 结构和 program 分支复用，后者是更通用的跨请求公共前缀复用概念
 - 关于和 `vLLM` 的区别，推荐回链 [[SGLang 与 vLLM 对比]]；避免把差异简化为“简单问答 vs Agent”
+- RTP-LLM 来源中的对比不应被写成 `SGLang` 的通用弱点；SGLang 在 LLM Programs、RadixAttention、结构化输出和 DP Attention 上仍有独立设计重心。
+- `Look Ma, No Bubbles!` 中关于 SGLang 的性能差距只应作为来源实验观察，不代表 SGLang 在高 batch、长上下文或 LLM Programs workload 下的通用表现。

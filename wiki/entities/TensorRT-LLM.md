@@ -15,6 +15,8 @@ NVIDIA 面向大模型推理部署的高性能推理框架，强调对硬件资�
 - 在多 GPU 和高性能部署语境中，TensorRT-LLM 经常作为工程参考实现出现。
 - 从面试口径看，可以把它概括为“围绕 NVIDIA 硬件做图优化、kernel 优化、量化和多卡执行路径优化的推理框架”，重点不是单个功能，而是整条硬件感知推理栈。
 - 新来源以 `TensorRT-LLM` 作为性能标杆对照 `SGLang V2`，认为后者在部分 H100 Llama3 serving benchmark 中已接近甚至超过它；该结论来自文章转述和外部博客图表，仍需按版本、硬件、模型和参数复核。
+- 语境中的 `TRTLLM kernel` 通常指 TensorRT-LLM 内部或来源于 TensorRT-LLM 的高性能 CUDA/CUTLASS/TensorRT 插件算子，例如 attention、GEMM、MoE、sampling、quantization/dequantization 等推理热点路径；它不是一个单独算子名，而是一类 NVIDIA 硬件特化 kernel。
+- [[FlashInfer]] 正在成为这些 LLM inference kernels 的更通用分发与集成入口之一，可被 vLLM、SGLang 或自研 serving engine 直接调用。
 
 ## 相关概念
 
@@ -22,6 +24,7 @@ NVIDIA 面向大模型推理部署的高性能推理框架，强调对硬件资�
 - [[Tensor Parallelism]]
 - [[PD分离]]
 - [[LLM Programs]]
+- [[CUDA Kernel]]
 
 ## 相关来源
 

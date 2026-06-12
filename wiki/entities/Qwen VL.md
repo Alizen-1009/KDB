@@ -13,16 +13,20 @@
 - `Qwen3VLVisionRotaryEmbedding` 被原文用作 2D 视觉 RoPE 的代码示例：图像 token 的 `row/col` 坐标会映射到不同旋转平面。
 - Qwen2 VL 的 M-RoPE 示例按 `mrope_section` 把通道分给时间、高度、宽度三段，但原文指出这种 chunked 分段可能造成频率分布不均。
 - Qwen2.5/Qwen3 VL 被原文列为 Interleaved-MRoPE 的改进方向：通过交错分配 `t/h/w` 轴，使频率布局更均衡。
+- RTP-LLM 来源使用 `Qwen/Qwen2.5-VL-7B-Instruct` 在 GQA 数据集上评估多模态 EPD 解耦部署，强调 ViT 与 LLM 分离后可以减少资源争用并提升吞吐；具体数字需按原论文 benchmark 复核。
 
 ## 相关概念
 
 - [[../concepts/RoPE]]
 - [[../concepts/M-RoPE]]
+- [[../concepts/PD分离]]
 
 ## 相关来源
 
 - [[../sources/彻底搞懂RoPE计算原理：从1D到3D]]
+- [[../sources/RTP-LLM]]
 
 ## 冲突与备注
 
 - 当前页面仅记录本次来源中涉及的位置编码线索；具体模型版本、源码接口和参数命名需按对应 `transformers` commit 或官方 repo 核实。
+- RTP-LLM 来源中的多模态性能是 serving 系统层结果，不代表 Qwen VL 模型结构本身的改动。

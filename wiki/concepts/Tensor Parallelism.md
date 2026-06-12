@@ -17,6 +17,7 @@
 - 通过 all-reduce 或类似同步机制在层间汇总
 - 通常优先用于节点内高速互联环境，因为每层都会发生较重通信
 - 在 Lecture 8 的最小实现里，前向先做局部 matmul，再通过 `all_gather` 拼回完整激活
+- 在常见 Megatron-style TP 中，Transformer 子层边界处的 hidden activation 往往保持完整 `[tokens, hidden]` 副本；column-parallel linear 切输出维并产生本地中间激活 shard，row-parallel linear 切输入维并在输出后 all-reduce。若启用 [[Sequence Parallelism]]，激活会更多沿 token/sequence 维切成 `[tokens_local, hidden]`，但通常不是把 hidden 维直接切成 `[tokens, hidden / TP]` 作为所有子层的统一输入。
 
 ## Forward 通信量粗估
 
@@ -32,7 +33,8 @@
 - 能有效降低单请求时延
 - 高度依赖节点内高速互联，跨节点通信成本会迅速上升
 - 相比流水线并行没有 bubble，但通信更频繁、对带宽要求也更高
-- 对 [[MLA]] / DeepSeek 类模型的 attention，普通 TP 可能导致 latent `KV Cache` 在多卡间重复保存；工程上会用 [[DP Attention]] 这类策略重新组织 attention 侧并行。
+- 对 [[MLA]] / DeepSeek 类模型的 attention，普通 TP 可能导致 latent `KV Cache` 在多卡间重复保存；工程上会用 [[DP Attention]] 或 [[Decode Context Parallel]] 这类策略重新组织 attention/KV cache 侧并行。
+- `vllm并行策略之DCP` 补充了一个 TP+DCP 的实现视角：`DCP` 复用 TP group，不额外增加 world size；进入 attention kernel 前，原本按 `TP` 切的 head 维并行会被重排为 `TP / DCP` 的 head 维并行加 `DCP` 的 `seq_len` 维并行，算完后再通过跨 DCP rank 通信合并 softmax state 和 output。
 
 ## 相关实体
 
@@ -44,6 +46,7 @@
 - [[../sources/LLM推理优化核心技术]]
 - [[../sources/斯坦福CS336 Lecture 7 - Parallelism basics]]
 - [[../sources/斯坦福CS336 Lecture 8 - Distributed communication and training code]]
+- [[../sources/vllm并行策略之DCP(Decode Context Parallel)]]
 
 ## 相关概念
 
@@ -51,10 +54,12 @@
 - [[KV Cache]]
 - [[Torch Distributed]]
 - [[Sequence Parallelism]]
+- [[Decode Context Parallel]]
 - [[流水线并行]]
 - [[DP Attention]]
+- [[Expert Parallelism]]
 
 ## 研究备注
 
-- 后续可补 `Expert Parallelism` 和训练/推理下 Tensor Parallel 的不同瓶颈
+- 后续可补训练/推理下 Tensor Parallel 的不同瓶颈
 - 面试里需要说明“通信量”和“通信时延”不同：decode 的每次 all-reduce payload 可能不大，但每层两次同步、层数多、step 高频，因此跨节点 TP 往往被 latency 和同步拖住。

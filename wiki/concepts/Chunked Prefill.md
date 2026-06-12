@@ -16,6 +16,7 @@
 - Decode 请求通常优先进入本轮 batch。
 - 如果还有 token budget，再调度 pending prefill tokens。
 - 如果某个 prefill 请求放不进当前 budget，就只处理其中一个 chunk，剩余 prompt tokens 留到后续 step。
+- 在 [[Decode Context Parallel]] 已启用的 vLLM 语境中，来源称 Chunked Prefill 需要配合 DCP 的 interleaved KVCache 布局写入缓存；也就是说，chunk 调度粒度和 DCP cache 分片是两个层级，前者切 prefill 调度步，后者切后续 decode 可读取的 KV token shard。
 
 ## 和 PD 分离的关系
 
@@ -43,6 +44,7 @@
 - [[../sources/LLM推理优化核心技术]]
 - [[../sources/vLLM v0 与 vLLM v1 调度架构差异截图整理]]
 - [[../sources/量化剪枝推理瓶颈Nsight与异构集群面试整理]]
+- [[../sources/vllm并行策略之DCP(Decode Context Parallel)]]
 
 ## 相关概念
 
@@ -51,8 +53,10 @@
 - [[vLLM V1 统一调度器]]
 - [[KV Cache]]
 - [[Prefix Caching]]
+- [[Decode Context Parallel]]
 
 ## 研究备注
 
 - vLLM 官方文档将 chunked prefill 描述为把 large prefills 拆小，并与 decode requests batch 在一起；V1 中在可能时默认启用。
 - vLLM disaggregated prefilling 文档也指出，合适 chunk size 的 chunked prefill 可以控制 tail ITL，但实践中 chunk size 难调，disaggregated prefill 更可靠地控制 tail ITL。
+- DCP 来源称它兼容 Chunked Prefill，但这是 backend 和版本相关实现能力；引用时需要核实具体 vLLM 版本、attention backend 与 cache manager 行为。

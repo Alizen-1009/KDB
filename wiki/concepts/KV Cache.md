@@ -17,6 +17,8 @@
 - 在 Gemma 4 `MTP Drafter` 中，KV cache 还可以跨 target model 与 drafter 复用：drafter 不必完整处理 prompt 建立自己的 KV，而是通过 cross-attention 使用目标模型已计算好的 KV cache
 - 在 `SGLang` 的 [[RadixAttention]] 语境中，KV cache 还会被保留在 radix tree 中，用于 program 分支、共享系统 prompt 或生成结果前缀的运行时复用
 - 在 [[FlashMLA]] 语境中，KV cache 以 MLA latent cache 与 paged cache metadata 形式参与 decode kernel；优化重点不只是少存，还包括如何按 block table、变长序列和 Split-KV 高效读取历史状态
+- 在 [[../entities/RTP-LLM]] 语境中，KV cache 被纳入 [[分层 KV Cache]] 与调度系统：Master 通过统一哈希映射跟踪跨 worker 前缀命中，并在 GPU、本地 CPU、远程 CPU、分布式存储之间按层级复用缓存
+- 在 [[Decode Context Parallel]] 语境中，KV cache 会在既有 TP group 内进一步沿 context/token 维切分，用来减少长上下文 decode 下的重复缓存；`vllm并行策略之DCP` 进一步说明，vLLM 口径下采用 interleaved 存储，单个 request 的第 `n` 个 token KV 放到 `n % cp_world_size` 对应的 DCP rank。
 
 ## 推理阶段视角
 
@@ -48,8 +50,9 @@
 - `Shared KV Cache`：模型内部层间共享 K/V，目标是减少层级缓存占用与重复投影
 - `Prefix Caching`：服务层跨请求复用公共前缀，目标是减少重复 prefill
 - `缓存感知路由`：请求分发层优化，目标是让前两类缓存收益真正落地
+- `分层 KV Cache`：生产系统层缓存管理，目标是把可复用 KV 从单 GPU 扩展到跨节点和跨存储层级
 
-这三者都和 KV Cache 有关，但作用层级分别是模型层、请求层和系统调度层。
+这些机制都和 KV Cache 有关，但作用层级不同：模型结构、请求复用、路由调度和跨层级存储管理不能混为一谈。
 
 ## Layout 与访问模式
 
@@ -58,6 +61,7 @@
 - PV 阶段需要对固定 head_dim 沿历史 token 维度做 `softmax(scores) @ V`，因此 V cache 更偏向让一个 block 内同一 head_dim 的多个 token 连续。
 - 从 `PAv1` 的 CUDA 并行视角看，K cache layout 还服务于让 warp 内不同 thread group 处理不同历史 token，并由代表线程并行写入 shared memory 中的 logits；V cache layout 则更强调读路径，与 shared memory 中的 softmax 权重做局部 dot 后再归约。
 - 这里的 `layout` 指逻辑张量维度如何映射到物理内存顺序；它不改变 attention 数学，只影响 kernel 的访存效率。
+- DCP 的 interleaved KV cache 是另一层分布式 layout：它决定 token KV 被哪个 DCP rank 持有。该布局会影响 decode 读取、本地 partial attention、`lse` 合并，以及 prefill / prefix cache 写入时的 cache manager 逻辑。
 
 ## 相关实体
 
@@ -65,6 +69,7 @@
 - [[../entities/TensorRT-LLM]]
 - [[../entities/Nvidia Dynamo]]
 - [[../entities/SGLang]]
+- [[../entities/RTP-LLM]]
 
 ## 相关来源
 
@@ -80,6 +85,8 @@
 - [[../sources/MLA与DP Attention面试整理]]
 - [[../sources/DeepSeekV4中RoPE设计解析]]
 - [[../sources/陈巍：DeepSeek 开源Day（1）-FlashMLA 深入分析（收录于：DeepSeek技术详解系列）]]
+- [[../sources/RTP-LLM]]
+- [[../sources/vllm并行策略之DCP(Decode Context Parallel)]]
 
 ## 相关概念
 
@@ -93,8 +100,10 @@
 - [[CUDA Kernel]]
 - [[MLA]]
 - [[FlashMLA]]
+- [[Decode Context Parallel]]
 - [[DP Attention]]
 - [[CSA-HCA|CSA/HCA]]
+- [[分层 KV Cache]]
 
 ## 研究备注
 
@@ -103,3 +112,4 @@
 - 从硬件指标看，decode 阶段常因 KV cache 读写变成 memory-bound：这时可能出现 `DRAM Bandwidth` 较高、`Tensor Active` 不高，而不是单纯的低精度或 Tensor Core 退化问题。
 - 需要区分两类“共享”：Gemma 4 目标模型内部的 `Shared KV Cache` 是层间共享；MTP drafter 里的 KV cache sharing 是 target model 与 drafter 之间的复用。
 - SGLang 的 `RadixAttention` 又是另一类运行时共享：它不是模型结构内部共享，而是通过前缀树保存并复用请求或 program 分支的历史 KV。
+- RTP-LLM 的来源补入了跨节点和多级存储视角，但具体缓存评分公式、同步周期与远程缓存成本应按论文/源码复核。

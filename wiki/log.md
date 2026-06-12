@@ -2,6 +2,213 @@
 
 按时间记录 ingest、query、lint 等操作，帮助 LLM 与人类共同追踪知识库的演化过程。
 
+## [2026-06-12] ingest | Look Ma, No Bubbles! Designing a Low-Latency Megakernel for Llama-1B
+
+- 读取原始资料：`raw/articles/Look Ma, No Bubbles! Designing a Low-Latency Megakernel for Llama-1B 1.md`
+- 创建来源页：`wiki/sources/Look Ma, No Bubbles! Designing a Low-Latency Megakernel for Llama-1B.md`
+- 创建概念页：`wiki/concepts/Megakernel.md`、`wiki/concepts/Programmatic Dependent Launch.md`
+- 创建实体页：`wiki/entities/HazyResearch.md`、`wiki/entities/Megakernels.md`
+- 更新概念页：`wiki/concepts/CUDA Kernel.md`、`wiki/concepts/算子融合.md`、`wiki/concepts/Tail Effect.md`、`wiki/concepts/Roofline 模型.md`、`wiki/concepts/CUDA内存层次.md`、`wiki/concepts/GPU执行模型.md`、`wiki/concepts/Profiling.md`
+- 更新实体页：`wiki/entities/vLLM.md`、`wiki/entities/SGLang.md`
+- 本次 ingest 将该文整理为“低延迟 batch size 1 Llama-1B decode 中 kernel 边界本身成为瓶颈”的系统案例：作者通过整模型 [[Megakernel]]、on-GPU interpreter、shared memory paging 和显式 counter 同步减少 memory pipeline bubbles；H100 `78%` memory bandwidth、相对 vLLM/SGLang `1.5x+`、B200 `<680 us` 等性能数字均保留为来源声称，需绑定硬件、dtype、prompt/generation 长度、baseline 配置和代码版本。
+
+## [2026-06-12] query | vLLM cudagraph_mode NONE 与 enforce eager
+
+- 读取索引页：`wiki/index.md`
+- 搜索本地资料中的 `CUDA Graph / cudagraph / enforce_eager / torch.compile`
+- 参考官方资料：vLLM `debug_vllm_compile` 与 `CUDA Graphs` 设计文档
+- 更新实体页：`wiki/entities/vLLM.md`
+- 更新概念页：`wiki/concepts/Torch Compile.md`
+- 本次 query 澄清：`cudagraph_mode=NONE` 只关闭 CUDA Graphs，通常用于排查 graph capture / replay / graph memory pool 问题；`--enforce-eager` 是更强的 vLLM eager 总开关，会关闭 `torch.compile` 集成和 CUDA Graphs，因此二者在“无 CUDA Graph”这一点上相同，但在是否仍允许 compile / Inductor / vLLM compile 路径上不同。
+
+## [2026-06-12] query | NVFP4 与 MXFP4 格式区别
+
+- 读取索引页：`wiki/index.md`
+- 搜索本地资料中的 `NVFP4 / MXFP4 / FP4 / 量化`
+- 参考外部资料：NVIDIA Transformer Engine / NVIDIA Technical Blog、OCP Microscaling Formats MX v1.0、AMD ROCm MXFP4/MXFP6 说明、Triton block-scaled matmul 文档
+- 更新概念页：`wiki/concepts/混合精度训练与推理.md`
+- 本次 query 澄清：`MXFP4` 是 OCP microscaling FP4 格式，通常由 `FP4 E2M1` 元素加每 32 个元素共享的 `E8M0` scale 组成；`NVFP4` 是 NVIDIA Blackwell/Transformer Engine 的 FP4 recipe，由 `FP4 E2M1` 元素、每 16 个元素共享的 `FP8 E4M3` block scale 和 per-tensor `FP32` global scale 组成。二者都不是裸 4-bit float，差异主要在 block size、scale dtype、是否有 global scale、硬件/框架支持与量化误差。
+
+## [2026-06-11] query | vLLM enforce eager 与不开 CUDA Graph 的区别
+
+- 读取索引页：`wiki/index.md`
+- 搜索本地资料中的 `CUDA Graph / eager / capture`
+- 参考官方资料：vLLM engine args / serve args 文档
+- 本次 query 澄清：`--enforce-eager` 是 vLLM 级别的强制 eager 执行开关，会禁用 CUDA Graph 并让模型始终走 PyTorch eager；默认 `enforce_eager=False` 时，vLLM 是 CUDA Graph 与 eager 的混合模式，能 capture 的固定路径走 graph，超过 capture 范围或不适合 capture 的动态路径回退 eager。“不开 CUDA Graph”若只是把 capture size 设小或让请求形态落到未 capture 范围，行为上会更多回退 eager，但语义上不一定等同于 `enforce_eager=True`。
+
+## [2026-06-11] query | Mamba page size 与时序 state 的关系
+
+- 读取索引页：`wiki/index.md`
+- 搜索本地资料中的 `Mamba / hybrid / page size / state cache`
+- 参考外部资料：vLLM Hybrid KV Cache Manager 设计文档、vLLM `MambaSpec` / KV cache utils 源码、PyTorch/vLLM hybrid models 博客
+- 本次 query 澄清：Mamba / linear attention 的算法记忆仍是 recurrent state，不是按历史 token 存完整 KV；但 vLLM 的 cache manager 需要把 attention KV cache 与 Mamba state cache 放进统一 allocator / block table / page accounting，因此给 Mamba state 引入 `page_size_bytes`。这里的 page 是物理内存管理单位，不等同于 Mamba 算法上的 token 历史分页。
+
+## [2026-06-11] query | TRTLLM kernel 与 FlashInfer
+
+- 读取索引页：`wiki/index.md`
+- 读取实体页：`wiki/entities/TensorRT-LLM.md`
+- 读取概念页：`wiki/concepts/CUDA Kernel.md`、`wiki/concepts/算子融合.md`
+- 参考官方资料：NVIDIA TensorRT-LLM 文档、FlashInfer 文档 / GitHub README、NVIDIA FlashInfer 技术博客
+- 创建实体页：`wiki/entities/FlashInfer.md`
+- 更新实体页：`wiki/entities/TensorRT-LLM.md`
+- 本次 query 澄清：`TRTLLM kernel` 通常不是一个具体算子名，而是指 TensorRT-LLM 内部或来源于 TensorRT-LLM 的高性能推理 kernel 集合；FlashInfer 则更像可被不同 serving engine 集成的 LLM kernel 库 / generator，覆盖 attention、GEMM、MoE、sampling、通信等热点路径。
+
+## [2026-06-11] query | Qwen3Next config 参数量估算
+
+- 读取索引页：`wiki/index.md`
+- 读取用户提供的 `Qwen3NextForCausalLM` config
+- 本次 query 按 Hugging Face 风格的 per-layer MoE 参数组织估算：若 `num_experts=512` 表示每个 MoE 层各自拥有 512 个 routed experts，则该 config 总参数约 `1,579.55B`，即约 `1.58T`；其中 MoE experts 占主导，约 `1,549.46B`。每 token 激活口径下，按 `top_k=10` 加 shared expert 粗算，层内 active 参数约 `59.49B`，若连 untied embedding 与 lm_head 一并计入约 `63.56B`。该结果说明此 config 与常见 `80B-A3B` 口径不一致，需确认是否为缩放/实验 config 或 experts 是否存在跨层共享、分片元信息等额外约定。
+
+## [2026-06-11] query | Qwen3Next chunked GDN 算子形状与优化
+
+- 读取索引页：`wiki/index.md`
+- 读取概念页：`wiki/concepts/Chunked Gated Delta Rule.md`
+- 参考用户提供的 `Qwen3NextForCausalLM` config，并核对 Hugging Face Transformers / FLA 相关实现
+- 更新概念页：`wiki/concepts/Chunked Gated Delta Rule.md`
+- 本次 query 将 `chunked GDN` 落到 Qwen3Next shape 口径：`hidden [B,T,8192]` 经投影、causal depthwise conv 后形成 `q/k/v [B,T,128,128]`、`g/beta [B,T,128]`，`chunk_gated_delta_rule` 输出 `[B,T,128,128]`，再经 gated RMSNorm 与 `out_proj` 回到 `[B,T,8192]`；其 cache state 为 `[N,128,128,128]`，是常数长度 recurrent state，不是随上下文线性增长的 KV cache。
+
+## [2026-06-09] query | Linear Attention 是否有 Prefix Cache
+
+- 读取索引页：`wiki/index.md`
+- 读取概念页：`wiki/concepts/Prefix Caching.md`、`wiki/concepts/KV Cache.md`、`wiki/concepts/Chunked Gated Delta Rule.md`
+- 参考外部资料：`Transformers are RNNs`、`Parallelizing Linear Transformers with the Delta Rule over Sequence Length`、`Kimi Linear`
+- 本次 query 澄清：线性注意力通常不需要标准 Transformer 那种逐 token 增长的 `KV Cache`；decode 路径更常缓存每层 recurrent/state 表示。若多个请求共享完全相同前缀，可以缓存该前缀结束处的 state 并作为后续 continuation 的初始状态，因此功能上有“prefix state cache”；但它不是传统 `KV prefix cache`，最长前缀匹配、分块 checkpoint、回滚与混合 attention 层的实现都依赖具体 runtime。
+
+## [2026-06-09] query | CuTe DSL 抽象层级
+
+- 读取索引页：`wiki/index.md`
+- 搜索本地资料中的 `CuTe / CuTeDSL / CUTLASS / DSL`
+- 参考官方资料：NVIDIA CUTLASS CuTe DSL / CUTLASS 4.x Python DSL 文档与 NVIDIA 技术博客
+- 本次 query 澄清：CuTe DSL 是 CUTLASS 4.x 中面向 GPU kernel authoring 的 Python-native 低级 DSL，基本沿用 CuTe C++ 的 layout、tensor、atom、tiled operation 等抽象；它相对 CuTe C++ 更像“Python 语法外壳 + JIT/MLIR 编译路径”，不是像 Triton/TVM 那样明显更高层的张量程序 DSL。
+
+## [2026-06-09] query | DCP 与 Flash Decoding 区别
+
+- 读取索引页：`wiki/index.md`
+- 读取概念页：`wiki/concepts/Decode Context Parallel.md`、`wiki/concepts/Flash Decoding.md`、`wiki/concepts/KV Cache.md`、`wiki/concepts/Tensor Parallelism.md`
+- 更新概念页：`wiki/concepts/Decode Context Parallel.md`
+- 本次 query 澄清：DCP 和 Flash Decoding 的共同点是都沿 context/KV 维切分并用 online softmax / log-sum-exp 合并局部结果；区别是 Flash Decoding 更偏 attention kernel / 算法思路，目标是小 `Q` decode 下增加 `KV split` 并行度，DCP 更偏多 GPU serving 并行策略，目标是在 TP group 内减少小 `num_kv_heads` 模型的 KV cache 复制，并处理 process group、interleaved KV cache、prefill 写入和跨 rank 通信。
+
+## [2026-06-09] query | DP Attention 是否一定加速
+
+- 读取概念页：`wiki/concepts/DP Attention.md`
+- 更新概念页：`wiki/concepts/DP Attention.md`
+- 本次 query 澄清：DP Attention 更偏多并发吞吐和可承载 batch size 优化，不保证单请求 latency 下降；当请求数少、batch 填不满或 router/通信/调度开销较高时，DPA 不一定加速，甚至可能让单请求变慢。
+
+## [2026-06-09] query | DP Attention size 与请求数关系
+
+- 读取概念页：`wiki/concepts/DP Attention.md`
+- 更新概念页：`wiki/concepts/DP Attention.md`
+- 本次 query 澄清：`dp attention = 8` 更准确表示有 8 个 attention data-parallel replica / 分片可承载请求流，而不是每个 decode step 固定只处理或正好处理 8 个请求。每个 replica 内部仍可 continuous batching 多个 active requests；单个长请求通常不会自动被 DPA 切成 8 份，这更接近 DCP 的问题。
+
+## [2026-06-09] ingest | vllm并行策略之DCP(Decode Context Parallel)
+
+- 读取原始资料：`raw/articles/vllm并行策略之DCP(Decode Context Parallel).md`
+- 创建来源页：`wiki/sources/vllm并行策略之DCP(Decode Context Parallel).md`
+- 创建实体页：`wiki/entities/梦初AI Infra.md`
+- 更新概念页：`wiki/concepts/Decode Context Parallel.md`、`wiki/concepts/KV Cache.md`、`wiki/concepts/Tensor Parallelism.md`、`wiki/concepts/Flash Decoding.md`、`wiki/concepts/Chunked Prefill.md`、`wiki/concepts/Prefix Caching.md`、`wiki/concepts/MLA.md`
+- 更新实体页：`wiki/entities/vLLM.md`
+- 本次 ingest 将 vLLM DCP 整理为“复用 TP group 的 decode context/KV 分片策略”：它通过 interleaved KV cache 存储把同一请求的历史 token KV 按 `token_idx % cp_world_size` 分到不同 DCP rank，decode 时各 rank 计算 partial output 与 `lse`，再合并为全局 attention output。来源中的 CUDA backend 支持、PCP 状态、`dcp_all2all` 通信和 Chunked Prefill / Prefix Cache 兼容性均标记为版本相关待核实。
+
+## [2026-06-09] query | DP Attention 是否能替代 DCP
+
+- 读取索引页：`wiki/index.md`
+- 读取概念页：`wiki/concepts/DP Attention.md`、`wiki/concepts/Decode Context Parallel.md`、`wiki/concepts/Tensor Parallelism.md`、`wiki/concepts/MLA.md`
+- 参考官方资料：SGLang `DP, DPA and SGLang DP Router` 文档、vLLM Context Parallel Deployment 文档
+- 更新概念页：`wiki/concepts/DP Attention.md`、`wiki/concepts/Decode Context Parallel.md`
+- 本次 query 澄清：DP Attention 和 DCP 都能缓解普通 TP 下 attention/KV cache 组织不理想的问题，但粒度不同。DP Attention 是请求/batch 级 replica，让不同 DP attention 副本处理不同请求并维护独立 KV cache；DCP 是单请求 context 级分片，把同一个长上下文请求的历史 KV 沿 token/context 维拆到多个 GPU 上，并合并局部 softmax 统计。二者不是简单替代关系。
+
+## [2026-06-09] query | DCP 与 TP 关系
+
+- 读取索引页：`wiki/index.md`
+- 读取概念页：`wiki/concepts/Tensor Parallelism.md`、`wiki/concepts/DP Attention.md`、`wiki/concepts/Flash Decoding.md`、`wiki/concepts/KV Cache.md`
+- 参考官方资料：vLLM Context Parallel Deployment 文档
+- 创建概念页：`wiki/concepts/Decode Context Parallel.md`
+- 更新概念页：`wiki/concepts/Tensor Parallelism.md`、`wiki/concepts/Flash Decoding.md`、`wiki/concepts/KV Cache.md`
+- 本次 query 澄清：DCP 不是替代 TP，而是在 TP 已经拉大、`KV heads` 维度切分受限时，面向 decode 阶段进一步沿 context/token 维切分 `KV Cache`。普通 TP 解决层内权重/计算切分；DCP 解决长上下文 decode 下 KV cache 重复保存和 batch size 受限问题。
+
+## [2026-06-09] query | Flash Decoding 与 FlashAttention Split-KV 关系
+
+- 读取索引页：`wiki/index.md`
+- 读取概念页：`wiki/concepts/FlashAttention.md`、`wiki/concepts/PagedAttention.md`、`wiki/concepts/Online Softmax.md`
+- 读取原始资料：`raw/articles/推理长序列利器：ChunkedPrefill&FlashDecoding原理详解.md`
+- 创建概念页：`wiki/concepts/Flash Decoding.md`
+- 更新概念页：`wiki/concepts/FlashAttention.md`、`wiki/concepts/PagedAttention.md`
+- 本次 query 澄清：Flash Decoding 可以面试级理解为 decode 场景下的 Split-KV FlashAttention-family 思路；它把历史 `KV Cache` 沿 context 维切成多个 split 并行计算局部 attention，再用 online softmax / log-sum-exp 统计合并为精确全局输出。边界是：它不是 FlashAttention 的简单改名，也不是 speculative decoding；重点是小 `Q` decode 下增加 `KV/context` 维并行度。
+
+## [2026-06-09] query | chunk_gated_delta_rule 中 chunk 含义
+
+- 读取索引页：`wiki/index.md`
+- 搜索本地资料中的 `chunk_gated_delta_rule / gated_delta_rule / chunk`
+- 参考外部资料：vLLM `fla.ops.chunk.chunk_gated_delta_rule` API、GatedDeltaNet 论文、FLA/GatedDeltaNet 相关实现文档
+- 创建概念页：`wiki/concepts/Chunked Gated Delta Rule.md`
+- 本次 query 澄清：`chunk_gated_delta_rule` 里的 `chunk` 不是 RAG 文本切片，也不是 serving 层的 `Chunked Prefill`，而是算子内部沿时间/token 维切块。它把 Gated Delta Rule 的长递推链拆成块内矩阵化并行 + 块间 state 传递，主要服务 prefill/training 等长序列并行计算。
+
+## [2026-06-09] query | MTP 层结构
+
+- 读取索引页：`wiki/index.md`
+- 读取概念页：`wiki/concepts/Multi-Token Prediction.md`、`wiki/concepts/MTP Drafter.md`
+- 读取原始资料：`raw/articles/LLM提速利器：投机推理的原理与常见方案.md`、`raw/articles/RTP-LLM：阿里开源工业级 LLM 推理引擎，模型加载提速 6.3 倍、TTFT 降低 37%，吞吐量领先 vLLM 与 SGLang！.md`、`raw/articles/Gemma 4：Drafter 详解.md`
+- 更新概念页：`wiki/concepts/Multi-Token Prediction.md`
+- 本次 query 将 MTP 层结构拆成三种口径：最简单的共享 trunk + 多个未来 token 输出头；DeepSeek-V3 风格的顺序 MTP module，融合主模型 hidden state 与未来 token embedding 后经过轻量 block 逐步预测更远 token；Gemma 4 风格的独立小 drafter，复用 target activation / KV cache 后生成 draft token。
+
+## [2026-06-09] query | MTP 与投机解码关系
+
+- 读取索引页：`wiki/index.md`
+- 读取概念页：`wiki/concepts/Speculative Decoding.md`、`wiki/concepts/MTP Drafter.md`
+- 读取来源页：`wiki/sources/Gemma 4：Drafter 详解.md`、`wiki/sources/LLM提速利器：投机推理的原理与常见方案.md`、`wiki/sources/RTP-LLM.md`
+- 创建概念页：`wiki/concepts/Multi-Token Prediction.md`
+- 更新概念页：`wiki/concepts/Speculative Decoding.md`、`wiki/concepts/MTP Drafter.md`
+- 本次 query 澄清：MTP 是 `Multi-Token Prediction`，可以是训练辅助目标，也可以在推理中作为候选 token 生成机制；投机解码是“候选生成 + target 验证 + 接受/回退”的执行框架。MTP 只有被用作 drafter/proposer 并交给 target model 验证时，才是投机解码的一种实现路线。
+
+## [2026-06-09] query | EP all-to-all 与 EP/TP size 关系
+
+- 读取索引页：`wiki/index.md`
+- 读取/更新概念页：`wiki/concepts/Expert Parallelism.md`、`wiki/concepts/集合通信.md`
+- 参考概念页：`wiki/concepts/MoE.md`、`wiki/concepts/Tensor Parallelism.md`、`wiki/concepts/DP Attention.md`
+- 本次 query 澄清：EP 使用 all-to-all 是因为每个 rank 的 token 会根据 router 被动态发送到任意 expert 所在 rank，通信是多对多 activation dispatch / combine，而不是 TP 式 partial result all-reduce。`EP size` 和 `TP size` 切分维度不同，不要求相等；单机单副本 serving 中 `EP=TP` 常见，但在 DP/DPA、跨节点或 hybrid MoE parallel 下会分开设计。
+
+## [2026-06-09] query | SP 下 attention 依赖如何保证
+
+- 读取/更新概念页：`wiki/concepts/Sequence Parallelism.md`
+- 本次 query 澄清：SP 将部分激活沿 token/sequence 维保存为 `[T/P,H]`，但标准 causal self-attention 不能只看本地 token shard；常见 TP+SP 实现会在 attention 或 column-parallel linear 前 all-gather 成完整 `[T,H]` / 完整 K/V 视图，做完 attention output projection 后再 reduce-scatter 回 `[T/P,H]`。真正把 attention 序列维本身分布式计算并交换 K/V block 的方案应和 Context Parallelism、Ring Attention、Ulysses 等区分。
+
+## [2026-06-09] query | TP 中输入激活是否复制
+
+- 更新概念页：`wiki/concepts/Tensor Parallelism.md`
+- 本次 query 澄清：常见 Megatron-style TP 里，Transformer 子层边界处的 hidden activation 往往是每个 TP rank 都有完整 `[tokens, hidden]`；TP 主要切 column/row linear 权重，并让中间激活 shard 化，row-parallel 输出后再 all-reduce。若启用 Sequence Parallelism，激活更多沿 token/sequence 维切为 `[tokens_local, hidden]`，而不是所有子层统一把 hidden 维切成 `[tokens, hidden/TP]`。
+
+## [2026-06-09] query | 大 EP / Expert Parallelism 解释
+
+- 读取索引页：`wiki/index.md`
+- 读取概念页：`wiki/concepts/MoE.md`、`wiki/concepts/Tensor Parallelism.md`、`wiki/concepts/DP Attention.md`
+- 创建概念页：`wiki/concepts/Expert Parallelism.md`
+- 更新概念页：`wiki/concepts/MoE.md`、`wiki/concepts/Tensor Parallelism.md`、`wiki/concepts/DP Attention.md`
+- 本次 query 将口语里的“大 EP”解释为 `EP size` 开得较大的 MoE 专家并行：expert 按 expert 维度分散到很多 GPU / rank，token 根据 router 结果跨卡发送到 expert 所在设备计算；收益是分散 expert 权重与提升系统吞吐，代价是 token dispatch / all-to-all、负载不均、小 batch GEMM 和跨节点 tail effect。
+
+## [2026-06-09] query | Qwen3.5-MoE TP8 shape
+
+- 读取/更新概念页：`wiki/concepts/MoE.md`
+- 本次 query 补充 Qwen3.5-MoE 在 `TP=8` 下的 MoE shape 账本：router 在该口径下按复制理解，输出 `[T,512]` 与 top-k `[T,10]`；routed expert 的 `gate_up_proj [512,2048,4096]` 按 intermediate 维切为每 rank `[512,256,4096]`，`down_proj [512,4096,1024]` 切为 `[512,4096,128]`；每个 expert 的本地中间激活为 `[n_e,128]`，down 后得到 `[n_e,4096]` partial，再经 TP all-reduce 合成完整 `[n_e,4096]`。
+
+## [2026-06-09] query | Qwen3.5-MoE 计算流程与 hidden/intermediate 维度
+
+- 读取索引页：`wiki/index.md`
+- 读取概念页：`wiki/concepts/MoE.md`
+- 参考官方 Hugging Face Transformers `qwen3_5_moe` 配置与建模源码
+- 更新概念页：`wiki/concepts/MoE.md`
+- 本次 query 将给定 `Qwen3_5MoeForConditionalGeneration` config 落到 shape 口径：文本侧 `hidden_size=4096` 是 decoder 主干宽度；`moe_intermediate_size=1024` 是每个 routed expert 的 SwiGLU 中间宽度；`num_experts=512` 且 `num_experts_per_tok=10` 表示每个 token 只路由到 10 个专家，并额外经过 shared expert。视觉侧 `hidden_size=1152`、`intermediate_size=4304` 属于 vision encoder 内部，`out_hidden_size=4096` 用于对齐文本主干。
+
+## [2026-06-09] ingest | RTP-LLM：阿里开源工业级 LLM 推理引擎，模型加载提速 6.3 倍、TTFT 降低 37%，吞吐量领先 vLLM 与 SGLang！
+
+- 读取原始资料：`raw/articles/RTP-LLM：阿里开源工业级 LLM 推理引擎，模型加载提速 6.3 倍、TTFT 降低 37%，吞吐量领先 vLLM 与 SGLang！.md`
+- 创建来源页：`wiki/sources/RTP-LLM.md`
+- 创建实体页：`wiki/entities/RTP-LLM.md`
+- 创建实体页：`wiki/entities/阿里巴巴.md`
+- 创建概念页：`wiki/concepts/分层 KV Cache.md`
+- 更新概念页：`wiki/concepts/PD分离.md`、`wiki/concepts/KV Cache.md`、`wiki/concepts/Prefix Caching.md`、`wiki/concepts/缓存感知路由.md`、`wiki/concepts/Speculative Decoding.md`、`wiki/concepts/混合精度训练与推理.md`
+- 更新实体页：`wiki/entities/vLLM.md`、`wiki/entities/SGLang.md`、`wiki/entities/Qwen VL.md`
+- 本次 ingest 将 RTP-LLM 整理为生产级推理 serving 系统案例：其价值点不只是某个 kernel，而是文件顺序驱动模型加载、中心化调度、跨 worker 前缀匹配、分层 KV cache、PD 分离、模块化推测解码、KV cache 量化和多模态 EPD 解耦的组合。文中的性能数字均保留为来源声称，后续引用需补模型、硬件、并行配置、流量形态和框架版本。
+
 ## [2026-06-08] ingest | 还在手写CUDA内核？CODA来了！LLM和新手也能让Transformer跑出光速
 
 - 读取原始资料：`raw/articles/还在手写CUDA内核？CODA来了！LLM和新手也能让Transformer跑出光速.md`

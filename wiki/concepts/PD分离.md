@@ -14,6 +14,7 @@
 - Prefill 引擎负责长输入处理、KV 构建和首 token
 - Decode 引擎负责后续自回归生成
 - 通过 NVLink 或 InfiniBand 等互联传递 KV Cache
+- 在 [[../entities/RTP-LLM]] 中，PD 分离被组织成 `PD-Fusion` 与 `PD-Disaggregation` 两种部署模式；后者将 Prefill/Decode 放到专用节点上，并通过跨节点 KV cache 传输衔接两个阶段
 
 ## 关键权衡
 
@@ -23,16 +24,19 @@
 
 ## 相关实体
 
+- [[../entities/RTP-LLM]]
 - [[../entities/Nvidia Dynamo]]
 - [[../entities/TensorRT-LLM]]
 
 ## 相关来源
 
 - [[../sources/LLM推理优化核心技术]]
+- [[../sources/RTP-LLM]]
 
 ## 相关概念
 
 - [[KV Cache]]
+- [[分层 KV Cache]]
 - [[缓存感知路由]]
 - [[Tensor Parallelism]]
 - [[Chunked Prefill]]
@@ -41,3 +45,4 @@
 
 - 条件聚合比全量解耦更实用，后续值得单独拆成子概念页
 - 面试里应避免说“有了 PD 分离就不需要 chunked prefill”。更准确的说法是：严格 PD 分离能更可靠地隔离 decode tail latency，但 chunked prefill 仍是 prefill 侧和混部路径的调度粒度工具。
+- RTP-LLM 的案例提醒：PD 分离不只是两类节点拆开，还要配套 KV 传输、缓存亲和路由、故障恢复和独立扩缩容；否则容易只把瓶颈从 GPU 计算转移到网络和调度层。

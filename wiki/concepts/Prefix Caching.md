@@ -15,6 +15,8 @@
 - 命中部分直接复用已有 KV
 - 只对第一个新 token 之后的内容继续做 prefill 或 decode
 - 在 `SGLang` 中，[[RadixAttention]] 用 radix tree 系统化保存 prompt 与生成结果的 KV cache，使 program 分支和共享系统 prompt 也能自动做前缀复用
+- 在 [[../entities/RTP-LLM]] 中，Master 使用统一哈希映射聚合 worker 缓存键，做跨 worker 前缀匹配，并把匹配结果反馈给调度器
+- 在 [[Decode Context Parallel]] 已启用时，prefix cache 命中的 KV 还需要符合 DCP 的分布式 cache layout；`vllm并行策略之DCP` 称 DCP 兼容 Prefix Cache，但该能力依赖具体 vLLM backend 和 cache manager 实现。
 
 ## 关键权衡
 
@@ -26,19 +28,25 @@
 
 - [[../entities/vLLM]]
 - [[../entities/SGLang]]
+- [[../entities/RTP-LLM]]
 
 ## 相关来源
 
 - [[../sources/LLM推理优化核心技术]]
 - [[../sources/SGLang：LLM推理引擎发展新方向]]
+- [[../sources/RTP-LLM]]
+- [[../sources/vllm并行策略之DCP(Decode Context Parallel)]]
 
 ## 相关概念
 
 - [[KV Cache]]
 - [[RadixAttention]]
 - [[缓存感知路由]]
+- [[分层 KV Cache]]
+- [[Decode Context Parallel]]
 
 ## 研究备注
 
 - 非前缀缓存仍是研究热点，后续可补 `CacheBlend`、`LMCache` 等实现
 - 需要区分通用 `Prefix Caching` 概念与 `RadixAttention` 这类具体 runtime 组织方式
+- RTP-LLM 的统一哈希映射属于系统级实现路线；缓存命中收益仍依赖 prompt 结构、hash 粒度、worker 负载和远程缓存读取成本。

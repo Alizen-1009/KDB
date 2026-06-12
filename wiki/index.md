@@ -12,15 +12,15 @@
 
 ## 资源统计
 
-- 原始文章：32
+- 原始文章：37
 - 原始论文：3
 - 原始仓库：1
 - 原始数据集：0
 - 原始图片：19
 - 原始代码：1
-- 来源文件：36
-- 实体文件：19
-- 概念文件：73
+- 来源文件：39
+- 实体文件：25
+- 概念文件：81
 - 报告文件：12
 - 幻灯片文件：0
 
@@ -29,12 +29,16 @@
 - [[../wiki/entities/DeepSeek V4|DeepSeek V4]]
 - [[../wiki/entities/DeepSeek-AI|DeepSeek-AI]]
 - [[../wiki/entities/Engram|Engram]]
+- [[../wiki/entities/FlashInfer|FlashInfer]]
 - [[../wiki/entities/Gemma 4|Gemma 4]]
 - [[../wiki/entities/Google DeepMind|Google DeepMind]]
+- [[../wiki/entities/HazyResearch|HazyResearch]]
+- [[../wiki/entities/Megakernels|Megakernels]]
 - [[../wiki/entities/Moonshot AI|Moonshot AI]]
 - [[../wiki/entities/NCCL|NCCL]]
 - [[../wiki/entities/Nvidia Dynamo|Nvidia Dynamo]]
 - [[../wiki/entities/Qwen VL|Qwen VL]]
+- [[../wiki/entities/RTP-LLM|RTP-LLM]]
 - [[../wiki/entities/SGLang|SGLang]]
 - [[../wiki/entities/Stanford CS336|Stanford CS336]]
 - [[../wiki/entities/TensorRT-LLM|TensorRT-LLM]]
@@ -43,7 +47,9 @@
 - [[../wiki/entities/vLLM Team|vLLM Team]]
 - [[../wiki/entities/vLLM|vLLM]]
 - [[../wiki/entities/方佳瑞|方佳瑞]]
+- [[../wiki/entities/梦初AI Infra|梦初AI Infra]]
 - [[../wiki/entities/特里斯丹井底之娃 往上爬|特里斯丹井底之娃 往上爬]]
+- [[../wiki/entities/阿里巴巴|阿里巴巴]]
 - [[../wiki/entities/陈巍|陈巍]]
 
 ## 概念页面
@@ -57,6 +63,7 @@
 - [[../wiki/concepts/CUDA Kernel|CUDA Kernel]]
 - [[../wiki/concepts/CUDA内存层次|CUDA内存层次]]
 - [[../wiki/concepts/Chinchilla Scaling|Chinchilla Scaling]]
+- [[../wiki/concepts/Chunked Gated Delta Rule|Chunked Gated Delta Rule]]
 - [[../wiki/concepts/Chunked Prefill|Chunked Prefill]]
 - [[../wiki/concepts/Conditional Memory|Conditional Memory]]
 - [[../wiki/concepts/Constrained Decoding|Constrained Decoding]]
@@ -64,9 +71,12 @@
 - [[../wiki/concepts/Critical Batch Size|Critical Batch Size]]
 - [[../wiki/concepts/DDP|DDP]]
 - [[../wiki/concepts/DP Attention|DP Attention]]
+- [[../wiki/concepts/Decode Context Parallel|Decode Context Parallel]]
 - [[../wiki/concepts/Double-Wide MLP|Double-Wide MLP]]
 - [[../wiki/concepts/Dual RoPE|Dual RoPE]]
+- [[../wiki/concepts/Expert Parallelism|Expert Parallelism]]
 - [[../wiki/concepts/FSDP|FSDP]]
+- [[../wiki/concepts/Flash Decoding|Flash Decoding]]
 - [[../wiki/concepts/FlashAttention|FlashAttention]]
 - [[../wiki/concepts/FlashMLA|FlashMLA]]
 - [[../wiki/concepts/GPU执行模型|GPU执行模型]]
@@ -78,7 +88,9 @@
 - [[../wiki/concepts/M-RoPE|M-RoPE]]
 - [[../wiki/concepts/MLA|MLA]]
 - [[../wiki/concepts/MTP Drafter|MTP Drafter]]
+- [[../wiki/concepts/Megakernel|Megakernel]]
 - [[../wiki/concepts/MoE|MoE]]
+- [[../wiki/concepts/Multi-Token Prediction|Multi-Token Prediction]]
 - [[../wiki/concepts/Occupancy|Occupancy]]
 - [[../wiki/concepts/Online Softmax|Online Softmax]]
 - [[../wiki/concepts/PD分离|PD分离]]
@@ -87,6 +99,7 @@
 - [[../wiki/concepts/PreNorm Dilution|PreNorm Dilution]]
 - [[../wiki/concepts/Prefix Caching|Prefix Caching]]
 - [[../wiki/concepts/Profiling|Profiling]]
+- [[../wiki/concepts/Programmatic Dependent Launch|Programmatic Dependent Launch]]
 - [[../wiki/concepts/RMSNorm|RMSNorm]]
 - [[../wiki/concepts/RadixAttention|RadixAttention]]
 - [[../wiki/concepts/RoPE|RoPE]]
@@ -109,6 +122,7 @@
 - [[../wiki/concepts/mHC|mHC]]
 - [[../wiki/concepts/vLLM V1 统一调度器|vLLM V1 统一调度器]]
 - [[../wiki/concepts/内存合并访问|内存合并访问]]
+- [[../wiki/concepts/分层 KV Cache|分层 KV Cache]]
 - [[../wiki/concepts/动态共享内存|动态共享内存]]
 - [[../wiki/concepts/持久批处理|持久批处理]]
 - [[../wiki/concepts/数据并行|数据并行]]
@@ -135,15 +149,18 @@
 - [[../wiki/sources/Kimi新作《Attention Residuals》：对Transformer中残差结构的调整|Kimi新作《Attention Residuals》：对Transformer中残差结构的调整]]
 - [[../wiki/sources/LLM推理优化核心技术|LLM推理优化核心技术]]
 - [[../wiki/sources/LLM提速利器：投机推理的原理与常见方案|LLM提速利器：投机推理的原理与常见方案]]
+- [[../wiki/sources/Look Ma, No Bubbles! Designing a Low-Latency Megakernel for Llama-1B|Look Ma, No Bubbles! Designing a Low-Latency Megakernel for Llama-1B]]
 - [[../wiki/sources/MLA与DP Attention面试整理|MLA与DP Attention面试整理]]
 - [[../wiki/sources/Model Runner V2 A Modular and Faster Core for vLLM|Model Runner V2 A Modular and Faster Core for vLLM]]
 - [[../wiki/sources/PageAttention代码走读|PageAttention代码走读]]
+- [[../wiki/sources/RTP-LLM|RTP-LLM]]
 - [[../wiki/sources/SGLang 与 vLLM 区别截图整理|SGLang 与 vLLM 区别截图整理]]
 - [[../wiki/sources/SGLang：LLM推理引擎发展新方向|SGLang：LLM推理引擎发展新方向]]
 - [[../wiki/sources/engram_demo_v1|engram_demo_v1]]
 - [[../wiki/sources/mHC: Manifold-Constrained Hyper-Connections|mHC: Manifold-Constrained Hyper-Connections]]
 - [[../wiki/sources/vLLM v0 与 vLLM v1 调度架构差异截图整理|vLLM v0 与 vLLM v1 调度架构差异截图整理]]
 - [[../wiki/sources/vLLM皇冠上的明珠：深入浅出理解PagedAttention CUDA实现|vLLM皇冠上的明珠：深入浅出理解PagedAttention CUDA实现]]
+- [[../wiki/sources/vllm并行策略之DCP(Decode Context Parallel)|vllm并行策略之DCP(Decode Context Parallel)]]
 - [[../wiki/sources/你一定要知道：CUDA优化六要|你一定要知道：CUDA优化六要]]
 - [[../wiki/sources/十分钟读懂旋转编码（RoPE）|十分钟读懂旋转编码（RoPE）]]
 - [[../wiki/sources/多卡GPU监控与SM执行模型面试整理|多卡GPU监控与SM执行模型面试整理]]
@@ -163,14 +180,14 @@
 
 ## 最近日志
 
-- [2026-06-08] ingest | 还在手写CUDA内核？CODA来了！LLM和新手也能让Transformer跑出光速
-- [2026-05-17] query | Engram O(1) 查表与静态记忆表理解
-- [2026-05-17] ingest | 陈巍：DeepSeek 开源Day（1）-FlashMLA 深入分析（收录于：DeepSeek技术详解系列）
-- [2026-05-15] query | DP Attention 具体执行逻辑
-- [2026-05-15] query | MLA 是否等同 MQA 与 TP/DPA 关系
-- [2026-05-15] query | MLA 公式与推理加速机制
-- [2026-05-14] ingest | vLLM皇冠上的明珠：深入浅出理解PagedAttention CUDA实现
-- [2026-05-14] query | PagedAttention CUDA 计算流程
+- [2026-06-12] ingest | Look Ma, No Bubbles! Designing a Low-Latency Megakernel for Llama-1B
+- [2026-06-12] query | vLLM cudagraph_mode NONE 与 enforce eager
+- [2026-06-12] query | NVFP4 与 MXFP4 格式区别
+- [2026-06-11] query | vLLM enforce eager 与不开 CUDA Graph 的区别
+- [2026-06-11] query | Mamba page size 与时序 state 的关系
+- [2026-06-11] query | TRTLLM kernel 与 FlashInfer
+- [2026-06-11] query | Qwen3Next config 参数量估算
+- [2026-06-11] query | Qwen3Next chunked GDN 算子形状与优化
 
 ## 报告
 

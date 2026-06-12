@@ -2,7 +2,7 @@
 
 ## 定义
 
-`MTP Drafter` 是 Gemma 4 中用于多 token 预测的草稿模型机制。它通过轻量 drafter 先生成多个候选 token，再由目标模型并行验证候选，从而加速自回归推理。
+`MTP Drafter` 是 Gemma 4 中用于 [[Multi-Token Prediction]] 的草稿模型机制。它通过轻量 drafter 先生成多个候选 token，再由目标模型并行验证候选，从而加速自回归推理。
 
 ## 它解决什么问题
 
@@ -28,7 +28,7 @@
 
 ## 与 Speculative Decoding 的关系
 
-`MTP Drafter` 是 [[Speculative Decoding]] 的一种具体实现。它和传统 draft model 路线相同点在于都采用“候选生成 + 目标模型验证”；不同点在于 Gemma 4 drafter 与目标模型结合更紧，会复用目标模型 activation 和 KV cache，并针对端侧模型优化 LM Head。
+`MTP Drafter` 是 [[Multi-Token Prediction]] 进入 [[Speculative Decoding]] 的一种具体实现。它和传统 draft model 路线相同点在于都采用“候选生成 + 目标模型验证”；不同点在于 Gemma 4 drafter 与目标模型结合更紧，会复用目标模型 activation 和 KV cache，并针对端侧模型优化 LM Head。
 
 ## 关键权衡
 
@@ -56,6 +56,7 @@
 ## 相关概念
 
 - [[Speculative Decoding]]
+- [[Multi-Token Prediction]]
 - [[KV Cache]]
 - [[Shared KV Cache]]
 - [[Per-Layer Embeddings]]
