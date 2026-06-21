@@ -35,7 +35,7 @@
 
 - Tri Dao
 - Han Guo
-- NVIDIA CUTLASS / CuTeDSL
+- NVIDIA CUTLASS / [[../concepts/CuTe DSL|CuTe DSL]]
 - Claude Code
 - Liger Kernel
 - FlashInfer

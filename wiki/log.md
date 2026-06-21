@@ -2,6 +2,24 @@
 
 按时间记录 ingest、query、lint 等操作，帮助 LLM 与人类共同追踪知识库的演化过程。
 
+## [2026-06-16] query | MHA/GQA/MLA prefill 计算量对比
+
+- 读取索引页：`wiki/index.md`
+- 读取概念页：`wiki/concepts/MLA.md`、`wiki/concepts/KV Cache.md`
+- 读取来源页：`wiki/sources/MLA与DP Attention面试整理.md`、`wiki/sources/斯坦福CS336 Lecture 10 - Inference systems and optimization.md`
+- 更新概念页：`wiki/concepts/KV Cache.md`
+- 本次 query 澄清：在输入 `[B, S, D]` 的单层 causal prefill 中，`MHA` 和 `GQA/MQA` 的 `QK^T + P @ V` 主体算术量同阶，近似 `B * D * S^2` MACs；`GQA/MQA` 主要减少 K/V 投影和 KV cache 写入/读取。`MLA` 的 absorbed latent 路径会把历史 cache 从完整 K/V 压到 `C + R` 元素，但 attention core 可能变成 `0.5 * B * S * (S + 1) * H_q * (2C + R)` MACs，因此它更像用额外或重排后的计算换更少 HBM 访问，收益尤其体现在 decode。
+
+## [2026-06-15] query | CuTe DSL 概念补页
+
+- 读取索引页：`wiki/index.md`
+- 搜索本地资料中的 `CuTe / CuTeDSL / CUTLASS / DSL`
+- 参考官方资料：NVIDIA CUTLASS CuTe DSL / Python DSL 文档与 NVIDIA 技术博客
+- 创建概念页：`wiki/concepts/CuTe DSL.md`
+- 更新概念页：`wiki/concepts/CODA.md`、`wiki/concepts/Triton.md`、`wiki/concepts/Torch Compile.md`
+- 更新来源页：`wiki/sources/还在手写CUDA内核？CODA来了！LLM和新手也能让Transformer跑出光速.md`
+- 本次 query 将 CuTe DSL 整理为 CUTLASS 4.x 中面向 GPU kernel authoring 的 Python-native 低级 DSL：它把 CuTe / CUTLASS C++ 的 layout、tensor、atom、tiled operation 等抽象搬到 Python 语法和 JIT / MLIR / `ptxas` 编译路径中；它比 Triton 更贴近 CUTLASS/CuTe 的 layout algebra 与硬件 atom 组合，不应理解为自动图优化器。
+
 ## [2026-06-12] ingest | Look Ma, No Bubbles! Designing a Low-Latency Megakernel for Llama-1B
 
 - 读取原始资料：`raw/articles/Look Ma, No Bubbles! Designing a Low-Latency Megakernel for Llama-1B 1.md`

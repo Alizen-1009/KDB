@@ -20,7 +20,7 @@ PyTorch 2.x 提供的图捕获与编译入口，用于把 Python 层模型或函
 
 - 对很多常见模式能带来“低改动、高收益”的优化
 - 但收益依赖动态图特征、输入形状、图可捕获性和后端成熟度
-- 面对需要代数重排和 GEMM epilogue 特化的路径，通用图编译未必能自动发现所有优化机会；这类场景可能仍需要 [[CODA]]、Triton、CUTLASS/CuTeDSL 或手写 kernel。
+- 面对需要代数重排和 GEMM epilogue 特化的路径，通用图编译未必能自动发现所有优化机会；这类场景可能仍需要 [[CODA]]、[[Triton]]、CUTLASS/[[CuTe DSL]] 或手写 kernel。
 - 在 `vLLM` 语境里，`torch.compile` / vLLM compile 与 CUDA Graphs 是两层优化：`cudagraph_mode=NONE` 只关闭 CUDA Graphs，`--enforce-eager` 才表示关闭 compile 集成并完全走 eager mode。
 
 ## 相关实体

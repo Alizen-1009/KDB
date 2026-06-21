@@ -14,7 +14,7 @@
 - 以 block / program 为中心组织 kernel，而不是手工管理每个线程细节
 - 用 JIT 编译把 Python 风格 kernel 转成底层 GPU 实现
 - 适合实现融合算子、softmax、matmul、norm 等常见高性能 kernel
-- [[CODA]] 来源中提到的 CuTeDSL / CUTLASS Python DSL 与 Triton 同属降低 GPU kernel 编写门槛的方向，但 CODA 更聚焦 `GEMM + epilogue` 抽象和 Transformer 小算子的代数重写。
+- [[CODA]] 来源中提到的 [[CuTe DSL]] / CUTLASS Python DSL 与 Triton 同属降低 GPU kernel 编写门槛的方向，但 CODA 更聚焦 `GEMM + epilogue` 抽象和 Transformer 小算子的代数重写。
 
 ## 关键权衡
 
@@ -41,4 +41,4 @@
 ## 研究备注
 
 - 后续可补 Triton 在 softmax、attention、matmul 和 fused MLP kernel 中的典型使用方式
-- 可进一步比较 Triton、CuTeDSL / CUTLASS、TileLang、ThunderKittens 在抽象层级、可控性和适合的 kernel 类型上的差异。
+- 可进一步比较 Triton、[[CuTe DSL]] / CUTLASS、TileLang、ThunderKittens 在抽象层级、可控性和适合的 kernel 类型上的差异。

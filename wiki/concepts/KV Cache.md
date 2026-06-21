@@ -33,6 +33,14 @@
 - [[MLA]] 把历史 `K/V` 缓存在更低维的 latent 表示里，显著减少每个历史 token 的 HBM 读取量；如果 attention score/value 路径仍保留较多按 head 计算，且 kernel 能有效复用 latent cache，就可能让 decode attention 的瓶颈从读 KV cache 转向实际计算吞吐。
 - 在共享或压缩 KV 的结构中，位置编码还会影响 cache 语义：若直接对共享 KV 做 RoPE，V 也可能携带位置相位；[[MLA]] 通过额外小型 RoPE K cache 解耦，[[CSA-HCA|CSA/HCA]] 则需要处理压缩块位置标定和输出逆旋转。
 
+## Prefill 计算量口径
+
+设输入 hidden 为 `[B, S, D]`，query heads 为 `H_q`，`D_h = D / H_q`，KV heads 为 `H_kv`，`r = H_kv / H_q`。以下用 MACs 计数；若按 FLOPs 计数，矩阵乘加通常约乘 `2`。
+
+- `MHA`：Q/K/V/O 线性层约 `4 * B * S * D^2` MACs；causal prefill 的 `QK^T + P @ V` 约 `B * D * S * (S + 1)` MACs，近似 `B * D * S^2`；单层 KV cache 写入约 `2 * B * S * D` 个元素。
+- `GQA/MQA`：Q 与 O 线性层不变，K/V 线性层随 `H_kv` 缩小，总线性层约 `(2 + 2r) * B * S * D^2` MACs；但 `QK^T + P @ V` 仍需对每个 query head 计算，算术量仍近似 `B * D * S^2` MACs；单层 KV cache 写入降为 `2 * B * S * D * r` 个元素。
+- `MLA`：若走 latent/absorbed 路径，设 KV latent rank 为 `C`，额外 RoPE key 维度为 `R`，attention core 约 `0.5 * B * S * (S + 1) * H_q * (2C + R)` MACs；cache 写入约 `B * S * (C + R)` 个元素。它在 prefill 下未必少算，核心收益更常体现在 decode 阶段少读历史 KV cache。
+
 ## 大小估算
 
 - 如果忽略分页、对齐和实现细节，`KV Cache` 大小通常近似与 `batch size`、`sequence length`、`num_layers`、`num_kv_heads`、`head_dim` 和 `dtype bytes` 线性相关

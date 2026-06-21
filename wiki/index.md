@@ -20,7 +20,7 @@
 - 原始代码：1
 - 来源文件：39
 - 实体文件：25
-- 概念文件：81
+- 概念文件：82
 - 报告文件：12
 - 幻灯片文件：0
 
@@ -69,6 +69,7 @@
 - [[../wiki/concepts/Constrained Decoding|Constrained Decoding]]
 - [[../wiki/concepts/Continuous Batching|Continuous Batching]]
 - [[../wiki/concepts/Critical Batch Size|Critical Batch Size]]
+- [[../wiki/concepts/CuTe DSL|CuTe DSL]]
 - [[../wiki/concepts/DDP|DDP]]
 - [[../wiki/concepts/DP Attention|DP Attention]]
 - [[../wiki/concepts/Decode Context Parallel|Decode Context Parallel]]
@@ -180,6 +181,7 @@
 
 ## 最近日志
 
+- [2026-06-15] query | CuTe DSL 概念补页
 - [2026-06-12] ingest | Look Ma, No Bubbles! Designing a Low-Latency Megakernel for Llama-1B
 - [2026-06-12] query | vLLM cudagraph_mode NONE 与 enforce eager
 - [2026-06-12] query | NVFP4 与 MXFP4 格式区别
@@ -187,7 +189,6 @@
 - [2026-06-11] query | Mamba page size 与时序 state 的关系
 - [2026-06-11] query | TRTLLM kernel 与 FlashInfer
 - [2026-06-11] query | Qwen3Next config 参数量估算
-- [2026-06-11] query | Qwen3Next chunked GDN 算子形状与优化
 
 ## 报告
 

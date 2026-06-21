@@ -35,7 +35,7 @@ CODA 是一种把 Transformer block 中大量非 attention 操作重写为 `GEMM
 
 - Tri Dao
 - Han Guo
-- NVIDIA CUTLASS / CuTeDSL
+- NVIDIA CUTLASS / [[CuTe DSL]]
 
 ## 相关来源
 
@@ -54,5 +54,5 @@ CODA 是一种把 Transformer block 中大量非 attention 操作重写为 `GEMM
 
 ## 研究备注
 
-- 后续应直接 ingest CODA 原论文和 `coda-kernels` repo，核实论文编号、具体 kernel 列表、CuTeDSL 用法、数值误差边界和 benchmark 配置。
+- 后续应直接 ingest CODA 原论文和 `coda-kernels` repo，核实论文编号、具体 kernel 列表、[[CuTe DSL]] 用法、数值误差边界和 benchmark 配置。
 - CODA 可作为面试中解释“融合不是越大越好”的正例：有效融合往往来自数据流账本和代数重写，而不是把所有相邻操作塞进一个超大 kernel。
