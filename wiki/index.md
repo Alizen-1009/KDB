@@ -181,14 +181,14 @@
 
 ## 最近日志
 
+- [2026-06-22] query | Split-KV 在现代 decode attention 中是否常见
+- [2026-06-22] query | DP Attention 概念复查
+- [2026-06-22] query | PD 分离与 Chunked Prefill 对 TPOT 的作用
+- [2026-06-22] query | MTP 推理验证规则
+- [2026-06-22] query | DeepSeek-V3 MTP 实现口径
+- [2026-06-22] query | DCP 和 Flash Decoding 区别复查
+- [2026-06-16] query | MHA/GQA/MLA prefill 计算量对比
 - [2026-06-15] query | CuTe DSL 概念补页
-- [2026-06-12] ingest | Look Ma, No Bubbles! Designing a Low-Latency Megakernel for Llama-1B
-- [2026-06-12] query | vLLM cudagraph_mode NONE 与 enforce eager
-- [2026-06-12] query | NVFP4 与 MXFP4 格式区别
-- [2026-06-11] query | vLLM enforce eager 与不开 CUDA Graph 的区别
-- [2026-06-11] query | Mamba page size 与时序 state 的关系
-- [2026-06-11] query | TRTLLM kernel 与 FlashInfer
-- [2026-06-11] query | Qwen3Next config 参数量估算
 
 ## 报告
 

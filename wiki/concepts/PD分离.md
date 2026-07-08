@@ -8,6 +8,7 @@
 
 - 减少 prefill 与 decode 在同一套资源上互相争用
 - 让不同阶段分别采用更适合自身负载的优化与并行策略
+- 更准确地说，它主要保护 decode 阶段的 ITL / TPOT 和 tail latency，而不是让单个 decode token 的模型计算本身变少；代价可能转移到 prefill 排队、KV Cache 传输和首 token 延迟。
 
 ## 核心机制
 

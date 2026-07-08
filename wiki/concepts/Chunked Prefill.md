@@ -9,6 +9,7 @@
 - 避免单个超长 prompt 的 prefill 长时间占用 GPU，造成 decode 请求 ITL / TPOT 抖动。
 - 降低长上下文 prefill 的单步峰值显存、workspace 和调度阻塞风险。
 - 在统一 token budget 调度中，把长 prefill 从“一个大任务”改成“多个可插队的小任务”，方便和 decode、prefix cache、speculative decoding 等能力组合。
+- 它改善的是混部调度下 decode 被 prefill 阻塞导致的 tail ITL / TPOT；对单个请求的 prefill 总计算量没有减少，chunk 太小还可能增加调度和 kernel 开销。
 
 ## 核心机制
 

@@ -25,6 +25,16 @@
 - 差异点：[[FlashAttention]] 的经典主战场是 prefill / training 这类 `Q` 长度较大的二维 attention；`Flash Decoding` 的关键是 `Q` 极短时沿 `KV/context` 维再切分，增加并行度。
 - 实现上，Flash Decoding 往往需要额外的 split 合并 kernel 或跨设备归约逻辑；它不只是把 FlashAttention API 换个参数。
 
+## 当前实现中的普及程度
+
+`Split-KV` 已经可以看作现代 LLM serving decode attention 后端里的常见实现技巧，尤其用于长上下文、小 batch、`Q length = 1` 或接近 1 的场景。不同系统未必叫 `Flash Decoding`：可能叫 `split-KV`、`KV sequence parallelism`、`multi-block attention`、`recursive / cascade attention`，或在多 GPU 上进一步变成 [[Decode Context Parallel]] / context parallel 的一部分。
+
+但它不是“所有 attention 都默认 Split-KV”：
+
+- prefill / training 阶段 `Q` 长度较大，通常已经能沿 batch、head、query block 等维度提供足够并行度，不一定需要沿 KV 再拆。
+- decode 阶段如果 batch 足够大、context 较短或 head 数足够多，普通 paged attention / FlashAttention-family kernel 可能已经够用。
+- `Split-KV` 会引入局部输出、max / log-sum-exp 和最终合并的额外开销；是否启用通常由 backend 的 heuristic、固定 split size、上下文长度、硬件和 cache layout 决定。
+
 ## 和相邻概念的区别
 
 - 与 [[PagedAttention]]：PagedAttention 重点是 paged KV cache 管理与间接寻址；Flash Decoding 重点是对长 `KV` 维做并行切分与 softmax 合并。二者可以组合。
@@ -56,3 +66,4 @@
 
 - `split-KV` 增加并行度的同时也引入合并开销，收益依赖 context length、batch size、num heads、cache layout、硬件和 kernel 实现。
 - 面试里不要把它说成“FlashAttention 的另一个名字”；更准确是“decode 小 Q 场景下，沿 KV/context 维扩展并行度的 FlashAttention-family 实现思路”。
+- 面试里也不要把 `Split-KV` 说成罕见技巧；现代 serving 后端已经普遍吸收了这个思路，只是会按 workload 条件选择是否启用。

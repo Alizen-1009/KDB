@@ -2,6 +2,52 @@
 
 按时间记录 ingest、query、lint 等操作，帮助 LLM 与人类共同追踪知识库的演化过程。
 
+## [2026-06-22] query | Split-KV 在现代 decode attention 中是否常见
+
+- 读取索引页：`wiki/index.md`
+- 读取概念页：`wiki/concepts/Flash Decoding.md`、`wiki/concepts/FlashAttention.md`、`wiki/concepts/Decode Context Parallel.md`
+- 搜索本地资料中的 `Split-KV / Flash Decoding / KV split`
+- 参考外部资料：PyTorch Flash-Decoding 博客、FlashInfer attention 文档、TensorRT-LLM GPT attention 文档
+- 更新概念页：`wiki/concepts/Flash Decoding.md`
+- 本次 query 澄清：`Split-KV` 已经是现代 LLM serving decode attention 后端中的常见技巧，尤其适合长上下文、小 batch、`Q length` 很短的 decode；但它不是所有 attention 的默认路径。Prefill / training 更常沿 query block、head、batch 等维度并行；decode 是否启用 Split-KV 通常取决于 backend heuristic、上下文长度、batch、head 数、cache layout、硬件和合并开销。
+
+## [2026-06-22] query | DP Attention 概念复查
+
+- 读取索引页：`wiki/index.md`
+- 读取概念页：`wiki/concepts/DP Attention.md`、`wiki/concepts/MLA.md`、`wiki/concepts/Tensor Parallelism.md`
+- 读取来源页：`wiki/sources/MLA与DP Attention面试整理.md`
+- 参考官方资料：SGLang `DP, DPA and SGLang DP Router` 文档、SGLang DeepSeek V3/V3.1/R1 使用文档
+- 本次 query 复用既有结论：`DP Attention / DPA` 是 attention component 级别的数据并行策略，不是把单个请求的 context 切开；它让不同 attention DP replica 处理不同请求/batch，并分别维护 KV cache。它适合 DeepSeek/MLA 等在普通 TP attention 下容易复制 latent KV cache 的模型，常与 MoE 的 [[Expert Parallelism]] 组合，用于提升多请求吞吐和可承载 batch size。
+
+## [2026-06-22] query | PD 分离与 Chunked Prefill 对 TPOT 的作用
+
+- 读取索引页：`wiki/index.md`
+- 读取概念页：`wiki/concepts/PD分离.md`、`wiki/concepts/Chunked Prefill.md`、`wiki/concepts/Continuous Batching.md`
+- 更新概念页：`wiki/concepts/PD分离.md`、`wiki/concepts/Chunked Prefill.md`
+- 本次 query 澄清：PD 分离和 Chunked Prefill 都是在缓解 prefill 对 decode 的阻塞，主要保护 decode ITL / TPOT 和 tail latency，而不是减少单个 decode token 的模型计算；PD 分离靠资源池隔离，Chunked Prefill 靠调度粒度切分。二者可能把成本转移到 TTFT、prefill 吞吐、KV cache 传输、调度开销或资源利用率上。
+
+## [2026-06-22] query | MTP 推理验证规则
+
+- 读取索引页：`wiki/index.md`
+- 读取概念页：`wiki/concepts/Speculative Decoding.md`、`wiki/concepts/Multi-Token Prediction.md`
+- 更新概念页：`wiki/concepts/Speculative Decoding.md`
+- 本次 query 澄清：MTP 推理中的验证由 target model 完成，而不是 MTP 自己判断；target 对 `prefix + draft` 做一次 forward，逐位置 score draft token。greedy 场景可用 argmax 一致性做连续接受；采样场景需要按 `min(1, p/q)` 的 speculative sampling 接受规则以及拒绝时的 `(p-q)_+` 替代分布，才能保持 target model 分布。runtime 形状上，verify 常把普通 decode 的 `qlen=1` 变成 `qlen=draft_len` 的 chunk decode，历史 prefix 仍来自 KV cache。
+
+## [2026-06-22] query | DeepSeek-V3 MTP 实现口径
+
+- 读取索引页：`wiki/index.md`
+- 读取概念页：`wiki/concepts/Multi-Token Prediction.md`、`wiki/concepts/MTP Drafter.md`
+- 参考外部资料：DeepSeek-V3 Technical Report、DeepSeek-V3 官方 `README_WEIGHTS.md`、NVIDIA Megatron-LM MTP 文档
+- 更新概念页：`wiki/concepts/Multi-Token Prediction.md`
+- 本次 query 澄清：DeepSeek-V3 的 MTP 不是简单并排多个 linear head，而是顺序 MTP module；每个 module 通过共享 embedding、projection、Transformer block、共享 output head 保留 causal chain。开源 V3 权重中 `num_nextn_predict_layers=1`，MTP 作为 `model.layers.61` 追加在 61 层主模型之后，并共享主模型 embedding 与 output head。
+
+## [2026-06-22] query | DCP 和 Flash Decoding 区别复查
+
+- 读取索引页：`wiki/index.md`
+- 读取概念页：`wiki/concepts/Decode Context Parallel.md`、`wiki/concepts/Flash Decoding.md`、`wiki/concepts/KV Cache.md`
+- 读取来源页：`wiki/sources/vllm并行策略之DCP(Decode Context Parallel).md`，并参考原始 Flash Decoding 资料片段
+- 本次 query 复用既有结论：二者都沿 context/KV 维切分并用 online softmax / log-sum-exp 合并局部结果；`Flash Decoding` 更偏 decode attention kernel / split-KV 算法思路，目标是提高小 `Q`、长 `KV` 时的并行度；`DCP` 更偏多 GPU serving 并行策略，目标是在 TP group 内减少小 `num_kv_heads` 模型的 KV cache 重复，并处理 interleaved KV cache、跨 rank 通信、prefill 写 cache 等系统问题。
+
 ## [2026-06-16] query | MHA/GQA/MLA prefill 计算量对比
 
 - 读取索引页：`wiki/index.md`

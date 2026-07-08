@@ -15,6 +15,27 @@
 - target model 对这些候选做并行检查
 - 按接受/拒绝规则保留一部分候选，并在需要时回退到 target 分布
 
+## 验证与接受规则
+
+验证阶段不是让 drafter / MTP 自己判断对错，而是把候选 token 接到当前上下文后，让 target model 一次 forward 计算这些位置的 logits：
+
+```text
+prefix = x_1 ... x_t
+draft  = y_1 ... y_k
+
+target input: x_1 ... x_t y_1 ... y_k
+
+target logits at position t     -> score y_1
+target logits at position t + 1 -> score y_2
+...
+target logits at position t+k-1 -> score y_k
+```
+
+- `greedy / argmax 验证`：若 target model 在对应位置的 argmax 等于 draft token，则接受；遇到第一个不一致的位置就停止，丢弃后续 draft，并用 target model 在失败位置给出的 token 继续。
+- `严格 speculative sampling`：若 draft token 来自 proposal distribution `q`，target distribution 为 `p`，则按 `min(1, p(y_i) / q(y_i))` 的概率接受；拒绝时从归一化后的正差分布 `(p - q)_+` 采样替代 token。这个规则用于保持采样分布与 target model 一致。
+- 如果所有 draft token 都被接受，通常还可以从 target model 在最后一个 draft 后的位置额外采样/选择一个 bonus token，从而保证本轮至少多前进。
+- 从 kernel / runtime 形状看，verify 阶段常把普通 decode 的 `qlen=1` 变成 `qlen=draft_len` 的小 chunk decode；历史 prefix 仍来自 KV cache，新增 draft token 的 KV 写入 speculative slots，接受后保留，拒绝后回滚或覆盖。
+
 ## 常见路线
 
 - `草稿模型`：用一个更小的 draft model 先生成候选，再由大模型校验

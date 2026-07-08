@@ -36,6 +36,14 @@ main model hidden h_t
 
 这种结构保留了因果链：预测更远 token 时，会条件化在前一个未来 token 上。
 
+DeepSeek-V3 开源权重中的具体口径：
+
+- `num_nextn_predict_layers = 1`，即开源 V3 权重包含 `1` 个 MTP Module。
+- 主模型包含 `model.layers.0` 到 `model.layers.60` 共 `61` 个 Transformer hidden layers；MTP module 作为追加层编号为 `model.layers.61`。
+- MTP module 与主模型共享 `model.embed_tokens` 和 `lm_head / shared_head`。
+- MTP module 自身包含 `enorm`、`eh_proj`、追加的 `model.layers.61.self_attn & mlp`、`hnorm`；其中 `enorm / hnorm` 是 RMSNorm，`eh_proj` 用于把归一化后的 hidden state 与未来 token embedding 融合/投影。
+- 官方权重说明给出的 MTP 规模是 `11.5B` unique parameters，不含共享的 `0.9B` embedding 和 `0.9B` output head；若把共享部分也算入 activation parameter 口径，则 MTP activation parameters 为 `2.4B`。
+
 ### 独立 drafter 式
 
 Gemma 4 的 [[MTP Drafter]] 更像专门训练的小型草稿模型。它会利用 target model activation、自己的 token embedding 和共享 KV cache，自回归地产生多个 draft token，再由 target model 验证。
