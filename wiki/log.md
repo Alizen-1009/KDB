@@ -1037,3 +1037,11 @@
 - 更新实体页：`wiki/entities/Engram.md`
 - 更新概念页：`wiki/concepts/Conditional Memory.md`
 - 未发现与现有 wiki 的直接冲突，本次主要把 `Engram` 从论文摘要推进到 demo 代码实现视角
+
+## [2026-07-08] query | MoE 通信-计算重叠与 MegaKernel 技术谱系
+
+- 讨论 5 份资料：DeepFusionKernel、Megakernel(HazyResearch)、Ladder-Residual、NVIDIA Wide-EP、UniEP
+- 创建报告：`output/reports/MoE通信-计算重叠与MegaKernel技术谱系.md`
+- 沉淀概念澄清：SwiGLU vs MoE、fused_moe 融合边界、通信-计算重叠的细粒度原理、Triton-distributed、UniEP 能否用于推理
+- 未新建独立概念/实体页（报告内已列出后续 ingest 建议）；相关已有页：Megakernel / MoE / Expert Parallelism / 算子融合
+- 待核实：各框架 fused_moe 融合边界、UniEP/Triton-distributed 晚于知识截止的 API 细节
