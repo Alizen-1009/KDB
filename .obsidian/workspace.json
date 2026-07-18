@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "raw/articles/Look Ma, No Bubbles! Designing a Low-Latency Megakernel for Llama-1B 1.md",
+                "file": "Clippings/GPU Kernel Performance Benchmarks by NVIDIA.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Look Ma, No Bubbles! Designing a Low-Latency Megakernel for Llama-1B 1"
+              "title": "GPU Kernel Performance Benchmarks by NVIDIA"
             }
           }
         ]
@@ -182,13 +182,26 @@
   },
   "active": "5765a90760201ff2",
   "lastOpenFiles": [
+    "AGENTS.md",
+    "Clippings/GPU Kernel Performance Benchmarks by NVIDIA.md",
+    "Clippings/MoE 所有层融到一个分布式算子GPU Kernel！FlashDMoE：GPU内核-硬件协同解锁大规模分布式机器学习性能极限！.md",
+    "Clippings/MoE 所有层融到一个分布式算子GPU Kernel！FlashDMoE：GPU内核-硬件协同解锁大规模分布式机器学习性能极限！ 1.md",
+    "Clippings/性能相比SGLangvLLM最高提升1.7倍！Mirage Persistent Kernel：首个自动巨核化多GPU LLM推理的编译器-运行时系统，细粒度计算-通信重叠.md",
+    "Clippings/超越 vLLM 与 SGLang！Event Tensor：以动态 MegaKernel 消除重编译，解锁GPU核间通信-计算重叠.md",
+    "Clippings/AutoMegaKernel：Agent驱动、跨GPU架构的MegaKernel方案，静态校验全模型单巨内核，最高提速 1.33 倍！.md",
+    "Clippings/AutoMegaKernel：Agent驱动、跨GPU架构的MegaKernel方案，静态校验全模型单巨内核，最高提速 1.33 倍！ 1.md",
+    "Clippings/Triton Layout 革命：GPU 编译器为什么不会分数据，以及怎么修好它（完整版）.md",
+    "Clippings/FA 提速近 2 倍！从 Tile 语言到空间架构：TileLoom 实现自动数据流规划破解空间加速器编程难题，性能追平厂商手工库.md",
+    "Clippings/Fable 5 官方实战指南：找到你的未知.md",
+    "Clippings/对标 vLLM，SGLang 吞吐！cuTile Rust 实现近零开销安全内核，GEMM 达 96% cuBLAS 性能.md",
+    "Clippings/MiniMax-M3：MSA 技术报告速读.md",
+    "raw/articles/Look Ma, No Bubbles! Designing a Low-Latency Megakernel for Llama-1B 1.md",
     "wiki/entities/Megakernels.md",
     "wiki/entities/HazyResearch.md",
     "wiki/concepts/Programmatic Dependent Launch.md",
     "wiki/concepts/Megakernel.md",
     "wiki/sources/Look Ma, No Bubbles! Designing a Low-Latency Megakernel for Llama-1B.md",
     "Clippings/Look Ma, No Bubbles! Designing a Low-Latency Megakernel for Llama-1B.md",
-    "raw/articles/Look Ma, No Bubbles! Designing a Low-Latency Megakernel for Llama-1B 1.md",
     "raw/articles/MXFP8、MXFP4 与 NVFP4 详解.md",
     "raw/papers/2603.15031v1.pdf",
     "raw/papers/2601.07372v1.pdf",
@@ -198,20 +211,7 @@
     "raw/articles/vllm并行策略之DCP(Decode Context Parallel).md",
     "wiki/entities/梦初AI Infra.md",
     "wiki/sources/vllm并行策略之DCP(Decode Context Parallel).md",
-    "raw/articles/逆向 NVIDIA：nv_isa_solver 用模糊测试把 nvdisasm \"榨干\"成 NVIDIA GPU ISA 手册.md",
-    "raw/articles/Gemma 4：Drafter 详解.md",
-    "wiki/concepts/Chunked Gated Delta Rule.md",
-    "wiki/sources/Gemma 4：Drafter 详解.md",
-    "wiki/concepts/Multi-Token Prediction.md",
-    "wiki/concepts/MTP Drafter.md",
-    "raw/articles/RTP-LLM：阿里开源工业级 LLM 推理引擎，模型加载提速 6.3 倍、TTFT 降低 37%，吞吐量领先 vLLM 与 SGLang！.md",
-    "wiki/sources/RTP-LLM.md",
-    "wiki/concepts/分层 KV Cache.md",
-    "wiki/entities/阿里巴巴.md",
-    "wiki/entities/RTP-LLM.md",
-    "wiki/sources/RTP-LLM：阿里开源工业级 LLM 推理引擎，模型加载提速 6.3 倍、TTFT 降低 37%，吞吐量领先 vLLM 与 SGLang！.md",
     "未命名.base",
-    "wiki/concepts/CODA.md",
     "Clippings",
     "output/code/__pycache__/openai_calll.cpython-312.pyc",
     "output/code/openai_calll.py",

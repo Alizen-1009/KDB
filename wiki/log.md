@@ -1045,3 +1045,19 @@
 - 沉淀概念澄清：SwiGLU vs MoE、fused_moe 融合边界、通信-计算重叠的细粒度原理、Triton-distributed、UniEP 能否用于推理
 - 未新建独立概念/实体页（报告内已列出后续 ingest 建议）；相关已有页：Megakernel / MoE / Expert Parallelism / 算子融合
 - 待核实：各框架 fused_moe 融合边界、UniEP/Triton-distributed 晚于知识截止的 API 细节
+
+## [2026-07-12] query | Prefill Attention 的 CUDA 并行映射
+
+- 读取概念页：`FlashAttention`、`GPU执行模型`、`Online Softmax`、`Tiling`、`CUDA Kernel`
+- 读取来源页与原始资料：`Flash Attention 详细解释推演与Pytorch代码实现`、`Stanford CS336 Lecture 5 - GPUs`
+- 使用 Dao-AILab/flash-attention 官方 CUDA 源码交叉检查典型 forward grid 的 `Q tile × batch × head` 映射
+- 创建报告：`output/reports/Prefill Attention 的 CUDA 并行映射.md`
+- 更新概念页：`wiki/concepts/FlashAttention.md`，补充 block/warp/thread 层级、单 block 内 `QK → online softmax → PV` 数据流、SM 驻留与 split-KV 特例
+- 未发现与现有 wiki 的直接冲突；显式标注 tile size、warp 分工和 split-KV 策略依赖具体版本与硬件
+
+## [2026-07-13] query | `cu_seqlens: [2]` 的 request 含义
+
+- 检查当前仓库，未找到该 JSON 字段的具体上下文
+- 更新报告：`output/reports/Prefill Attention 的 CUDA 并行映射.md`，补充 varlen packed batch 中 `cu_seqlens` 的解读规则
+- 标准 FlashAttention-style 约定下，`cu_seqlens` 应以 `0` 开头，request 数为 `len(cu_seqlens)-1`；单个 2-token request 应为 `[0, 2]`
+- 字面 `[2]` 对标准格式来说不完整；只有在某框架明确省略起始 `0` 的日志约定下，才表示 1 个长度为 2 的 request

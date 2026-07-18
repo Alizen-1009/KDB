@@ -17,6 +17,19 @@
 - 使用 [[Online Softmax]] 支持按块归一化，并避免显式保存完整概率矩阵
 - 通过融合与重计算减少中间张量物化和反复访存，本质上是用少量额外计算换更低的 `HBM` 读写
 
+## Prefill CUDA 并行映射（典型 FA2 风格）
+
+> [!note] 实现归纳
+> 以现代 fused FlashAttention forward kernel 为例；具体 tile size、warp 分工和 grid 维度顺序会随 FlashAttention 版本、GPU 架构、head dimension 和 backend 改变。
+
+- 设 `Q: [B, Hq, Nq, D]`，典型 grid 可理解为 `ceil(Nq / Br) × B × Hq`。一个 CUDA thread block / CTA 负责一个 `(batch, Q head, Q row tile)`，最终只写它所属的 `O[b, h, q0:q0+Br, :]`。
+- block 先把一块 `Q` 搬入 shared memory / registers，并为该 tile 的每个 query 行初始化 `m=-inf`、`d=0` 和未归一化输出累加器 `O_acc=0`。
+- 随后该 block 沿 `K/V` 序列分块循环：协作搬运 `K_j/V_j`，用 Tensor Core / MMA 计算 `S_j = Q_i K_j^T`，施加 scale 和 mask，做逐行归约，再用 [[Online Softmax]] 更新 `m/d/O_acc`，并计算 `P_j V_j`。
+- `K/V` tile 之间存在 online softmax 状态依赖，因此常规 prefill 路径由同一 block 顺序扫过它所需的 `K/V` tiles；但 tile 内的拷贝、MMA、行归约和 `PV` 由多个 warp / thread 并行，并可用异步拷贝和双缓冲重叠搬运与计算。
+- 遍历完所有可见 `K/V` tiles 后，block 做一次 `O_acc / d`，把输出 tile（以及需要时的 log-sum-exp）写回 HBM。因果 mask 下，只需遍历当前 `Q` tile 可见的 `K/V` 范围。
+- block 由 GPU 动态调度到某个 [[GPU执行模型|SM]]；它一旦驻留就不跨 SM 迁移，但一个 SM 可以同时驻留多个 block。实际数量受线程数、寄存器和 shared memory 用量限制，并不是“每个 SM 固定只跑一个 block”。
+- 当 `B × Hq × ceil(Nq/Br)` 太小、难以喂饱所有 SM 时，某些 backend 会再沿 `KV/context` 维做 split-KV，由多个 block 产生局部结果，再用 log-sum-exp / online-softmax 规则合并；这是增加并行度的特化路径，不是上述常规映射的必选步骤。
+
 ## FA1 与 FA2 的差异
 
 - `FlashAttention-1` 更接近“外 KV 内 Q”：同一个 `KV` block 会反复驱动多个 `Q` block 更新，因此输出状态更容易频繁回写 HBM

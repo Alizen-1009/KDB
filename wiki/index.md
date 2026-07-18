@@ -21,7 +21,7 @@
 - 来源文件：39
 - 实体文件：25
 - 概念文件：82
-- 报告文件：12
+- 报告文件：14
 - 幻灯片文件：0
 
 ## 实体页面
@@ -194,6 +194,8 @@
 
 - [[../output/reports/AI Infra面试题全答（二）|AI Infra面试题全答（二）]]
 - [[../output/reports/Gemma 开源代码结构导读|Gemma 开源代码结构导读]]
+- [[../output/reports/MoE通信-计算重叠与MegaKernel技术谱系|MoE通信-计算重叠与MegaKernel技术谱系]]
+- [[../output/reports/Prefill Attention 的 CUDA 并行映射|Prefill Attention 的 CUDA 并行映射]]
 - [[../output/reports/多卡GPU监控与SM执行模型面试整理|多卡GPU监控与SM执行模型面试整理]]
 - [[../output/reports/多卡与推理系统面试梳理|多卡与推理系统面试梳理]]
 - [[../output/reports/大模型系统面试题全答|大模型系统面试题全答]]
