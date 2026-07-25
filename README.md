@@ -4,10 +4,11 @@
 
 - `raw/`：原始资料层，只读不写
 - `wiki/`：由 LLM 持续编译和维护的知识层
-- `AGENTS.md`：schema 规则层，约束 LLM 如何 ingest / query / lint
-- `output/`：研究输出、对比分析、幻灯片、可视化
+- `AGENTS.md`：schema 规则层，约束 LLM 如何 ingest / query / export
+- `output/`：研究输出、对比分析、幻灯片、可视化、复习卡片
 - `inbox/`：待处理资料与待回答问题
-- `scripts/`：辅助脚本
+- `.claude/skills/`：三个核心动作的执行流程（ingest / query / export）
+- `scripts/`：确定性的辅助脚本（重建索引、写日志、卡片转换、健康检查）
 
 ## 核心理念
 
@@ -50,38 +51,54 @@ Obsidian 是这个知识库的阅读与导航前端。建议把以下页面固�
 `AGENTS.md` 规定：
 
 - 页面结构与命名方式
-- ingest / query / lint 的工作流
+- ingest / query / export 的工作流约束
 - 如何处理冲突、缺口、版本差异和回填
 
 ## 你要的 Ingest 风格
 
 这套仓库按“先讨论、再落盘”的方式设计：
 
-1. 你执行 `python3 scripts/ingest.py raw/...`
+1. 你执行 `/kb-ingest raw/...`
 2. LLM 先完整阅读原始资料
 3. 先和你确认 `2-3` 条摘要以及值得关注的论断
 4. 得到确认后，再创建 `wiki/sources/` 页面
 5. 再精确更新相关 `wiki/entities/`、`wiki/concepts/`
 6. 标注冲突，更新交叉引用、`wiki/index.md` 和 `wiki/log.md`
 
-也就是说，`ingest.py` 不是让 LLM 直接闷头写，而是把这套操作流程显式写进任务模板。
+这个“先汇报、等确认”的人工闸门是整套流程的核心，写在 skill 里强制执行。
 
 ## 三个核心动作
 
+三个动作都是 skill（`.claude/skills/`），因为它们需要判断：读什么、更新哪些页面、有没有冲突。确定性的部分才是脚本，由 skill 调用。
+
 ### Ingest
 
-```bash
-python3 scripts/ingest.py raw/papers/flashattention-3.pdf
-python3 scripts/ingest.py raw/repos/vllm/README.md
+```
+/kb-ingest raw/papers/flashattention-3.pdf
+/kb-ingest                      # 列出 raw/ 里还没进 wiki 的资料
 ```
 
 ### Query
 
-```bash
-python3 scripts/query.py "对比 vLLM、SGLang 和 TensorRT-LLM 的推理架构权衡"
+```
+/kb-query 对比 vLLM、SGLang 和 TensorRT-LLM 的推理架构权衡
 ```
 
-### Lint
+产出 `output/reports/` 下的报告（或 `output/slides/` 的 Marp 幻灯片），高价值结论回填 `wiki/`。
+
+### Export
+
+```
+/kb-export attention
+```
+
+从概念页和面试整理生成 `output/cards/<主题>.md` 问答卡片，再转成 Anki 可导入的 TSV：
+
+```bash
+python3 scripts/export_cards.py output/cards/attention.md
+```
+
+### 健康检查
 
 ```bash
 python3 scripts/lint.py
@@ -90,12 +107,13 @@ python3 scripts/lint.py
 ## 推荐工作流
 
 1. 用网页剪藏、手工收集或 git clone 把资料放入 `raw/`
-2. 用 `scripts/ingest.py` 发起一轮摄入
+2. 用 `/kb-ingest` 发起一轮摄入
 3. 先读 LLM 给出的摘要和重点判断
 4. 你确认关注点后，再让 LLM 更新 wiki 页面
-5. 通过 `scripts/query.py` 发起研究问题
+5. 通过 `/kb-query` 发起研究问题
 6. 把高价值输出回填到 `wiki/`
-7. 定期运行 `scripts/lint.py`
+7. 需要背的主题用 `/kb-export` 导出复习卡片
+8. 定期运行 `python3 scripts/lint.py`
 
 ## Obsidian 优化
 

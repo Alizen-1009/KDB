@@ -6,11 +6,12 @@
 
 1. 把网页、论文、repo、benchmark、截图放进 `raw/`
 2. 在 Obsidian 中打开对应文件，确认命名和内容没问题
-3. 运行 `python3 scripts/ingest.py raw/...`
+3. 在 Claude Code 里执行 `/kb-ingest raw/...`
 4. 先阅读 AI 给出的 `2-3` 条摘要和重点论断
 5. 确认重点后，再让 AI 写入 `wiki/sources/`、`wiki/entities/`、`wiki/concepts/`
-6. 用 `python3 scripts/query.py "你的问题"` 发起研究输出
+6. 用 `/kb-query 你的问题` 发起研究输出
 7. 在 Obsidian 中审阅 `output/` 下的结果，并决定是否回填到 `wiki/`
+8. 要背的主题用 `/kb-export <主题>` 导出到 `output/cards/`，再导入 Anki
 
 ## Obsidian 侧最佳实践
 

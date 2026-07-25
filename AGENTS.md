@@ -57,6 +57,8 @@
 
 ## 核心操作
 
+三个核心动作的**执行流程**写在 `.claude/skills/` 下（`kb-ingest` / `kb-query` / `kb-export`），本文件只定义**规则约束**。两者分工：skill 说“按什么顺序做”，schema 说“什么算写对了”。改规则改这里，改流程改 skill。
+
 ### Ingest
 
 输入：一份或一批新的原始资料。
@@ -84,6 +86,23 @@
 3. 输出为 Markdown 报告、对比表、Marp 幻灯片或可视化
 4. 对高价值结论进行回填
 5. 记录到 `wiki/log.md`
+
+### Export
+
+输入：一个需要反复记忆的主题。
+
+流程：
+
+1. 从概念页、实体页和 `output/reports/` 的面试整理里选料
+2. 写成 `output/cards/<主题>.md` 的问答卡片，回链来源页面
+3. 用 `scripts/export_cards.py` 转成 Anki 导入文件
+4. 记录到 `wiki/log.md`
+
+约束：
+
+- 标了“待核实”的结论、没有一手来源的 benchmark 数字不出卡
+- 一张卡一个知识点，且必须独立成立（Anki 会打乱顺序）
+- 卡片是 wiki 的派生物，不是新的事实来源；发现卡片写错，回去改 wiki 页面再重新导出
 
 ### Lint
 
