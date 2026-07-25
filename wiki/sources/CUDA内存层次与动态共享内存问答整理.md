@@ -1,3 +1,10 @@
+---
+type: source
+source_kind: 面试整理
+topic: GPU 编程
+updated: 2026-05-06
+---
+
 # CUDA内存层次与动态共享内存问答整理
 
 ## 来源信息

@@ -1,3 +1,10 @@
+---
+type: concept
+topic: KV Cache
+sources: 14
+updated: 2026-06-21
+---
+
 # KV Cache
 
 ## 定义

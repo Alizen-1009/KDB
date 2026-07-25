@@ -1,3 +1,10 @@
+---
+type: concept
+topic: 推理服务
+sources: 2
+updated: 2026-07-08
+---
+
 # PD分离
 
 ## 定义

@@ -1,3 +1,10 @@
+---
+type: concept
+topic: KV Cache
+sources: 1
+updated: 2026-06-12
+---
+
 # 分层 KV Cache
 
 ## 定义

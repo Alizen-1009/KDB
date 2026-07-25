@@ -1,3 +1,11 @@
+---
+type: entity
+entity_type: 框架
+topic: 并行与分布式
+sources: 1
+updated: 2026-04-23
+---
+
 # NCCL
 
 ## 一句话说明

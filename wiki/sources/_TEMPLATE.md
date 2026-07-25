@@ -1,3 +1,10 @@
+---
+type: source
+source_kind: 
+topic: 
+updated: 
+---
+
 # 来源摘要名称
 
 ## 来源信息

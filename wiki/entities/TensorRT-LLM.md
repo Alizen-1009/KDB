@@ -1,3 +1,11 @@
+---
+type: entity
+entity_type: 框架
+topic: 推理服务
+sources: 2
+updated: 2026-06-12
+---
+
 # TensorRT-LLM
 
 ## 一句话说明

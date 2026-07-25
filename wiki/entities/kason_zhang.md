@@ -1,3 +1,11 @@
+---
+type: entity
+entity_type: 人物
+topic: 推理服务
+sources: 1
+updated: 2026-04-23
+---
+
 # kason_zhang
 
 ## 一句话说明

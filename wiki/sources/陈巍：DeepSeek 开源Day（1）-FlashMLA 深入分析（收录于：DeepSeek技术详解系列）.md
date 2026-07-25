@@ -1,3 +1,10 @@
+---
+type: source
+source_kind: 文章
+topic: 注意力机制
+updated: 2026-05-17
+---
+
 # 陈巍：DeepSeek 开源Day（1）-FlashMLA 深入分析（收录于：DeepSeek技术详解系列）
 
 ## 来源信息

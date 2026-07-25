@@ -1,3 +1,10 @@
+---
+type: source
+source_kind: 文章
+topic: 推理服务
+updated: 2026-05-07
+---
+
 # SGLang：LLM推理引擎发展新方向
 
 ## 来源信息
@@ -6,7 +13,7 @@
 - 作者：方佳瑞​新知答主
 - 日期：2024-07-31
 - 类型：文章
-- 原始文件：[[../raw/articles/SGLang：LLM推理引擎发展新方向|SGLang：LLM推理引擎发展新方向]]
+- 原始文件：[[../../raw/articles/SGLang：LLM推理引擎发展新方向|SGLang：LLM推理引擎发展新方向]]
 - 原始链接：[知乎专栏](https://zhuanlan.zhihu.com/p/711378550)
 
 ## 2-3 条核心摘要

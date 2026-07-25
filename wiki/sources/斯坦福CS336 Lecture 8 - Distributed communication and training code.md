@@ -1,3 +1,10 @@
+---
+type: source
+source_kind: 课程
+topic: 并行与分布式
+updated: 2026-04-23
+---
+
 # 斯坦福CS336 Lecture 8 - Distributed communication and training code
 
 ## 来源信息
@@ -6,7 +13,7 @@
 - 作者：[[../entities/Stanford CS336]]
 - 日期：2025 Spring
 - 类型：可执行课程讲稿 / 代码
-- 原始文件：[[../raw/articles/斯坦福CS336 Lecture 8 - Distributed communication and training code|斯坦福CS336 Lecture 8 - Distributed communication and training code]]
+- 原始文件：[[../../raw/articles/斯坦福CS336 Lecture 8 - Distributed communication and training code|斯坦福CS336 Lecture 8 - Distributed communication and training code]]
 
 ## 2-3 条核心摘要
 

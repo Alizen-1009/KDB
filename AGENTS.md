@@ -34,6 +34,7 @@
 - `wiki/sources/`：单份来源摘要
 - `wiki/entities/`：人物、项目、框架、组织、硬件、数据集、benchmark 等实体
 - `wiki/concepts/`：概念、机制、算法、术语
+- `wiki/maps/`：主题地图（每个 topic 一页，顶部是手写导读，下半是自动清单）
 - `wiki/index.md`：总索引
 - `wiki/log.md`：操作日志
 
@@ -54,6 +55,28 @@
 - 单篇来源摘要文件名尽量与原始资料同名；但论文用论文标题，不用 arXiv 编号
 - 概念页使用“概念名.md”
 - 实体页使用“实体名.md”
+
+## Frontmatter 规范
+
+`wiki/concepts/`、`wiki/entities/`、`wiki/sources/` 下每个页面都必须有 frontmatter。索引与主题地图按它分组，`scripts/kb_meta.py check` 会校验（也集成进 `lint`）。
+
+```yaml
+# 概念页
+type: concept
+topic: GPU 编程     # 见下方固定词表
+sources: 3          # 派生字段，勿手填
+updated: 2026-07-12 # 派生字段，勿手填
+```
+
+实体页多一个 `entity_type`，来源页多一个 `source_kind` 且没有 `sources`。
+
+固定词表（新增取值前先想清楚是否真的是新主题，词表膨胀等于没有分类）：
+
+- `topic`：`注意力机制` `KV Cache` `推理服务` `并行与分布式` `GPU 编程` `性能分析` `模型架构` `投机解码` `训练与 Scaling` `位置编码`
+- `entity_type`：`项目` `框架` `模型` `公司` `组织` `人物` `课程` `硬件` `benchmark`
+- `source_kind`：`文章` `论文` `课程` `代码` `面试整理` `截图整理` `repo` `数据集`
+
+`sources` 与 `updated` 由 `python3 scripts/kb_meta.py sync` 从实际链接数和 git 提交日期刷新，不要手写。词表本身定义在 `scripts/kb_meta.py`，改词表要同时改那里。
 
 ## 核心操作
 

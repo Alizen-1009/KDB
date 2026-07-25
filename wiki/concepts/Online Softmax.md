@@ -1,3 +1,10 @@
+---
+type: concept
+topic: 注意力机制
+sources: 3
+updated: 2026-04-23
+---
+
 # Online Softmax
 
 ## 定义

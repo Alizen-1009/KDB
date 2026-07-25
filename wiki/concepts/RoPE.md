@@ -1,3 +1,10 @@
+---
+type: concept
+topic: 位置编码
+sources: 3
+updated: 2026-05-17
+---
+
 # RoPE
 
 ## 定义

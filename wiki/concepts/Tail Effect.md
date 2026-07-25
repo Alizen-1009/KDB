@@ -1,3 +1,10 @@
+---
+type: concept
+topic: GPU 编程
+sources: 3
+updated: 2026-06-12
+---
+
 # Tail Effect
 
 ## 定义

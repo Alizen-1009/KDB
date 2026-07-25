@@ -9,6 +9,14 @@
 - 知识库索引：[[wiki/index]]
 - 操作日志：[[wiki/log]]
 
+## 主题地图
+
+每张地图顶部是手写导读（这个主题按什么顺序读），下半是自动维护的清单。
+
+- [[wiki/maps/注意力机制|注意力机制]] ｜ [[wiki/maps/KV Cache|KV Cache]] ｜ [[wiki/maps/推理服务|推理服务]]
+- [[wiki/maps/并行与分布式|并行与分布式]] ｜ [[wiki/maps/GPU 编程|GPU 编程]] ｜ [[wiki/maps/性能分析|性能分析]]
+- [[wiki/maps/模型架构|模型架构]] ｜ [[wiki/maps/投机解码|投机解码]] ｜ [[wiki/maps/训练与 Scaling|训练与 Scaling]] ｜ [[wiki/maps/位置编码|位置编码]]
+
 ## 日常工作流
 
 - 摄入新资料：[[Obsidian Workflow]]

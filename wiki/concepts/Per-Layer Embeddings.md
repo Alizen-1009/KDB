@@ -1,3 +1,10 @@
+---
+type: concept
+topic: 模型架构
+sources: 2
+updated: 2026-05-07
+---
+
 # Per-Layer Embeddings
 
 ## 定义

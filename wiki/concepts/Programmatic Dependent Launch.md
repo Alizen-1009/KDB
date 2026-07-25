@@ -1,3 +1,10 @@
+---
+type: concept
+topic: GPU 编程
+sources: 1
+updated: 2026-06-12
+---
+
 # Programmatic Dependent Launch
 
 ## 定义

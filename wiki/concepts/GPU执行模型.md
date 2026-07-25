@@ -1,3 +1,10 @@
+---
+type: concept
+topic: GPU 编程
+sources: 6
+updated: 2026-06-12
+---
+
 # GPU执行模型
 
 ## 定义

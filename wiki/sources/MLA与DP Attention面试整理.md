@@ -1,3 +1,10 @@
+---
+type: source
+source_kind: 面试整理
+topic: 注意力机制
+updated: 2026-05-17
+---
+
 # MLA与DP Attention面试整理
 
 ## 来源信息

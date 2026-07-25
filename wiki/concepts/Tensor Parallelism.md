@@ -1,3 +1,10 @@
+---
+type: concept
+topic: 并行与分布式
+sources: 4
+updated: 2026-06-12
+---
+
 # Tensor Parallelism
 
 ## 定义

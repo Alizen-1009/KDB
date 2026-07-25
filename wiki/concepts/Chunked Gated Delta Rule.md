@@ -1,3 +1,10 @@
+---
+type: concept
+topic: 注意力机制
+sources: 0
+updated: 2026-06-12
+---
+
 # Chunked Gated Delta Rule
 
 ## 定义

@@ -15,11 +15,14 @@ An **Obsidian vault / AI-infra knowledge base**, not an application. There is no
 `scripts/` (all paths resolve against the **repo root**, not the shell cwd):
 
 ```bash
-python3 scripts/update_index.py                # regenerate wiki/index.md (generated file — never hand-edit)
+python3 scripts/kb_meta.py check|sync          # validate frontmatter / refresh derived sources+updated
+python3 scripts/update_index.py                # regenerate wiki/index.md + wiki/maps/*.md auto sections
 python3 scripts/kb_log.py <action> "<title>" -b "…" -b "…"   # append to wiki/log.md (format-controlled)
 python3 scripts/export_cards.py [output/cards/x.md]          # Markdown Q/A cards -> Anki TSV
-python3 scripts/lint.py                        # health check (thin wrapper over health_check.py)
+python3 scripts/lint.py                        # broken links, wrong link paths, frontmatter, orphans
 ```
+
+After any `wiki/` edit, run `kb_meta.py sync && update_index.py && lint.py` — lint is expected to be all-green.
 
 `scripts/ingest.py` and `scripts/query.py` were deleted (2026-07): they only wrote a prompt template to `inbox/` for Claude to read back — `inbox/` never accumulated a single one in git history. Don't reintroduce that indirection.
 
@@ -28,7 +31,7 @@ python3 scripts/lint.py                        # health check (thin wrapper over
 **Three content layers** (`AGENTS.md` defines them in full):
 
 - `raw/` — immutable source material (`articles/ papers/ repos/ datasets/ images/ code/`). Never edit or "fix" it; record contradictions in `wiki/`, not here.
-- `wiki/` — the compiled knowledge layer Claude maintains: `sources/` (one page per raw item), `entities/` (projects, orgs, people, hardware), `concepts/` (mechanisms, algorithms, terms), plus generated `index.md` and append-only `log.md`.
+- `wiki/` — the compiled knowledge layer Claude maintains: `sources/` (one page per raw item), `entities/` (projects, orgs, people, hardware), `concepts/` (mechanisms, algorithms, terms), `maps/` (one page per topic), plus generated `index.md` and append-only `log.md`.
 - `output/` — research artifacts: `reports/` (technical), `interview/` (interview prep, split out 2026-07-25 — 11 of the original 14 reports), `slides/` (Marp), `visuals/`, `cards/` (review cards + `cards/anki/`), `code/`. High-value conclusions get backfilled into `wiki/`.
 
 **The two-phase gate is the core operating rule.** On ingest: read the full source, report `2-3` core summaries + `1-3` notable claims to the user, **wait for confirmation**, and only then write `wiki/sources/`, update related entity/concept pages, flag conflicts explicitly, update cross-references, `wiki/index.md`, and append to `wiki/log.md`. Finish by reporting what was created vs. updated and any unresolved points.
@@ -37,8 +40,10 @@ python3 scripts/lint.py                        # health check (thin wrapper over
 
 ## Conventions that are easy to get wrong
 
-- **`wiki/index.md` is generated** by `update_index.py` — never hand-edit it. `wiki/log.md` is append-only via `scripts/kb_log.py` — don't hand-edit it either, the entry format is script-controlled.
+- **Every page in `wiki/{concepts,entities,sources}` carries frontmatter** (`type`, `topic`, plus `entity_type`/`source_kind`; `sources` and `updated` are derived). Topic vocabulary is fixed — it lives in `scripts/kb_meta.py` and is mirrored for humans in `AGENTS.md`. The index and topic maps group by these fields, so a page without valid frontmatter falls out of navigation entirely.
+- **`wiki/index.md` is generated** by `update_index.py` — never hand-edit it. Same for everything below the `BEGIN AUTO` marker in `wiki/maps/<topic>.md`; **the 导读 section above that marker is hand-written and preserved** across regeneration — that's where reading order lives. `wiki/log.md` is append-only via `scripts/kb_log.py` — don't hand-edit it either, the entry format is script-controlled.
 - **Wikilink targets are filename stems.** Cross-directory links inside `wiki/` use relative form (`[[../entities/vLLM]]`, `[[../sources/xxx]]`); same-directory links are bare (`[[MLA]]`). Renaming a page silently breaks every inbound link — grep before renaming.
+- **Count the `../` carefully.** `wiki/sources/` → raw is `../../raw/...`; `output/reports|interview/` → wiki is `../../wiki/...`. 39 links had one `../` too few (fixed 2026-07-25); `lint.py` now catches this, since the name resolves even when the path doesn't.
 - **Source page naming differs by kind**: articles and code mirror the raw file's stem (`raw/articles/PageAttention代码走读.md` → `wiki/sources/PageAttention代码走读.md`); papers use the paper title, not the arXiv id (`raw/papers/2603.15031v1.pdf` → `wiki/sources/Attention Residuals.md`). Source pages must contain an `原始文件：` field — `lint.py` checks for it.
 - **`_`-prefixed files are infrastructure**: `wiki/*/_TEMPLATE.md` are the canonical page templates (excluded from the index and lint). Duplicate copies under `Templates/` were deleted 2026-07-25; only `Templates/Query Report Template.md` remains there, since `output/` has no `_TEMPLATE`.
 - **Images** live under `raw/images/<主题>/` and are embedded as `![[raw/images/...]]`. Clipped articles keep remote image URLs (zhihu CDN) rather than local copies.

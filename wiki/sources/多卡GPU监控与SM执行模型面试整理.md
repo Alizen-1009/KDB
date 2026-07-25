@@ -1,3 +1,10 @@
+---
+type: source
+source_kind: 面试整理
+topic: GPU 编程
+updated: 2026-07-25
+---
+
 # 多卡GPU监控与SM执行模型面试整理
 
 ## 来源信息

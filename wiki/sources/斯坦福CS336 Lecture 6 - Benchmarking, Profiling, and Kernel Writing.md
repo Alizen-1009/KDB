@@ -1,3 +1,10 @@
+---
+type: source
+source_kind: 课程
+topic: 性能分析
+updated: 2026-04-23
+---
+
 # 斯坦福CS336 Lecture 6 - Benchmarking, Profiling, and Kernel Writing
 
 ## 来源信息
@@ -6,7 +13,7 @@
 - 作者：[[../entities/Stanford CS336]]
 - 日期：2025 Spring
 - 类型：可执行课程讲稿 / 代码
-- 原始文件：[[../raw/articles/斯坦福CS336 Lecture 6 - Benchmarking, Profiling, and Kernel Writing|斯坦福CS336 Lecture 6 - Benchmarking, Profiling, and Kernel Writing]]
+- 原始文件：[[../../raw/articles/斯坦福CS336 Lecture 6 - Benchmarking, Profiling, and Kernel Writing|斯坦福CS336 Lecture 6 - Benchmarking, Profiling, and Kernel Writing]]
 
 ## 2-3 条核心摘要
 

@@ -1,3 +1,10 @@
+---
+type: concept
+topic: KV Cache
+sources: 4
+updated: 2026-06-12
+---
+
 # Prefix Caching
 
 ## 定义

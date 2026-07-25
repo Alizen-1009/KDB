@@ -1,3 +1,10 @@
+---
+type: concept
+topic: 性能分析
+sources: 3
+updated: 2026-06-12
+---
+
 # Roofline 模型
 
 ## 定义

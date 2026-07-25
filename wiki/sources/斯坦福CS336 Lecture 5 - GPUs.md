@@ -1,3 +1,10 @@
+---
+type: source
+source_kind: 课程
+topic: GPU 编程
+updated: 2026-04-23
+---
+
 # 斯坦福CS336 Lecture 5 - GPUs
 
 ## 来源信息
@@ -6,7 +13,7 @@
 - 作者：[[../entities/Stanford CS336]]
 - 日期：2025 Spring
 - 类型：课程讲义 / 视频镜像
-- 原始文件：[[../raw/articles/斯坦福CS336 Lecture 5 - GPUs|斯坦福CS336 Lecture 5 - GPUs]]
+- 原始文件：[[../../raw/articles/斯坦福CS336 Lecture 5 - GPUs|斯坦福CS336 Lecture 5 - GPUs]]
 
 ## 2-3 条核心摘要
 

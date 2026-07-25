@@ -1,3 +1,10 @@
+---
+type: concept
+topic: 推理服务
+sources: 4
+updated: 2026-07-08
+---
+
 # Chunked Prefill
 
 ## 定义

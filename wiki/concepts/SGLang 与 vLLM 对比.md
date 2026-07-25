@@ -1,3 +1,10 @@
+---
+type: concept
+topic: 推理服务
+sources: 4
+updated: 2026-05-07
+---
+
 # SGLang 与 vLLM 对比
 
 ## 定义

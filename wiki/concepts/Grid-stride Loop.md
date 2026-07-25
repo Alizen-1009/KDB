@@ -1,3 +1,10 @@
+---
+type: concept
+topic: GPU 编程
+sources: 1
+updated: 2026-04-23
+---
+
 # Grid-stride Loop
 
 ## 定义

@@ -1,3 +1,10 @@
+---
+type: source
+source_kind: 文章
+topic: 投机解码
+updated: 2026-05-07
+---
+
 # Gemma 4：Drafter 详解
 
 ## 来源信息

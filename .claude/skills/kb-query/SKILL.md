@@ -11,7 +11,7 @@ description: 基于 wiki/ 回答研究问题——架构对比、性能归因、
 
 ## 检索顺序
 
-1. 先读 `wiki/index.md`，挑出相关的概念页、实体页、来源页。
+1. 先读 `wiki/index.md`（按主题分组），锁定主题后读 `wiki/maps/<topic>.md`——它的《导读》写了这个主题的阅读顺序和主干页面，比在 82 个概念里瞎翻快得多。
 2. 读这些 wiki 页面，它们才是这个库的检索入口。
 3. **只有 wiki 信息不足时**才回 `raw/` 读原始资料——这个库的设计前提就是知识已经编译过一遍，不是每次问答都重新 RAG 原文。
 4. 涉及具体实现细节（kernel grid 映射、调度器行为、API 签名）时，交叉核对官方源码或文档，并在报告里写明核对来源。
@@ -44,7 +44,9 @@ description: 基于 wiki/ 回答研究问题——架构对比、性能归因、
 
 1. **回填**：如果产生了新的、稳定的结论，写回相关概念页或实体页——只停在报告里的结论等于没有进知识库。回填后重跑索引。
 2. ```bash
+   python3 scripts/kb_meta.py sync
    python3 scripts/update_index.py
+   python3 scripts/lint.py
    python3 scripts/kb_log.py query "<问题标题>" \
      -b "读取概念页：\`FlashAttention\`、\`GPU执行模型\`" \
      -b "创建报告：\`output/reports/xxx.md\`" \

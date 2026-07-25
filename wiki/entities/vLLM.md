@@ -1,3 +1,11 @@
+---
+type: entity
+entity_type: 框架
+topic: 推理服务
+sources: 14
+updated: 2026-06-12
+---
+
 # vLLM
 
 ## 一句话说明

@@ -1,3 +1,10 @@
+---
+type: source
+source_kind: 文章
+topic: 位置编码
+updated: 2026-05-17
+---
+
 # DeepSeekV4中RoPE设计解析
 
 ## 来源信息
@@ -6,7 +13,7 @@
 - 作者：kaiyuan
 - 日期：2026-05-08
 - 类型：文章 / 机制讲解 / 位置编码实现分析
-- 原始文件：[[../raw/articles/DeepSeekV4中RoPE设计解析|DeepSeekV4中RoPE设计解析]]
+- 原始文件：[[../../raw/articles/DeepSeekV4中RoPE设计解析|DeepSeekV4中RoPE设计解析]]
 - 原始链接：https://mp.weixin.qq.com/s/lCTvzq8FiY4q6r4D6QLh9Q
 
 ## 2-3 条核心摘要

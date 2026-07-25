@@ -1,3 +1,10 @@
+---
+type: source
+source_kind: 面试整理
+topic: KV Cache
+updated: 2026-04-23
+---
+
 # 美团一面：请介绍 vLLM PageAttention
 
 ## 来源信息
@@ -6,7 +13,7 @@
 - 作者：待确认（原始剪藏未提供明确署名）
 - 日期：2026-04-23（剪藏时间）
 - 类型：短文 / 面试复盘 / 推理系统概念讲解
-- 原始文件：[[../raw/articles/美团一面：请介绍 vLLM PageAttention|美团一面：请介绍 vLLM PageAttention]]
+- 原始文件：[[../../raw/articles/美团一面：请介绍 vLLM PageAttention|美团一面：请介绍 vLLM PageAttention]]
 
 ## 2-3 条核心摘要
 

@@ -1,3 +1,10 @@
+---
+type: concept
+topic: 注意力机制
+sources: 1
+updated: 2026-05-17
+---
+
 # FlashMLA
 
 ## 定义

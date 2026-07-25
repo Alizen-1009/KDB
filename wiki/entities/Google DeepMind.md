@@ -1,3 +1,11 @@
+---
+type: entity
+entity_type: 公司
+topic: 模型架构
+sources: 1
+updated: 2026-04-23
+---
+
 # Google DeepMind
 
 ## 一句话说明

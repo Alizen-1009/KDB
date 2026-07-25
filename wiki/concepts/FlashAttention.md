@@ -1,3 +1,10 @@
+---
+type: concept
+topic: 注意力机制
+sources: 4
+updated: 2026-07-18
+---
+
 # FlashAttention
 
 ## 定义

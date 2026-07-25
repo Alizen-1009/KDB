@@ -1,3 +1,10 @@
+---
+type: concept
+topic: KV Cache
+sources: 7
+updated: 2026-06-12
+---
+
 # PagedAttention
 
 ## 定义

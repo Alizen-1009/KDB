@@ -1,3 +1,10 @@
+---
+type: source
+source_kind: 论文
+topic: 模型架构
+updated: 2026-04-23
+---
+
 # Conditional Memory via Scalable Lookup: A New Axis of Sparsity for Large Language Models
 
 ## 来源信息

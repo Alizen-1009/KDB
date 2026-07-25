@@ -1,3 +1,10 @@
+---
+type: concept
+topic: 性能分析
+sources: 4
+updated: 2026-06-12
+---
+
 # Profiling
 
 ## 定义

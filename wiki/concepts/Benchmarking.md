@@ -1,3 +1,10 @@
+---
+type: concept
+topic: 性能分析
+sources: 1
+updated: 2026-04-23
+---
+
 # Benchmarking
 
 ## 定义

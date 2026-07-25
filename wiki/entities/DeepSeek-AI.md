@@ -1,3 +1,11 @@
+---
+type: entity
+entity_type: 公司
+topic: 模型架构
+sources: 5
+updated: 2026-05-17
+---
+
 # DeepSeek-AI
 
 ## 一句话说明

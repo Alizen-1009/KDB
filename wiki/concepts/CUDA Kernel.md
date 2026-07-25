@@ -1,3 +1,10 @@
+---
+type: concept
+topic: GPU 编程
+sources: 8
+updated: 2026-06-12
+---
+
 # CUDA Kernel
 
 ## 定义

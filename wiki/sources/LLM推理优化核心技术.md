@@ -1,3 +1,10 @@
+---
+type: source
+source_kind: 文章
+topic: 推理服务
+updated: 2026-04-23
+---
+
 # LLM推理优化核心技术
 
 ## 来源信息
@@ -6,7 +13,7 @@
 - 作者：[[kason_zhang]]
 - 日期：2026-04-12
 - 类型：文章
-- 原始文件：[[../raw/articles/LLM推理优化核心技术|LLM推理优化核心技术]]
+- 原始文件：[[../../raw/articles/LLM推理优化核心技术|LLM推理优化核心技术]]
 
 ## 2-3 条核心摘要
 

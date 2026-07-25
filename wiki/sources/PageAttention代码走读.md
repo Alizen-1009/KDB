@@ -1,3 +1,10 @@
+---
+type: source
+source_kind: 文章
+topic: KV Cache
+updated: 2026-05-08
+---
+
 # PageAttention代码走读
 
 ## 来源信息
@@ -6,7 +13,7 @@
 - 作者：zzk againAbove & Beyond
 - 日期：2023-11-25
 - 类型：文章 / 代码走读
-- 原始文件：[[../raw/articles/PageAttention代码走读|PageAttention代码走读]]
+- 原始文件：[[../../raw/articles/PageAttention代码走读|PageAttention代码走读]]
 - 原始链接：[知乎专栏](https://zhuanlan.zhihu.com/p/668736097)
 
 ## 2-3 条核心摘要

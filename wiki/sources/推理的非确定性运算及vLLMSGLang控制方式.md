@@ -1,3 +1,10 @@
+---
+type: source
+source_kind: 文章
+topic: 推理服务
+updated: 2026-05-06
+---
+
 # 推理的非确定性运算及vLLMSGLang控制方式
 
 ## 来源信息
@@ -6,7 +13,7 @@
 - 作者：kaiyuan新知答主
 - 日期：2026-03-20
 - 类型：文章
-- 原始文件：[[../raw/articles/推理的非确定性运算及vLLMSGLang控制方式|推理的非确定性运算及vLLMSGLang控制方式]]
+- 原始文件：[[../../raw/articles/推理的非确定性运算及vLLMSGLang控制方式|推理的非确定性运算及vLLMSGLang控制方式]]
 
 ## 2-3 条核心摘要
 

@@ -1,3 +1,10 @@
+---
+type: concept
+topic: GPU 编程
+sources: 5
+updated: 2026-06-12
+---
+
 # CUDA内存层次
 
 ## 定义

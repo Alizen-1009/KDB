@@ -1,3 +1,10 @@
+---
+type: source
+source_kind: 文章
+topic: 并行与分布式
+updated: 2026-06-12
+---
+
 # vllm并行策略之DCP(Decode Context Parallel)
 
 ## 来源信息

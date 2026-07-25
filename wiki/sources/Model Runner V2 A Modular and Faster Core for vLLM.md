@@ -1,3 +1,10 @@
+---
+type: source
+source_kind: 文章
+topic: 推理服务
+updated: 2026-04-23
+---
+
 # Model Runner V2 A Modular and Faster Core for vLLM
 
 ## 来源信息

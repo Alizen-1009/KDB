@@ -5,6 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 import re
 
+from kb_meta import check as check_frontmatter
 from kb_utils import ROOT, visible_files, wikilinks_in
 
 WIKI = ROOT / "wiki"
@@ -72,6 +73,27 @@ def is_placeholder_target(target: str) -> bool:
     return target in placeholders
 
 
+def wrong_path(source: Path, raw_link: str) -> str | None:
+    """带路径的 wikilink 里，路径本身写错时返回真实位置。
+
+    只校验带 `/` 的链接——裸名链接由 Obsidian 按 vault 内文件名解析，没有路径可错。
+    """
+    target = raw_link.split("|", 1)[0].split("#", 1)[0].strip()
+    if "/" not in target:
+        return None
+    if not target.endswith(".md"):
+        target += ".md"
+    if (source.parent / target).exists():
+        return None
+    hits = [p for p in markdown_files(ROOT) if p.name == Path(target).name]
+    if not hits:
+        return None
+    # 同名文件可能存在多份（raw/articles 与 wiki/sources 常同名），优先报链接自己声明的那个目录
+    declared = Path(target).parent.name
+    hits.sort(key=lambda p: p.parent.name != declared)
+    return hits[0].relative_to(ROOT).as_posix()
+
+
 def main() -> None:
     files = markdown_files(ROOT)
     known = {p.stem for p in files}
@@ -89,8 +111,12 @@ def main() -> None:
             if target and target not in known:
                 rel = file.relative_to(ROOT)
                 problems.append(f"{rel}: 缺失链接目标 [[{match}]]")
-            elif target in backlinks:
+                continue
+            if target in backlinks:
                 backlinks[target] += 1
+            bad_path = wrong_path(file, match)
+            if bad_path:
+                problems.append(f"{file.relative_to(ROOT)}: 链接路径不存在 [[{match}]]，实际在 {bad_path}")
 
         if file.parent == WIKI / "sources" and "原始文件：" not in text:
             source_reference_issues.append(
@@ -132,6 +158,15 @@ def main() -> None:
             print(f"- {problem}")
     else:
         print("No broken wiki links found.")
+
+    print("")
+    frontmatter_issues = check_frontmatter()
+    if frontmatter_issues:
+        print("Frontmatter 问题：")
+        for item in frontmatter_issues:
+            print(f"- {item}")
+    else:
+        print("All wiki pages have valid frontmatter.")
 
     print("")
     if source_reference_issues:

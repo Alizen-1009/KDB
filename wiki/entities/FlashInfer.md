@@ -1,3 +1,11 @@
+---
+type: entity
+entity_type: 框架
+topic: GPU 编程
+sources: 0
+updated: 2026-06-12
+---
+
 # FlashInfer
 
 ## 一句话说明

@@ -1,3 +1,10 @@
+---
+type: source
+source_kind: 论文
+topic: GPU 编程
+updated: 2026-06-12
+---
+
 # Look Ma, No Bubbles! Designing a Low-Latency Megakernel for Llama-1B
 
 ## 来源信息

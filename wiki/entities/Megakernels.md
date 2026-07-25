@@ -1,3 +1,11 @@
+---
+type: entity
+entity_type: 项目
+topic: GPU 编程
+sources: 1
+updated: 2026-06-12
+---
+
 # Megakernels
 
 ## 一句话说明

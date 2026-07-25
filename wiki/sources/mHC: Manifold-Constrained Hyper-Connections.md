@@ -1,3 +1,10 @@
+---
+type: source
+source_kind: 论文
+topic: 模型架构
+updated: 2026-04-23
+---
+
 # mHC: Manifold-Constrained Hyper-Connections
 
 ## 来源信息

@@ -1,3 +1,10 @@
+---
+type: concept
+topic: 训练与 Scaling
+sources: 3
+updated: 2026-05-06
+---
+
 # Scaling Laws
 
 ## 定义

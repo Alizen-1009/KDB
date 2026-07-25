@@ -1,3 +1,10 @@
+---
+type: source
+source_kind: 文章
+topic: 位置编码
+updated: 2026-05-17
+---
+
 # 彻底搞懂RoPE计算原理：从1D到3D
 
 ## 来源信息
@@ -6,7 +13,7 @@
 - 作者：kaiyuan
 - 日期：2026-04-08
 - 类型：文章 / 机制讲解 / 多模态位置编码实现导读
-- 原始文件：[[../raw/articles/彻底搞懂RoPE计算原理：从1D到3D|彻底搞懂RoPE计算原理：从1D到3D]]
+- 原始文件：[[../../raw/articles/彻底搞懂RoPE计算原理：从1D到3D|彻底搞懂RoPE计算原理：从1D到3D]]
 - 原始链接：https://mp.weixin.qq.com/s/8_0V6Yxw-_03lCY3ujPVtA
 
 ## 2-3 条核心摘要

@@ -1,3 +1,10 @@
+---
+type: source
+source_kind: 代码
+topic: 模型架构
+updated: 2026-04-23
+---
+
 # engram_demo_v1
 
 ## 来源信息

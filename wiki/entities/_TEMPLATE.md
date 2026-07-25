@@ -1,3 +1,11 @@
+---
+type: entity
+entity_type: 
+topic: 
+sources: 0
+updated: 
+---
+
 # 实体名称
 
 ## 一句话说明

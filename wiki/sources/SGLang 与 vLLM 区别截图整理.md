@@ -1,3 +1,10 @@
+---
+type: source
+source_kind: 截图整理
+topic: 推理服务
+updated: 2026-05-07
+---
+
 # SGLang 与 vLLM 区别截图整理
 
 ## 来源信息
@@ -6,7 +13,7 @@
 - 作者：用户提供截图；LLM 校正整理
 - 日期：2026-05-07
 - 类型：截图 / 对话整理
-- 原始文件：[[../raw/articles/SGLang 与 vLLM 区别截图整理|SGLang 与 vLLM 区别截图整理]]
+- 原始文件：[[../../raw/articles/SGLang 与 vLLM 区别截图整理|SGLang 与 vLLM 区别截图整理]]
 
 ## 2-3 条核心摘要
 

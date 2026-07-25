@@ -1,3 +1,11 @@
+---
+type: entity
+entity_type: 人物
+topic: 并行与分布式
+sources: 1
+updated: 2026-06-12
+---
+
 # 梦初AI Infra
 
 ## 一句话说明

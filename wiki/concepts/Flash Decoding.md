@@ -1,3 +1,10 @@
+---
+type: concept
+topic: 注意力机制
+sources: 2
+updated: 2026-07-08
+---
+
 # Flash Decoding
 
 ## 定义

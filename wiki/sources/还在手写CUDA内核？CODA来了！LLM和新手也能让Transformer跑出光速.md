@@ -1,3 +1,10 @@
+---
+type: source
+source_kind: 文章
+topic: GPU 编程
+updated: 2026-06-21
+---
+
 # 还在手写CUDA内核？CODA来了！LLM和新手也能让Transformer跑出光速
 
 ## 来源信息
@@ -6,7 +13,7 @@
 - 作者：机器之心
 - 日期：2026-05-24 编辑；原始资料创建于 2026-06-08
 - 类型：文章
-- 原始文件：[[../raw/articles/还在手写CUDA内核？CODA来了！LLM和新手也能让Transformer跑出光速|还在手写CUDA内核？CODA来了！LLM和新手也能让Transformer跑出光速]]
+- 原始文件：[[../../raw/articles/还在手写CUDA内核？CODA来了！LLM和新手也能让Transformer跑出光速|还在手写CUDA内核？CODA来了！LLM和新手也能让Transformer跑出光速]]
 - 外部线索：文章指向论文 `CODA: Rewriting Transformer Blocks as GEMM-Epilogue Programs` 与代码仓库 `HanGuo97/coda-kernels`
 
 ## 2-3 条核心摘要

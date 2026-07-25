@@ -13,7 +13,7 @@
 - 再讲机制
 - 最后补 tradeoff 和工程判断
 
-相关概念可结合 [[../wiki/concepts/CUDA Kernel|CUDA Kernel]]、[[../wiki/concepts/算子融合|算子融合]]、[[../wiki/concepts/Profiling|Profiling]]、[[../wiki/concepts/FlashAttention|FlashAttention]]、[[../wiki/concepts/KV Cache|KV Cache]] 一起看。
+相关概念可结合 [[../../wiki/concepts/CUDA Kernel|CUDA Kernel]]、[[../../wiki/concepts/算子融合|算子融合]]、[[../../wiki/concepts/Profiling|Profiling]]、[[../../wiki/concepts/FlashAttention|FlashAttention]]、[[../../wiki/concepts/KV Cache|KV Cache]] 一起看。
 
 ## 5. 针对特定 shape 的算子调优，如何制定优化策略以超越官方库的性能？
 
@@ -33,7 +33,7 @@
 
 ### 2. 先做算账：这个 shape 是 memory-bound 还是 compute-bound
 
-先从 [[../wiki/concepts/Roofline 模型|Roofline 模型]] 想：
+先从 [[../../wiki/concepts/Roofline 模型|Roofline 模型]] 想：
 
 - 如果算子 arithmetic intensity 很低，优先想 `访存重排 / 融合 / 复用`
 - 如果已经接近 compute-bound，优先想 `Tensor Core 命中 / tile 设计 / pipeline overlap`
@@ -181,7 +181,7 @@
 - 更规则的线程映射
 - 把多个低 intensity 小算子拼成更高 intensity 的大算子
 
-这也是为什么融合常常和 [[../wiki/concepts/Tiling|Tiling]]、[[../wiki/concepts/重计算|重计算]]、[[../wiki/concepts/FlashAttention|FlashAttention]] 一起出现。
+这也是为什么融合常常和 [[../../wiki/concepts/Tiling|Tiling]]、[[../../wiki/concepts/重计算|重计算]]、[[../../wiki/concepts/FlashAttention|FlashAttention]] 一起出现。
 
 ### 5. 融合不一定更快，最常见的反噬点
 
@@ -582,7 +582,7 @@ ncu --set full --kernel-name regex:your_kernel python your_script.py
 所以 decode 阶段常常会变得更偏 memory-bound，这也是为什么：
 
 - cache 布局
-- [[../wiki/concepts/PagedAttention|PagedAttention]]
+- [[../../wiki/concepts/PagedAttention|PagedAttention]]
 - cache 精度
 - prefix 共享
 
@@ -679,12 +679,12 @@ decode 阶段通常更小、更碎、更偏 cache 读，因此收益结构和 pr
 
 ### Vault 内
 
-- [[../wiki/sources/斯坦福CS336 Lecture 5 - GPUs|斯坦福CS336 Lecture 5 - GPUs]]
-- [[../wiki/sources/斯坦福CS336 Lecture 6 - Benchmarking, Profiling, and Kernel Writing|斯坦福CS336 Lecture 6 - Benchmarking, Profiling, and Kernel Writing]]
-- [[../wiki/sources/你一定要知道：CUDA优化六要|你一定要知道：CUDA优化六要]]
-- [[../wiki/sources/LLM推理优化核心技术|LLM推理优化核心技术]]
-- [[../wiki/sources/Flash Attention 详细解释推演与Pytorch代码实现|Flash Attention 详细解释推演与Pytorch代码实现]]
-- [[../wiki/sources/美团一面：请介绍 vLLM PageAttention|美团一面：请介绍 vLLM PageAttention]]
+- [[../../wiki/sources/斯坦福CS336 Lecture 5 - GPUs|斯坦福CS336 Lecture 5 - GPUs]]
+- [[../../wiki/sources/斯坦福CS336 Lecture 6 - Benchmarking, Profiling, and Kernel Writing|斯坦福CS336 Lecture 6 - Benchmarking, Profiling, and Kernel Writing]]
+- [[../../wiki/sources/你一定要知道：CUDA优化六要|你一定要知道：CUDA优化六要]]
+- [[../../wiki/sources/LLM推理优化核心技术|LLM推理优化核心技术]]
+- [[../../wiki/sources/Flash Attention 详细解释推演与Pytorch代码实现|Flash Attention 详细解释推演与Pytorch代码实现]]
+- [[../../wiki/sources/美团一面：请介绍 vLLM PageAttention|美团一面：请介绍 vLLM PageAttention]]
 
 ### 外部参考
 

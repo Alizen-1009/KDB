@@ -1,3 +1,10 @@
+---
+type: concept
+topic: 推理服务
+sources: 1
+updated: 2026-05-07
+---
+
 # Constrained Decoding
 
 ## 定义

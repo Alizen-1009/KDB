@@ -1,3 +1,10 @@
+---
+type: source
+source_kind: 文章
+topic: 模型架构
+updated: 2026-04-23
+---
+
 # Kimi新作《Attention Residuals》：对Transformer中残差结构的调整
 
 ## 来源信息

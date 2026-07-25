@@ -1,3 +1,10 @@
+---
+type: concept
+topic: 推理服务
+sources: 2
+updated: 2026-05-17
+---
+
 # vLLM V1 统一调度器
 
 ## 定义

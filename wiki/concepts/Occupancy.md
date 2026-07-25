@@ -1,3 +1,10 @@
+---
+type: concept
+topic: GPU 编程
+sources: 4
+updated: 2026-05-07
+---
+
 # Occupancy
 
 ## 定义

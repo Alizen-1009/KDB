@@ -1,3 +1,11 @@
+---
+type: entity
+entity_type: 人物
+topic: 推理服务
+sources: 2
+updated: 2026-05-17
+---
+
 # kaiyuan
 
 ## 一句话说明

@@ -1,3 +1,10 @@
+---
+type: concept
+topic: 
+sources: 0
+updated: 
+---
+
 # 概念名称
 
 ## 定义

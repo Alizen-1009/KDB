@@ -1,3 +1,10 @@
+---
+type: source
+source_kind: 文章
+topic: 模型架构
+updated: 2026-04-23
+---
+
 # Gemma 4 核心技术深度解析：PLE、Shared KV Cache 与全模态架构
 
 ## 来源信息
@@ -6,7 +13,7 @@
 - 作者：[[特里斯丹井底之娃 往上爬]]
 - 日期：2026-04-03
 - 类型：文章
-- 原始文件：[[../raw/articles/Gemma 4 核心技术深度解析：PLE、Shared KV Cache 与全模态架构|Gemma 4 核心技术深度解析：PLE、Shared KV Cache 与全模态架构]]
+- 原始文件：[[../../raw/articles/Gemma 4 核心技术深度解析：PLE、Shared KV Cache 与全模态架构|Gemma 4 核心技术深度解析：PLE、Shared KV Cache 与全模态架构]]
 
 ## 2-3 条核心摘要
 

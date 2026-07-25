@@ -1,3 +1,10 @@
+---
+type: concept
+topic: 投机解码
+sources: 3
+updated: 2026-07-08
+---
+
 # Multi-Token Prediction
 
 ## 定义

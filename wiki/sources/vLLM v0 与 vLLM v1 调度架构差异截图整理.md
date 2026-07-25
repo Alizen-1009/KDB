@@ -1,3 +1,10 @@
+---
+type: source
+source_kind: 截图整理
+topic: 推理服务
+updated: 2026-05-07
+---
+
 # vLLM v0 与 vLLM v1 调度架构差异截图整理
 
 ## 来源信息

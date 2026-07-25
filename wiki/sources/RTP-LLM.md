@@ -1,3 +1,10 @@
+---
+type: source
+source_kind: 文章
+topic: 推理服务
+updated: 2026-06-12
+---
+
 # RTP-LLM：阿里开源工业级 LLM 推理引擎，模型加载提速 6.3 倍、TTFT 降低 37%，吞吐量领先 vLLM 与 SGLang！
 
 ## 来源信息

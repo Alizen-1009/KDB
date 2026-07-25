@@ -1,3 +1,10 @@
+---
+type: source
+source_kind: 论文
+topic: 模型架构
+updated: 2026-05-06
+---
+
 # Attention Residuals
 
 ## 来源信息

@@ -1,3 +1,11 @@
+---
+type: entity
+entity_type: 课程
+topic: 训练与 Scaling
+sources: 5
+updated: 2026-04-23
+---
+
 # Stanford CS336
 
 ## 一句话说明

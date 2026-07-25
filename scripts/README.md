@@ -4,13 +4,25 @@
 
 ## `update_index.py`
 
-扫描知识库并重建 `wiki/index.md`（统计 + 实体 / 概念 / 来源 / 报告 / 幻灯片列表 + 最近日志）。
+重建 `wiki/index.md` 和 `wiki/maps/<主题>.md`。分组依据是页面 frontmatter 的 `topic` / `entity_type` / `source_kind`，所以页面必须先有 frontmatter。
 
-`wiki/index.md` 是生成物，不要手工编辑。
+- `wiki/index.md` 整页是生成物，不要手工编辑。
+- `wiki/maps/<主题>.md` 只有 `BEGIN AUTO` 标记之后的部分是生成物；**标记之前的《导读》是手写区，重新生成时保留**。想写“这个主题按什么顺序读”，写在那里。
 
 ```bash
 python3 scripts/update_index.py
 ```
+
+## `kb_meta.py`
+
+frontmatter 的词表、校验与派生字段维护。
+
+```bash
+python3 scripts/kb_meta.py check   # 校验 type / topic / entity_type / source_kind 是否在词表内
+python3 scripts/kb_meta.py sync    # 从实际链接数和 git 提交日期刷新 sources / updated
+```
+
+`TOPICS` / `ENTITY_TYPES` / `SOURCE_KINDS` 三个词表定义在这个文件里，是唯一来源；`AGENTS.md` 里那份是给人看的副本，改词表要同时改。
 
 ## `kb_log.py`
 
@@ -35,7 +47,7 @@ python3 scripts/export_cards.py output/cards/attention.md
 
 ## `lint.py` / `health_check.py`
 
-对 wiki 做健康检查：断链、孤儿页、来源页缺 `原始文件：` 字段、空目录。`lint.py` 是 `health_check.py` 的入口包装。
+对 wiki 做健康检查：断链、**链接路径写错**（名字对但相对路径错，Obsidian 里点不开）、frontmatter 是否合规、孤儿页、来源页缺 `原始文件：` 字段、空目录。`lint.py` 是 `health_check.py` 的入口包装。
 
 ```bash
 python3 scripts/lint.py

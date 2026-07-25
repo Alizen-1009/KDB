@@ -1,3 +1,10 @@
+---
+type: source
+source_kind: 面试整理
+topic: 性能分析
+updated: 2026-07-25
+---
+
 # 量化剪枝推理瓶颈Nsight与异构集群面试整理
 
 ## 来源信息

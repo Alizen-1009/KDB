@@ -1,3 +1,10 @@
+---
+type: concept
+topic: KV Cache
+sources: 2
+updated: 2026-05-07
+---
+
 # Shared KV Cache
 
 ## 定义

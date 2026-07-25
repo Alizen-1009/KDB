@@ -1,3 +1,10 @@
+---
+type: concept
+topic: 训练与 Scaling
+sources: 1
+updated: 2026-04-23
+---
+
 # Critical Batch Size
 
 ## 定义

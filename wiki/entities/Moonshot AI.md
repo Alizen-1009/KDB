@@ -1,3 +1,11 @@
+---
+type: entity
+entity_type: 公司
+topic: 模型架构
+sources: 2
+updated: 2026-05-06
+---
+
 # Moonshot AI
 
 ## 一句话说明

@@ -1,3 +1,10 @@
+---
+type: concept
+topic: 推理服务
+sources: 5
+updated: 2026-05-17
+---
+
 # Continuous Batching
 
 ## 定义

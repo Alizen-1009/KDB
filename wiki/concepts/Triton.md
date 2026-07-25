@@ -1,3 +1,10 @@
+---
+type: concept
+topic: GPU 编程
+sources: 2
+updated: 2026-06-21
+---
+
 # Triton
 
 ## 定义

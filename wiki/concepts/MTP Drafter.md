@@ -1,3 +1,10 @@
+---
+type: concept
+topic: 投机解码
+sources: 2
+updated: 2026-06-12
+---
+
 # MTP Drafter
 
 ## 定义

@@ -43,13 +43,17 @@ PDF 用 Read 的 `pages` 参数分批读完；长文章分段读到底。**不�
    - 文章、代码：与 raw 文件 stem 一致（`raw/articles/PageAttention代码走读.md` → `wiki/sources/PageAttention代码走读.md`）
    - 论文：用论文标题，不用 arXiv 编号（`raw/papers/2603.15031v1.pdf` → `wiki/sources/Attention Residuals.md`）
 2. **实体页 / 概念页**：先 `ls wiki/concepts wiki/entities` 看已有页面。优先在现有页面里局部增补相关小节，**不重写整页**；只有确实是新概念/新实体才新建，新建时用同目录的 `_TEMPLATE.md`。
+   新建页面必须带 frontmatter（`type` / `topic` / 实体页的 `entity_type` / 来源页的 `source_kind`），取值只能来自 `AGENTS.md` 的固定词表。`sources` 和 `updated` 留空或随便填，后面 `kb_meta.py sync` 会覆盖。
 3. **冲突**：新资料与已有 wiki 结论矛盾时，在页面里显式标注两种说法及各自来源，不要静默改写旧结论。
 4. **交叉引用要双向**：来源页的《关键概念》列出概念页，同时概念页的《相关来源》要回链这篇来源页。只做单向就会在 lint 里变成孤儿页。
 5. **链接写法**跟随现状：同目录裸名 `[[MLA]]`，跨目录相对路径 `[[../entities/vLLM]]`。图片用 `![[raw/images/<主题>/<文件名>]]`。
-6. **重建索引**（不要手改 `wiki/index.md`，它是生成物）：
+6. **刷新元数据并重建索引**（`wiki/index.md` 和 `wiki/maps/*.md` 的自动区都是生成物，不要手改）：
    ```bash
-   python3 scripts/update_index.py
+   python3 scripts/kb_meta.py sync      # 刷新 sources / updated
+   python3 scripts/update_index.py      # 重建索引与主题地图
+   python3 scripts/lint.py              # 断链、路径、frontmatter 校验，应为全绿
    ```
+   如果新概念页让某个主题的阅读顺序变了，考虑在 `wiki/maps/<topic>.md` 的《导读》里补一句——那是手写区，不会被覆盖。
 7. **追加日志**（不要手编 `wiki/log.md`，格式由脚本保证）：
    ```bash
    python3 scripts/kb_log.py ingest "<资料标题>" \

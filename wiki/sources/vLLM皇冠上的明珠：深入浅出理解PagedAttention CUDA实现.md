@@ -1,3 +1,10 @@
+---
+type: source
+source_kind: 文章
+topic: KV Cache
+updated: 2026-05-17
+---
+
 # vLLM皇冠上的明珠：深入浅出理解PagedAttention CUDA实现
 
 ## 来源信息
@@ -6,7 +13,7 @@
 - 作者：[[../entities/方佳瑞]]
 - 日期：2023-12-28
 - 类型：文章 / CUDA kernel 代码实现解析
-- 原始文件：[[../raw/articles/vLLM皇冠上的明珠：深入浅出理解PagedAttention CUDA实现]]
+- 原始文件：[[../../raw/articles/vLLM皇冠上的明珠：深入浅出理解PagedAttention CUDA实现]]
 - 原始链接：[知乎专栏](https://zhuanlan.zhihu.com/p/673284781?share_code=HttD5x9CDmV1&utm_psn=2015858798674338445)
 
 ## 2-3 条核心摘要

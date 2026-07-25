@@ -1,3 +1,10 @@
+---
+type: source
+source_kind: 文章
+topic: 注意力机制
+updated: 2026-04-23
+---
+
 # Flash Attention 详细解释推演与Pytorch代码实现
 
 ## 来源信息
@@ -6,7 +13,7 @@
 - 作者：柠檬沙棘1996
 - 日期：2026-04-12（文末编辑时间）
 - 类型：文章 / 机制推导 / PyTorch 代码讲解
-- 原始文件：[[../raw/articles/Flash Attention 详细解释推演与Pytorch代码实现|Flash Attention 详细解释推演与Pytorch代码实现]]
+- 原始文件：[[../../raw/articles/Flash Attention 详细解释推演与Pytorch代码实现|Flash Attention 详细解释推演与Pytorch代码实现]]
 
 ## 2-3 条核心摘要
 

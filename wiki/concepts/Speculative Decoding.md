@@ -1,3 +1,10 @@
+---
+type: concept
+topic: 投机解码
+sources: 6
+updated: 2026-07-08
+---
+
 # Speculative Decoding
 
 ## 定义

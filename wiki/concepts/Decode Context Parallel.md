@@ -1,3 +1,10 @@
+---
+type: concept
+topic: 并行与分布式
+sources: 1
+updated: 2026-06-12
+---
+
 # Decode Context Parallel
 
 ## 定义

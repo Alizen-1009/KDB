@@ -1,3 +1,10 @@
+---
+type: concept
+topic: GPU 编程
+sources: 1
+updated: 2026-06-21
+---
+
 # CuTe DSL
 
 ## 定义

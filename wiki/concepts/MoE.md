@@ -1,3 +1,10 @@
+---
+type: concept
+topic: 模型架构
+sources: 3
+updated: 2026-06-12
+---
+
 # MoE
 
 ## 定义

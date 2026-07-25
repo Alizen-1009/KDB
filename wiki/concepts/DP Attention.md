@@ -1,3 +1,10 @@
+---
+type: concept
+topic: 并行与分布式
+sources: 1
+updated: 2026-06-12
+---
+
 # DP Attention
 
 ## 定义

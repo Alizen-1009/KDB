@@ -1,3 +1,10 @@
+---
+type: concept
+topic: 模型架构
+sources: 1
+updated: 2026-04-23
+---
+
 # Double-Wide MLP
 
 ## 定义
