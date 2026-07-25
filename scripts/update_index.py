@@ -48,6 +48,9 @@ def main() -> None:
     concept_files = list_files(wiki_dir / "concepts", (".md",))
     report_files = list_files(output_dir / "reports", (".md",))
     slide_files = list_files(output_dir / "slides", (".md",))
+    interview_files = [
+        p for p in list_files(output_dir / "interview", (".md",)) if p.parent.name == "interview"
+    ]
     recent_logs = recent_log_items(wiki_dir / "log.md")
 
     article_count = len(list_files(raw_dir / "articles"))
@@ -82,6 +85,7 @@ def main() -> None:
         f"- 实体文件：{len([p for p in entity_files if not p.name.startswith('_')])}",
         f"- 概念文件：{len([p for p in concept_files if not p.name.startswith('_')])}",
         f"- 报告文件：{len(report_files)}",
+        f"- 面试文件：{len(interview_files)}",
         f"- 幻灯片文件：{len(slide_files)}",
         "",
     ]
@@ -106,6 +110,7 @@ def main() -> None:
     )
     lines.extend(section("最近日志", recent_logs))
     lines.extend(section("报告", [rel_link(p) for p in report_files]))
+    lines.extend(section("面试备考", [rel_link(p) for p in interview_files]))
     lines.extend(section("幻灯片", [rel_link(p) for p in slide_files]))
 
     target = wiki_dir / "index.md"

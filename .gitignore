@@ -1,3 +1,8 @@
 .DS_Store
 __pycache__/
 *.pyc
+
+# Obsidian 本地状态与插件（不随 vault 同步）
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json
+.obsidian/plugins/

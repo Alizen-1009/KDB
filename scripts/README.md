@@ -41,7 +41,9 @@ python3 scripts/export_cards.py output/cards/attention.md
 python3 scripts/lint.py
 ```
 
-已知问题：目前扫描全仓库所有 `.md`，所以“断链”一节里大部分是 `raw/articles/` 剪藏笔记 frontmatter 里的作者名（`[[方佳瑞​新知答主]]` 这类）造成的假阳性。只有 `wiki/` 和 `output/` 下的结果需要处理。
+扫描全仓库所有 `.md`，但会先剔掉 YAML frontmatter、代码块和行内代码里的 `[[...]]`——剪藏笔记的 `author:` 字段和文档里的示例写法都不是真链接。链接目标归一化时只剥 `.md` 后缀和 `#` 锚点，不用 `Path.stem`（文件名里可能带小数点，比如“提升 1.7 倍”）。
+
+所以这份输出现在应该是零噪音的：报出来的断链就是真断链。
 
 ## `kb_utils.py`
 

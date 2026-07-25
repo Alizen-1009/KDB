@@ -107,7 +107,7 @@
 - 更新现有页：[[../../wiki/concepts/MoE|MoE]]、[[../../wiki/concepts/Expert Parallelism|Expert Parallelism]]、[[../../wiki/concepts/Megakernel|Megakernel]]、[[../../wiki/concepts/算子融合|算子融合]]
 
 ## 相关已有笔记（Clippings，主题邻近）
-- [[../../Clippings/性能相比SGLangvLLM最高提升1.7倍！Mirage Persistent Kernel：首个自动巨核化多GPU LLM推理的编译器-运行时系统，细粒度计算-通信重叠|Mirage Persistent Kernel]]
-- [[../../Clippings/AutoMegaKernel：Agent驱动、跨GPU架构的MegaKernel方案，静态校验全模型单巨内核，最高提速 1.33 倍！|AutoMegaKernel]]
-- [[../../Clippings/MoE 所有层融到一个分布式算子GPU Kernel！FlashDMoE：GPU内核-硬件协同解锁大规模分布式机器学习性能极限！|FlashDMoE]]
-- [[../../Clippings/超越 vLLM 与 SGLang！Event Tensor：以动态 MegaKernel 消除重编译，解锁GPU核间通信-计算重叠|Event Tensor]]
+- [[性能相比SGLangvLLM最高提升1.7倍！Mirage Persistent Kernel：首个自动巨核化多GPU LLM推理的编译器-运行时系统，细粒度计算-通信重叠|Mirage Persistent Kernel]]
+- [[AutoMegaKernel：Agent驱动、跨GPU架构的MegaKernel方案，静态校验全模型单巨内核，最高提速 1.33 倍！|AutoMegaKernel]]
+- [[MoE 所有层融到一个分布式算子GPU Kernel！FlashDMoE：GPU内核-硬件协同解锁大规模分布式机器学习性能极限！|FlashDMoE]]
+- [[超越 vLLM 与 SGLang！Event Tensor：以动态 MegaKernel 消除重编译，解锁GPU核间通信-计算重叠|Event Tensor]]

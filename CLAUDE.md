@@ -29,7 +29,7 @@ python3 scripts/lint.py                        # health check (thin wrapper over
 
 - `raw/` — immutable source material (`articles/ papers/ repos/ datasets/ images/ code/`). Never edit or "fix" it; record contradictions in `wiki/`, not here.
 - `wiki/` — the compiled knowledge layer Claude maintains: `sources/` (one page per raw item), `entities/` (projects, orgs, people, hardware), `concepts/` (mechanisms, algorithms, terms), plus generated `index.md` and append-only `log.md`.
-- `output/` — research artifacts: `reports/` (incl. 9 of 14 being interview prep), `slides/` (Marp), `visuals/`, `cards/` (review cards + `cards/anki/`), `code/`. High-value conclusions get backfilled into `wiki/`.
+- `output/` — research artifacts: `reports/` (technical), `interview/` (interview prep, split out 2026-07-25 — 11 of the original 14 reports), `slides/` (Marp), `visuals/`, `cards/` (review cards + `cards/anki/`), `code/`. High-value conclusions get backfilled into `wiki/`.
 
 **The two-phase gate is the core operating rule.** On ingest: read the full source, report `2-3` core summaries + `1-3` notable claims to the user, **wait for confirmation**, and only then write `wiki/sources/`, update related entity/concept pages, flag conflicts explicitly, update cross-references, `wiki/index.md`, and append to `wiki/log.md`. Finish by reporting what was created vs. updated and any unresolved points.
 
@@ -40,11 +40,11 @@ python3 scripts/lint.py                        # health check (thin wrapper over
 - **`wiki/index.md` is generated** by `update_index.py` — never hand-edit it. `wiki/log.md` is append-only via `scripts/kb_log.py` — don't hand-edit it either, the entry format is script-controlled.
 - **Wikilink targets are filename stems.** Cross-directory links inside `wiki/` use relative form (`[[../entities/vLLM]]`, `[[../sources/xxx]]`); same-directory links are bare (`[[MLA]]`). Renaming a page silently breaks every inbound link — grep before renaming.
 - **Source page naming differs by kind**: articles and code mirror the raw file's stem (`raw/articles/PageAttention代码走读.md` → `wiki/sources/PageAttention代码走读.md`); papers use the paper title, not the arXiv id (`raw/papers/2603.15031v1.pdf` → `wiki/sources/Attention Residuals.md`). Source pages must contain an `原始文件：` field — `lint.py` checks for it.
-- **`_`-prefixed files are infrastructure**: `wiki/*/_TEMPLATE.md` are per-directory page templates and are excluded from the index and lint. `Templates/` holds the Obsidian-facing copies of the same four templates.
-- **Images** live under `raw/images/<主题>/` and are embedded as `![[raw/images/...]]`. Root-level `.tmp_*_images/` dirs are scratch dumps from article scraping, not part of the schema.
+- **`_`-prefixed files are infrastructure**: `wiki/*/_TEMPLATE.md` are the canonical page templates (excluded from the index and lint). Duplicate copies under `Templates/` were deleted 2026-07-25; only `Templates/Query Report Template.md` remains there, since `output/` has no `_TEMPLATE`.
+- **Images** live under `raw/images/<主题>/` and are embedded as `![[raw/images/...]]`. Clipped articles keep remote image URLs (zhihu CDN) rather than local copies.
 - **Web-clipped articles live in `raw/articles/`** with YAML frontmatter (`source`, `author`, `tags: clippings`). A separate root-level `Clippings/` staging dir existed until 2026-07-25 and was folded into `raw/articles/`; if it reappears (the Obsidian Web Clipper default target), fold it back rather than maintaining two intake paths.
-- **`lint.py` scans every `.md` in the repo, including `raw/`.** Its "broken wiki links" section is dominated by known false positives: clipper `author:` fields like `[[方佳瑞​新知答主]]` (20 of 29 current findings). Only findings under `wiki/` and `output/` are actionable.
-- **Report → wiki links use `[[../../wiki/concepts/X|X]]`** (`output/reports/` is two levels deep; two existing `../wiki/...` links are broken).
+- **`lint.py` output is expected to be clean** (as of 2026-07-25 it reports zero broken links). It scans every `.md` in the repo but ignores `[[...]]` inside YAML frontmatter, code fences, and inline code — so clipper `author:` fields and doc examples don't register. If it reports a broken link, it's real; fix it rather than dismissing it as noise.
+- **Report → wiki links use `[[../../wiki/concepts/X|X]]`** (`output/reports/` and `output/interview/` are both two levels deep; a few legacy `../wiki/...` links are broken).
 
 ## Writing standards (from AGENTS.md)
 

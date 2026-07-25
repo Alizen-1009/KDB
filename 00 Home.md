@@ -16,30 +16,20 @@
 - 研究输出：[[output/README]]
 - 原始资料区：[[raw/README]]
 
+## 三个核心动作
+
+在 Claude Code 里执行，流程写在 `.claude/skills/`：
+
+- `/kb-ingest raw/...`：把原始资料编译进 wiki
+- `/kb-query <问题>`：产出研究报告，回填 wiki
+- `/kb-export <主题>`：导出复习卡片到 `output/cards/`
+
 ## 页面模板
 
-- 来源摘要模板：[[Templates/Source Note Template]]
-- 实体页模板：[[Templates/Entity Note Template]]
-- 概念页模板：[[Templates/Concept Note Template]]
+- 来源摘要模板：[[wiki/sources/_TEMPLATE|来源页模板]]
+- 实体页模板：[[wiki/entities/_TEMPLATE|实体页模板]]
+- 概念页模板：[[wiki/concepts/_TEMPLATE|概念页模板]]
 - 查询输出模板：[[Templates/Query Report Template]]
-
-## AI Infra 主题入口
-
-- [[wiki/concepts/_TEMPLATE|概念页模板]]
-- [[wiki/entities/_TEMPLATE|实体页模板]]
-- [[wiki/sources/_TEMPLATE|来源页模板]]
-
-## 建议第一批主题
-
-- Paged Attention
-- Continuous Batching
-- KV Cache
-- FlashAttention
-- FSDP
-- ZeRO
-- vLLM
-- SGLang
-- TensorRT-LLM
 
 ## 使用建议
 

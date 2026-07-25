@@ -84,7 +84,7 @@ Obsidian 是这个知识库的阅读与导航前端。建议把以下页面固�
 /kb-query 对比 vLLM、SGLang 和 TensorRT-LLM 的推理架构权衡
 ```
 
-产出 `output/reports/` 下的报告（或 `output/slides/` 的 Marp 幻灯片），高价值结论回填 `wiki/`。
+产出 `output/reports/` 下的技术报告（面试备考类放 `output/interview/`，幻灯片放 `output/slides/`），高价值结论回填 `wiki/`。
 
 ### Export
 

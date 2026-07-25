@@ -1,6 +1,6 @@
 ---
 name: kb-export
-description: 从 wiki/ 的概念页、实体页和 output/reports/ 的面试整理里生成复习卡片——写成 output/cards/ 下的 Markdown 问答，再用 scripts/export_cards.py 转成 Anki 可导入的 TSV。当用户说 export / 导出卡片 / 生成 Anki / 做复习卡 / 我要背这个主题时使用。
+description: 从 wiki/ 的概念页、实体页和 output/interview/ 的面试备考资料里生成复习卡片——写成 output/cards/ 下的 Markdown 问答，再用 scripts/export_cards.py 转成 Anki 可导入的 TSV。当用户说 export / 导出卡片 / 生成 Anki / 做复习卡 / 我要背这个主题时使用。
 ---
 
 # Export：把 wiki 导出成复习卡片
@@ -14,7 +14,7 @@ description: 从 wiki/ 的概念页、实体页和 output/reports/ 的面试整�
 按适合出卡的程度排序：
 
 1. **概念页的《定义》《核心机制》《关键权衡》** ——最适合，本来就是压缩过的知识点。
-2. **`output/reports/` 里的面试整理**（现有 9 篇）——已经是问答形式，基本可以直接转。
+2. **`output/interview/` 里的面试备考资料**（现有 11 篇）——已经是问答形式，基本可以直接转。
 3. 实体页的《核心信息》——适合出“X 是谁做的 / 解决什么问题”这类事实卡。
 
 **不要出卡的内容**：页面里标了“待核实”的结论；没有一手来源的 benchmark 数字；依赖特定版本且原文没写清版本的实现细节。`AGENTS.md` 禁止伪造这类事实，卡片会被反复记诵，错了代价更大。

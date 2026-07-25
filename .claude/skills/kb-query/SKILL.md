@@ -1,6 +1,6 @@
 ---
 name: kb-query
-description: 基于 wiki/ 回答研究问题——架构对比、性能归因、机制拆解、实现路线评估——产出 output/reports/ 下的报告（或 output/slides/ 的 Marp 幻灯片），并把高价值结论回填 wiki/。当用户说 query / 出个报告 / 写篇对比，或提出“对比 X 与 Y”“为什么 X 更快”这类研究问题时使用。
+description: 基于 wiki/ 回答研究问题——架构对比、性能归因、机制拆解、实现路线评估——产出 output/reports/ 下的报告（面试向的放 output/interview/，幻灯片放 output/slides/），并把高价值结论回填 wiki/。当用户说 query / 出个报告 / 写篇对比，或提出“对比 X 与 Y”“为什么 X 更快”这类研究问题时使用。
 ---
 
 # Query：基于 wiki 产出研究输出
@@ -18,7 +18,7 @@ description: 基于 wiki/ 回答研究问题——架构对比、性能归因、
 
 ## 输出
 
-写到 `output/reports/<描述性中文标题>.md`。**文件名不加时间戳**——现有 14 篇都是纯标题，早期脚本的 `20260722-xxx` 前缀已废弃。如果是面试向的梳理，标题里带“面试”二字（现有 9 篇如此），便于以后拆分目录。
+技术报告写到 `output/reports/<描述性中文标题>.md`，**面试备考类写到 `output/interview/`**（这两类内容的组织方式不同，已经分开）。**文件名不加时间戳**——现有文件都是纯标题，早期脚本的 `20260722-xxx` 前缀已废弃。
 
 要 Marp 幻灯片时写到 `output/slides/`，同样的命名规则。
 
@@ -38,7 +38,7 @@ description: 基于 wiki/ 回答研究问题——架构对比、性能归因、
 - **性能权衡**：代价和适用边界
 - **待核实**：推断、超出知识截止的 API、没有一手来源的数字
 
-回链 wiki 页面用 `[[../../wiki/concepts/KV Cache|KV Cache]]` 形式（`output/reports/` 深两层，`../wiki/...` 是错的，现有报告里有两处这种断链）。
+回链 wiki 页面用 `[[../../wiki/concepts/KV Cache|KV Cache]]` 形式（`output/reports/` 和 `output/interview/` 都深两层，`../wiki/...` 是错的）。
 
 ## 收尾
 
