@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: 推理服务
-sources: 2
+sources: 3
 updated: 2026-07-08
 ---
 
@@ -24,6 +24,12 @@ updated: 2026-07-08
 - 通过 NVLink 或 InfiniBand 等互联传递 KV Cache
 - 在 [[../entities/RTP-LLM]] 中，PD 分离被组织成 `PD-Fusion` 与 `PD-Disaggregation` 两种部署模式；后者将 Prefill/Decode 放到专用节点上，并通过跨节点 KV cache 传输衔接两个阶段
 
+## 与 AFD 的区别与组合
+
+[[Attention-FFN 分离]] 与 PD 分离作用于不同切分轴，可以叠加：PD 在请求生命周期上拆 Prefill/Decode，AFD 在每个切分层内部拆 Attention/FFN。组合部署可以分别设置 Prefill A/F 资源池和 Decode A/F 资源池。
+
+两者的状态传输不同：PD 主要在 Prefill 完成后把各层 KV Cache 与请求状态交给 Decode，属于阶段性交接；AFD 则在每个 forward step 的每个切分层发送当前 hidden states，并把 FFN output 返回 Attention 侧，频率更高但中间激活生命周期更短。vLLM AFD Plugin 的异步 CAM 路径就是面向 PD 分离部署中的 prefill 阶段。
+
 ## 关键权衡
 
 - 获得更好的资源专用化和调优空间
@@ -35,11 +41,13 @@ updated: 2026-07-08
 - [[../entities/RTP-LLM]]
 - [[../entities/Nvidia Dynamo]]
 - [[../entities/TensorRT-LLM]]
+- [[../entities/vLLM AFD Plugin]]
 
 ## 相关来源
 
 - [[../sources/LLM推理优化核心技术]]
 - [[../sources/RTP-LLM]]
+- [[../sources/vLLM AFD Plugin 发布：为 MoE 推理拆分 Attention 与 FFN，实现灵活部署]]
 
 ## 相关概念
 
@@ -48,6 +56,7 @@ updated: 2026-07-08
 - [[缓存感知路由]]
 - [[Tensor Parallelism]]
 - [[Chunked Prefill]]
+- [[Attention-FFN 分离]]
 
 ## 研究备注
 

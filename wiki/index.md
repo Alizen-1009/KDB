@@ -25,15 +25,15 @@
 
 ## 资源统计
 
-- 原始文章：48
+- 原始文章：49
 - 原始论文：3
 - 原始仓库：0
 - 原始数据集：0
 - 原始图片：19
 - 原始代码：1
-- 来源文件：39
-- 实体文件：25
-- 概念文件：82
+- 来源文件：40
+- 实体文件：26
+- 概念文件：83
 - 报告文件：3
 - 面试文件：11
 - 卡片文件：0
@@ -62,8 +62,9 @@
 - [[../wiki/concepts/分层 KV Cache|分层 KV Cache]]
 - [[../wiki/concepts/缓存感知路由|缓存感知路由]]
 
-### 推理服务（9）
+### 推理服务（10）
 
+- [[../wiki/concepts/Attention-FFN 分离|Attention-FFN 分离]]
 - [[../wiki/concepts/Chunked Prefill|Chunked Prefill]]
 - [[../wiki/concepts/Constrained Decoding|Constrained Decoding]]
 - [[../wiki/concepts/Continuous Batching|Continuous Batching]]
@@ -156,10 +157,11 @@
 
 ## 实体页面（按类型）
 
-### 项目（2）
+### 项目（3）
 
 - [[../wiki/entities/Engram|Engram]]
 - [[../wiki/entities/Megakernels|Megakernels]]
+- [[../wiki/entities/vLLM AFD Plugin|vLLM AFD Plugin]]
 
 ### 框架（7）
 
@@ -205,7 +207,7 @@
 
 ## 来源摘要（按类型）
 
-### 文章（20）
+### 文章（21）
 
 - [[../wiki/sources/CUDA优化维度框架|CUDA优化维度框架]]
 - [[../wiki/sources/DeepSeekV4中RoPE设计解析|DeepSeekV4中RoPE设计解析]]
@@ -219,6 +221,7 @@
 - [[../wiki/sources/PageAttention代码走读|PageAttention代码走读]]
 - [[../wiki/sources/RTP-LLM|RTP-LLM]]
 - [[../wiki/sources/SGLang：LLM推理引擎发展新方向|SGLang：LLM推理引擎发展新方向]]
+- [[../wiki/sources/vLLM AFD Plugin 发布：为 MoE 推理拆分 Attention 与 FFN，实现灵活部署|vLLM AFD Plugin 发布：为 MoE 推理拆分 Attention 与 FFN，实现灵活部署]]
 - [[../wiki/sources/vLLM皇冠上的明珠：深入浅出理解PagedAttention CUDA实现|vLLM皇冠上的明珠：深入浅出理解PagedAttention CUDA实现]]
 - [[../wiki/sources/vllm并行策略之DCP(Decode Context Parallel)|vllm并行策略之DCP(Decode Context Parallel)]]
 - [[../wiki/sources/你一定要知道：CUDA优化六要|你一定要知道：CUDA优化六要]]

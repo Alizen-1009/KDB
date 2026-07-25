@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: 模型架构
-sources: 3
+sources: 4
 updated: 2026-06-12
 ---
 
@@ -210,6 +210,12 @@ for e in experts:
 
 所以高性能单卡 MoE 通常更倾向使用 `grouped matmul / grouped GEMM` 来算 expert FFN；`batched matmul` 主要出现在 padding 到固定 capacity 的简单实现、训练参考实现，或 expert token 数较均匀且 padding 浪费可接受的场景。
 
+## AFD 中的 MoE 服务化
+
+[[Attention-FFN 分离]] 可以把 MoE/FFN 路径从维护请求状态和 KV Cache 的 Attention worker 中拆出。每个切分层由 Attention 侧发送 hidden states、`layer_id` 和执行元数据，FFN 侧完成 Router、token dispatch、expert compute 与 combine 后返回 FFN output。FFN 侧仍可内部使用 [[Expert Parallelism]]；此时要区分 A/F 服务间的激活往返与 FFN ranks 内部的 EP All-to-All。
+
+这种分离不改变 `Attention[l] -> FFN[l] -> Attention[l+1]` 的模型依赖，也不保证自动提速。收益来自 Attention 与专家容量的独立配比及不同 ubatch 的通信—计算重叠，代价是每个切分层的双向激活通信。
+
 ## 面试口径
 
 一句话：`MoE` 算子不是“把很多 MLP 全算一遍”，而是 `router -> top-k -> token dispatch -> expert FFN -> weighted gather` 这一条稀疏执行链。
@@ -231,17 +237,20 @@ for e in experts:
 - [[DP Attention]]
 - [[Sparsity Allocation]]
 - [[Warp Divergence]]
+- [[Attention-FFN 分离]]
 
 ## 相关实体
 
 - [[../entities/DeepSeek-AI]]
 - [[../entities/Gemma 4]]
+- [[../entities/vLLM AFD Plugin]]
 
 ## 相关来源
 
 - [[../sources/LLM推理优化核心技术]]
 - [[../sources/Gemma 4 核心技术深度解析：PLE、Shared KV Cache 与全模态架构]]
 - [[../sources/Conditional Memory via Scalable Lookup: A New Axis of Sparsity for Large Language Models]]
+- [[../sources/vLLM AFD Plugin 发布：为 MoE 推理拆分 Attention 与 FFN，实现灵活部署]]
 
 ## 研究备注
 

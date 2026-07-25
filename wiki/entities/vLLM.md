@@ -2,7 +2,7 @@
 type: entity
 entity_type: 框架
 topic: 推理服务
-sources: 14
+sources: 15
 updated: 2026-06-12
 ---
 
@@ -35,6 +35,7 @@ updated: 2026-06-12
 - 新来源 `vllm并行策略之DCP` 补充了 `vLLM` 的 decode context parallel 口径：DCP 复用 TP group，通过 `--decode-context-parallel-size` 在 decode 阶段沿 `seq_len` 维分片 KV cache，适合 `MLA/MQA/GQA` 这类 `num_kv_heads` 较小、纯 TP 容易复制 KV cache 的场景。
 - `vLLM` 的 `--enforce-eager` 与 `cudagraph_mode=NONE` 不完全等价：前者是运行在 eager mode 的总开关，会关闭 `torch.compile` 集成和 CUDA Graphs；后者只关闭 CUDA Graphs，仍可能保留 `torch.compile` / vLLM compile 的其他路径。
 - `Look Ma, No Bubbles!` 将 vLLM 作为 Llama-3.2-1B、batch size 1、BF16 低延迟 decode baseline，指出在该极窄场景中许多短 kernel 边界会限制可用 HBM 带宽；该结论不能直接外推到高并发 serving。
+- 新来源 `vLLM AFD Plugin` 展示了 vLLM 的外部插件扩展面：在保留调度器、KV Cache、请求生命周期和 OpenAI 兼容接口的同时，可通过 connector 把每个 MoE 切分层的 FFN 执行移到独立服务，让 Attention 与专家容量采用不同 rank 拓扑。
 
 ## 相关概念
 
@@ -53,6 +54,7 @@ updated: 2026-06-12
 - [[Chunked Prefill]]
 - [[Torch Compile]]
 - [[Megakernel]]
+- [[Attention-FFN 分离]]
 
 ## 相关来源
 
@@ -70,6 +72,7 @@ updated: 2026-06-12
 - [[../sources/RTP-LLM]]
 - [[../sources/vllm并行策略之DCP(Decode Context Parallel)]]
 - [[../sources/Look Ma, No Bubbles! Designing a Low-Latency Megakernel for Llama-1B]]
+- [[../sources/vLLM AFD Plugin 发布：为 MoE 推理拆分 Attention 与 FFN，实现灵活部署]]
 
 ## 冲突与备注
 
@@ -87,3 +90,4 @@ updated: 2026-06-12
 - DCP 来源中的 CUDA backend 支持、PCP 状态、`dcp_all2all` 通信和 Chunked Prefill / Prefix Cache 兼容性都应按具体 vLLM 版本、PR 或官方文档复核。
 - `cudagraph_mode=NONE` 只表示不 capture/replay CUDA Graph；如果排查的是 `torch.compile` / Dynamo / Inductor / vLLM compile 本身的问题，应使用 `--enforce-eager` 或进一步设置 compilation mode，而不是只关 CUDA Graphs。
 - `Look Ma, No Bubbles!` 中关于 vLLM H100 带宽利用率和相对 megakernel 的性能差距，均应作为来源 benchmark 声称引用，并保留 prompt 长度、生成长度、dtype、硬件和 baseline 配置。
+- AFD Plugin 在来源发布时锁定 vLLM `0.19.1` 和 model runner v1，且两种角色均加载完整权重；不能把实验插件的能力外推为任意 vLLM 版本的原生支持。

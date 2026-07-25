@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: 并行与分布式
-sources: 4
+sources: 5
 updated: 2026-06-12
 ---
 
@@ -35,6 +35,10 @@ updated: 2026-06-12
 - 所以每层 forward 的每 rank 发送通信量约为 `4 * (P - 1) / P * M * H * b` bytes；整模型再乘层数 `L`。
 - Decode 场景里 `M` 通常是当前 step 的 active sequence 数；Prefill 场景里 `M` 是本轮 prompt tokens 数，因此 prefill 单次通信量更大，但 decode 的通信更高频、更容易受 all-reduce latency 影响。
 
+## 与 AFD 的组合
+
+[[Attention-FFN 分离]] 允许 Attention 与 FFN 两侧分别采用 TP：A 侧可切 Attention projection/head，F 侧可在 EP 之外继续切单个 expert。两侧 TP size 在概念上不必相等，但 A 侧输出布局与 F 侧 EP/TP 布局不一致时，connector 可能需要额外的 gather、scatter 或重分布。具体组合是否可用必须以插件版本和已验证 recipe 为准，不能从“可组合”推导出任意拓扑均已支持。
+
 ## 关键权衡
 
 - 能有效降低单请求时延
@@ -54,6 +58,7 @@ updated: 2026-06-12
 - [[../sources/斯坦福CS336 Lecture 7 - Parallelism basics]]
 - [[../sources/斯坦福CS336 Lecture 8 - Distributed communication and training code]]
 - [[../sources/vllm并行策略之DCP(Decode Context Parallel)]]
+- [[../sources/vLLM AFD Plugin 发布：为 MoE 推理拆分 Attention 与 FFN，实现灵活部署]]
 
 ## 相关概念
 
@@ -65,6 +70,7 @@ updated: 2026-06-12
 - [[流水线并行]]
 - [[DP Attention]]
 - [[Expert Parallelism]]
+- [[Attention-FFN 分离]]
 
 ## 研究备注
 

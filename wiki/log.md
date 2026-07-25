@@ -1061,3 +1061,12 @@
 - 更新报告：`output/reports/Prefill Attention 的 CUDA 并行映射.md`，补充 varlen packed batch 中 `cu_seqlens` 的解读规则
 - 标准 FlashAttention-style 约定下，`cu_seqlens` 应以 `0` 开头，request 数为 `len(cu_seqlens)-1`；单个 2-token request 应为 `[0, 2]`
 - 字面 `[2]` 对标准格式来说不完整；只有在某框架明确省略起始 `0` 的日志约定下，才表示 1 个长度为 2 的 request
+
+## [2026-07-25] ingest | vLLM AFD Plugin 发布：为 MoE 推理拆分 Attention 与 FFN，实现灵活部署
+
+- 读取原始资料：`raw/articles/vLLM AFD Plugin 发布：为 MoE 推理拆分 Attention 与 FFN，实现灵活部署.md`
+- 创建来源页：`wiki/sources/vLLM AFD Plugin 发布：为 MoE 推理拆分 Attention 与 FFN，实现灵活部署.md`
+- 创建概念页：`wiki/concepts/Attention-FFN 分离.md`，整理逐层数据流、hidden states 传输、与 PP/PD 的区别及与 EP/TP 的组合
+- 创建实体页：`wiki/entities/vLLM AFD Plugin.md`
+- 更新概念与实体页：`MoE`、`Expert Parallelism`、`Tensor Parallelism`、`流水线并行`、`PD分离`、`vLLM`、`NCCL`
+- 未发现与现有 wiki 的直接冲突；benchmark 受模拟规模、强制均衡路由和裁剪模型限制
