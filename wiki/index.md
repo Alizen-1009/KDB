@@ -25,15 +25,15 @@
 
 ## 资源统计
 
-- 原始文章：49
+- 原始文章：54
 - 原始论文：3
 - 原始仓库：0
 - 原始数据集：0
 - 原始图片：19
 - 原始代码：1
-- 来源文件：40
-- 实体文件：26
-- 概念文件：83
+- 来源文件：43
+- 实体文件：28
+- 概念文件：87
 - 报告文件：3
 - 面试文件：11
 - 卡片文件：0
@@ -41,7 +41,7 @@
 
 ## 概念页面（按主题）
 
-### 注意力机制（8）
+### 注意力机制（9）
 
 - [[../wiki/concepts/CSA-HCA|CSA-HCA]]
 - [[../wiki/concepts/Chunked Gated Delta Rule|Chunked Gated Delta Rule]]
@@ -51,8 +51,9 @@
 - [[../wiki/concepts/MLA|MLA]]
 - [[../wiki/concepts/Online Softmax|Online Softmax]]
 - [[../wiki/concepts/混合注意力|混合注意力]]
+- [[../wiki/concepts/线性注意力递归状态|线性注意力递归状态]]
 
-### KV Cache（7）
+### KV Cache（8）
 
 - [[../wiki/concepts/KV Cache|KV Cache]]
 - [[../wiki/concepts/PagedAttention|PagedAttention]]
@@ -61,6 +62,7 @@
 - [[../wiki/concepts/Shared KV Cache|Shared KV Cache]]
 - [[../wiki/concepts/分层 KV Cache|分层 KV Cache]]
 - [[../wiki/concepts/缓存感知路由|缓存感知路由]]
+- [[../wiki/concepts/递归状态 Prefix Caching|递归状态 Prefix Caching]]
 
 ### 推理服务（10）
 
@@ -75,7 +77,7 @@
 - [[../wiki/concepts/持久批处理|持久批处理]]
 - [[../wiki/concepts/确定性推理|确定性推理]]
 
-### 并行与分布式（12）
+### 并行与分布式（14）
 
 - [[../wiki/concepts/DDP|DDP]]
 - [[../wiki/concepts/DP Attention|DP Attention]]
@@ -88,6 +90,8 @@
 - [[../wiki/concepts/ZeRO|ZeRO]]
 - [[../wiki/concepts/数据并行|数据并行]]
 - [[../wiki/concepts/流水线并行|流水线并行]]
+- [[../wiki/concepts/跨 Mesh 权重重分片|跨 Mesh 权重重分片]]
+- [[../wiki/concepts/通信-计算重叠|通信-计算重叠]]
 - [[../wiki/concepts/集合通信|集合通信]]
 
 ### GPU 编程（21）
@@ -157,10 +161,11 @@
 
 ## 实体页面（按类型）
 
-### 项目（3）
+### 项目（4）
 
 - [[../wiki/entities/Engram|Engram]]
 - [[../wiki/entities/Megakernels|Megakernels]]
+- [[../wiki/entities/NCCL Extensions|NCCL Extensions]]
 - [[../wiki/entities/vLLM AFD Plugin|vLLM AFD Plugin]]
 
 ### 框架（7）
@@ -204,10 +209,14 @@
 
 - [[../wiki/entities/Stanford CS336|Stanford CS336]]
 
+### 硬件（1）
+
+- [[../wiki/entities/NVIDIA Rubin|NVIDIA Rubin]]
+
 
 ## 来源摘要（按类型）
 
-### 文章（21）
+### 文章（24）
 
 - [[../wiki/sources/CUDA优化维度框架|CUDA优化维度框架]]
 - [[../wiki/sources/DeepSeekV4中RoPE设计解析|DeepSeekV4中RoPE设计解析]]
@@ -218,8 +227,11 @@
 - [[../wiki/sources/LLM推理优化核心技术|LLM推理优化核心技术]]
 - [[../wiki/sources/LLM提速利器：投机推理的原理与常见方案|LLM提速利器：投机推理的原理与常见方案]]
 - [[../wiki/sources/Model Runner V2 A Modular and Faster Core for vLLM|Model Runner V2 A Modular and Faster Core for vLLM]]
+- [[../wiki/sources/NVIDIA 开源 NCCL Extensions：把 MoE 专家路由与跨 Mesh 权重重分片推进到 GPU 设备侧|NVIDIA 开源 NCCL Extensions：把 MoE 专家路由与跨 Mesh 权重重分片推进到 GPU 设备侧]]
+- [[../wiki/sources/Nvidia Rubin架构分析预览|Nvidia Rubin架构分析预览]]
 - [[../wiki/sources/PageAttention代码走读|PageAttention代码走读]]
 - [[../wiki/sources/RTP-LLM|RTP-LLM]]
+- [[../wiki/sources/SGLang的KDA管理与Prefix Cache难题|SGLang的KDA管理与Prefix Cache难题]]
 - [[../wiki/sources/SGLang：LLM推理引擎发展新方向|SGLang：LLM推理引擎发展新方向]]
 - [[../wiki/sources/vLLM AFD Plugin 发布：为 MoE 推理拆分 Attention 与 FFN，实现灵活部署|vLLM AFD Plugin 发布：为 MoE 推理拆分 Attention 与 FFN，实现灵活部署]]
 - [[../wiki/sources/vLLM皇冠上的明珠：深入浅出理解PagedAttention CUDA实现|vLLM皇冠上的明珠：深入浅出理解PagedAttention CUDA实现]]

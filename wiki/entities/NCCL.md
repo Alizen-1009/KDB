@@ -2,7 +2,7 @@
 type: entity
 entity_type: 框架
 topic: 并行与分布式
-sources: 2
+sources: 3
 updated: 2026-04-23
 ---
 
@@ -22,6 +22,7 @@ NVIDIA 提供的集合通信库，用于把多 GPU / 多节点训练中的 colle
 - 在 PyTorch 分布式 GPU 训练中，经常作为 backend 承担 collective communication 的实际执行。
 - 它的性能高度依赖 GPU 间互联和节点拓扑，例如 NVLink、NVSwitch、PCIe 以及跨节点网络。
 - `vLLM AFD Plugin` 的 `P2pNcclAFDConnector` 使用同步 P2P 路径在 Attention 与 FFN 服务间交换激活，面向 decode，并支持来源所述的 `FULL_DECODE_ONLY` CUDA Graph 路径。
+- NVIDIA 官方仓库 [[NCCL Extensions]] 在 NCCL Host/Device API 之上提供 AI 专用通信模式：`nccl_ep` 处理 MoE dispatch/combine，`nccl_m2n` 处理跨 GPU Mesh 的 tensor reshard；它是独立扩展项目，不应与 NCCL core 混为一谈。
 
 ## 相关概念
 
@@ -29,12 +30,17 @@ NVIDIA 提供的集合通信库，用于把多 GPU / 多节点训练中的 colle
 - [[Torch Distributed]]
 - [[数据并行]]
 - [[Attention-FFN 分离]]
+- [[Expert Parallelism]]
+- [[通信-计算重叠]]
+- [[跨 Mesh 权重重分片]]
 
 ## 相关来源
 
 - [[../sources/斯坦福CS336 Lecture 8 - Distributed communication and training code]]
 - [[../sources/vLLM AFD Plugin 发布：为 MoE 推理拆分 Attention 与 FFN，实现灵活部署]]
+- [[../sources/NVIDIA 开源 NCCL Extensions：把 MoE 专家路由与跨 Mesh 权重重分片推进到 GPU 设备侧]]
 
 ## 冲突与备注
 
-- 归档时要区分 `torch.distributed` 这样的接口层和 `NCCL` 这样的 backend 执行层，它们不是一回事
+- 归档时要区分 `torch.distributed` 这样的接口层和 `NCCL` 这样的 backend 执行层，它们不是一回事。
+- 也要区分 NCCL core 与 `NCCL Extensions`：后者把特定 AI 数据流固化成扩展原语，当前 API、硬件门槛和成熟度需按具体仓库 commit 核实。

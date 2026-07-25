@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: GPU 编程
-sources: 6
+sources: 7
 updated: 2026-06-12
 ---
 
@@ -27,6 +27,12 @@ updated: 2026-06-12
 - CUDA kernel 之间通常存在严格顺序边界：后一个 kernel 的 block 不会在前一个 kernel 的所有 block 完成前开始执行。这个语义简化了数据依赖管理，但在许多短 kernel 串联时会放大 launch overhead、tail effect 和 load bubble。
 - [[Megakernel]] 通过在单个 kernel 内部自行调度 SM instruction 和同步依赖，绕开部分 kernel 间全局边界，但也把依赖正确性责任交给实现者。
 
+## Rubin 架构与跨 kernel 调度
+
+[[../entities/NVIDIA Rubin]] 来源转述 Rubin 将部分 I/O 功能移到独立 I/O Die，并把双计算 Die 的 SM 总数提高到 224。对执行模型更重要的不是 SM 数本身，而是 producer-consumer kernel 能否按更细粒度数据 ready 关系推进，从而减少前序 kernel 尾部与后序 kernel 启动之间的 bubble。
+
+来源关于具体轮询、barrier 和 scheduler 驻留方式仍是作者推测；正式理解应区分官方产品描述、PTX 可见语义和硬件调度器内部实现。
+
 ## 关键权衡
 
 - SIMT 模型让大量同构计算更容易扩展
@@ -35,6 +41,7 @@ updated: 2026-06-12
 ## 相关实体
 
 - [[../entities/Stanford CS336]]
+- [[../entities/NVIDIA Rubin]]
 
 ## 相关来源
 
@@ -44,6 +51,7 @@ updated: 2026-06-12
 - [[../sources/CUDA内存层次与动态共享内存问答整理]]
 - [[../sources/多卡GPU监控与SM执行模型面试整理]]
 - [[../sources/Look Ma, No Bubbles! Designing a Low-Latency Megakernel for Llama-1B]]
+- [[../sources/Nvidia Rubin架构分析预览]]
 
 ## 相关概念
 

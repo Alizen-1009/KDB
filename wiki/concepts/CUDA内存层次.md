@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: GPU 编程
-sources: 5
+sources: 6
 updated: 2026-06-12
 ---
 
@@ -29,6 +29,12 @@ updated: 2026-06-12
 - `Host Memory` 是 CPU 侧内存；pinned host memory 更适合异步 H2D / D2H 拷贝
 - [[Megakernel]] 来源提供了一个 shared memory 资源管理案例：把 H100 每个 SM 的部分 shared memory 切成固定页，instruction 显式申请/释放 page，用于在前一段计算收尾时尽早加载下一段权重。
 
+## Rubin 的动态 L2 生命周期提示
+
+[[../entities/NVIDIA Rubin]] 来源介绍的 `applypriority` 允许在数据使用阶段结束后，动态调整既有 cache line/tensor footprint 的 eviction priority。MoE 中可先让当前 expert 权重倾向 `evict_last`，供多个 token/tile 重复读取；expert last-use 后再恢复 `evict_normal`，避免旧热点挤压下一个 expert 的 L2 容量。
+
+它也可用于多阶段 GEMM、fused kernel、sliding-window attention 或 KV 生命周期，但 cache hint 只是替换倾向，不是锁定驻留保证；收益取决于 working set、L2 容量和真实复用距离。
+
 ## 关键权衡
 
 - 越靠近执行单元通常越快，但容量越小、作用域越窄
@@ -39,6 +45,7 @@ updated: 2026-06-12
 ## 相关实体
 
 - [[../entities/Stanford CS336]]
+- [[../entities/NVIDIA Rubin]]
 
 ## 相关来源
 
@@ -47,6 +54,7 @@ updated: 2026-06-12
 - [[../sources/你一定要知道：CUDA优化六要]]
 - [[../sources/CUDA优化维度框架]]
 - [[../sources/Look Ma, No Bubbles! Designing a Low-Latency Megakernel for Llama-1B]]
+- [[../sources/Nvidia Rubin架构分析预览]]
 
 ## 相关概念
 

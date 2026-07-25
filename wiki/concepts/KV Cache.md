@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: KV Cache
-sources: 14
+sources: 15
 updated: 2026-06-21
 ---
 
@@ -26,6 +26,12 @@ updated: 2026-06-21
 - 在 [[FlashMLA]] 语境中，KV cache 以 MLA latent cache 与 paged cache metadata 形式参与 decode kernel；优化重点不只是少存，还包括如何按 block table、变长序列和 Split-KV 高效读取历史状态
 - 在 [[../entities/RTP-LLM]] 语境中，KV cache 被纳入 [[分层 KV Cache]] 与调度系统：Master 通过统一哈希映射跟踪跨 worker 前缀命中，并在 GPU、本地 CPU、远程 CPU、分布式存储之间按层级复用缓存
 - 在 [[Decode Context Parallel]] 语境中，KV cache 会在既有 TP group 内进一步沿 context/token 维切分，用来减少长上下文 decode 下的重复缓存；`vllm并行策略之DCP` 进一步说明，vLLM 口径下采用 interleaved 存储，单个 request 的第 `n` 个 token KV 放到 `n % cp_world_size` 对应的 DCP rank。
+
+## 与递归线性状态的区别
+
+KV Cache 按 token/page 保存显式历史，已保存的每行 K/V 可以作为独立前缀记录复用。GDN/KDA 等线性注意力则用 [[线性注意力递归状态]] 压缩历史：Conv State 保存短卷积窗口，矩阵状态保存推进到当前边界后的长期聚合结果。后者大小不随上下文线性增长，但不能自然提供任意 token 边界回退，因此 Prefix Cache 需要 [[递归状态 Prefix Caching|递归状态 checkpoint]]。
+
+混合 MLA/KDA 模型会同时维护 Token KV Pool 与按请求分配的递归状态槽；“统一缓存”通常指逻辑前缀树与生命周期协调，不表示两类状态具有相同物理布局或恢复粒度。
 
 ## 推理阶段视角
 
@@ -102,6 +108,7 @@ updated: 2026-06-21
 - [[../sources/陈巍：DeepSeek 开源Day（1）-FlashMLA 深入分析（收录于：DeepSeek技术详解系列）]]
 - [[../sources/RTP-LLM]]
 - [[../sources/vllm并行策略之DCP(Decode Context Parallel)]]
+- [[../sources/SGLang的KDA管理与Prefix Cache难题]]
 
 ## 相关概念
 
@@ -119,6 +126,8 @@ updated: 2026-06-21
 - [[DP Attention]]
 - [[CSA-HCA|CSA/HCA]]
 - [[分层 KV Cache]]
+- [[线性注意力递归状态]]
+- [[递归状态 Prefix Caching]]
 
 ## 研究备注
 

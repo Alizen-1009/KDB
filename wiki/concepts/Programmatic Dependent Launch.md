@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: GPU 编程
-sources: 1
+sources: 2
 updated: 2026-06-12
 ---
 
@@ -22,6 +22,12 @@ updated: 2026-06-12
 - 前后 kernel 之间通过同步点保证数据依赖不被破坏。
 - 在 `Look Ma, No Bubbles!` 来源中，作者认为 PDL 的 `cudaGridDependencySynchronize` 粒度仍偏粗：例如 attention 需要等待所有 Q/K/V 完成，而不能按 head 或 chunk 级别尽早消费已准备好的输入。
 
+## Rubin 的 Thread Block 级依赖方向
+
+[[../entities/NVIDIA Rubin]] 来源描述了比 Blackwell PDL 更数据驱动的 producer-consumer 启动方向：consumer kernel 可以更早进入等待状态，在 producer 的 tile/thread block 数据 ready 后继续工作，而不是等待更大范围依赖解除。这有潜力减少短 kernel 串联的 bubble，并缩小与 [[Megakernel]] 内部细粒度调度的差距。
+
+但来源作者在 PTX 9.4 预览中未找到完整 Grid Scheduling 或 Tile Publication 指令；关于 consumer block 预占少量资源、轮询共享 flag/barrier、使用 acquire/release 的实现属于推测，不能作为已确认的 Rubin 微架构事实。
+
 ## 关键权衡
 
 - 相比完全串行 launch，PDL 可以减少一部分 kernel 边界等待。
@@ -31,10 +37,12 @@ updated: 2026-06-12
 ## 相关实体
 
 - [[../entities/Megakernels]]
+- [[../entities/NVIDIA Rubin]]
 
 ## 相关来源
 
 - [[../sources/Look Ma, No Bubbles! Designing a Low-Latency Megakernel for Llama-1B]]
+- [[../sources/Nvidia Rubin架构分析预览]]
 
 ## 相关概念
 

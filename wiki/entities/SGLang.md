@@ -2,7 +2,7 @@
 type: entity
 entity_type: 框架
 topic: 推理服务
-sources: 7
+sources: 8
 updated: 2026-06-12
 ---
 
@@ -28,6 +28,8 @@ updated: 2026-06-12
 - 官方文档语境里，SGLang 对 DeepSeek/MLA serving 还强调 [[DP Attention]]：通过 attention 侧数据并行减少 TP 下 latent KV cache 重复，提升可承载 batch size 和吞吐。
 - 新来源 `RTP-LLM` 将 `SGLang` 作为模型加载、TTFT、推测解码和多模态吞吐的对比基线；这些结果应视为特定 benchmark/生产流量下的来源声称。
 - `Look Ma, No Bubbles!` 将 SGLang 作为 Llama-3.2-1B、batch size 1、BF16 低延迟 decode baseline，指出 megakernel 在该特定场景中能进一步减少 kernel 边界带来的 pipeline bubble。
+- 新来源从混合 MLA/KDA serving 补充状态管理视角：Token KV Pool 保存按 token 组织的 MLA KV，MambaPool 保存按请求、按层组织的 Conv State 与递归矩阵状态；UnifiedRadixCache 在同一逻辑树上协调两类 component 的前缀匹配和生命周期。
+- 对递归状态做 Prefix Cache 时，SGLang 需要保存边界 checkpoint；如果 KV 命中位置没有对应状态快照，就回退到最近共同边界并重新 prefill。来源还描述了 speculative verification 的状态暂存/提交路径。
 
 ## 相关概念
 
@@ -42,6 +44,9 @@ updated: 2026-06-12
 - [[DP Attention]]
 - [[分层 KV Cache]]
 - [[Megakernel]]
+- [[线性注意力递归状态]]
+- [[递归状态 Prefix Caching]]
+- [[混合注意力]]
 
 ## 相关来源
 
@@ -52,6 +57,7 @@ updated: 2026-06-12
 - [[../sources/MLA与DP Attention面试整理]]
 - [[../sources/RTP-LLM]]
 - [[../sources/Look Ma, No Bubbles! Designing a Low-Latency Megakernel for Llama-1B]]
+- [[../sources/SGLang的KDA管理与Prefix Cache难题]]
 
 ## 冲突与备注
 
@@ -61,3 +67,4 @@ updated: 2026-06-12
 - 关于和 `vLLM` 的区别，推荐回链 [[SGLang 与 vLLM 对比]]；避免把差异简化为“简单问答 vs Agent”
 - RTP-LLM 来源中的对比不应被写成 `SGLang` 的通用弱点；SGLang 在 LLM Programs、RadixAttention、结构化输出和 DP Attention 上仍有独立设计重心。
 - `Look Ma, No Bubbles!` 中关于 SGLang 的性能差距只应作为来源实验观察，不代表 SGLang 在高 batch、长上下文或 LLM Programs workload 下的通用表现。
+- KDA 状态管理来源是二手截图式代码解读；`MambaPool`、`UnifiedRadixCache`、copy-on-write、extra-buffer tracking 与模型支持范围都应按具体 SGLang commit 核实。

@@ -1070,3 +1070,33 @@
 - 创建实体页：`wiki/entities/vLLM AFD Plugin.md`
 - 更新概念与实体页：`MoE`、`Expert Parallelism`、`Tensor Parallelism`、`流水线并行`、`PD分离`、`vLLM`、`NCCL`
 - 未发现与现有 wiki 的直接冲突；benchmark 受模拟规模、强制均衡路由和裁剪模型限制
+
+## [2026-07-25] ingest | NVIDIA 开源 NCCL Extensions：MoE EP 与跨 Mesh 权重重分片
+
+- 读取原始资料：`raw/articles/NVIDIA 开源 NCCL Extensions：把 MoE 专家路由与跨 Mesh 权重重分片推进到 GPU 设备侧.md`
+- 创建来源页：`wiki/sources/NVIDIA 开源 NCCL Extensions：把 MoE 专家路由与跨 Mesh 权重重分片推进到 GPU 设备侧.md`
+- 创建实体页：`wiki/entities/NCCL Extensions.md`
+- 创建概念页：`wiki/concepts/跨 Mesh 权重重分片.md`、`wiki/concepts/通信-计算重叠.md`
+- 更新页面：`Expert Parallelism`、`MoE`、`集合通信`、`NCCL`，补充 nccl_ep 与 nccl_m2n 的定位和双向链接
+- 讨论归纳：在线 RL 中 M2N 负责 Training -> Rollout 的策略权重同步，不负责轨迹回传或逐 token 中间状态
+- 待核实：精确 API、CUDA/NCCL/硬件支持范围及 RING/DIRECT 性能以对应仓库 commit 为准
+
+## [2026-07-25] ingest | SGLang 的 KDA/GDN 状态管理与 Prefix Cache
+
+- 读取完整截图资料：`raw/articles/SGLang的KDA管理与Prefix Cache难题.md`（14 张正文图片）
+- 创建来源页：`wiki/sources/SGLang的KDA管理与Prefix Cache难题.md`
+- 创建概念页：`wiki/concepts/线性注意力递归状态.md`，区分 Conv State 与长期矩阵状态并整理 GDN 更新机制
+- 创建概念页：`wiki/concepts/递归状态 Prefix Caching.md`，整理 checkpoint、共同恢复边界、重算与显存权衡
+- 更新页面：`Chunked Gated Delta Rule`、`Prefix Caching`、`KV Cache`、`混合注意力`、`Speculative Decoding`、`SGLang`
+- 机制归纳：GDN 的矩阵状态按 fast-weight/key-value 关联记忆解释；Conv State 为 causal depthwise convolution 保存短窗口
+- 待核实：KDA 状态 S 的官方数学定义，以及 SGLang MambaPool/UnifiedRadixCache/暂存提交路径的具体源码版本
+
+## [2026-07-25] ingest | Nvidia Rubin 架构分析预览
+
+- 读取原始资料：`raw/articles/Nvidia Rubin架构分析预览.md`
+- 创建来源页：`wiki/sources/Nvidia Rubin架构分析预览.md`
+- 创建硬件实体页：`wiki/entities/NVIDIA Rubin.md`
+- 更新概念页：`MoE`、`Programmatic Dependent Launch`、`GPU执行模型`、`CUDA内存层次`、`通信-计算重叠`、`算子融合`、`混合精度训练与推理`
+- 重点整理 MoE 优化链：TMA runtime override、Expert 权重 L2 priority、SFU epilogue 与 counted dispatch/combine
+- 未发现直接冲突；counted fabric 的 Rubin 产品叙事与 PTX 9.3 sm_100+ target 需要区分
+- 待核实：PTX 9.4 最终语义、Rubin 实机性能、作者反推的频率与调度器实现

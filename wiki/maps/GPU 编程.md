@@ -15,6 +15,8 @@ topic: GPU 编程
 4. **减少 launch 与 HBM 往返**：[[../concepts/算子融合|算子融合]] → [[../concepts/Programmatic Dependent Launch|Programmatic Dependent Launch]] → [[../concepts/Megakernel|Megakernel]]（融合的极端形态）。
 5. **写 kernel 的抽象层**：[[../concepts/Triton|Triton]]、[[../concepts/CuTe DSL|CuTe DSL]]、[[../concepts/Torch Compile|Torch Compile]]、[[../concepts/CODA|CODA]]。
 
+架构代际案例可读 [[../entities/NVIDIA Rubin|NVIDIA Rubin]]：把 SM/Tensor Core/SFU/HBM 的硬件变化，映射到 TMA 动态 expert 搬运、L2 priority、跨 kernel dependency、counted NVLink communication 与 sparse Attention staging。
+
 <!-- BEGIN AUTO：以下由 scripts/update_index.py 生成，改动会被覆盖 -->
 
 ## 概念（21）
@@ -41,17 +43,19 @@ topic: GPU 编程
 - [[../concepts/动态共享内存|动态共享内存]]
 - [[../concepts/算子融合|算子融合]]
 
-## 实体（3）
+## 实体（4）
 
 - [[../entities/FlashInfer|FlashInfer]]
 - [[../entities/HazyResearch|HazyResearch]]
 - [[../entities/Megakernels|Megakernels]]
+- [[../entities/NVIDIA Rubin|NVIDIA Rubin]]
 
-## 来源（8）
+## 来源（9）
 
 - [[../sources/CUDA优化维度框架|CUDA优化维度框架]]
 - [[../sources/CUDA内存层次与动态共享内存问答整理|CUDA内存层次与动态共享内存问答整理]]
 - [[../sources/Look Ma, No Bubbles! Designing a Low-Latency Megakernel for Llama-1B|Look Ma, No Bubbles! Designing a Low-Latency Megakernel for Llama-1B]]
+- [[../sources/Nvidia Rubin架构分析预览|Nvidia Rubin架构分析预览]]
 - [[../sources/你一定要知道：CUDA优化六要|你一定要知道：CUDA优化六要]]
 - [[../sources/多卡GPU监控与SM执行模型面试整理|多卡GPU监控与SM执行模型面试整理]]
 - [[../sources/斯坦福CS336 Lecture 5 - GPUs|斯坦福CS336 Lecture 5 - GPUs]]

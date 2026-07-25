@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: 注意力机制
-sources: 0
+sources: 1
 updated: 2026-06-12
 ---
 
@@ -34,6 +34,15 @@ S0 -> S1 -> S2 -> S3 -> ... -> SL
 
 块内仍然保持因果依赖，但会把一段 token 的更新改写成更适合 GPU 的矩阵运算；块间只传递每个 chunk 的最终状态。
 
+## 持久状态：Conv State 与矩阵状态
+
+GDN 层跨 token 持久化的通常不只有 `final_state` 矩阵，还包括短 causal depthwise convolution 的 Conv State：
+
+- Conv State 保存最近 `kernel_size-1` 个卷积输入特征，供下一 token 计算局部卷积；
+- Recurrent Matrix State 把全部历史压缩成每 head 固定大小的 key-value 关联记忆，由当前 `k/v/gate` 更新、由 `q` 读取。
+
+Decode 逐 token 原地推进两种状态；chunk 版本在 prefill/training 中把块内更新矩阵化、块间传递最终状态。可恢复前缀边界必须同时保存两者，详见 [[线性注意力递归状态]] 与 [[递归状态 Prefix Caching]]。
+
 ## 和 Chunked Prefill 的区别
 
 - [[Chunked Prefill]] 的 chunk 是 serving 调度粒度：长 prompt 分多轮下发，方便和 decode 交错。
@@ -53,7 +62,7 @@ S0 -> S1 -> S2 -> S3 -> ... -> SL
 - 投影后：`q [B,T,16,128]`、`k [B,T,16,128]`、`v [B,T,128,128]`、`z [B,T,128,128]`、`beta [B,T,128]`、`g [B,T,128]`
 - 因为 `128 / 16 = 8`，Qwen3Next 会把 `q/k` repeat 到 value-head 粒度，送入 GDN kernel 时为 `q/k/v [B,T,128,128]`
 - `chunk_gated_delta_rule` 输出 `o [B,T,128,128]`，再经 gated RMSNorm、flatten 为 `[B,T,16384]`，最后 `out_proj` 回 `[B,T,8192]`
-- 若输出 cache state，`final_state` 形状为 `[N,128,128,128]`，其中 `N` 是 batch 中的序列数；bf16 下约 `4 MB / linear-attention layer / sequence`
+- 若输出 cache matrix state，`final_state` 形状为 `[N,128,128,128]`，其中 `N` 是 batch 中的序列数；bf16 下约 `4 MB / linear-attention layer / sequence`。该数值只计算矩阵状态，不包含 Conv State 和 runtime bookkeeping。
 
 这个配置的 `layer_types` 是每 4 层 3 个 `linear_attention` 加 1 个 `full_attention`，共 60 层时约 45 个 GDN 层、15 个 full attention 层。
 
@@ -62,3 +71,17 @@ S0 -> S1 -> S2 -> S3 -> ... -> SL
 - [[Chunked Prefill]]
 - [[KV Cache]]
 - [[CUDA Kernel]]
+- [[线性注意力递归状态]]
+- [[递归状态 Prefix Caching]]
+
+## 相关实体
+
+- [[../entities/SGLang]]
+
+## 相关来源
+
+- [[../sources/SGLang的KDA管理与Prefix Cache难题]]
+
+## 研究备注
+
+- 上述 GDN state 语义可用于理解递归线性注意力；KDA 的精确矩阵公式不能直接由 GDN 公式替代，需要一手技术资料核实。

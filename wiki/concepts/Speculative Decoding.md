@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: 投机解码
-sources: 6
+sources: 7
 updated: 2026-07-08
 ---
 
@@ -67,6 +67,7 @@ target logits at position t+k-1 -> score y_k
 - 在 Gemma 4 的 `MTP Drafter` 语境里，target model 仍是最终验证者；连续接受的草稿 token 可直接输出，遇到第一个拒绝 token 后，后续草稿被丢弃并由 target model 给出替代 token
 - 在 `SGLang` 的黑盒 API 场景中，文章提到另一种解释器级 speculative execution：第一次 API 调用忽略 stop 条件多生成若干 token，后续原语若能匹配这些额外输出，就可以减少一次 API 调用的输入成本和延迟
 - RTP-LLM 来源强调 C++ 级别的模块化调用可减少 Python/C++ 边界开销；该说法需要结合具体框架版本和 profiler 结果核实
+- 对 GDN/KDA 等递归线性注意力，draft token 不仅会写临时 KV，还会推进 Conv State 与矩阵状态。Rejected token 不能留在主状态中；来源描述 SGLang 先写暂存状态，验证后按实际接受长度提交，精确实现依赖版本。
 
 ## 相关实体
 
@@ -84,6 +85,7 @@ target logits at position t+k-1 -> score y_k
 - [[../sources/Gemma 4：Drafter 详解]]
 - [[../sources/SGLang：LLM推理引擎发展新方向]]
 - [[../sources/RTP-LLM]]
+- [[../sources/SGLang的KDA管理与Prefix Cache难题]]
 
 ## 相关概念
 
@@ -92,6 +94,8 @@ target logits at position t+k-1 -> score y_k
 - [[Multi-Token Prediction]]
 - [[MTP Drafter]]
 - [[LLM Programs]]
+- [[线性注意力递归状态]]
+- [[递归状态 Prefix Caching]]
 
 ## 研究备注
 

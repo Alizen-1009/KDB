@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: 模型架构
-sources: 4
+sources: 6
 updated: 2026-06-12
 ---
 
@@ -210,6 +210,21 @@ for e in experts:
 
 所以高性能单卡 MoE 通常更倾向使用 `grouped matmul / grouped GEMM` 来算 expert FFN；`batched matmul` 主要出现在 padding 到固定 capacity 的简单实现、训练参考实现，或 expert token 数较均匀且 padding 浪费可接受的场景。
 
+## Rubin 的 MoE 执行链优化
+
+[[../entities/NVIDIA Rubin]] 的相关机制可以串成一条动态 expert 执行链：
+
+1. Router 选中 expert 后，复用公共 TensorMap，并通过 TMA runtime override 覆盖 global base address/dimensions/strides，避免为每个同 shape/layout 的 expert 保存或频繁 patch 独立 descriptor。
+2. Expert 权重加载后以 `evict_last` 倾向留在 L2，供多个 token/tile 重复使用；last-use 后用 `applypriority` 恢复 `evict_normal`，把 cache capacity 让给下一个热点 expert。
+3. Tensor Core 执行 Grouped GEMM，增强 SFU 处理 SwiGLU activation/epilogue，降低“GEMM 已完成但 epilogue 未跟上”的空泡风险。
+4. 跨 GPU dispatch/combine 可结合 counted put/reduction，让接收端按已访问字节数判断数据 ready，减少额外 barrier、ack 和 atomic flag。
+
+这些机制优化权重寻址、搬运、缓存生命周期、epilogue 与同步，不减少 MoE 数学 FLOPs，也不保证理论子系统提升能完全转化为端到端收益。
+
+## NCCL EP 中的 dispatch/combine
+
+[[../entities/NCCL Extensions]] 的 `nccl_ep` 将 MoE token 的 dispatch/combine 下沉为带模型结构语义的通信组件。与通用 All-to-All 相比，它直接表达 top-k 路由、expert/rank 布局、接收布局及低延迟/高吞吐算法模式；但 Router 决策、Grouped GEMM 和完整 serving 生命周期仍由上层系统负责。
+
 ## AFD 中的 MoE 服务化
 
 [[Attention-FFN 分离]] 可以把 MoE/FFN 路径从维护请求状态和 KV Cache 的 Attention worker 中拆出。每个切分层由 Attention 侧发送 hidden states、`layer_id` 和执行元数据，FFN 侧完成 Router、token dispatch、expert compute 与 combine 后返回 FFN output。FFN 侧仍可内部使用 [[Expert Parallelism]]；此时要区分 A/F 服务间的激活往返与 FFN ranks 内部的 EP All-to-All。
@@ -238,12 +253,17 @@ for e in experts:
 - [[Sparsity Allocation]]
 - [[Warp Divergence]]
 - [[Attention-FFN 分离]]
+- [[通信-计算重叠]]
+- [[CUDA内存层次]]
+- [[算子融合]]
 
 ## 相关实体
 
 - [[../entities/DeepSeek-AI]]
 - [[../entities/Gemma 4]]
 - [[../entities/vLLM AFD Plugin]]
+- [[../entities/NCCL Extensions]]
+- [[../entities/NVIDIA Rubin]]
 
 ## 相关来源
 
@@ -251,6 +271,8 @@ for e in experts:
 - [[../sources/Gemma 4 核心技术深度解析：PLE、Shared KV Cache 与全模态架构]]
 - [[../sources/Conditional Memory via Scalable Lookup: A New Axis of Sparsity for Large Language Models]]
 - [[../sources/vLLM AFD Plugin 发布：为 MoE 推理拆分 Attention 与 FFN，实现灵活部署]]
+- [[../sources/NVIDIA 开源 NCCL Extensions：把 MoE 专家路由与跨 Mesh 权重重分片推进到 GPU 设备侧]]
+- [[../sources/Nvidia Rubin架构分析预览]]
 
 ## 研究备注
 

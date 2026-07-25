@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: 并行与分布式
-sources: 3
+sources: 4
 updated: 2026-06-12
 ---
 
@@ -57,6 +57,12 @@ EP 下每个 rank 都可能产生要发给任意 expert 的 token，而这些 ex
 
 部署里经常看到 `EP size = TP size`，通常是因为单机单副本、只开一个并行组时配置最简单：同一组 GPU 既承担 TP 通信，也承担 MoE expert 分布。但这不是数学要求，也不是所有 serving 框架的固定规则。实际选择更受这些因素影响：总 GPU 数、是否启用 DP / DPA、expert 数是否能被 EP size 整除、节点内外网络拓扑、decode batch 大小、是否允许每个 expert 内部再 TP。
 
+## NCCL EP 的专用通信路径
+
+[[../entities/NCCL Extensions]] 中的 `nccl_ep` 把 MoE 的 dispatch/combine 固化为带 top-k、expert/rank 布局和输出布局语义的通信 API，而不是让每个框架自行组合 permutation、临时 buffer、All-to-All/P2P 与同步事件。
+
+它区分两类负载：Low-Latency 路径面向小 batch 和推理，可用 `send_only + ncclEpComplete` 把发送与接收完成拆开，为 [[通信-计算重叠]] 留出窗口；High-Throughput 路径面向训练和 prefill，按 LSA/NVLink 域内与 GIN/RDMA 跨域组织 warp 和流水阶段。它仍不是完整 MoE runtime，不负责 Router 策略、专家 GEMM、请求调度或 KV Cache。
+
 ## 与 AFD 的组合
 
 在 [[Attention-FFN 分离]] 中，EP 自然位于 FFN 服务内部：Attention 侧先通过 AFD connector 把 hidden states 交给 FFN 侧，FFN ranks 再按 expert id 执行 dispatch All-to-All、local expert compute 和 combine All-to-All，最后通过 connector 把 FFN output 返回 Attention 侧。
@@ -86,12 +92,14 @@ EP 下每个 rank 都可能产生要发给任意 expert 的 token，而这些 ex
 - [[集合通信]]
 - [[Tail Effect]]
 - [[Attention-FFN 分离]]
+- [[通信-计算重叠]]
 
 ## 相关来源
 
 - [[../sources/LLM推理优化核心技术]]
 - [[../sources/MLA与DP Attention面试整理]]
 - [[../sources/vLLM AFD Plugin 发布：为 MoE 推理拆分 Attention 与 FFN，实现灵活部署]]
+- [[../sources/NVIDIA 开源 NCCL Extensions：把 MoE 专家路由与跨 Mesh 权重重分片推进到 GPU 设备侧]]
 
 ## 研究备注
 
