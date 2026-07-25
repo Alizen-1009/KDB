@@ -6,12 +6,12 @@
 
 1. 把网页、论文、repo、benchmark、截图放进 `raw/`
 2. 在 Obsidian 中打开对应文件，确认命名和内容没问题
-3. 在 Claude Code 里执行 `/kb-ingest raw/...`
+3. 在 Pi 里执行 `/skill:kb-ingest raw/...`
 4. 先阅读 AI 给出的 `2-3` 条摘要和重点论断
 5. 确认重点后，再让 AI 写入 `wiki/sources/`、`wiki/entities/`、`wiki/concepts/`
-6. 用 `/kb-query 你的问题` 发起研究输出
+6. 用 `/skill:kb-query 你的问题` 发起研究输出
 7. 在 Obsidian 中审阅 `output/` 下的结果，并决定是否回填到 `wiki/`
-8. 要背的主题用 `/kb-export <主题>` 导出到 `output/cards/`，再导入 Anki
+8. 要背的主题用 `/skill:kb-export <主题>` 导出到 `output/cards/`，再导入 Anki
 
 ## Obsidian 侧最佳实践
 
@@ -26,9 +26,9 @@
 - 让 AI 尽量做局部更新，而不是重写整页
 - 让 AI 把新结论写进来源页、实体页、概念页，而不是只停留在聊天里
 
-## 和 Claudian / 类似插件的关系
+## 和其他 Obsidian AI 插件的关系
 
-如果你在 Obsidian 里使用 Claudian 这类插件：
+如果你在 Obsidian 里使用其他 AI 插件：
 
 - 可以直接在 Vault 里选中文件后让 AI 总结
 - 可以让它按当前 Vault 模板写新笔记

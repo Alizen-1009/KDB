@@ -7,7 +7,7 @@
 - `AGENTS.md`：schema 规则层，约束 LLM 如何 ingest / query / export
 - `output/`：研究输出、对比分析、幻灯片、可视化、复习卡片
 - `inbox/`：待处理资料与待回答问题
-- `.claude/skills/`：三个核心动作的执行流程（ingest / query / export）
+- `.pi/skills/`：三个核心动作的执行流程（ingest / query / export）
 - `scripts/`：确定性的辅助脚本（重建索引、写日志、卡片转换、健康检查）
 
 ## 核心理念
@@ -58,7 +58,7 @@ Obsidian 是这个知识库的阅读与导航前端。建议把以下页面固�
 
 这套仓库按“先讨论、再落盘”的方式设计：
 
-1. 你执行 `/kb-ingest raw/...`
+1. 你在 Pi 中执行 `/skill:kb-ingest raw/...`
 2. LLM 先完整阅读原始资料
 3. 先和你确认 `2-3` 条摘要以及值得关注的论断
 4. 得到确认后，再创建 `wiki/sources/` 页面
@@ -69,19 +69,19 @@ Obsidian 是这个知识库的阅读与导航前端。建议把以下页面固�
 
 ## 三个核心动作
 
-三个动作都是 skill（`.claude/skills/`），因为它们需要判断：读什么、更新哪些页面、有没有冲突。确定性的部分才是脚本，由 skill 调用。
+三个动作都是 Pi skill（`.pi/skills/`），因为它们需要判断：读什么、更新哪些页面、有没有冲突。确定性的部分才是脚本，由 skill 调用。
 
 ### Ingest
 
 ```
-/kb-ingest raw/papers/flashattention-3.pdf
-/kb-ingest                      # 列出 raw/ 里还没进 wiki 的资料
+/skill:kb-ingest raw/papers/flashattention-3.pdf
+/skill:kb-ingest                      # 列出 raw/ 里还没进 wiki 的资料
 ```
 
 ### Query
 
 ```
-/kb-query 对比 vLLM、SGLang 和 TensorRT-LLM 的推理架构权衡
+/skill:kb-query 对比 vLLM、SGLang 和 TensorRT-LLM 的推理架构权衡
 ```
 
 产出 `output/reports/` 下的技术报告（面试备考类放 `output/interview/`，幻灯片放 `output/slides/`），高价值结论回填 `wiki/`。
@@ -89,7 +89,7 @@ Obsidian 是这个知识库的阅读与导航前端。建议把以下页面固�
 ### Export
 
 ```
-/kb-export attention
+/skill:kb-export attention
 ```
 
 从概念页和面试整理生成 `output/cards/<主题>.md` 问答卡片，再转成 Anki 可导入的 TSV：
@@ -107,12 +107,12 @@ python3 scripts/lint.py
 ## 推荐工作流
 
 1. 用网页剪藏、手工收集或 git clone 把资料放入 `raw/`
-2. 用 `/kb-ingest` 发起一轮摄入
+2. 用 `/skill:kb-ingest` 发起一轮摄入
 3. 先读 LLM 给出的摘要和重点判断
 4. 你确认关注点后，再让 LLM 更新 wiki 页面
-5. 通过 `/kb-query` 发起研究问题
+5. 通过 `/skill:kb-query` 发起研究问题
 6. 把高价值输出回填到 `wiki/`
-7. 需要背的主题用 `/kb-export` 导出复习卡片
+7. 需要背的主题用 `/skill:kb-export` 导出复习卡片
 8. 定期运行 `python3 scripts/lint.py`
 
 ## Obsidian 优化
@@ -123,4 +123,4 @@ python3 scripts/lint.py
 - 协作说明：`Obsidian Workflow.md`
 - 模板目录：`Templates/`
 
-后续如果你在 Obsidian 里配合 Claudian 或其他 AI 插件使用，AI 更容易直接按当前 Vault 结构产出笔记，而不是随意散落文件。
+后续如果你在 Obsidian 里配合其他 AI 插件使用，AI 更容易直接按当前 Vault 结构产出笔记，而不是随意散落文件。

@@ -78,9 +78,17 @@ updated: 2026-07-12 # 派生字段，勿手填
 
 `sources` 与 `updated` 由 `python3 scripts/kb_meta.py sync` 从实际链接数和 git 提交日期刷新，不要手写。词表本身定义在 `scripts/kb_meta.py`，改词表要同时改那里。
 
+## 自动化约定
+
+- 这个仓库是 Obsidian Vault，不是应用；`scripts/` 只包含 Python 标准库脚本，无需虚拟环境或额外依赖。
+- `wiki/index.md` 是生成物；`wiki/maps/*.md` 中 `BEGIN AUTO` 标记后的区域也是生成物，不要手改。主题地图标记前的《导读》是手写区。
+- `wiki/log.md` 只通过 `scripts/kb_log.py` 追加，不要手编。
+- 每次修改 `wiki/` 后依次运行 `python3 scripts/kb_meta.py sync`、`python3 scripts/update_index.py`、`python3 scripts/lint.py`。
+- 来源页必须包含 `原始文件：` 字段；知识库正文默认使用中文。
+
 ## 核心操作
 
-三个核心动作的**执行流程**写在 `.claude/skills/` 下（`kb-ingest` / `kb-query` / `kb-export`），本文件只定义**规则约束**。两者分工：skill 说“按什么顺序做”，schema 说“什么算写对了”。改规则改这里，改流程改 skill。
+三个核心动作的**执行流程**写在 `.pi/skills/` 下（`kb-ingest` / `kb-query` / `kb-export`），本文件只定义**规则约束**。两者分工：skill 说“按什么顺序做”，schema 说“什么算写对了”。改规则改这里，改流程改 skill。
 
 ### Ingest
 

@@ -1,6 +1,6 @@
 # Scripts
 
-这里只放**确定性的文件操作**。三个核心动作（ingest / query / export）本身是 skill，不是脚本——它们需要判断力，写在 `.claude/skills/` 下。脚本负责的是格式必须一致、不该交给 LLM 逐字手写的部分，由 skill 在流程末尾调用。
+这里只放**确定性的文件操作**。三个核心动作（ingest / query / export）本身是 skill，不是脚本——它们需要判断力，写在 `.pi/skills/` 下。脚本负责的是格式必须一致、不该交给 LLM 逐字手写的部分，由 skill 在流程末尾调用。
 
 ## `update_index.py`
 

@@ -26,11 +26,11 @@
 
 ## 三个核心动作
 
-在 Claude Code 里执行，流程写在 `.claude/skills/`：
+在 Pi 里执行，流程写在 `.pi/skills/`：
 
-- `/kb-ingest raw/...`：把原始资料编译进 wiki
-- `/kb-query <问题>`：产出研究报告，回填 wiki
-- `/kb-export <主题>`：导出复习卡片到 `output/cards/`
+- `/skill:kb-ingest raw/...`：把原始资料编译进 wiki
+- `/skill:kb-query <问题>`：产出研究报告，回填 wiki
+- `/skill:kb-export <主题>`：导出复习卡片到 `output/cards/`
 
 ## 页面模板
 
