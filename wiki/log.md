@@ -1100,3 +1100,13 @@
 - 重点整理 MoE 优化链：TMA runtime override、Expert 权重 L2 priority、SFU epilogue 与 counted dispatch/combine
 - 未发现直接冲突；counted fabric 的 Rubin 产品叙事与 PTX 9.3 sm_100+ target 需要区分
 - 待核实：PTX 9.4 最终语义、Rubin 实机性能、作者反推的频率与调度器实现
+
+## [2026-07-25] ingest | 2026 年 MoE 架构关键变化：LatentMoE
+
+- 读取完整截图资料：`raw/articles/2026 年MoE 架构正在发生一次关键变化.md`（9 张正文图片）
+- 创建来源页：`wiki/sources/2026 年MoE 架构正在发生一次关键变化.md`
+- 创建概念页：`wiki/concepts/LatentMoE.md`
+- 更新页面：`MoE`、`Expert Parallelism`、`Sparsity Allocation`、`混合精度训练与推理`、`Moonshot AI`
+- 讨论澄清：d 是模型主干 hidden size，ℓ 是 routed expert 潜在输入输出维度，m 是 expert intermediate size
+- 机制归纳：潜在空间可按 ℓ/d 缩小 expert 权重主导项和 EP activation payload，但不等于端到端获得 d/ℓ 倍加速
+- 待核实：LatentMoE 官方定义、投影共享方式、Nemotron 3 Super/Kimi K3 规格及 benchmark

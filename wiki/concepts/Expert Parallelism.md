@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: 并行与分布式
-sources: 4
+sources: 5
 updated: 2026-06-12
 ---
 
@@ -63,6 +63,12 @@ EP 下每个 rank 都可能产生要发给任意 expert 的 token，而这些 ex
 
 它区分两类负载：Low-Latency 路径面向小 batch 和推理，可用 `send_only + ncclEpComplete` 把发送与接收完成拆开，为 [[通信-计算重叠]] 留出窗口；High-Throughput 路径面向训练和 prefill，按 LSA/NVLink 域内与 GIN/RDMA 跨域组织 warp 和流水阶段。它仍不是完整 MoE runtime，不负责 Router 策略、专家 GEMM、请求调度或 KV Cache。
 
+## LatentMoE 对 EP payload 的影响
+
+传统 EP dispatch/combine 传输的主 activation 宽度通常是模型 hidden size `d`；[[LatentMoE]] 若在 dispatch 前完成下投影，则跨 rank 传输 `[tokens, ℓ]`。忽略 metadata、padding 和固定延迟时，主 payload 比例约为 `ℓ/d`。
+
+这会降低提高 Top-k 时的通信成本斜率，但不会让 Top-k 免费增长：token 复制份数、expert GEMM、collective 启动、负载不均和 combine 仍随激活 experts 增加。实际通信时间也不会严格按 `d/ℓ` 缩短，尤其在小消息、latency-bound 或软件开销占主导时。
+
 ## 与 AFD 的组合
 
 在 [[Attention-FFN 分离]] 中，EP 自然位于 FFN 服务内部：Attention 侧先通过 AFD connector 把 hidden states 交给 FFN 侧，FFN ranks 再按 expert id 执行 dispatch All-to-All、local expert compute 和 combine All-to-All，最后通过 connector 把 FFN output 返回 Attention 侧。
@@ -92,6 +98,7 @@ EP 下每个 rank 都可能产生要发给任意 expert 的 token，而这些 ex
 - [[集合通信]]
 - [[Tail Effect]]
 - [[Attention-FFN 分离]]
+- [[LatentMoE]]
 - [[通信-计算重叠]]
 
 ## 相关来源
@@ -100,6 +107,7 @@ EP 下每个 rank 都可能产生要发给任意 expert 的 token，而这些 ex
 - [[../sources/MLA与DP Attention面试整理]]
 - [[../sources/vLLM AFD Plugin 发布：为 MoE 推理拆分 Attention 与 FFN，实现灵活部署]]
 - [[../sources/NVIDIA 开源 NCCL Extensions：把 MoE 专家路由与跨 Mesh 权重重分片推进到 GPU 设备侧]]
+- [[../sources/2026 年MoE 架构正在发生一次关键变化]]
 
 ## 研究备注
 

@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: 模型架构
-sources: 1
+sources: 2
 updated: 2026-04-23
 ---
 
@@ -23,6 +23,12 @@ updated: 2026-04-23
 - 通过 allocation ratio 扫描不同分配比例，比较验证损失与下游表现
 - 论文观察到 U 型规律：纯 MoE 和过度记忆化都不是最优，中间区域表现最好
 
+## LatentMoE 的新分配轴
+
+[[LatentMoE]] 把 MoE 预算分配从“总 Expert 参数与 active Top-k”扩展为多维权衡：潜在维度 `ℓ`、Expert 总数 `E`、Top-k `K`、expert intermediate size `m`、上下投影开销和 EP 通信预算。
+
+减小 `ℓ` 可降低每次 routed expert 访问的权重/通信成本，把预算转给更多 experts 或更高 Top-k；但潜在空间过窄会形成信息瓶颈，且 `d -> ℓ -> d` 投影并非免费。因此最优点仍需在固定总参数、active FLOPs、训练 token 和系统拓扑下实测。
+
 ## 关键权衡
 
 - 过度偏向 MoE 时，模型缺少原生静态记忆原语，仍要用深层计算重建固定模式
@@ -32,14 +38,18 @@ updated: 2026-04-23
 ## 相关实体
 
 - [[../entities/Engram]]
+- [[../entities/Moonshot AI]]
 
 ## 相关来源
 
 - [[../sources/Conditional Memory via Scalable Lookup: A New Axis of Sparsity for Large Language Models]]
+- [[../sources/2026 年MoE 架构正在发生一次关键变化]]
 
 ## 相关概念
 
 - [[Conditional Memory]]
+- [[MoE]]
+- [[LatentMoE]]
 
 ## 研究备注
 

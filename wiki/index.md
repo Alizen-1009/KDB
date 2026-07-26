@@ -31,9 +31,9 @@
 - 原始数据集：0
 - 原始图片：19
 - 原始代码：1
-- 来源文件：43
+- 来源文件：44
 - 实体文件：28
-- 概念文件：87
+- 概念文件：88
 - 报告文件：3
 - 面试文件：11
 - 卡片文件：0
@@ -124,12 +124,13 @@
 - [[../wiki/concepts/Profiling|Profiling]]
 - [[../wiki/concepts/Roofline 模型|Roofline 模型]]
 
-### 模型架构（10）
+### 模型架构（11）
 
 - [[../wiki/concepts/Attention Residuals|Attention Residuals]]
 - [[../wiki/concepts/Conditional Memory|Conditional Memory]]
 - [[../wiki/concepts/Double-Wide MLP|Double-Wide MLP]]
 - [[../wiki/concepts/Hyper-Connections|Hyper-Connections]]
+- [[../wiki/concepts/LatentMoE|LatentMoE]]
 - [[../wiki/concepts/MoE|MoE]]
 - [[../wiki/concepts/Per-Layer Embeddings|Per-Layer Embeddings]]
 - [[../wiki/concepts/PreNorm Dilution|PreNorm Dilution]]
@@ -216,8 +217,9 @@
 
 ## 来源摘要（按类型）
 
-### 文章（24）
+### 文章（25）
 
+- [[../wiki/sources/2026 年MoE 架构正在发生一次关键变化|2026 年MoE 架构正在发生一次关键变化]]
 - [[../wiki/sources/CUDA优化维度框架|CUDA优化维度框架]]
 - [[../wiki/sources/DeepSeekV4中RoPE设计解析|DeepSeekV4中RoPE设计解析]]
 - [[../wiki/sources/Flash Attention 详细解释推演与Pytorch代码实现|Flash Attention 详细解释推演与Pytorch代码实现]]

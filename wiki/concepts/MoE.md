@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: 模型架构
-sources: 6
+sources: 7
 updated: 2026-06-12
 ---
 
@@ -221,6 +221,12 @@ for e in experts:
 
 这些机制优化权重寻址、搬运、缓存生命周期、epilogue 与同步，不减少 MoE 数学 FLOPs，也不保证理论子系统提升能完全转化为端到端收益。
 
+## LatentMoE：压缩 routed expert 路径
+
+[[LatentMoE]] 保持主干 hidden size `d` 不变，在 routed experts 前后加入 `d -> ℓ -> d` 投影，使 expert 内部从传统的 `d -> m -> d` 变成 `ℓ -> m -> ℓ`。这里 `m` 仍是 expert intermediate size；被压缩的是 expert 的输入/输出宽度。
+
+若 EP dispatch 发生在下投影后，跨 rank activation 从 `[tokens, d]` 变为 `[tokens, ℓ]`，同时 expert 输入/输出相关权重从 `d × m` 量级降为 `ℓ × m`。当 `d/ℓ=4` 时，这两个主导子项可粗略缩到四分之一，但整个 block 还要支付上下投影、Router/shared expert、metadata、collective latency 和其他模型路径，因此不能声称端到端快 4 倍。
+
 ## NCCL EP 中的 dispatch/combine
 
 [[../entities/NCCL Extensions]] 的 `nccl_ep` 将 MoE token 的 dispatch/combine 下沉为带模型结构语义的通信组件。与通用 All-to-All 相比，它直接表达 top-k 路由、expert/rank 布局、接收布局及低延迟/高吞吐算法模式；但 Router 决策、Grouped GEMM 和完整 serving 生命周期仍由上层系统负责。
@@ -256,6 +262,7 @@ for e in experts:
 - [[通信-计算重叠]]
 - [[CUDA内存层次]]
 - [[算子融合]]
+- [[LatentMoE]]
 
 ## 相关实体
 
@@ -273,6 +280,7 @@ for e in experts:
 - [[../sources/vLLM AFD Plugin 发布：为 MoE 推理拆分 Attention 与 FFN，实现灵活部署]]
 - [[../sources/NVIDIA 开源 NCCL Extensions：把 MoE 专家路由与跨 Mesh 权重重分片推进到 GPU 设备侧]]
 - [[../sources/Nvidia Rubin架构分析预览]]
+- [[../sources/2026 年MoE 架构正在发生一次关键变化]]
 
 ## 研究备注
 
