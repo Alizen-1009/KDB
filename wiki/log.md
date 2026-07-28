@@ -1110,3 +1110,50 @@
 - 讨论澄清：d 是模型主干 hidden size，ℓ 是 routed expert 潜在输入输出维度，m 是 expert intermediate size
 - 机制归纳：潜在空间可按 ℓ/d 缩小 expert 权重主导项和 EP activation payload，但不等于端到端获得 d/ℓ 倍加速
 - 待核实：LatentMoE 官方定义、投影共享方式、Nemotron 3 Super/Kimi K3 规格及 benchmark
+
+## [2026-07-26] ingest | vLLM Large Scale Serving：Wide-EP、DBO 与 EPLB
+
+- 读取原始资料：`raw/articles/vLLM Large Scale Serving DeepSeek @ 2.2k toksH200 with Wide-EP.md`
+- 创建来源页：`wiki/sources/vLLM Large Scale Serving DeepSeek @ 2.2k toksH200 with Wide-EP.md`
+- 创建概念页：`Wide Expert Parallelism`、`Dual Batch Overlap`、`Expert Parallel Load Balancing`
+- 创建实体页：`wiki/entities/DeepEP.md`
+- 更新页面：`vLLM`、`vLLM Team`、`Expert Parallelism`、`DP Attention`、`通信-计算重叠`、`PD分离`、`Attention-FFN 分离`
+- Benchmark 边界：2.2k tok/s/H200 来自 CoreWeave H200/InfiniBand/ConnectX-7 社区结果和多项组合优化，完整负载参数待核实
+
+## [2026-07-26] ingest | MegaMoE — 让 all-to-all 消失
+
+- 读取原始资料：`raw/articles/MegaMoE — 让 all-to-all 消失.md`
+- 创建来源页：`wiki/sources/MegaMoE — 让 all-to-all 消失.md`
+- 创建概念页：`wiki/concepts/MegaMoE.md`
+- 更新页面：`Dual Batch Overlap`、`MoE`、`Expert Parallelism`、`通信-计算重叠`、`Megakernel`、`算子融合`
+- 讨论澄清：DBO 是跨两个 microbatch 的 runtime overlap；MegaMoE 是单 batch 内按 expert wave 的五阶段融合流水
+- 标题校正：All-to-All 只可能从关键路径被隐藏，通信逻辑和字节量并未消失
+- 待核实：DeepSeek-V4 一手报告、MegaMoE kernel 边界、wave 配置、pull/push 语义与 1.50–1.96x benchmark 条件
+
+## [2026-07-26] ingest | vLLM x TileRT：延迟敏感型可插拔 Decode
+
+- 读取原始资料：`raw/articles/vLLM x TileRT Specialized Decode for Latency-Critical Serving.md`
+- 创建来源页：`wiki/sources/vLLM x TileRT Specialized Decode for Latency-Critical Serving.md`
+- 创建实体页：`wiki/entities/TileRT.md`
+- 创建概念页：`wiki/concepts/可插拔 Decode 引擎.md`
+- 更新页面：`PD分离`、`vLLM`、`KV Cache`、`Speculative Decoding`、`通信-计算重叠`、`vLLM Team`
+- 机制归纳：PD 分离不仅隔离资源，还允许共享 vLLM Serving/Prefill 层下组合 native 与专用 Decode backend
+- 待核实：TileRT 专用 kernel 原理、跨引擎 state layout/版本兼容和完整 benchmark 条件
+
+## [2026-07-26] ingest | vLLM PCP 与 DCP 深度解析
+
+- 读取原始资料：`raw/articles/vllm PCP 与 DCP 深度解析.md`
+- 创建来源页：`wiki/sources/vllm PCP 与 DCP 深度解析.md`
+- 创建概念页：`Prefill Context Parallel`、`Ring Attention`、`DeepSpeed Ulysses`
+- 更新页面：`Decode Context Parallel`、`Chunked Prefill`、`Online Softmax`、`MLA`、`通信-计算重叠`、`vLLM`
+- 讨论澄清：Ring 固定本地 Q 并轮转 K/V；Ulysses 对 Q/K/V 一起 All-to-All，将 Sequence Shard 临时转为 Head Shard
+- 冲突处理：DCP topology 采用既有来源的复用 TP group 口径；完整 KV AllGather 与 local attention/LSE merge 冲突时采用后者作为稳定数学机制
+- 待核实：PCP 合并状态与 CLI、ag_rs/a2a 精确张量流、PCP×DCP group 构造及 GQA/MLA backend 差异
+
+## [2026-07-27] query | vLLM CUDA Graph Piecewise 与 Full Decode Only
+
+- 读取主题地图：`GPU 编程`；读取概念/实体页：`Torch Compile`、`vLLM`
+- 核对官方源码：vLLM `compilation.py`、`cudagraph_dispatcher.py`（commit `439f336`）
+- 创建报告：`output/reports/vLLM CUDA Graph Piecewise 与 Full Decode Only.md`
+- 新增概念页：`wiki/concepts/CUDA Graph 执行模式.md`；更新实体页：`wiki/entities/vLLM.md`
+- 待核实：具体部署版本的 attention backend、并行方式、LoRA/spec decode 组合对 full graph 的支持及实测收益

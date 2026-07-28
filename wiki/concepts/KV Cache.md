@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: KV Cache
-sources: 15
+sources: 16
 updated: 2026-06-21
 ---
 
@@ -32,6 +32,12 @@ updated: 2026-06-21
 KV Cache 按 token/page 保存显式历史，已保存的每行 K/V 可以作为独立前缀记录复用。GDN/KDA 等线性注意力则用 [[线性注意力递归状态]] 压缩历史：Conv State 保存短卷积窗口，矩阵状态保存推进到当前边界后的长期聚合结果。后者大小不随上下文线性增长，但不能自然提供任意 token 边界回退，因此 Prefix Cache 需要 [[递归状态 Prefix Caching|递归状态 checkpoint]]。
 
 混合 MLA/KDA 模型会同时维护 Token KV Pool 与按请求分配的递归状态槽；“统一缓存”通常指逻辑前缀树与生命周期协调，不表示两类状态具有相同物理布局或恢复粒度。
+
+## 跨引擎 PD 状态交接
+
+在 vLLM Prefill + TileRT Decode 这类 [[可插拔 Decode 引擎|异构 PD]] 中，交接对象不只普通 KV Cache，还包括压缩 KV、sparse-attention index cache、MTP draft-layer KV 和执行元数据。目标引擎需要把状态转换为自己的原生 layout 后注入 live engine。
+
+来源使用 Mooncake/NIXL 以 RDMA one-sided writes 写入预注册 GPU buffers，避免 Host staging 和中间序列化；但 state extraction、本地 staging copy、layout conversion 与网络传输仍有实际成本。
 
 ## 推理阶段视角
 
@@ -109,6 +115,7 @@ KV Cache 按 token/page 保存显式历史，已保存的每行 K/V 可以作为
 - [[../sources/RTP-LLM]]
 - [[../sources/vllm并行策略之DCP(Decode Context Parallel)]]
 - [[../sources/SGLang的KDA管理与Prefix Cache难题]]
+- [[../sources/vLLM x TileRT Specialized Decode for Latency-Critical Serving]]
 
 ## 相关概念
 
@@ -128,6 +135,7 @@ KV Cache 按 token/page 保存显式历史，已保存的每行 K/V 可以作为
 - [[分层 KV Cache]]
 - [[线性注意力递归状态]]
 - [[递归状态 Prefix Caching]]
+- [[可插拔 Decode 引擎]]
 
 ## 研究备注
 

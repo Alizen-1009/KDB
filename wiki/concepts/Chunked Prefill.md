@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: 推理服务
-sources: 4
+sources: 5
 updated: 2026-07-08
 ---
 
@@ -25,6 +25,19 @@ updated: 2026-07-08
 - 如果还有 token budget，再调度 pending prefill tokens。
 - 如果某个 prefill 请求放不进当前 budget，就只处理其中一个 chunk，剩余 prompt tokens 留到后续 step。
 - 在 [[Decode Context Parallel]] 已启用的 vLLM 语境中，来源称 Chunked Prefill 需要配合 DCP 的 interleaved KVCache 布局写入缓存；也就是说，chunk 调度粒度和 DCP cache 分片是两个层级，前者切 prefill 调度步，后者切后续 decode 可读取的 KV token shard。
+
+## 与 PCP 的关系
+
+[[Prefill Context Parallel]] 与 Chunked Prefill 互补：Chunked Prefill 在调度/时间维把长 Prompt 拆成多个步骤，PCP 在空间维把当前 chunk 沿 sequence 分给多 GPU 并行计算。
+
+```text
+长 Prompt
+-> Scheduler 选择本轮 Prefill chunk
+-> PCP ranks 并行计算该 chunk
+-> 后续 chunks 继续调度
+```
+
+Chunking 主要控制峰值显存、公平性和对 Decode 的干扰；PCP 主要分摊单个长请求的 Prefill Attention 计算。Chunk 太小会让 PCP 每 rank 工作量不足并放大通信成本，因此需要联合调优。
 
 ## 和 PD 分离的关系
 
@@ -53,6 +66,7 @@ updated: 2026-07-08
 - [[../sources/vLLM v0 与 vLLM v1 调度架构差异截图整理]]
 - [[../sources/量化剪枝推理瓶颈Nsight与异构集群面试整理]]
 - [[../sources/vllm并行策略之DCP(Decode Context Parallel)]]
+- [[../sources/vllm PCP 与 DCP 深度解析]]
 
 ## 相关概念
 
@@ -62,6 +76,7 @@ updated: 2026-07-08
 - [[KV Cache]]
 - [[Prefix Caching]]
 - [[Decode Context Parallel]]
+- [[Prefill Context Parallel]]
 
 ## 研究备注
 

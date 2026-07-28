@@ -25,23 +25,23 @@
 
 ## 资源统计
 
-- 原始文章：54
+- 原始文章：58
 - 原始论文：3
 - 原始仓库：0
 - 原始数据集：0
 - 原始图片：19
 - 原始代码：1
-- 来源文件：44
-- 实体文件：28
-- 概念文件：88
-- 报告文件：3
+- 来源文件：48
+- 实体文件：30
+- 概念文件：97
+- 报告文件：4
 - 面试文件：11
 - 卡片文件：0
 - 幻灯片文件：0
 
 ## 概念页面（按主题）
 
-### 注意力机制（9）
+### 注意力机制（10）
 
 - [[../wiki/concepts/CSA-HCA|CSA-HCA]]
 - [[../wiki/concepts/Chunked Gated Delta Rule|Chunked Gated Delta Rule]]
@@ -50,6 +50,7 @@
 - [[../wiki/concepts/FlashMLA|FlashMLA]]
 - [[../wiki/concepts/MLA|MLA]]
 - [[../wiki/concepts/Online Softmax|Online Softmax]]
+- [[../wiki/concepts/Ring Attention|Ring Attention]]
 - [[../wiki/concepts/混合注意力|混合注意力]]
 - [[../wiki/concepts/线性注意力递归状态|线性注意力递归状态]]
 
@@ -64,7 +65,7 @@
 - [[../wiki/concepts/缓存感知路由|缓存感知路由]]
 - [[../wiki/concepts/递归状态 Prefix Caching|递归状态 Prefix Caching]]
 
-### 推理服务（10）
+### 推理服务（11）
 
 - [[../wiki/concepts/Attention-FFN 分离|Attention-FFN 分离]]
 - [[../wiki/concepts/Chunked Prefill|Chunked Prefill]]
@@ -74,19 +75,25 @@
 - [[../wiki/concepts/PD分离|PD分离]]
 - [[../wiki/concepts/SGLang 与 vLLM 对比|SGLang 与 vLLM 对比]]
 - [[../wiki/concepts/vLLM V1 统一调度器|vLLM V1 统一调度器]]
+- [[../wiki/concepts/可插拔 Decode 引擎|可插拔 Decode 引擎]]
 - [[../wiki/concepts/持久批处理|持久批处理]]
 - [[../wiki/concepts/确定性推理|确定性推理]]
 
-### 并行与分布式（14）
+### 并行与分布式（19）
 
 - [[../wiki/concepts/DDP|DDP]]
 - [[../wiki/concepts/DP Attention|DP Attention]]
 - [[../wiki/concepts/Decode Context Parallel|Decode Context Parallel]]
+- [[../wiki/concepts/DeepSpeed Ulysses|DeepSpeed Ulysses]]
+- [[../wiki/concepts/Dual Batch Overlap|Dual Batch Overlap]]
+- [[../wiki/concepts/Expert Parallel Load Balancing|Expert Parallel Load Balancing]]
 - [[../wiki/concepts/Expert Parallelism|Expert Parallelism]]
 - [[../wiki/concepts/FSDP|FSDP]]
+- [[../wiki/concepts/Prefill Context Parallel|Prefill Context Parallel]]
 - [[../wiki/concepts/Sequence Parallelism|Sequence Parallelism]]
 - [[../wiki/concepts/Tensor Parallelism|Tensor Parallelism]]
 - [[../wiki/concepts/Torch Distributed|Torch Distributed]]
+- [[../wiki/concepts/Wide Expert Parallelism|Wide Expert Parallelism]]
 - [[../wiki/concepts/ZeRO|ZeRO]]
 - [[../wiki/concepts/数据并行|数据并行]]
 - [[../wiki/concepts/流水线并行|流水线并行]]
@@ -94,17 +101,19 @@
 - [[../wiki/concepts/通信-计算重叠|通信-计算重叠]]
 - [[../wiki/concepts/集合通信|集合通信]]
 
-### GPU 编程（21）
+### GPU 编程（23）
 
 - [[../wiki/concepts/Bank Conflict|Bank Conflict]]
 - [[../wiki/concepts/Block Reduce|Block Reduce]]
 - [[../wiki/concepts/CODA|CODA]]
+- [[../wiki/concepts/CUDA Graph 执行模式|CUDA Graph 执行模式]]
 - [[../wiki/concepts/CUDA Kernel|CUDA Kernel]]
 - [[../wiki/concepts/CUDA内存层次|CUDA内存层次]]
 - [[../wiki/concepts/CuTe DSL|CuTe DSL]]
 - [[../wiki/concepts/GPU执行模型|GPU执行模型]]
 - [[../wiki/concepts/Grid-stride Loop|Grid-stride Loop]]
 - [[../wiki/concepts/Histogram|Histogram]]
+- [[../wiki/concepts/MegaMoE|MegaMoE]]
 - [[../wiki/concepts/Megakernel|Megakernel]]
 - [[../wiki/concepts/Occupancy|Occupancy]]
 - [[../wiki/concepts/Programmatic Dependent Launch|Programmatic Dependent Launch]]
@@ -162,14 +171,15 @@
 
 ## 实体页面（按类型）
 
-### 项目（4）
+### 项目（5）
 
+- [[../wiki/entities/DeepEP|DeepEP]]
 - [[../wiki/entities/Engram|Engram]]
 - [[../wiki/entities/Megakernels|Megakernels]]
 - [[../wiki/entities/NCCL Extensions|NCCL Extensions]]
 - [[../wiki/entities/vLLM AFD Plugin|vLLM AFD Plugin]]
 
-### 框架（7）
+### 框架（8）
 
 - [[../wiki/entities/FlashInfer|FlashInfer]]
 - [[../wiki/entities/NCCL|NCCL]]
@@ -177,6 +187,7 @@
 - [[../wiki/entities/RTP-LLM|RTP-LLM]]
 - [[../wiki/entities/SGLang|SGLang]]
 - [[../wiki/entities/TensorRT-LLM|TensorRT-LLM]]
+- [[../wiki/entities/TileRT|TileRT]]
 - [[../wiki/entities/vLLM|vLLM]]
 
 ### 模型（3）
@@ -217,7 +228,7 @@
 
 ## 来源摘要（按类型）
 
-### 文章（25）
+### 文章（29）
 
 - [[../wiki/sources/2026 年MoE 架构正在发生一次关键变化|2026 年MoE 架构正在发生一次关键变化]]
 - [[../wiki/sources/CUDA优化维度框架|CUDA优化维度框架]]
@@ -228,6 +239,7 @@
 - [[../wiki/sources/Kimi新作《Attention Residuals》：对Transformer中残差结构的调整|Kimi新作《Attention Residuals》：对Transformer中残差结构的调整]]
 - [[../wiki/sources/LLM推理优化核心技术|LLM推理优化核心技术]]
 - [[../wiki/sources/LLM提速利器：投机推理的原理与常见方案|LLM提速利器：投机推理的原理与常见方案]]
+- [[../wiki/sources/MegaMoE — 让 all-to-all 消失|MegaMoE — 让 all-to-all 消失]]
 - [[../wiki/sources/Model Runner V2 A Modular and Faster Core for vLLM|Model Runner V2 A Modular and Faster Core for vLLM]]
 - [[../wiki/sources/NVIDIA 开源 NCCL Extensions：把 MoE 专家路由与跨 Mesh 权重重分片推进到 GPU 设备侧|NVIDIA 开源 NCCL Extensions：把 MoE 专家路由与跨 Mesh 权重重分片推进到 GPU 设备侧]]
 - [[../wiki/sources/Nvidia Rubin架构分析预览|Nvidia Rubin架构分析预览]]
@@ -236,7 +248,10 @@
 - [[../wiki/sources/SGLang的KDA管理与Prefix Cache难题|SGLang的KDA管理与Prefix Cache难题]]
 - [[../wiki/sources/SGLang：LLM推理引擎发展新方向|SGLang：LLM推理引擎发展新方向]]
 - [[../wiki/sources/vLLM AFD Plugin 发布：为 MoE 推理拆分 Attention 与 FFN，实现灵活部署|vLLM AFD Plugin 发布：为 MoE 推理拆分 Attention 与 FFN，实现灵活部署]]
+- [[../wiki/sources/vLLM Large Scale Serving DeepSeek @ 2.2k toksH200 with Wide-EP|vLLM Large Scale Serving DeepSeek @ 2.2k toksH200 with Wide-EP]]
+- [[../wiki/sources/vLLM x TileRT Specialized Decode for Latency-Critical Serving|vLLM x TileRT Specialized Decode for Latency-Critical Serving]]
 - [[../wiki/sources/vLLM皇冠上的明珠：深入浅出理解PagedAttention CUDA实现|vLLM皇冠上的明珠：深入浅出理解PagedAttention CUDA实现]]
+- [[../wiki/sources/vllm PCP 与 DCP 深度解析|vllm PCP 与 DCP 深度解析]]
 - [[../wiki/sources/vllm并行策略之DCP(Decode Context Parallel)|vllm并行策略之DCP(Decode Context Parallel)]]
 - [[../wiki/sources/你一定要知道：CUDA优化六要|你一定要知道：CUDA优化六要]]
 - [[../wiki/sources/十分钟读懂旋转编码（RoPE）|十分钟读懂旋转编码（RoPE）]]
@@ -296,6 +311,7 @@
 - [[../output/reports/Gemma 开源代码结构导读|Gemma 开源代码结构导读]]
 - [[../output/reports/MoE通信-计算重叠与MegaKernel技术谱系|MoE通信-计算重叠与MegaKernel技术谱系]]
 - [[../output/reports/Prefill Attention 的 CUDA 并行映射|Prefill Attention 的 CUDA 并行映射]]
+- [[../output/reports/vLLM CUDA Graph Piecewise 与 Full Decode Only|vLLM CUDA Graph Piecewise 与 Full Decode Only]]
 
 ## 面试备考
 

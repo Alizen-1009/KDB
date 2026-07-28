@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: 并行与分布式
-sources: 5
+sources: 7
 updated: 2026-06-12
 ---
 
@@ -69,6 +69,12 @@ EP 下每个 rank 都可能产生要发给任意 expert 的 token，而这些 ex
 
 这会降低提高 Top-k 时的通信成本斜率，但不会让 Top-k 免费增长：token 复制份数、expert GEMM、collective 启动、负载不均和 combine 仍随激活 experts 增加。实际通信时间也不会严格按 `d/ℓ` 缩短，尤其在小消息、latency-bound 或软件开销占主导时。
 
+## Wide-EP 与运行时配套
+
+[[Wide Expert Parallelism]] 将 Attention 数据并行副本与共享的宽 EP group 组合：各 Attention replica 独立维护请求和 MLA KV Cache，到 MoE 层时把 token dispatch 到跨 ranks 分布的 experts。它可减少普通 TP 下 latent KV 的重复，但会放大 All-to-All、rank 同步和真实流量中的 expert imbalance。
+
+常见配套是 [[Dual Batch Overlap]] 用两个 microbatch 隐藏部分通信等待，[[Expert Parallel Load Balancing]] 动态调整逻辑 expert 到物理 rank 的 placement，[[../entities/DeepEP]] 提供 dispatch/combine backend。
+
 ## 与 AFD 的组合
 
 在 [[Attention-FFN 分离]] 中，EP 自然位于 FFN 服务内部：Attention 侧先通过 AFD connector 把 hidden states 交给 FFN 侧，FFN ranks 再按 expert id 执行 dispatch All-to-All、local expert compute 和 combine All-to-All，最后通过 connector 把 FFN output 返回 Attention 侧。
@@ -99,6 +105,10 @@ EP 下每个 rank 都可能产生要发给任意 expert 的 token，而这些 ex
 - [[Tail Effect]]
 - [[Attention-FFN 分离]]
 - [[LatentMoE]]
+- [[Wide Expert Parallelism]]
+- [[Dual Batch Overlap]]
+- [[Expert Parallel Load Balancing]]
+- [[MegaMoE]]
 - [[通信-计算重叠]]
 
 ## 相关来源
@@ -108,6 +118,8 @@ EP 下每个 rank 都可能产生要发给任意 expert 的 token，而这些 ex
 - [[../sources/vLLM AFD Plugin 发布：为 MoE 推理拆分 Attention 与 FFN，实现灵活部署]]
 - [[../sources/NVIDIA 开源 NCCL Extensions：把 MoE 专家路由与跨 Mesh 权重重分片推进到 GPU 设备侧]]
 - [[../sources/2026 年MoE 架构正在发生一次关键变化]]
+- [[../sources/vLLM Large Scale Serving DeepSeek @ 2.2k toksH200 with Wide-EP]]
+- [[../sources/MegaMoE — 让 all-to-all 消失]]
 
 ## 研究备注
 

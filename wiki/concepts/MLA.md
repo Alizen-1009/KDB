@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: 注意力机制
-sources: 4
+sources: 5
 updated: 2026-06-12
 ---
 
@@ -59,6 +59,10 @@ updated: 2026-06-12
 - [[Decode Context Parallel]] 也是系统并行策略；`vllm并行策略之DCP` 将 MLA decode 视为 DCP 的典型适用场景之一，因为 MLA decode 可呈现接近 MQA 的单 KV head 形态，纯 TP 容易复制 KV cache。
 - 这些策略经常在 DeepSeek/MLA serving 中配合出现，但作用层级不同。
 
+## 与 PCP/DCP 的边界
+
+MLA 压缩历史 KV 后，纯 TP 沿 KV-head 维的切分空间更有限，因此 [[Decode Context Parallel]] 可沿 token/context 维减少重复 cache。对 Prefill，[[Prefill Context Parallel]] 切的是长 Prompt 的 sequence computation；是否采用 Ring/Ulysses 以及 latent layout 如何重排，取决于具体 backend，不能用传统 MHA head-shard 公式直接推断。
+
 ## 关键权衡
 
 - 优点：显著降低 KV cache 占用与读流量，长上下文 decode 更友好。
@@ -76,6 +80,7 @@ updated: 2026-06-12
 - [[../sources/DeepSeekV4中RoPE设计解析]]
 - [[../sources/陈巍：DeepSeek 开源Day（1）-FlashMLA 深入分析（收录于：DeepSeek技术详解系列）]]
 - [[../sources/vllm并行策略之DCP(Decode Context Parallel)]]
+- [[../sources/vllm PCP 与 DCP 深度解析]]
 
 ## 相关概念
 
@@ -87,6 +92,7 @@ updated: 2026-06-12
 - [[FlashAttention]]
 - [[FlashMLA]]
 - [[Decode Context Parallel]]
+- [[Prefill Context Parallel]]
 
 ## 研究备注
 

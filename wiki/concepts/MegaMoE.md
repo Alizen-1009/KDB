@@ -1,8 +1,8 @@
 ---
 type: concept
 topic: GPU 编程
-sources: 0
-updated:
+sources: 1
+updated: 2026-07-26
 ---
 
 # MegaMoE

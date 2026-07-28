@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: GPU 编程
-sources: 1
+sources: 2
 updated: 2026-06-12
 ---
 
@@ -31,6 +31,10 @@ updated: 2026-06-12
 - Megakernel 的收益不只来自减少中间张量 HBM 往返，还来自消除 kernel 边界本身造成的调度、尾部和 pipeline bubble。
 - 代价也更大：原本由 CUDA kernel launch 隐含保证的数据依赖，需要在 kernel 内显式同步和调度。
 
+## 与 MegaMoE 的关系
+
+[[MegaMoE]] 是针对 MoE dispatch/FFN/combine 的 wave 级融合流水；本页的 Megakernel 是跨更长算子链、甚至整模型 forward 的广义模式。MegaMoE 是否由单一 persistent kernel 实现尚未被当前二手来源确认，因此不能仅凭名称把两者等同。
+
 ## 关键权衡
 
 - 适合固定模型、固定 shape、低 batch、低延迟、memory-bound 的窄场景；不应直接推广为所有 LLM serving 的默认方案。
@@ -46,6 +50,7 @@ updated: 2026-06-12
 ## 相关来源
 
 - [[../sources/Look Ma, No Bubbles! Designing a Low-Latency Megakernel for Llama-1B]]
+- [[../sources/MegaMoE — 让 all-to-all 消失]]
 
 ## 相关概念
 
@@ -57,6 +62,8 @@ updated: 2026-06-12
 - [[Roofline 模型]]
 - [[Programmatic Dependent Launch]]
 - [[Profiling]]
+- [[MegaMoE]]
+- [[通信-计算重叠]]
 
 ## 研究备注
 

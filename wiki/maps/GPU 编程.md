@@ -19,17 +19,19 @@ topic: GPU 编程
 
 <!-- BEGIN AUTO：以下由 scripts/update_index.py 生成，改动会被覆盖 -->
 
-## 概念（21）
+## 概念（23）
 
 - [[../concepts/Bank Conflict|Bank Conflict]]
 - [[../concepts/Block Reduce|Block Reduce]]
 - [[../concepts/CODA|CODA]]
+- [[../concepts/CUDA Graph 执行模式|CUDA Graph 执行模式]]
 - [[../concepts/CUDA Kernel|CUDA Kernel]]
 - [[../concepts/CUDA内存层次|CUDA内存层次]]
 - [[../concepts/CuTe DSL|CuTe DSL]]
 - [[../concepts/GPU执行模型|GPU执行模型]]
 - [[../concepts/Grid-stride Loop|Grid-stride Loop]]
 - [[../concepts/Histogram|Histogram]]
+- [[../concepts/MegaMoE|MegaMoE]]
 - [[../concepts/Megakernel|Megakernel]]
 - [[../concepts/Occupancy|Occupancy]]
 - [[../concepts/Programmatic Dependent Launch|Programmatic Dependent Launch]]
@@ -50,11 +52,12 @@ topic: GPU 编程
 - [[../entities/Megakernels|Megakernels]]
 - [[../entities/NVIDIA Rubin|NVIDIA Rubin]]
 
-## 来源（9）
+## 来源（10）
 
 - [[../sources/CUDA优化维度框架|CUDA优化维度框架]]
 - [[../sources/CUDA内存层次与动态共享内存问答整理|CUDA内存层次与动态共享内存问答整理]]
 - [[../sources/Look Ma, No Bubbles! Designing a Low-Latency Megakernel for Llama-1B|Look Ma, No Bubbles! Designing a Low-Latency Megakernel for Llama-1B]]
+- [[../sources/MegaMoE — 让 all-to-all 消失|MegaMoE — 让 all-to-all 消失]]
 - [[../sources/Nvidia Rubin架构分析预览|Nvidia Rubin架构分析预览]]
 - [[../sources/你一定要知道：CUDA优化六要|你一定要知道：CUDA优化六要]]
 - [[../sources/多卡GPU监控与SM执行模型面试整理|多卡GPU监控与SM执行模型面试整理]]

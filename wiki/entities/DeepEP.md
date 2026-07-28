@@ -2,8 +2,8 @@
 type: entity
 entity_type: 项目
 topic: 并行与分布式
-sources: 0
-updated:
+sources: 1
+updated: 2026-07-26
 ---
 
 # DeepEP

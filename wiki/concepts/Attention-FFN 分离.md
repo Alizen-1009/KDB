@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: 推理服务
-sources: 1
+sources: 2
 updated: 2026-07-25
 ---
 
@@ -167,6 +167,10 @@ Decode pool
 | 频率 | 以请求阶段交接为主 | 每个 forward step 的每个切分层 |
 | 生命周期 | KV Cache 在后续 decode 中长期保留 | 中间激活主要服务当前层/当前 step |
 
+## 与 Wide-EP 的边界
+
+[[Wide Expert Parallelism]] 在同一 serving 拓扑内以 Attention DP replicas 共享宽 expert pool；AFD 则把 Attention 和 FFN 提升为独立服务角色，可分别设置 rank 数和扩缩容策略。两者都需要 A/F 激活交换，也都可使用 EP、DBO 等内部优化，但 AFD 的服务边界和部署自由度更强、逐层连接器复杂度也更高。
+
 ## 关键权衡
 
 - **资源专用化与通信开销**：独立扩缩容可能提高设备利用率，但要覆盖逐层双向激活传输和布局转换成本。
@@ -192,6 +196,7 @@ Decode pool
 ## 相关来源
 
 - [[../sources/vLLM AFD Plugin 发布：为 MoE 推理拆分 Attention 与 FFN，实现灵活部署]]
+- [[../sources/vLLM Large Scale Serving DeepSeek @ 2.2k toksH200 with Wide-EP]]
 
 ## 相关概念
 
@@ -203,6 +208,8 @@ Decode pool
 - [[DP Attention]]
 - [[集合通信]]
 - [[KV Cache]]
+- [[Wide Expert Parallelism]]
+- [[Dual Batch Overlap]]
 
 ## 研究备注
 

@@ -2,7 +2,7 @@
 type: source
 source_kind: 文章
 topic: 推理服务
-updated:
+updated: 2026-07-26
 ---
 
 # vLLM Large Scale Serving DeepSeek @ 2.2k toksH200 with Wide-EP

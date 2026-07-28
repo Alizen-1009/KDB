@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: 模型架构
-sources: 7
+sources: 9
 updated: 2026-06-12
 ---
 
@@ -227,6 +227,12 @@ for e in experts:
 
 若 EP dispatch 发生在下投影后，跨 rank activation 从 `[tokens, d]` 变为 `[tokens, ℓ]`，同时 expert 输入/输出相关权重从 `d × m` 量级降为 `ℓ × m`。当 `d/ℓ=4` 时，这两个主导子项可粗略缩到四分之一，但整个 block 还要支付上下投影、Router/shared expert、metadata、collective latency 和其他模型路径，因此不能声称端到端快 4 倍。
 
+## MegaMoE：Wave 级五阶段流水
+
+[[MegaMoE]] 将 dispatch、L1/up GEMM、activation、L2/down GEMM、combine 按 expert waves 错位流水，使一个 wave 的计算覆盖其它 wave 的通信。All-to-All 并未消失；只有当计算时间足以覆盖通信时，它才可能从关键路径上隐藏。
+
+这与 [[Dual Batch Overlap]] 不同：DBO 在 runtime 层交错两个 microbatch，MegaMoE 在单 batch 内细分 expert waves。Wave 越多并非越好，因为单 wave GEMM 和消息会变小，调度、同步与长尾成本会上升。
+
 ## NCCL EP 中的 dispatch/combine
 
 [[../entities/NCCL Extensions]] 的 `nccl_ep` 将 MoE token 的 dispatch/combine 下沉为带模型结构语义的通信组件。与通用 All-to-All 相比，它直接表达 top-k 路由、expert/rank 布局、接收布局及低延迟/高吞吐算法模式；但 Router 决策、Grouped GEMM 和完整 serving 生命周期仍由上层系统负责。
@@ -263,6 +269,10 @@ for e in experts:
 - [[CUDA内存层次]]
 - [[算子融合]]
 - [[LatentMoE]]
+- [[MegaMoE]]
+- [[Dual Batch Overlap]]
+- [[Wide Expert Parallelism]]
+- [[Expert Parallel Load Balancing]]
 
 ## 相关实体
 
@@ -281,6 +291,8 @@ for e in experts:
 - [[../sources/NVIDIA 开源 NCCL Extensions：把 MoE 专家路由与跨 Mesh 权重重分片推进到 GPU 设备侧]]
 - [[../sources/Nvidia Rubin架构分析预览]]
 - [[../sources/2026 年MoE 架构正在发生一次关键变化]]
+- [[../sources/vLLM Large Scale Serving DeepSeek @ 2.2k toksH200 with Wide-EP]]
+- [[../sources/MegaMoE — 让 all-to-all 消失]]
 
 ## 研究备注
 

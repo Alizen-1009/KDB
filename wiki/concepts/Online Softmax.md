@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: 注意力机制
-sources: 3
+sources: 4
 updated: 2026-04-23
 ---
 
@@ -24,6 +24,12 @@ updated: 2026-04-23
 - 用 `exp(m_old - m_new)` 和 `exp(m_block - m_new)` 把旧统计与新统计拉回同一参考系
 - 分母 `d` 与未归一化输出分子 `O` 独立维护，所有 block 处理完后再统一做一次 `O / d`
 
+## 在 Ring Attention 与 DCP 中
+
+[[Ring Attention]] 固定本地 Q，让 K/V blocks 分轮到达；Online Softmax 维护跨 blocks 的 running max、normalizer 和加权输出，使每个 Q shard 最终得到精确全序列结果。
+
+[[Decode Context Parallel]] 则让 KV 保持在不同 ranks，本地计算 `local_lse/local_out`，再用相同的 log-sum-exp 缩放原则跨 ranks 合并。二者共享数学基础，但一个是 KV block 流水，一个是分布式 partial-output reduction。
+
 ## 关键权衡
 
 - 它是 exact reformulation，不是 approximate attention
@@ -39,12 +45,15 @@ updated: 2026-04-23
 - [[../sources/斯坦福CS336 Lecture 5 - GPUs]]
 - [[../sources/Flash Attention 详细解释推演与Pytorch代码实现]]
 - [[../sources/秋招CUDA手撕题复盘（附代码）]]
+- [[../sources/vllm PCP 与 DCP 深度解析]]
 
 ## 相关概念
 
 - [[FlashAttention]]
 - [[Tiling]]
 - [[Roofline 模型]]
+- [[Ring Attention]]
+- [[Decode Context Parallel]]
 
 ## 研究备注
 

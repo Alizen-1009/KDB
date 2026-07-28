@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: 并行与分布式
-sources: 1
+sources: 2
 updated: 2026-06-12
 ---
 
@@ -27,6 +27,25 @@ updated: 2026-06-12
 - Attention 输出需要像 [[Flash Decoding]] 一样合并各 shard 的局部 softmax 统计，而不是直接相加局部结果。
 - 在 vLLM 口径里，`dcp_size` 不增加启动 GPU 数，而是在既有 `tp_size` 内减少 KV cache 重复；官方文档给出的约束口径是 `dcp_size` 落在 `[1, tp_size / H]`，其中 `H` 是模型的 `KV heads` 数量。
 - 该来源还给出使用口径：通过 `--decode-context-parallel-size x` 开启，`TP` 需要能被 `DCP` 整除，`TP world_size` 不会因为 DCP 增加；attention 内部的 head 维并行度从 `TP` 变为 `TP / DCP`，同时增加 `seq_len` 维 `DCP` 并行。
+
+## 分布式 Softmax 合并
+
+DCP rank 用本地 KV shard 计算：
+
+```text
+scores_i = Q @ K_i^T
+local_lse_i = logsumexp(scores_i)
+local_out_i = softmax(scores_i) @ V_i
+```
+
+`local_out_i` 不能直接相加，因为每个 shard 的 Softmax 分母不同。精确全局输出需要：
+
+```text
+global_lse = logsumexp(local_lse_0, ..., local_lse_n)
+global_out = Σ exp(local_lse_i - global_lse) * local_out_i
+```
+
+具体 backend 可用 AllGather/ReduceScatter 或 All-to-All 交换 Query、LSE、partial output 等张量，但稳定机制是“KV 保持 context 分片、本地 Partial Attention、跨 rank 合并 Softmax 统计”，不应笼统写成每层 AllGather 完整 KV。
 
 ## 为什么 TP 不一定够
 
@@ -88,13 +107,18 @@ DCP 主要优化 decode 阶段，但 prefill 仍需要配合：
 - [[PagedAttention]]
 - [[Chunked Prefill]]
 - [[Prefix Caching]]
+- [[Prefill Context Parallel]]
+- [[Online Softmax]]
 
 ## 相关来源
 
 - [[../sources/vllm并行策略之DCP(Decode Context Parallel)]]
+- [[../sources/vllm PCP 与 DCP 深度解析]]
 
 ## 研究备注
 
 - DCP 的收益依赖长上下文、`num_kv_heads`、`tp_size`、batch size、attention backend 和跨 rank 合并开销；短上下文或 KV cache 不紧张时不一定值得开。
 - vLLM 官方文档将 DCP 描述为适用于 MLA 和 GQA 模型的 decode context parallel；具体支持矩阵和参数名应随 vLLM 版本核实。
 - `vllm并行策略之DCP` 中关于 CUDA backend、PCP 开发状态、`dcp_all2all` 通信和 Chunked Prefill / Prefix Cache 兼容性的描述，应视为来源时点的实现观察，后续需要按官方文档、PR 或 commit 复核。
+- 新来源同时出现“DCP 复用 TP group、不增加 world size”和“总 GPU=TP×DCP”的冲突拓扑。本页暂保留已有 vLLM 来源的复用 TP group 口径；group construction、参数约束和后端通信必须绑定版本。
+- 新来源对 `ag_rs` 先后给出“完整 KV AllGather”与“local attention + LSE/output merge”两种不同数据流。本页采用后者作为稳定数学机制，精确 collective 张量待源码核实。

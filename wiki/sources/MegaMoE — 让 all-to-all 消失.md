@@ -2,7 +2,7 @@
 type: source
 source_kind: 文章
 topic: GPU 编程
-updated:
+updated: 2026-07-26
 ---
 
 # MegaMoE — 让 all-to-all 消失

@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: 投机解码
-sources: 7
+sources: 8
 updated: 2026-07-08
 ---
 
@@ -68,6 +68,7 @@ target logits at position t+k-1 -> score y_k
 - 在 `SGLang` 的黑盒 API 场景中，文章提到另一种解释器级 speculative execution：第一次 API 调用忽略 stop 条件多生成若干 token，后续原语若能匹配这些额外输出，就可以减少一次 API 调用的输入成本和延迟
 - RTP-LLM 来源强调 C++ 级别的模块化调用可减少 Python/C++ 边界开销；该说法需要结合具体框架版本和 profiler 结果核实
 - 对 GDN/KDA 等递归线性注意力，draft token 不仅会写临时 KV，还会推进 Conv State 与矩阵状态。Rejected token 不能留在主状态中；来源描述 SGLang 先写暂存状态，验证后按实际接受长度提交，精确实现依赖版本。
+- 在 vLLM Prefill + TileRT Decode 的跨引擎 PD 中，TileRT 要从首个 Decode step 启用 MTP，因此 Prefill 侧必须生成并传递 draft-layer KV；目标引擎还需对齐 token position、dtype、layout 和 speculative config。
 
 ## 相关实体
 
@@ -86,6 +87,7 @@ target logits at position t+k-1 -> score y_k
 - [[../sources/SGLang：LLM推理引擎发展新方向]]
 - [[../sources/RTP-LLM]]
 - [[../sources/SGLang的KDA管理与Prefix Cache难题]]
+- [[../sources/vLLM x TileRT Specialized Decode for Latency-Critical Serving]]
 
 ## 相关概念
 
@@ -96,6 +98,7 @@ target logits at position t+k-1 -> score y_k
 - [[LLM Programs]]
 - [[线性注意力递归状态]]
 - [[递归状态 Prefix Caching]]
+- [[可插拔 Decode 引擎]]
 
 ## 研究备注
 

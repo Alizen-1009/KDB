@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: 推理服务
-sources: 3
+sources: 5
 updated: 2026-07-08
 ---
 
@@ -24,11 +24,24 @@ updated: 2026-07-08
 - 通过 NVLink 或 InfiniBand 等互联传递 KV Cache
 - 在 [[../entities/RTP-LLM]] 中，PD 分离被组织成 `PD-Fusion` 与 `PD-Disaggregation` 两种部署模式；后者将 Prefill/Decode 放到专用节点上，并通过跨节点 KV cache 传输衔接两个阶段
 
+## 同构与异构 PD
+
+PD 分离不仅允许 Prefill/Decode 独立扩缩，也使 Decode backend 成为可选择组件：
+
+- 同构 PD：Prefill 与 Decode 使用同一种引擎，状态 layout 和兼容路径相对简单。
+- 异构 PD：例如 vLLM Prefill + [[../entities/TileRT]] Decode；共享 vLLM API、调度和 Prefix Cache，但将延迟敏感流量交给专用 Decode runtime。
+
+异构交接通常不只传普通 KV，还可能包含 sparse attention index、MTP draft-layer KV 与元数据，并需在目标端转换为原生 layout，详见 [[可插拔 Decode 引擎]]。
+
 ## 与 AFD 的区别与组合
 
 [[Attention-FFN 分离]] 与 PD 分离作用于不同切分轴，可以叠加：PD 在请求生命周期上拆 Prefill/Decode，AFD 在每个切分层内部拆 Attention/FFN。组合部署可以分别设置 Prefill A/F 资源池和 Decode A/F 资源池。
 
 两者的状态传输不同：PD 主要在 Prefill 完成后把各层 KV Cache 与请求状态交给 Decode，属于阶段性交接；AFD 则在每个 forward step 的每个切分层发送当前 hidden states，并把 FFN output 返回 Attention 侧，频率更高但中间激活生命周期更短。vLLM AFD Plugin 的异步 CAM 路径就是面向 PD 分离部署中的 prefill 阶段。
+
+## Wide-EP 下的额外价值
+
+[[Wide Expert Parallelism]] 的 ranks 需要在每个 MoE 层协调 dispatch/combine；一个长而 compute-bound 的 prefill 请求可能拖慢整个 EP group。PD 分离可把这种干扰隔离到 Prefill pool，并让 Prefill/Decode 分别选择偏高吞吐或低延迟的 [[../entities/DeepEP]] 路径。
 
 ## 关键权衡
 
@@ -42,12 +55,17 @@ updated: 2026-07-08
 - [[../entities/Nvidia Dynamo]]
 - [[../entities/TensorRT-LLM]]
 - [[../entities/vLLM AFD Plugin]]
+- [[../entities/vLLM]]
+- [[../entities/DeepEP]]
+- [[../entities/TileRT]]
 
 ## 相关来源
 
 - [[../sources/LLM推理优化核心技术]]
 - [[../sources/RTP-LLM]]
 - [[../sources/vLLM AFD Plugin 发布：为 MoE 推理拆分 Attention 与 FFN，实现灵活部署]]
+- [[../sources/vLLM Large Scale Serving DeepSeek @ 2.2k toksH200 with Wide-EP]]
+- [[../sources/vLLM x TileRT Specialized Decode for Latency-Critical Serving]]
 
 ## 相关概念
 
@@ -57,6 +75,8 @@ updated: 2026-07-08
 - [[Tensor Parallelism]]
 - [[Chunked Prefill]]
 - [[Attention-FFN 分离]]
+- [[Wide Expert Parallelism]]
+- [[可插拔 Decode 引擎]]
 
 ## 研究备注
 

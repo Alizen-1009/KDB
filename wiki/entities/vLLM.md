@@ -2,7 +2,7 @@
 type: entity
 entity_type: 框架
 topic: 推理服务
-sources: 15
+sources: 18
 updated: 2026-06-12
 ---
 
@@ -34,8 +34,13 @@ updated: 2026-06-12
 - 新来源 `RTP-LLM` 将 `vLLM` 作为模型加载、TTFT、推测解码和多模态吞吐的对比基线；这些对比应限定在原文给出的模型、硬件、并行配置和框架版本下。
 - 新来源 `vllm并行策略之DCP` 补充了 `vLLM` 的 decode context parallel 口径：DCP 复用 TP group，通过 `--decode-context-parallel-size` 在 decode 阶段沿 `seq_len` 维分片 KV cache，适合 `MLA/MQA/GQA` 这类 `num_kv_heads` 较小、纯 TP 容易复制 KV cache 的场景。
 - `vLLM` 的 `--enforce-eager` 与 `cudagraph_mode=NONE` 不完全等价：前者是运行在 eager mode 的总开关，会关闭 `torch.compile` 集成和 CUDA Graphs；后者只关闭 CUDA Graphs，仍可能保留 `torch.compile` / vLLM compile 的其他路径。
+- vLLM V1 的 [[../concepts/CUDA Graph 执行模式|CUDA Graph 执行模式]] 区分 workload 与 capture 粒度：`PIECEWISE` 对各类 batch 只 capture graph-safe partitions；`FULL_DECODE_ONLY` 对 uniform decode 使用 full graph，而 prefill 与 mixed batch 不使用 CUDA Graph。
 - `Look Ma, No Bubbles!` 将 vLLM 作为 Llama-3.2-1B、batch size 1、BF16 低延迟 decode baseline，指出在该极窄场景中许多短 kernel 边界会限制可用 HBM 带宽；该结论不能直接外推到高并发 serving。
 - 新来源 `vLLM AFD Plugin` 展示了 vLLM 的外部插件扩展面：在保留调度器、KV Cache、请求生命周期和 OpenAI 兼容接口的同时，可通过 connector 把每个 MoE 切分层的 FFN 执行移到独立服务，让 Attention 与专家容量采用不同 rank 拓扑。
+- vLLM 官方 Wide-EP 来源补充了大规模 DeepSeek serving 路线：Attention DP replicas 独立维护 MLA KV Cache，experts 跨宽 EP group 分布，并用 DeepEP、DBO、EPLB 和 PD 分离处理通信、负载不均与阶段干扰。
+- 该来源引用 CoreWeave H200/InfiniBand/ConnectX-7 社区 benchmark 的 `2.2k tok/s/H200`，但收益来自多项 kernel 与 runtime 优化组合，不能归因于 Wide-EP 单项。
+- vLLM x TileRT 来源展示了 V1 Connector 的另一条扩展路线：stock vLLM 保留 API、调度、Prefix Cache 和 Prefill，通过 `KVConnectorBase_V1` 与 `MultiConnector` 把部分延迟敏感流量交给 TileRT Decode，同时 native Decode pool 继续服务普通流量。
+- 新增 PCP/DCP 解读补充 Context Parallel 路线：DCP 面向 Decode KV context 分片；PCP 面向单个超长 Prefill 的 sequence 并行，可采用 Ring Attention 或 Ulysses。PCP 的合并状态、CLI 和 group topology 仍属版本/RFC 边界。
 
 ## 相关概念
 
@@ -53,8 +58,16 @@ updated: 2026-06-12
 - [[Decode Context Parallel]]
 - [[Chunked Prefill]]
 - [[Torch Compile]]
+- [[CUDA Graph 执行模式]]
 - [[Megakernel]]
 - [[Attention-FFN 分离]]
+- [[Wide Expert Parallelism]]
+- [[Dual Batch Overlap]]
+- [[Expert Parallel Load Balancing]]
+- [[可插拔 Decode 引擎]]
+- [[Prefill Context Parallel]]
+- [[Ring Attention]]
+- [[DeepSpeed Ulysses]]
 
 ## 相关来源
 
@@ -73,6 +86,9 @@ updated: 2026-06-12
 - [[../sources/vllm并行策略之DCP(Decode Context Parallel)]]
 - [[../sources/Look Ma, No Bubbles! Designing a Low-Latency Megakernel for Llama-1B]]
 - [[../sources/vLLM AFD Plugin 发布：为 MoE 推理拆分 Attention 与 FFN，实现灵活部署]]
+- [[../sources/vLLM Large Scale Serving DeepSeek @ 2.2k toksH200 with Wide-EP]]
+- [[../sources/vLLM x TileRT Specialized Decode for Latency-Critical Serving]]
+- [[../sources/vllm PCP 与 DCP 深度解析]]
 
 ## 冲突与备注
 
@@ -91,3 +107,6 @@ updated: 2026-06-12
 - `cudagraph_mode=NONE` 只表示不 capture/replay CUDA Graph；如果排查的是 `torch.compile` / Dynamo / Inductor / vLLM compile 本身的问题，应使用 `--enforce-eager` 或进一步设置 compilation mode，而不是只关 CUDA Graphs。
 - `Look Ma, No Bubbles!` 中关于 vLLM H100 带宽利用率和相对 megakernel 的性能差距，均应作为来源 benchmark 声称引用，并保留 prompt 长度、生成长度、dtype、硬件和 baseline 配置。
 - AFD Plugin 在来源发布时锁定 vLLM `0.19.1` 和 model runner v1，且两种角色均加载完整权重；不能把实验插件的能力外推为任意 vLLM 版本的原生支持。
+- Wide-EP 来源基于 2025-12 的 vLLM 能力；CLI、DBO 阈值、EPLB 和 backend 支持应按具体版本核实。
+- TileRT 集成依赖 vLLM V1 公共 Connector；跨引擎 KV/sparse index/MTP 状态格式与升级兼容需绑定版本验证。
+- PCP/DCP 二手来源对 world size、`ag_rs` 数据流、PCP 上线版本和参数名存在冲突；稳定机制可保留，精确实现需以官方文档/commit 为准。
