@@ -26,7 +26,7 @@
 ## 资源统计
 
 - 原始文章：58
-- 原始论文：3
+- 原始论文：4
 - 原始仓库：0
 - 原始数据集：0
 - 原始图片：19
@@ -34,7 +34,7 @@
 - 来源文件：48
 - 实体文件：30
 - 概念文件：97
-- 报告文件：4
+- 报告文件：5
 - 面试文件：11
 - 卡片文件：0
 - 幻灯片文件：0
@@ -308,6 +308,7 @@
 
 ## 报告
 
+- [[../output/reports/FlashKDA优化方法与GDN迁移指南|FlashKDA优化方法与GDN迁移指南]]
 - [[../output/reports/Gemma 开源代码结构导读|Gemma 开源代码结构导读]]
 - [[../output/reports/MoE通信-计算重叠与MegaKernel技术谱系|MoE通信-计算重叠与MegaKernel技术谱系]]
 - [[../output/reports/Prefill Attention 的 CUDA 并行映射|Prefill Attention 的 CUDA 并行映射]]

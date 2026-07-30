@@ -1157,3 +1157,11 @@
 - 创建报告：`output/reports/vLLM CUDA Graph Piecewise 与 Full Decode Only.md`
 - 新增概念页：`wiki/concepts/CUDA Graph 执行模式.md`；更新实体页：`wiki/entities/vLLM.md`
 - 待核实：具体部署版本的 attention backend、并行方式、LoRA/spec decode 组合对 full graph 的支持及实测收益
+
+## [2026-07-28] distill | FlashKDA 优化方法与 GDN 迁移指南
+
+- 整理当前对话为：`output/reports/FlashKDA优化方法与GDN迁移指南.md`
+- 依据源码：`/Users/alizen/Dev/FlashKDA`（commit `d2ff19a`）
+- 依据原始资料：`raw/papers/k3_tech_report.pdf`
+- 未更新概念页；Kimi K3 原始资料尚未正式 ingest
+- 待核实：GDN 轻量两阶段、fused persistent 变体及动态派发阈值需要实际 benchmark
