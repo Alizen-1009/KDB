@@ -1379,3 +1379,15 @@
 - 更新概念页：`wiki/concepts/KDA.md`，将T=1最小版作为优先入口
 - 接口简化：上游预计算并传入q/k/v/alpha/beta，核心只接收`q,k:[B,H,K]`、`v:[B,H,V]`、`alpha:[B,H,K]`、`beta:[B,H]`、`state:[B,H,K,V]`，返回`output`与`new_state`。
 - 边界：若传入g/b则核心前执行alpha=exp(g)、beta=sigmoid(b)；完整层的ShortConv、Conv State、RMSNorm、output gate和out_proj放在核心函数外。
+
+## [2026-08-02] query | Kimi K3 KDA 部署与 Prefix Cache
+
+- 读取官方资料：Kimi K3 Technical Report §5.1、§5.3、§5.4.1–5.4.2
+- 交叉核对当前vLLM源码：Kimi K3 KDA cache tuple、state shape/dtype、FlashKDA Prefill、fused Decode与spec state indices
+- 创建报告：`output/reports/Kimi K3的KDA部署与Prefix Cache.md`
+- 更新概念/实体：`wiki/concepts/KDA.md`、`wiki/entities/Kimi K3.md`
+- 核心结论：Hybrid KDA–MLA Prefix命中要求同一边界同时存在MLA KV和全部KDA group checkpoints；KDA cached snapshot只读，命中后复制到请求私有running state。
+- 粒度解耦：physical page可为6144 tokens，fine hash block可为512 tokens，KDA checkpoint只保存在稀疏hash endpoints；示例匹配2800 tokens时命中B=2560。
+- 部署覆盖：FlashKDA Prefill、intra-device CP、跨卡KCP、P/D不同TP transfer re-layout、Spec Decode projected-input replay、CPU write-back offload与cache-aware affinity。
+- 说明性估算：按69层、H96、TP8、head_dim128、FP32 recurrent state，约51.75MiB/request/rank，解释checkpoint为何必须稀疏；该值不是报告benchmark。
+- 待核实：报告未公开完整生产cache manager；Conv State与Matrix State具体page打包、cache保留策略和上游vLLM对生产方案的覆盖程度需绑定实现版本。

@@ -85,6 +85,14 @@ y_t = W_o [sigmoid(W_g x_t) * RMSNorm(o_t)]
 
 它允许每个 token 按输出 channel 调节递归状态读取结果。
 
+## 部署与Prefix Cache
+
+Kimi K3混合部署同时维护两类cache：KDA的固定大小`Conv State + Matrix State`，以及Gated MLA随序列增长的Paged KV Cache。Prefix只有在同一token边界同时存在MLA KV和所有KDA cache groups的状态checkpoint时才能复用。
+
+生产系统将两类cache放入统一byte-sized paged pool，但解耦physical page、prefix hash block与KDA checkpoint粒度：报告示例使用6144-token物理page、内部512-token hash blocks，KDA仅在稀疏hash endpoints保存checkpoint。命中时checkpoint先复制为请求私有running state，不能原地修改共享快照。完整流程见 [[../../output/reports/Kimi K3的KDA部署与Prefix Cache|Kimi K3的KDA部署与Prefix Cache]]。
+
+投机解码回滚与Prefix Cache不同：K3不为每个draft位置保存完整状态，而缓存较小的projected inputs，在验证后片上重放accepted tokens并重建正确状态。
+
 ## 工程权衡
 
 - Channel-wise decay 比 scalar GDN 更有表达力，不同 key channels 可有不同记忆长度。

@@ -42,8 +42,13 @@ TP8 不是唯一拓扑。vLLM recipe 同时提供 multi-node TP、TP+EP、DP+EP�
 
 纯TP8时，每rank保留全部896个逻辑experts的约1/8 tensor shard；TP8+EP8时，则更接近每rank放置112个experts并通过All-to-All路由token。两者每rankexpert存储都约为全局1/8，但通信模式不同。
 
+## KDA Prefix Cache
+
+K3生产Serving将KDA固定大小状态与MLA Paged KV联合管理：Prefix命中必须在同一token边界同时恢复MLA KV与所有KDA状态组。Physical page、fine-grained prefix hash与稀疏KDA checkpoint采用不同粒度；命中快照复制为请求私有running state后才能继续更新。详见 [[../../output/reports/Kimi K3的KDA部署与Prefix Cache|Kimi K3的KDA部署与Prefix Cache]]。
+
 ## 相关概念
 
+- [[KDA]]
 - [[Chunked Gated Delta Rule]]
 - [[线性注意力递归状态]]
 - [[MLA]]

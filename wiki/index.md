@@ -34,7 +34,7 @@
 - 来源文件：48
 - 实体文件：31
 - 概念文件：98
-- 报告文件：17
+- 报告文件：18
 - 面试文件：11
 - 卡片文件：0
 - 幻灯片文件：0
@@ -320,6 +320,7 @@
 - [[../output/reports/KDA相对GDN的改进|KDA相对GDN的改进]]
 - [[../output/reports/Kimi K3为何采用TP8部署|Kimi K3为何采用TP8部署]]
 - [[../output/reports/Kimi K3权重构成与TP8切分|Kimi K3权重构成与TP8切分]]
+- [[../output/reports/Kimi K3的KDA部署与Prefix Cache|Kimi K3的KDA部署与Prefix Cache]]
 - [[../output/reports/MLA模型常见部署拓扑|MLA模型常见部署拓扑]]
 - [[../output/reports/MoE通信-计算重叠与MegaKernel技术谱系|MoE通信-计算重叠与MegaKernel技术谱系]]
 - [[../output/reports/PCP是什么|PCP是什么]]
