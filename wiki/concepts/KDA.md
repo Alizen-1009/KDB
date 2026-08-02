@@ -100,6 +100,10 @@ Kimi K3混合部署同时维护两类cache：KDA的固定大小`Conv State + Mat
 - Lower bound 既是数值稳定设计，也是硬件设计：它使16-token tile可统一映射到Tensor Core矩阵乘。
 - KDA仍是固定大小递归状态，不能像KV Cache一样任意回退历史token；serving还需保存Conv State和Matrix State checkpoint。
 
+## FlashKDA并行
+
+逐token递推可写成仿射transition `S_t=M_t S_{t-1}+B_t`。仿射变换可结合，因此segments可用prefix scan组合；chunk内部通过UT transform改写为causal lower-triangular GEMM。[[../entities/FlashKDA|FlashKDA]]进一步用CUTLASS/Tensor Core实现，并重叠块内token计算与块间状态传播。完整推导见 [[../../output/reports/FlashKDA为什么能并行|FlashKDA为什么能并行]]。
+
 ## 伪代码
 
 Decode `T=1` 且上游已算好 `q/k/v/alpha/beta` 时，优先看 [[../../output/reports/KDA最小Decode伪代码|KDA最小Decode伪代码]]；完整输入投影、Conv State、batch/sequence与K-last布局再看 [[../../output/reports/KDA伪代码与输入输出|KDA伪代码与输入输出]]。

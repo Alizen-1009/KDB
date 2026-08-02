@@ -1391,3 +1391,51 @@
 - 部署覆盖：FlashKDA Prefill、intra-device CP、跨卡KCP、P/D不同TP transfer re-layout、Spec Decode projected-input replay、CPU write-back offload与cache-aware affinity。
 - 说明性估算：按69层、H96、TP8、head_dim128、FP32 recurrent state，约51.75MiB/request/rank，解释checkpoint为何必须稀疏；该值不是报告benchmark。
 - 待核实：报告未公开完整生产cache manager；Conv State与Matrix State具体page打包、cache保留策略和上游vLLM对生产方案的覆盖程度需绑定实现版本。
+
+## [2026-08-02] query | 为什么 Kimi K3 不是统一采用 DP8 EP8 而常见 TP8
+
+- 更新报告：`output/reports/Kimi K3为何采用TP8部署.md`
+- 更新实体：`wiki/entities/Kimi K3.md`
+- 核心澄清：K3不是纯MLA，而是69层96-head KDA + 24层Gated MLA；MLA压缩KV不等于Q/O投影、KDA heads、dense路径和active compute无需TP。
+- 认可DP/EP边界：Attention DP8/Wide-EP8适合高并发Decode，当前PD recipe也采用Decode TP1/DEP；Prefill则采用TP8/TEP分摊单请求计算。
+- 新增KDA state账本：按69层、H96、head_dim128、FP32估算，TP8约51.75MiB recurrent state/request/rank，TP1单rank承担完整数百MiB状态及读写带宽。
+- 其它因素：纯DP/EP复制数十B级dense/shared路径，EP8显存余量有限，TP8命中12 local heads与LatentMoE TP8/16专用kernel。
+- 注明DP8+EP8若共享同8 ranks通常world size仍为8；若DP与EP正交展开则是64，讨论拓扑时需明确。
+
+## [2026-08-02] query | Kimi K3 技术报告后续阅读重点
+
+- 读取K3报告目录与重点章节：§2.2–2.5、§3.2–3.4、§4.1.4、§5.1–5.4及MoonEP/LatentMoE相关段落
+- 创建路线图：`output/reports/Kimi K3技术报告后续阅读重点.md`
+- 更新实体：`wiki/entities/Kimi K3.md`
+- 最高优先级：Stable LatentMoE公式→Quantile Balancing→MoonEP动态冗余experts→LatentMoE serving kernel，直接解释K3的TP/DP/EP账本。
+- 次优先级：Deployment-Aware Post-Training与EAGLE-3/KDA Replay、KCP仿射prefix scan、AttnRes部署I/O、NoPE与1M context、3T训练内存系统、fleet cache调度。
+- 边界：Benchmark/成本曲线为模型方自报；Native Vision与Agentic RL按当前Infra研究目标可后置。
+
+## [2026-08-02] query | MoonEP 动态冗余 Expert 机制
+
+- 读取官方资料：Kimi K3 Technical Report §5.2.1与Appendix E上界证明
+- 创建报告：`output/reports/MoonEP动态冗余Expert机制.md`
+- 创建实体：`wiki/entities/MoonEP.md`；更新`wiki/entities/Kimi K3.md`关联
+- 核心机制：不改变Router选中的expert ID，只将热点expert复制到underloaded rank，并迁移该expert的部分token assignments；Backward将副本梯度Reduce回home expert。
+- 上界：每rank预留E/R个redundant-expert slots可保证任意路由下存在perfectly balanced plan；最坏下界ceil(E(R-1)/R²)约等于E/R，故基本紧致。
+- 系统收益：每rank固定S×K assignments、固定通信buffer、zero-copy permute/unpermute、静态rank shape和sync-free launch；rank内expert skew仍由workload-aware GEMM scheduler处理。
+- 边界：MoonEP在报告中属于训练系统，不应直接推断在线Decode启用；E/R是容量上界而非平均复制数。
+
+## [2026-08-02] query | MoonEP 与 EPLB 的异同
+
+- 读取当前vLLM官方EPLB文档与默认policy源码：历史负载window、周期重排、redundant physical experts、hierarchical packing与异步迁移
+- 更新报告：`output/reports/MoonEP动态冗余Expert机制.md`
+- 更新实体：`wiki/entities/MoonEP.md`
+- 共同点：logical expert可映射到多个physical replicas，复制hot experts并按负载调整placement，均需额外显存与权重迁移。
+- 区别：vLLM EPLB按历史window周期性优化预计负载，冗余数配置且不保证下一batch严格均衡；MoonEP按当前layer/micro-batch真实routes进行assignment-level规划，保证每rank严格S×K，并有每rankE/R槽的最坏可行性上界。
+- 场景边界：当前vLLM EPLB面向Serving、无Backward；K3报告中的MoonEP面向训练，需要把副本梯度Reduce回home expert。
+
+## [2026-08-02] query | FlashKDA 与 FLA 为什么能并行
+
+- 读取官方资料：Kimi K3 Technical Report §2.1.1、§5.1；交叉核对当前vLLM KDA FlashKDA/Triton Prefill与fused Decode路径
+- 创建报告：`output/reports/FlashKDA为什么能并行.md`
+- 创建实体：`wiki/entities/FlashKDA.md`；更新概念：`wiki/concepts/KDA.md`
+- 核心数学：KDA递推可写为S_t=M_t S_{t-1}+B_t；仿射transition满足结合律，可做segment prefix scan。
+- Chunk并行：UT transform将块内递推改写为inter-chunk项(Gamma×Q)S_in与intra-chunk lower-triangular GEMM A V_tilde。
+- K3 lower-bounded decay使16-token tile的1/Gamma留在BF16范围内，对角与非对角tiles统一走Tensor Core GEMM。
+- 工程边界：FlashKDA是CUTLASS专用backend，FLA是算子库；训练/Prefill走chunkwise，T=1 Decode走fused recurrent；chunk间仍有状态依赖，通过head parallel、scan和overlap降低串行占比。

@@ -45,9 +45,10 @@ topic: GPU 编程
 - [[../concepts/动态共享内存|动态共享内存]]
 - [[../concepts/算子融合|算子融合]]
 
-## 实体（4）
+## 实体（5）
 
 - [[../entities/FlashInfer|FlashInfer]]
+- [[../entities/FlashKDA|FlashKDA]]
 - [[../entities/HazyResearch|HazyResearch]]
 - [[../entities/Megakernels|Megakernels]]
 - [[../entities/NVIDIA Rubin|NVIDIA Rubin]]

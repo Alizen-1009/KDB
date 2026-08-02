@@ -118,14 +118,25 @@ TP8 因而能命中专门优化的 collective + RMSNorm + latent up-projection �
 
 ## 6. 为什么不直接 DP8/EP8
 
-纯 `DP8/TP1/EP8` 对许多 DeepSeek/MLA MoE 是常见高吞吐路线，但 K3 更大：
+先区分两种说法：
 
-- 总权重约为3T级；
-- non-expert 模块、shared experts、KDA/MLA/AttnRes 与 vision encoder 仍有 replicated 部分；
-- 每个 DP rank 还需要 cache、workspace、CUDA Graph 和 runtime buffer；
-- 当前 vLLM recipe 将 DEP 最低规模设为16 GPUs。
+```text
+DP8 + EP8共享同一组8 ranks：world size通常仍是8
+DP8 × EP8正交展开：world size是64
+```
 
-所以固定8张高显存 GPU 时，TP8/TP8+EP 往往比 DP8 更容易先把模型放下并获得单请求性能。资源扩大后，DP/EP 才更适合扩展吞吐。
+通常所说的Attention DP8 / Wide-EP8是第一种：8个ranks各处理不同请求，dense attention路径复制，896个experts在8 ranks间分布。它确实是高并发Decode的合理方向，而且当前K3 PD recipe的Decode正是`TP1 + DEP`，所以“应该用DP/EP”对Decode吞吐场景并没有错。
+
+但它不是所有阶段都比TP8好：
+
+1. **K3不是纯MLA**：69层是96-head KDA，只有24层是Gated MLA。MLA压缩KV cache不等于Q/O projection、KDA heads和dense计算无需切分。
+2. **单请求Prefill**：DP不能让8张卡共同分摊同一请求的投影/GEMM；TP8可以分摊96个KDA/Q heads和层内计算。超长Prefill还在TP之上使用FlashKDA和KDA CP。
+3. **Dense与shared路径复制**：纯DP8/EP8会在每个rank复制attention/KDA、AttnRes、embedding、vision、shared experts及部分LatentMoE投影；这些非routed-expert部分虽然只占总参数小比例，绝对量仍是数十B参数级。
+4. **KDA state带宽与容量**：KDA每个请求有69层固定矩阵状态。按H96、head_dim128、FP32估算，完整状态跨ranks为数百MiB；TP8按heads切成每rank约51.75MiB recurrent state，而TP1的单个请求在一张卡上承担完整state读取/写回。DP/EP能用请求并行换吞吐，但单请求Decode state bandwidth更重。
+5. **Kernel特化**：当前K3 kernel围绕规整TP shape设计，TP8给每rank 12 heads；LatentMoE tail fusion也只支持TP8/TP16。
+6. **显存余量**：总权重约3T级。EP8虽能分摊routed experts，但每rank还要容纳复制路径、自己的KDA/MLA cache、workspace与CUDA Graph；当前recipe将DEP最低规模设为16 GPUs。
+
+所以固定8张高显存GPU时，TP8/TP8+EP往往更容易先把模型放下并获得单请求性能；资源扩大且Decode并发足够时，DP/EP更适合扩展吞吐。
 
 ## 7. TP8 的代价
 
@@ -155,7 +166,14 @@ Prefill：TEP，TP=8
 Decode：DEP，TP=1
 ```
 
-这说明 TP8 更适合 Prefill/单实例计算与权重分摊；高并发 Decode 可以通过更宽 DP/EP 提高吞吐。TP8 是组件，不是所有阶段都必须一致。
+这实际上同时验证了两种直觉：
+
+```text
+超长Prefill/单请求计算：TP8合理
+高并发Decode/Attention DP：DP+EP合理
+```
+
+P/D之间会传输MLA KV与KDA状态；若两边TP degree不同，K3生产系统在传输路径上重排head-sharded KDA state。TP8是组件，不是所有阶段都必须一致。
 
 ## 官方依据
 

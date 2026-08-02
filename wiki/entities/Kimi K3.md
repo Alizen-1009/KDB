@@ -28,7 +28,7 @@ sources: 0
 - 官方技术报告中的 Block AttnRes prefill 用 TP collective 拆成 ReduceScatter + AllGather 来实现 activation sequence parallel；Stable LatentMoE projection 也跨 ranks 分片，并把 output AllGather 融入 GEMM epilogue。
 - vLLM 当前 K3 SM100 latent-MoE tail fusion 只接受 TP8/TP16，说明专用 kernel 对这些部署 shape 有明确特化。
 
-TP8 不是唯一拓扑。vLLM recipe 同时提供 multi-node TP、TP+EP、DP+EP、TP×DP 和 PD 分离；高并发 Decode 可使用更宽 DP/EP，而 Prefill pool 可保留 TP8。当前 vLLM K3 MLA 路径不支持 DCP/PCP，因此不能直接套用普通 MLA 的 `TP8+DCP8` 建议。
+TP8 不是唯一拓扑。vLLM recipe 同时提供 multi-node TP、TP+EP、DP+EP、TP×DP 和 PD 分离；其PD示例明确采用`Prefill TP8/TEP`与`Decode TP1/DEP`：前者用TP分摊单请求的KDA/投影计算和head-sharded state，后者用Attention DP+EP扩大高并发Decode吞吐。按当前公开shape估算，69层KDA FP32 recurrent state在TP8时约51.75MiB/request/rank，而TP1请求需在单rank承担完整数百MiB级state，因此拓扑还会改变单请求状态带宽与容量。当前 vLLM K3 MLA 路径不支持 DCP/PCP，不能直接套用普通 MLA 的 `TP8+DCP8` 建议。
 
 ## 参数构成粗估
 
@@ -46,6 +46,10 @@ TP8 不是唯一拓扑。vLLM recipe 同时提供 multi-node TP、TP+EP、DP+EP�
 
 K3生产Serving将KDA固定大小状态与MLA Paged KV联合管理：Prefix命中必须在同一token边界同时恢复MLA KV与所有KDA状态组。Physical page、fine-grained prefix hash与稀疏KDA checkpoint采用不同粒度；命中快照复制为请求私有running state后才能继续更新。详见 [[../../output/reports/Kimi K3的KDA部署与Prefix Cache|Kimi K3的KDA部署与Prefix Cache]]。
 
+## 后续阅读重点
+
+在KDA与Prefix Cache之后，最值得继续推导的是Stable LatentMoE、Quantile Balancing与MoonEP的算法—训练—部署闭环；阅读优先级见 [[../../output/reports/Kimi K3技术报告后续阅读重点|Kimi K3技术报告后续阅读重点]]。
+
 ## 相关概念
 
 - [[KDA]]
@@ -56,6 +60,7 @@ K3生产Serving将KDA固定大小状态与MLA Paged KV联合管理：Prefix命�
 - [[Attention Residuals]]
 - [[Tensor Parallelism]]
 - [[Expert Parallelism]]
+- [[MoonEP]]
 - [[PD分离]]
 
 ## 官方资料

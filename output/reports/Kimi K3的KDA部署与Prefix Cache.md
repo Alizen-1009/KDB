@@ -334,7 +334,7 @@ Prefill每次forward结束后：
 - conversation-turn边界通常保留，用于未来跨请求复用；
 - 不在每512 tokens都永久保存一份。
 
-Cached checkpoint是只读snapshot：
+Cached checkpoint是只读snapshot：dui y
 
 ```text
 命中：snapshot -> copy -> private running state

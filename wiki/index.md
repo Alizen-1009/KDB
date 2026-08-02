@@ -32,9 +32,9 @@
 - 原始图片：19
 - 原始代码：1
 - 来源文件：48
-- 实体文件：31
+- 实体文件：33
 - 概念文件：98
-- 报告文件：18
+- 报告文件：21
 - 面试文件：11
 - 卡片文件：0
 - 幻灯片文件：0
@@ -172,11 +172,13 @@
 
 ## 实体页面（按类型）
 
-### 项目（5）
+### 项目（7）
 
 - [[../wiki/entities/DeepEP|DeepEP]]
 - [[../wiki/entities/Engram|Engram]]
+- [[../wiki/entities/FlashKDA|FlashKDA]]
 - [[../wiki/entities/Megakernels|Megakernels]]
+- [[../wiki/entities/MoonEP|MoonEP]]
 - [[../wiki/entities/NCCL Extensions|NCCL Extensions]]
 - [[../wiki/entities/vLLM AFD Plugin|vLLM AFD Plugin]]
 
@@ -312,6 +314,7 @@
 
 - [[../output/reports/DCP是什么|DCP是什么]]
 - [[../output/reports/DeepSpeed Ulysses适用场景与DeepSeek关系|DeepSpeed Ulysses适用场景与DeepSeek关系]]
+- [[../output/reports/FlashKDA为什么能并行|FlashKDA为什么能并行]]
 - [[../output/reports/FlashKDA优化方法与GDN迁移指南|FlashKDA优化方法与GDN迁移指南]]
 - [[../output/reports/GDN公式与逐步计算|GDN公式与逐步计算]]
 - [[../output/reports/Gemma 开源代码结构导读|Gemma 开源代码结构导读]]
@@ -319,10 +322,12 @@
 - [[../output/reports/KDA最小Decode伪代码|KDA最小Decode伪代码]]
 - [[../output/reports/KDA相对GDN的改进|KDA相对GDN的改进]]
 - [[../output/reports/Kimi K3为何采用TP8部署|Kimi K3为何采用TP8部署]]
+- [[../output/reports/Kimi K3技术报告后续阅读重点|Kimi K3技术报告后续阅读重点]]
 - [[../output/reports/Kimi K3权重构成与TP8切分|Kimi K3权重构成与TP8切分]]
 - [[../output/reports/Kimi K3的KDA部署与Prefix Cache|Kimi K3的KDA部署与Prefix Cache]]
 - [[../output/reports/MLA模型常见部署拓扑|MLA模型常见部署拓扑]]
 - [[../output/reports/MoE通信-计算重叠与MegaKernel技术谱系|MoE通信-计算重叠与MegaKernel技术谱系]]
+- [[../output/reports/MoonEP动态冗余Expert机制|MoonEP动态冗余Expert机制]]
 - [[../output/reports/PCP是什么|PCP是什么]]
 - [[../output/reports/Prefill Attention 的 CUDA 并行映射|Prefill Attention 的 CUDA 并行映射]]
 - [[../output/reports/Triton在Ascend上的支持|Triton在Ascend上的支持]]
