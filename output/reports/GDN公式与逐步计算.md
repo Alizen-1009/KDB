@@ -359,7 +359,77 @@ $$
 
 ---
 
-## 8. 一个二维数值例子
+## 8. `einsum("hk,hkv->hv", k, state)` 如何理解
+
+假设：
+
+```text
+k:     [H, K]
+state: [H, K, V]
+```
+
+表达式：
+
+```python
+prediction = torch.einsum("hk,hkv->hv", k, state)
+```
+
+各字母规则是：
+
+- `h` 同时出现在两个输入和输出：保留head维，不跨head求和；
+- `k` 出现在两个输入、没有出现在输出：沿key维求和；
+- `v` 出现在state和输出：保留value维。
+
+逐元素公式：
+
+$$
+\operatorname{prediction}[h,v]
+=\sum_{j=1}^{K}k[h,j]\,S[h,j,v]
+$$
+
+即对每个head独立计算：
+
+$$
+\hat v_h=k_h^\top S_h
+$$
+
+它等价于：
+
+```python
+prediction = torch.bmm(
+    k.unsqueeze(1),      # [H, 1, K]
+    state,               # [H, K, V]
+).squeeze(1)             # [H, V]
+```
+
+或：
+
+```python
+prediction = (k.unsqueeze(-1) * state).sum(dim=-2)
+```
+
+这里没有显式写`.transpose()`，因为PyTorch的一维向量 `[K]` 本身不区分“行向量/列向量”；`einsum`通过下标约定表达了数学上的 $k^\top S$。
+
+但`einsum`并没有让layout问题消失。如果state实际存成K-last：
+
+```text
+state: [H, V, K]
+```
+
+就必须改为：
+
+```python
+prediction = torch.einsum("hk,hvk->hv", k, state)
+# 或 prediction = state @ k.unsqueeze(-1)
+```
+
+所以：
+
+> `einsum`可以避免手写转置，但开发者仍必须正确标注每个axis；它不会自动判断哪个维度是K或V。
+
+性能上也不能由“没写transpose”推导出“没有layout成本”。`einsum`会根据stride和backend选择实现；K/V哪个维度连续、是否需要内部重排、能否映射到GEMV/GEMM，仍会影响kernel性能。
+
+## 9. 一个二维数值例子
 
 令：
 
@@ -462,7 +532,7 @@ $$
 
 ---
 
-## 9. 多head与GVA
+## 10. 多head与GVA
 
 包含 batch/head 后，常见逻辑形状为：
 
@@ -495,7 +565,7 @@ H_v = 128
 
 ---
 
-## 10. 输出门与回投影
+## 11. 输出门与回投影
 
 递推得到每个 value head 的 $o_t$ 后，通常还会使用 $z_t$ 做 gated normalization：
 
@@ -523,7 +593,7 @@ $$
 
 ---
 
-## 11. 完整前向流程
+## 12. 完整前向流程
 
 ```text
 hidden x_t
@@ -554,7 +624,7 @@ o_t = (scale * q_t)^T S_t
 
 ---
 
-## 12. Prefill与Decode如何使用同一公式
+## 13. Prefill与Decode如何使用同一公式
 
 ### Decode / fused recurrent
 
@@ -585,7 +655,7 @@ Chunk版本与逐token版本应保持同一数学语义；差别在并行重排�
 
 ---
 
-## 13. 与标准线性注意力和普通DeltaNet对比
+## 14. 与标准线性注意力和普通DeltaNet对比
 
 ### 标准线性注意力
 
@@ -614,7 +684,7 @@ $$
 
 ---
 
-## 14. 复杂度与状态
+## 15. 复杂度与状态
 
 每 token、每 head 的主状态更新量级为：
 
@@ -647,7 +717,7 @@ Prefix Cache、请求迁移和投机解码回滚都必须同时处理二者。
 
 ---
 
-## 15. 最小PyTorch参考伪代码
+## 16. 最小PyTorch参考伪代码
 
 ```python
 import torch
@@ -697,7 +767,7 @@ def gdn_step(
 
 ---
 
-## 16. 常见误区
+## 17. 常见误区
 
 1. **$g$ 与 $\alpha$混用**：FLA常传log-space $g$，实际衰减率是 $e^g$；某些backend直接传real-space gate。
 2. **$\alpha$ 与 $\beta$职责混淆**：$\alpha$遗忘旧状态，$\beta$控制当前delta写入。

@@ -34,7 +34,7 @@
 - 来源文件：48
 - 实体文件：31
 - 概念文件：98
-- 报告文件：15
+- 报告文件：17
 - 面试文件：11
 - 卡片文件：0
 - 幻灯片文件：0
@@ -315,6 +315,8 @@
 - [[../output/reports/FlashKDA优化方法与GDN迁移指南|FlashKDA优化方法与GDN迁移指南]]
 - [[../output/reports/GDN公式与逐步计算|GDN公式与逐步计算]]
 - [[../output/reports/Gemma 开源代码结构导读|Gemma 开源代码结构导读]]
+- [[../output/reports/KDA伪代码与输入输出|KDA伪代码与输入输出]]
+- [[../output/reports/KDA最小Decode伪代码|KDA最小Decode伪代码]]
 - [[../output/reports/KDA相对GDN的改进|KDA相对GDN的改进]]
 - [[../output/reports/Kimi K3为何采用TP8部署|Kimi K3为何采用TP8部署]]
 - [[../output/reports/Kimi K3权重构成与TP8切分|Kimi K3权重构成与TP8切分]]

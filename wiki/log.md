@@ -1352,3 +1352,30 @@
 - Kimi K3改进：g=g_min×sigmoid(exp(A)z)，g_min=-5，使16-token tile累计log-decay在(-80,0)，1/Gamma小于exp(80)，可在BF16范围内把对角/非对角tile统一为Tensor Core GEMM。
 - 第二项改进：Kimi Linear低秩output gate升级为input-dependent full-rank gate sigmoid(W_g x)×RMSNorm(o)。
 - 边界：KDA channel-wise gate与UT/chunk计算更复杂；具体state layout、dtype、workspace和dispatch需绑定serving backend。
+
+## [2026-08-02] query | GDN einsum hk,hkv 到 hv 的含义
+
+- 更新报告：`output/reports/GDN公式与逐步计算.md`，补充einsum逐轴解释、等价bmm/逐元素写法和layout边界
+- 本次 query 澄清：h保留为head batch维，k因未出现在输出而求和，v保留；prediction[h,v]=sum_j k[h,j]×state[h,j,v]，等价每head的k^T S。
+- 边界：einsum省去显式transpose语法但不会自动识别layout；state若为[H,V,K]必须改成`hvk`标注，物理stride和内部layout成本仍影响性能。
+
+## [2026-08-02] query | 为什么 GDN 公式里 k_t 要写转置
+
+- 本次 query 澄清：数学默认k_t是[d_k,1]列向量，S是[d_k,d_v]，为了收缩key维并输出[d_v]，必须写k_t^T S，即[1,d_k]×[d_k,d_v]。
+- 代码中的k常为一维tensor[d_k]，一维tensor没有行列方向；einsum通过重复下标完成收缩，因此不需要物理transpose。若state使用[d_v,d_k]转置布局，则等价公式写成S k_t。
+
+## [2026-08-02] query | 导出 KDA 输入输出与伪代码
+
+- 读取官方公式：Kimi K3 Technical Report §2.1.1、Eq.1–6
+- 创建Obsidian Markdown：`output/reports/KDA伪代码与输入输出.md`
+- 更新概念页：`wiki/concepts/KDA.md`，添加伪代码报告回链
+- 文档包含：层级输入输出与状态、参数形状、单token单head、batch+multi-head einsum、完整KDA层forward、逐步shape表、K-last布局、Prefill/Decode边界。
+- 核心reference：state_bar=Diag(alpha)S；prediction=k^T state_bar；delta_v=beta(v-prediction)；state=state_bar+k delta_v^T；output=state^T q。
+- 待核实：生产FlashKDA的融合、UT transform、state dtype、varlen slots与具体checkpoint权重布局需绑定backend版本。
+
+## [2026-08-02] query | 导出 KDA T=1 最小 Decode 伪代码
+
+- 创建简化文档：`output/reports/KDA最小Decode伪代码.md`
+- 更新概念页：`wiki/concepts/KDA.md`，将T=1最小版作为优先入口
+- 接口简化：上游预计算并传入q/k/v/alpha/beta，核心只接收`q,k:[B,H,K]`、`v:[B,H,V]`、`alpha:[B,H,K]`、`beta:[B,H]`、`state:[B,H,K,V]`，返回`output`与`new_state`。
+- 边界：若传入g/b则核心前执行alpha=exp(g)、beta=sigmoid(b)；完整层的ShortConv、Conv State、RMSNorm、output gate和out_proj放在核心函数外。
