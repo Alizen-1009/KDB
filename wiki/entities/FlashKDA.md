@@ -3,7 +3,7 @@ type: entity
 entity_type: 项目
 topic: GPU 编程
 updated: 2026-08-02
-sources: 0
+sources: 1
 ---
 
 # FlashKDA
@@ -34,7 +34,7 @@ O = (Gamma * Q) @ S_in + Tril((Gamma * Q) @ (K/Gamma)^T) @ V_tilde
 - 长序列Prefill；
 - 不主要用于`T=1` Decode，后者走fused recurrent kernel。
 
-FlashKDA是专用backend；Flash Linear Attention（FLA）是提供多种线性注意力算子与backend接口的库。
+FlashKDA是专用backend；Flash Linear Attention（FLA）是提供多种线性注意力算子与backend接口的库。vLLM的K3 Preview确认Prefill同时集成FlashKDA与Triton路径，并优化Merged Input Projection、Causal Conv与Initial State Gather。当前检查源码中Prefill仍可见Q/K/V Conv逻辑调用，因此“Projection + Conv Fusion”的精确kernel边界需绑定Release Branch；截至文章发布时最终Backend Selection和数值验证仍在进行。
 
 ## 详细报告
 
@@ -45,6 +45,10 @@ FlashKDA是专用backend；Flash Linear Attention（FLA）是提供多种线性�
 - [[../concepts/KDA|KDA]]
 - [[../concepts/Chunked Gated Delta Rule|Chunked Gated Delta Rule]]
 - [[../concepts/线性注意力递归状态|线性注意力递归状态]]
+
+## 相关来源
+
+- [[../sources/A Preview of Production-Scale Kimi K3 Support on vLLM]]
 
 ## 官方资料
 

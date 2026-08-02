@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: 模型架构
-sources: 1
+sources: 2
 updated: 2026-07-25
 ---
 
@@ -143,6 +143,12 @@ latent dimension ℓ
 Kimi K3 官方技术报告确认其 Stable LatentMoE 使用 `d=7168`、latent dimension `ℓ=3584`、单 expert hidden dimension `m=3072`，共有896个 routed experts、每 token激活16个，并有2个 full-width shared experts。routed path 执行 `d→ℓ` 后路由和 expert 计算，再经 RMSNorm 与 `ℓ→d` 返回主干；expert weights 使用 MXFP4、输入 activation 使用 MXFP8，非 expert 模块保持更高精度。
 
 Serving 优化中，latent down-projection 与 router GEMM 融合，latent weights 跨 TP ranks 分片，并把 output AllGather 融入 GEMM epilogue；这说明 projection 开销是否可融合是 LatentMoE 端到端收益的关键。详见 [[../entities/Kimi K3]] 与 [Kimi K3 Technical Report](../../raw/papers/k3_tech_report.pdf)。
+
+vLLM的K3 Preview还记录：SiTU已接入MXFP4 TRTLLM-Gen与DeepGEMM路径，AMD侧使用FlyDSL MLIR的A16W4/A8W4融合算子；16-GPU `DP16+EP16`只明确完成Optimized Backend选择与Correctness Check，不能当作吞吐Benchmark。
+
+## 相关来源补充
+
+- [[../sources/A Preview of Production-Scale Kimi K3 Support on vLLM]]
 
 ## 研究备注
 

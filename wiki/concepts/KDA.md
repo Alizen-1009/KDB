@@ -2,7 +2,7 @@
 type: concept
 topic: 注意力机制
 updated: 2026-08-02
-sources: 0
+sources: 1
 ---
 
 # KDA
@@ -93,12 +93,18 @@ Kimi K3混合部署同时维护两类cache：KDA的固定大小`Conv State + Mat
 
 投机解码回滚与Prefix Cache不同：K3不为每个draft位置保存完整状态，而缓存较小的projected inputs，在验证后片上重放accepted tokens并重建正确状态。
 
+vLLM的K3集成进一步将Physical State Block、Scheduler Alignment与Prefix Hash Unit解耦：大状态块内部仍可注册细粒度Prefix Endpoint，但只有MLA KV、Matrix State和ShortConv State对同一个`num_computed_tokens`有效时才算命中。命中checkpoint必须Copy-on-Write为请求私有Running State。
+
 ## 工程权衡
 
 - Channel-wise decay 比 scalar GDN 更有表达力，不同 key channels 可有不同记忆长度。
 - 代价是 gate、累计 decay、chunkwise变换和kernel layout更复杂。
 - Lower bound 既是数值稳定设计，也是硬件设计：它使16-token tile可统一映射到Tensor Core矩阵乘。
 - KDA仍是固定大小递归状态，不能像KV Cache一样任意回退历史token；serving还需保存Conv State和Matrix State checkpoint。
+
+## 投影与Decode融合
+
+vLLM K3将共享输入`x`的Q/K/V、Full-rank Output Gate、Decay低秩入口和Beta合并为一次Merged Column-Parallel GEMM；Decay的第二级低秩Projection因依赖中间量仍单独执行。Q/K/V保持Packed Layout，使Decode可用一次Packed Conv Update，并进一步融合ShortConv、Q/K Norm、Gate、KDA Recurrence、Output Gate与RMSNorm。Input Projection和最终`o_proj`仍是独立GEMM，不能把它描述成整层单一kernel。Prefill因FlashKDA需要dense Q/K/V，融合边界与Decode不同。Shape与源码路径见 [[../../output/reports/KDA投影融合优化|KDA投影融合优化]]。
 
 ## FlashKDA并行
 
@@ -114,6 +120,10 @@ Decode `T=1` 且上游已算好 `q/k/v/alpha/beta` 时，优先看 [[../../outpu
 - [[Chunked Gated Delta Rule]]
 - [[混合注意力]]
 - [[MLA]]
+
+## 相关来源
+
+- [[../sources/A Preview of Production-Scale Kimi K3 Support on vLLM]]
 
 ## 官方资料
 

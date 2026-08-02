@@ -2,7 +2,7 @@
 type: entity
 entity_type: 框架
 topic: 推理服务
-sources: 18
+sources: 19
 updated: 2026-06-12
 ---
 
@@ -41,6 +41,7 @@ updated: 2026-06-12
 - 该来源引用 CoreWeave H200/InfiniBand/ConnectX-7 社区 benchmark 的 `2.2k tok/s/H200`，但收益来自多项 kernel 与 runtime 优化组合，不能归因于 Wide-EP 单项。
 - vLLM x TileRT 来源展示了 V1 Connector 的另一条扩展路线：stock vLLM 保留 API、调度、Prefix Cache 和 Prefill，通过 `KVConnectorBase_V1` 与 `MultiConnector` 把部分延迟敏感流量交给 TileRT Decode，同时 native Decode pool 继续服务普通流量。
 - 新增 PCP/DCP 解读补充 Context Parallel 路线：DCP 面向 Decode KV context 分片；PCP 面向单个超长 Prefill 的 sequence 并行。官方 `main` commit `1ad5182` 中 PCP 是与 TP 正交、会扩张 world size 的维度：`world_size = PP × PCP × TP`，rank 顺序为 `DP × PP × PCP × TP`；当前 MRV2 实现只支持 MLA，源码采用 partial-Q/full-KV 的 PCP-group AllGather 路径。官方文档另列 partial-Q/partial-KV Ring Attention 方向，但两条策略仍标为 active development；官方仓库当前未实现/提及 Ulysses。
+- Kimi K3 Preview记录了vLLM对混合KDA–MLA Cache的核心扩展：将Physical State Block、Scheduler Alignment与Prefix-match Unit解耦；MLA KV、KDA Matrix State与ShortConv State必须对同一个`num_computed_tokens`有效，命中后通过Copy-on-Write恢复为请求私有Running State。该能力属于可复用于其他Hybrid Attention模型的核心基础设施，而不是K3特例补丁。
 
 ## 相关概念
 
@@ -68,6 +69,8 @@ updated: 2026-06-12
 - [[Prefill Context Parallel]]
 - [[Ring Attention]]
 - [[DeepSpeed Ulysses]]
+- [[递归状态 Prefix Caching]]
+- [[KDA]]
 
 ## 相关来源
 
@@ -89,6 +92,7 @@ updated: 2026-06-12
 - [[../sources/vLLM Large Scale Serving DeepSeek @ 2.2k toksH200 with Wide-EP]]
 - [[../sources/vLLM x TileRT Specialized Decode for Latency-Critical Serving]]
 - [[../sources/vllm PCP 与 DCP 深度解析]]
+- [[../sources/A Preview of Production-Scale Kimi K3 Support on vLLM]]
 
 ## 冲突与备注
 
@@ -110,3 +114,4 @@ updated: 2026-06-12
 - Wide-EP 来源基于 2025-12 的 vLLM 能力；CLI、DBO 阈值、EPLB 和 backend 支持应按具体版本核实。
 - TileRT 集成依赖 vLLM V1 公共 Connector；跨引擎 KV/sparse index/MTP 状态格式与升级兼容需绑定版本验证。
 - PCP/DCP 二手来源对 world size、`ag_rs` 数据流、PCP 上线版本和参数名存在冲突。官方 `main` commit `1ad5182` 已明确 PCP 扩张 world size、DCP 默认不扩张；但发布版本与 backend 数据流仍需绑定实际 commit。
+- K3官方博客是权重发布前Preview：Non-disaggregated Serving已工作，但FlashKDA Backend Selection、PD/Offload Prefix Cache、EP与Vendor Validation仍在进行；不能把“已集成”自动写成“所有部署路径已完成生产验证”。

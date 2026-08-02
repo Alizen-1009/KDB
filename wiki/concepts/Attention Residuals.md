@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: 模型架构
-sources: 2
+sources: 3
 updated: 2026-05-06
 ---
 
@@ -33,14 +33,20 @@ updated: 2026-05-06
 - `Block AttnRes` 是典型的系统折中：牺牲部分“全深度自由度”，换取更好的工程可部署性
 - 在 pipeline parallelism 场景下，论文用 cross-stage caching 减少重复传输，用 two-phase computation 和 online softmax merge 摊薄推理 I/O；报告的训练额外开销小于 4%，典型推理延迟额外开销小于 2%
 
+## vLLM K3 推理实现
+
+K3的93层网络若朴素实现Block AttnRes，会增加跨层表示读写、归约和Normalization Launch。vLLM Preview称Release Branch已集成Triton与NVIDIA Kernel，在支持shape上融合Residual Update、AttnRes Mixing和Output RMSNorm，并用Sequence Parallel分片跨rank流量；文章只称早期Kernel结果积极，端到端收益仍在不同Prefill长度和并行配置下测量。
+
 ## 相关实体
 
 - [[../entities/Moonshot AI]]
+- [[../entities/vLLM]]
 
 ## 相关来源
 
 - [[../sources/Attention Residuals]]
 - [[../sources/Kimi新作《Attention Residuals》：对Transformer中残差结构的调整]]
+- [[../sources/A Preview of Production-Scale Kimi K3 Support on vLLM]]
 
 ## 相关概念
 

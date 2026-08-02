@@ -11,7 +11,7 @@ sources: 1
 
 在 vLLM V1 中，`cudagraph_mode` 决定模型执行的哪一部分、哪些 batch 类型使用 CUDA Graph capture/replay。CUDA Graph 通过重放预先捕获的 GPU 工作序列减少 CPU 逐 kernel 提交开销，但要求被捕获路径的地址、形状和控制流满足静态化约束。
 
-> 版本边界：以下模式语义按 vLLM 官方源码 `vllm/config/compilation.py` 与 `vllm/v1/cudagraph_dispatcher.py`（commit `439f336`）整理；该配置仍被官方标为可能变化。
+> 版本边界：模式语义最初按 vLLM 官方源码 commit `439f336` 整理；Capture Size默认公式又核对了 commit `1ad5182` 的 `vllm/config/vllm.py`、`compilation.py` 与 `cudagraph_dispatcher.py`。该配置仍可能变化。
 
 ## PIECEWISE
 
@@ -54,6 +54,22 @@ sources: 1
 | decode launch 开销 | 中等 | 通常更低 |
 | capture/显存重点 | 多个子图与 capture size | 只为 decode full graph 形态付费 |
 
+## Capture Size 为什么可以大于 max_num_seqs
+
+当前vLLM默认逻辑是：
+
+```text
+decode_query_len = 1 + num_speculative_tokens
+max_capture = min(max_num_seqs × decode_query_len × 2, 512)
+max_capture = min(max_capture, max_num_batched_tokens)
+```
+
+这里`max_num_seqs`是并发请求数，而CUDA Graph Size是一次Forward的扁平化`num_tokens` Shape。普通Decode每请求1 token时二者相等；Speculative Decode、Chunked Prefill或Mixed Batch中，一个请求可贡献多个tokens，因此`num_tokens`可大于`num_seqs`。
+
+`decode_query_len`显式覆盖Spec Decode每请求的多个位置；额外乘2是默认Mixed/Piecewise Headroom启发式，不是正确性不变量。Uniform FULL Decode创建Graph Key时还会过滤到`max_num_seqs × uniform_decode_query_len`，所以普通Full Decode不会因为全局候选上限为2倍就实际运行超过请求上限的序列数。512是默认最高Cap，用于控制Capture启动时间与Graph显存，不是硬件限制；详细例子见 [[../../output/reports/vLLM CUDA Graph Capture Size为何是两倍max_num_seqs|vLLM CUDA Graph Capture Size为何是两倍max_num_seqs]]。
+
+Runtime还会把实际Token数向上Padding到最近Captured Size，例如137 tokens可使用144-token Graph。Graph Shape大于实际Batch在这种情况下也属于正常设计。
+
 ## 选择建议
 
 - **混合 serving、chunked prefill、动态 attention backend**：优先 `PIECEWISE`，用部分 graph coverage 换兼容性。
@@ -80,6 +96,7 @@ sources: 1
 
 - [`vllm/config/compilation.py`](https://github.com/vllm-project/vllm/blob/439f336212227833e126526d3c5f3ef3968dfbf5/vllm/config/compilation.py)：枚举、模式定义、适用说明与 compilation 依赖。
 - [`vllm/v1/cudagraph_dispatcher.py`](https://github.com/vllm-project/vllm/blob/439f336212227833e126526d3c5f3ef3968dfbf5/vllm/v1/cudagraph_dispatcher.py)：capture key 初始化、uniform decode 判定入口与 `FULL -> PIECEWISE -> NONE` runtime dispatch。
+- vLLM commit `1ad5182` 的 `vllm/config/vllm.py::_set_cudagraph_sizes`：`decode_query_len`、2倍默认Headroom、512 Cap与`max_num_batched_tokens`截断。
 
 ## 待核实
 

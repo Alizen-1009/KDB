@@ -3,7 +3,7 @@ type: entity
 entity_type: 模型
 topic: 模型架构
 updated: 2026-07-30
-sources: 0
+sources: 1
 ---
 
 # Kimi K3
@@ -17,7 +17,7 @@ sources: 0
 - 总参数量 2.8T，单 token 激活约 104.2B 参数；稀疏激活减少每 token 计算，但部署仍需让 896 个 routed experts 的权重可被路由访问。
 - 模型宽度 7168，96 attention heads；Stable LatentMoE latent dimension 3584、单 expert hidden dimension 3072，每 token 激活 16/896 routed experts，并有 2 个 shared experts。
 - MoE expert 权重在部署感知后训练中使用 MXFP4、输入 activation 使用 MXFP8；attention projection、latent MoE projection、shared experts 和 router 保持更高精度。
-- KDA 与 Gated MLA 形成混合 cache：KDA recurrent state 固定大小，MLA KV cache 随 context 增长；官方 serving 系统联合管理两类 cache。
+- KDA 与 Gated MLA 形成混合 cache：KDA recurrent state 固定大小，MLA KV cache 随 context 增长；vLLM集成要求MLA KV、KDA Matrix State与ShortConv State对同一个`num_computed_tokens`有效，并解耦Physical Block、Scheduler Alignment和Prefix Hash粒度。
 - “MLA只有一个 latent KV head”不等于模型只有一个 attention head：K3 有96个 Q/attention heads，且69/93层是 KDA。TP8 可把 Q heads、KDA head states、dense/projection权重与 active compute 分摊到8 ranks；当前24个 Gated MLA层的 latent KV cache会在纯TP路径下复制，这是局部代价。
 
 ## 为什么常见 TP8
@@ -63,6 +63,10 @@ K3生产Serving将KDA固定大小状态与MLA Paged KV联合管理：Prefix命�
 - [[MoonEP]]
 - [[PD分离]]
 
+## 相关来源
+
+- [[../sources/A Preview of Production-Scale Kimi K3 Support on vLLM]]
+
 ## 官方资料
 
 - [Kimi K3 Technical Report](../../raw/papers/k3_tech_report.pdf)
@@ -73,3 +77,4 @@ K3生产Serving将KDA固定大小状态与MLA Paged KV联合管理：Prefix命�
 
 - vLLM recipe 在权重正式发布前把约 1.68TB 标为估算值；实际 safetensors、加载后显存、CUDA Graph、KV/state cache 和 workspace 需按最终 checkpoint 与硬件实测。
 - TP8、TP16、TEP、DEP 与 PD 分离的最优点取决于 GPU 显存、节点互联、batch/context 分布与 SLO，不存在脱离硬件和负载的固定答案。
+- vLLM K3博客属于Day-0 Preview；文章中的“integrated”和“being validated”必须分开记录，后续正式版本可能改变默认Backend、Prefix Cache开关和硬件支持矩阵。

@@ -25,16 +25,16 @@
 
 ## 资源统计
 
-- 原始文章：58
+- 原始文章：59
 - 原始论文：4
 - 原始仓库：0
 - 原始数据集：0
 - 原始图片：19
 - 原始代码：1
-- 来源文件：48
+- 来源文件：49
 - 实体文件：33
 - 概念文件：98
-- 报告文件：21
+- 报告文件：23
 - 面试文件：11
 - 卡片文件：0
 - 幻灯片文件：0
@@ -232,9 +232,10 @@
 
 ## 来源摘要（按类型）
 
-### 文章（29）
+### 文章（30）
 
 - [[../wiki/sources/2026 年MoE 架构正在发生一次关键变化|2026 年MoE 架构正在发生一次关键变化]]
+- [[../wiki/sources/A Preview of Production-Scale Kimi K3 Support on vLLM|A Preview of Production-Scale Kimi K3 Support on vLLM]]
 - [[../wiki/sources/CUDA优化维度框架|CUDA优化维度框架]]
 - [[../wiki/sources/DeepSeekV4中RoPE设计解析|DeepSeekV4中RoPE设计解析]]
 - [[../wiki/sources/Flash Attention 详细解释推演与Pytorch代码实现|Flash Attention 详细解释推演与Pytorch代码实现]]
@@ -319,6 +320,7 @@
 - [[../output/reports/GDN公式与逐步计算|GDN公式与逐步计算]]
 - [[../output/reports/Gemma 开源代码结构导读|Gemma 开源代码结构导读]]
 - [[../output/reports/KDA伪代码与输入输出|KDA伪代码与输入输出]]
+- [[../output/reports/KDA投影融合优化|KDA投影融合优化]]
 - [[../output/reports/KDA最小Decode伪代码|KDA最小Decode伪代码]]
 - [[../output/reports/KDA相对GDN的改进|KDA相对GDN的改进]]
 - [[../output/reports/Kimi K3为何采用TP8部署|Kimi K3为何采用TP8部署]]
@@ -332,6 +334,7 @@
 - [[../output/reports/Prefill Attention 的 CUDA 并行映射|Prefill Attention 的 CUDA 并行映射]]
 - [[../output/reports/Triton在Ascend上的支持|Triton在Ascend上的支持]]
 - [[../output/reports/Triton跨芯片支持|Triton跨芯片支持]]
+- [[../output/reports/vLLM CUDA Graph Capture Size为何是两倍max_num_seqs|vLLM CUDA Graph Capture Size为何是两倍max_num_seqs]]
 - [[../output/reports/vLLM CUDA Graph Piecewise 与 Full Decode Only|vLLM CUDA Graph Piecewise 与 Full Decode Only]]
 
 ## 面试备考

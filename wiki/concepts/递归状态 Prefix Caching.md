@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: KV Cache
-sources: 1
+sources: 2
 updated: 2026-07-25
 ---
 
@@ -54,6 +54,33 @@ KV 命中到 token 10
 
 若命中边界有 checkpoint，来源描述 SGLang 通过 copy-on-write 把快照恢复到新请求的活动状态槽，避免原地修改缓存快照。
 
+## vLLM 的三种粒度解耦
+
+Kimi K3 的 vLLM 集成将此前容易绑定在一起的三种粒度分开：
+
+```text
+Physical block size
+= GPU内存按多大块分配、引用和驱逐
+
+Scheduler alignment
+= 执行在哪些边界停止并注册状态，保证所有cache groups具有相同num_computed_tokens
+
+Prefix-match unit
+= 每隔多少tokens生成chained hash并允许匹配共享prefix
+```
+
+例如 Physical State Block 可覆盖数千 tokens，但内部仍可每数百 tokens形成一个 Prefix Hash Endpoint。最终可复用边界必须同时存在：
+
+```text
+MLA/full-attention KV[0:B)
++ KDA Matrix State_B
++ KDA ShortConv State_B
+```
+
+如果MLA匹配到`B=2560`但KDA只保存了`B=2048`的checkpoint，联合命中必须回退到2048。Scheduler不能把已经推进到其他位置的KDA State注册成2560，也不能让不同Cache Groups对`num_computed_tokens`有不同理解。
+
+Cached KDA checkpoint是只读Snapshot。命中时先Copy-on-Write到请求私有Running State，再继续Prefill/Decode；同一调度step中新注册但复制尚未完成的状态不能立即被其他请求命中，否则可能读到旧owner或正在修改的数据。细节来源见 [[../sources/A Preview of Production-Scale Kimi K3 Support on vLLM]]。
+
 ## 显存与重算交换
 
 - checkpoint 密：可在更细粒度边界恢复，重算少，但每个快照要保存所有相关层的 Conv State 和矩阵状态，显存高。
@@ -83,10 +110,13 @@ rejected draft 不得污染 Conv State 与 Matrix State
 ## 相关实体
 
 - [[../entities/SGLang]]
+- [[../entities/vLLM]]
+- [[../entities/Kimi K3]]
 
 ## 相关来源
 
 - [[../sources/SGLang的KDA管理与Prefix Cache难题]]
+- [[../sources/A Preview of Production-Scale Kimi K3 Support on vLLM]]
 
 ## 相关概念
 

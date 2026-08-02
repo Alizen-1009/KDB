@@ -1439,3 +1439,24 @@
 - Chunk并行：UT transform将块内递推改写为inter-chunk项(Gamma×Q)S_in与intra-chunk lower-triangular GEMM A V_tilde。
 - K3 lower-bounded decay使16-token tile的1/Gamma留在BF16范围内，对角与非对角tiles统一走Tensor Core GEMM。
 - 工程边界：FlashKDA是CUTLASS专用backend，FLA是算子库；训练/Prefill走chunkwise，T=1 Decode走fused recurrent；chunk间仍有状态依赖，通过head parallel、scan和overlap降低串行占比。
+
+## [2026-08-02] ingest | A Preview of Production-Scale Kimi K3 Support on vLLM
+
+- 读取原始资料：`raw/articles/A Preview of Production-Scale Kimi K3 Support on vLLM.md`
+- 创建来源页：`wiki/sources/A Preview of Production-Scale Kimi K3 Support on vLLM.md`
+- 更新概念页：`wiki/concepts/递归状态 Prefix Caching.md`、`wiki/concepts/KDA.md`、`wiki/concepts/LatentMoE.md`、`wiki/concepts/Attention Residuals.md`
+- 更新实体页：`wiki/entities/vLLM.md`、`wiki/entities/vLLM Team.md`、`wiki/entities/Kimi K3.md`、`wiki/entities/FlashKDA.md`
+- 创建派生报告：`output/reports/KDA投影融合优化.md`
+- 核心信息：vLLM解耦Physical Block、Scheduler Alignment与Prefix-match Unit；Hybrid Cache命中要求MLA KV、KDA Matrix/Conv State在同一num_computed_tokens边界有效，并通过Copy-on-Write恢复私有Running State。
+- 投影融合校准：当前源码为Merged Q/K/V/G/F_A/Beta Input GEMM +独立Decay二级Projection；Decode融合Packed Conv、KDA、Gate与Norm，但Input/O Projection仍独立；Prefill边界需绑定Release Branch。
+- 未发现机制层直接冲突；Preview中的integrated/being validated与当前commit/recipe默认开关存在版本边界，已显式标注。
+
+## [2026-08-02] query | vLLM CUDA Graph Capture Size 为什么是两倍 max_num_seqs
+
+- 核对官方源码：`vllm/config/vllm.py::_set_cudagraph_sizes`、`config/compilation.py`、`v1/cudagraph_dispatcher.py`，commit `1ad5182`
+- 创建报告：`output/reports/vLLM CUDA Graph Capture Size为何是两倍max_num_seqs.md`
+- 更新概念：`wiki/concepts/CUDA Graph 执行模式.md`
+- 纠正公式：当前源码是`min(max_num_seqs×(1+num_spec_tokens)×2,512,max_num_batched_tokens)`，不是`max(512,...)`。
+- 核心区分：max_num_seqs是请求数，CUDA Graph Size是扁平化num_tokens shape；Spec Decode、Prefill/Mixed中每请求可贡献多个tokens。
+- 额外×2是Mixed/Piecewise默认headroom启发式；Uniform FULL Decode keys仍过滤到`max_num_seqs×uniform_decode_query_len`。
+- Runtime实际token数会向上padding到最近capture size；512是控制capture时间/显存的默认cap，不是CUDA硬件限制。
