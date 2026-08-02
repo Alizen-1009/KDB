@@ -13,12 +13,16 @@ updated: 2026-06-12
 
 ## 为什么叫 Chunk
 
-`Gated Delta Rule` 本身是递推形式：
+`Gated Delta Rule` 本身是递推形式。若状态采用工程常见的 K-last 布局 `S [d_v,d_k]`：
 
 ```text
-S_t = alpha_t * S_{t-1} + beta_t * (v_t - alpha_t * S_{t-1} k_t) k_t^T
-o_t = S_t (q_t * scale)
+S_bar = alpha_t * S_{t-1}
+delta_v = beta_t * (v_t - S_bar @ k_t)
+S_t = S_bar + delta_v @ k_t^T
+o_t = S_t @ (q_t * scale)
 ```
+
+若采用数学布局 `S [d_k,d_v]`，则全部转置后写成 `prediction=k_t^T S_bar`、`S_t=S_bar+k_t delta_v^T`。详见 [[../../output/reports/GDN公式与逐步计算|GDN公式与逐步计算]]。
 
 如果按 token 一个一个算，就是 recurrent path，依赖链很长：
 

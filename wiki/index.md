@@ -33,21 +33,22 @@
 - 原始代码：1
 - 来源文件：48
 - 实体文件：31
-- 概念文件：97
-- 报告文件：13
+- 概念文件：98
+- 报告文件：15
 - 面试文件：11
 - 卡片文件：0
 - 幻灯片文件：0
 
 ## 概念页面（按主题）
 
-### 注意力机制（10）
+### 注意力机制（11）
 
 - [[../wiki/concepts/CSA-HCA|CSA-HCA]]
 - [[../wiki/concepts/Chunked Gated Delta Rule|Chunked Gated Delta Rule]]
 - [[../wiki/concepts/Flash Decoding|Flash Decoding]]
 - [[../wiki/concepts/FlashAttention|FlashAttention]]
 - [[../wiki/concepts/FlashMLA|FlashMLA]]
+- [[../wiki/concepts/KDA|KDA]]
 - [[../wiki/concepts/MLA|MLA]]
 - [[../wiki/concepts/Online Softmax|Online Softmax]]
 - [[../wiki/concepts/Ring Attention|Ring Attention]]
@@ -312,7 +313,9 @@
 - [[../output/reports/DCP是什么|DCP是什么]]
 - [[../output/reports/DeepSpeed Ulysses适用场景与DeepSeek关系|DeepSpeed Ulysses适用场景与DeepSeek关系]]
 - [[../output/reports/FlashKDA优化方法与GDN迁移指南|FlashKDA优化方法与GDN迁移指南]]
+- [[../output/reports/GDN公式与逐步计算|GDN公式与逐步计算]]
 - [[../output/reports/Gemma 开源代码结构导读|Gemma 开源代码结构导读]]
+- [[../output/reports/KDA相对GDN的改进|KDA相对GDN的改进]]
 - [[../output/reports/Kimi K3为何采用TP8部署|Kimi K3为何采用TP8部署]]
 - [[../output/reports/Kimi K3权重构成与TP8切分|Kimi K3权重构成与TP8切分]]
 - [[../output/reports/MLA模型常见部署拓扑|MLA模型常见部署拓扑]]

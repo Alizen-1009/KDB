@@ -1324,3 +1324,31 @@
 - active账本：Top16 routed experts约48.6B；含shared/latent projection/router后MoE active path约66.1B/63.4%，其余Attention+dense模块约38.1B/36.6%。
 - TP8切分：KDA/Q heads为12/rank；纯TP下每rank持有全部896逻辑experts的1/8 tensor shard，TP+EP下约112 experts/rank并用All-to-All。Router、部分low-rank projection和当前Gated MLA latent KV仍复制。
 - 待核实：参数拆分为公开维度推导而非最终checkpoint逐tensor统计；具体weight layout依赖pure TP、EP、MegaMoE和专用fusion backend。
+
+## [2026-08-02] query | GDN 公式与逐步计算导出
+
+- 读取概念页：`Chunked Gated Delta Rule`、`线性注意力递归状态`
+- 核对实现：FLA `naive_recurrent_gated_delta_rule`、`GatedDeltaNet` layer，以及本地Qwen3.7 GDN production reference
+- 创建Obsidian Markdown：`output/reports/GDN公式与逐步计算.md`
+- 更新概念页：`wiki/concepts/线性注意力递归状态.md`、`wiki/concepts/Chunked Gated Delta Rule.md`
+- 公式确认：dt=softplus(a+dt_bias)，g=-exp(A_log)dt，alpha=exp(g)，beta=sigmoid(b)；S_bar=alpha S，delta_v=beta(v-k^T S_bar)，S=S_bar+k delta_v^T，o=(scale q)^T S。
+- 文档包含：形状表、gate参数化、逐步递推、转置layout、二维数值例子、GVA、多head/output gate、prefill/decode、最小PyTorch参考与常见误区。
+- 待核实：具体模型的output gate、Q/K normalization、negative-eigenvalue扩展、state dtype与cache layout需绑定版本。
+
+## [2026-08-02] query | GDN 中 A_log 与 dt_bias 的含义
+
+- 读取并更新：`output/reports/GDN公式与逐步计算.md`、`wiki/concepts/线性注意力递归状态.md`
+- 本次 query 澄清：A_log[H]是每个value/state head的可学习基础衰减速率，实际A=-exp(A_log)<0；dt_bias[H]是正步长dt=softplus(a_t+dt_bias)的head-wise基线。
+- 最终retention：alpha=exp(-exp(A_log)×softplus(a_t+dt_bias))。A_log越大或有效dt越大，当前旧状态衰减越强。
+- 补充数值例子与SSM时间尺度直觉；注明dt_bias不是位置/attention bias。
+
+## [2026-08-02] query | KDA 相对 GDN 的改进
+
+- 读取官方资料：Kimi K3 Technical Report §2.1.1、Eq.1–6
+- 创建概念页：`wiki/concepts/KDA.md`
+- 创建报告：`output/reports/KDA相对GDN的改进.md`
+- 更新概念页：`wiki/concepts/线性注意力递归状态.md`，用官方公式替换KDA待核实表述
+- 核心机制：GDN用per-head scalar retention；KDA用per-head、per-key-channel vector alpha，状态更新仍是衰减→预测→Delta误差→rank-1写入。
+- Kimi K3改进：g=g_min×sigmoid(exp(A)z)，g_min=-5，使16-token tile累计log-decay在(-80,0)，1/Gamma小于exp(80)，可在BF16范围内把对角/非对角tile统一为Tensor Core GEMM。
+- 第二项改进：Kimi Linear低秩output gate升级为input-dependent full-rank gate sigmoid(W_g x)×RMSNorm(o)。
+- 边界：KDA channel-wise gate与UT/chunk计算更复杂；具体state layout、dtype、workspace和dispatch需绑定serving backend。
