@@ -138,7 +138,13 @@ latent dimension ℓ
 - [[混合精度训练与推理]]
 - [[Tensor Parallelism]]
 
+## Kimi K3 官方实例
+
+Kimi K3 官方技术报告确认其 Stable LatentMoE 使用 `d=7168`、latent dimension `ℓ=3584`、单 expert hidden dimension `m=3072`，共有896个 routed experts、每 token激活16个，并有2个 full-width shared experts。routed path 执行 `d→ℓ` 后路由和 expert 计算，再经 RMSNorm 与 `ℓ→d` 返回主干；expert weights 使用 MXFP4、输入 activation 使用 MXFP8，非 expert 模块保持更高精度。
+
+Serving 优化中，latent down-projection 与 router GEMM 融合，latent weights 跨 TP ranks 分片，并把 output AllGather 融入 GEMM epilogue；这说明 projection 开销是否可融合是 LatentMoE 端到端收益的关键。详见 [[../entities/Kimi K3]] 与 [Kimi K3 Technical Report](../../raw/papers/k3_tech_report.pdf)。
+
 ## 研究备注
 
-- 当前来源为二手截图文章。Router、Gate、Shared Expert 是否在 `d` 维，以及投影是共享、per-layer 还是 per-expert，需要官方 LatentMoE 论文和模型代码核实。
-- Nemotron 3 Super、Kimi K3 的具体配置与性能数字暂不作为本概念的通用事实。
+- LatentMoE 的通用质量/性能结论仍需等参数、等 active FLOPs、等训练 token 和一致硬件 benchmark；Kimi K3 单例不能证明所有模型都受益。
+- Nemotron 3 Super 的具体配置仍主要来自二手来源，需官方报告核实。

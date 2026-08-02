@@ -40,7 +40,7 @@ updated: 2026-06-12
 - vLLM 官方 Wide-EP 来源补充了大规模 DeepSeek serving 路线：Attention DP replicas 独立维护 MLA KV Cache，experts 跨宽 EP group 分布，并用 DeepEP、DBO、EPLB 和 PD 分离处理通信、负载不均与阶段干扰。
 - 该来源引用 CoreWeave H200/InfiniBand/ConnectX-7 社区 benchmark 的 `2.2k tok/s/H200`，但收益来自多项 kernel 与 runtime 优化组合，不能归因于 Wide-EP 单项。
 - vLLM x TileRT 来源展示了 V1 Connector 的另一条扩展路线：stock vLLM 保留 API、调度、Prefix Cache 和 Prefill，通过 `KVConnectorBase_V1` 与 `MultiConnector` 把部分延迟敏感流量交给 TileRT Decode，同时 native Decode pool 继续服务普通流量。
-- 新增 PCP/DCP 解读补充 Context Parallel 路线：DCP 面向 Decode KV context 分片；PCP 面向单个超长 Prefill 的 sequence 并行，可采用 Ring Attention 或 Ulysses。PCP 的合并状态、CLI 和 group topology 仍属版本/RFC 边界。
+- 新增 PCP/DCP 解读补充 Context Parallel 路线：DCP 面向 Decode KV context 分片；PCP 面向单个超长 Prefill 的 sequence 并行。官方 `main` commit `1ad5182` 中 PCP 是与 TP 正交、会扩张 world size 的维度：`world_size = PP × PCP × TP`，rank 顺序为 `DP × PP × PCP × TP`；当前 MRV2 实现只支持 MLA，源码采用 partial-Q/full-KV 的 PCP-group AllGather 路径。官方文档另列 partial-Q/partial-KV Ring Attention 方向，但两条策略仍标为 active development；官方仓库当前未实现/提及 Ulysses。
 
 ## 相关概念
 
@@ -109,4 +109,4 @@ updated: 2026-06-12
 - AFD Plugin 在来源发布时锁定 vLLM `0.19.1` 和 model runner v1，且两种角色均加载完整权重；不能把实验插件的能力外推为任意 vLLM 版本的原生支持。
 - Wide-EP 来源基于 2025-12 的 vLLM 能力；CLI、DBO 阈值、EPLB 和 backend 支持应按具体版本核实。
 - TileRT 集成依赖 vLLM V1 公共 Connector；跨引擎 KV/sparse index/MTP 状态格式与升级兼容需绑定版本验证。
-- PCP/DCP 二手来源对 world size、`ag_rs` 数据流、PCP 上线版本和参数名存在冲突；稳定机制可保留，精确实现需以官方文档/commit 为准。
+- PCP/DCP 二手来源对 world size、`ag_rs` 数据流、PCP 上线版本和参数名存在冲突。官方 `main` commit `1ad5182` 已明确 PCP 扩张 world size、DCP 默认不扩张；但发布版本与 backend 数据流仍需绑定实际 commit。

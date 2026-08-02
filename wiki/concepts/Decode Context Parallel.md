@@ -61,6 +61,58 @@ TP 解决的是“单层权重和矩阵计算怎么分摊”，它很适合降�
 
 所以 DCP 不是比 TP “更高一级所以替代 TP”，而是当 TP 已经拉大、KV head 维切不动时，给 decode 阶段补上的 KV/context 维切分。
 
+## 是否需要 DP，以及 DCP rank 如何组织
+
+- DCP **不要求**启用 Data Parallelism。DP 是请求/副本维并行，DCP 是同一请求的 context/KV 维并行，两者正交，可以单独使用，也可以组合。
+- 在 vLLM 的复用 TP group 口径中，`dcp_size` **不乘到物理 GPU 数上**。它只是在已有 `tp_size` 个进程/GPU 中建立 DCP 子组，因此仅知道 `DCP = 4` 不能唯一确定总卡数，还要看 `TP`、`PP` 和可选的 `DP`。
+- 常见的一进程一卡语境下，每个物理进程同时有 global rank、TP rank，以及所在 DCP group 内的 local DCP rank；`DCP = 4` 表示每个 DCP group 有 `dcp_rank = 0..3` 四个成员，并不额外创建四个进程。
+- 例如 `TP = 4, DCP = 4, PP = 1, DP = 1` 使用 4 张卡，四个 TP rank 同时组成一个四成员 DCP group。
+- `TP = 8, DCP = 4, PP = 1, DP = 1` 仍使用 8 张卡；attention 逻辑上形成 `TP / DCP = 2` 个 head/KV-head 分片方向，每个方向内有 4 个 context shards，也可看成 `2 × 4` 的二维布局。具体 global rank 到二维坐标的编号顺序属于实现细节，不应脱离版本假定。
+- `TP = 4, DCP = 4, PP = 2` 使用 8 张卡；每个 pipeline stage 各自有一个 4-rank TP/DCP group。
+- 若再启用普通 `DP = 2`，则会复制两套上述模型并行拓扑；在不考虑其他并行维度时，物理卡数可粗略看作 `DP × PP × TP`，DCP 不再额外相乘。
+
+配置上通常要求 `TP` 能被 `DCP` 整除，并受模型 KV-head 数量和 backend 支持约束；因此 `DCP = 4` 至少需要一个可容纳 4 个成员的有效 TP group，但“DCP=4 就一定是 4 张卡”只有在 `TP=4、PP=1、DP=1` 时才成立。
+
+### 单 KV head、`DP=8, TP=1, EP=8` 的例子
+
+这是 [[Wide Expert Parallelism]] / DP Attention 的典型逻辑拓扑，而不是 DCP 拓扑：8 张 GPU 同时充当 8 个 Attention DP ranks 和一个 8-rank EP group。每个请求被分配给某一个 Attention DP rank，该 rank 单独保存该请求完整的单-head/latent KV Cache；到 MoE 层时，token 再通过 EP dispatch 去 8 张卡上寻找对应 expert。
+
+因为每个 Attention replica 的 `TP=1`，可复用的 TP group 只有一个成员，所以按 vLLM 的 TP-group 复用口径只能有 `DCP=1`，也就是实际上没有 context 分片。`num_kv_heads=1` 说明“如果把 TP 拉大，DCP 很有价值”，但它不会让 `TP=1` 自动产生多个 DCP ranks。
+
+若固定仍是 8 张卡，并希望 `DCP=4`，一种概念上的重排是 `Attention DP=2, TP=4, DCP=4, EP=8`：两组 Attention replicas 各占 4 个 TP/DCP ranks，每个请求在组内把 KV context 切成 4 份，而 MoE experts 仍可跨全部 8 ranks 做 EP。相比原来的 `DP=8, TP=1, EP=8`，这是用请求级并行宽度从 8 降到 2，换单请求 context 分片、KV 容量与带宽分摊；同时增加 DCP/TP 通信。该组合是否被目标 vLLM 版本、模型与 backend 完整支持，必须用实际配置和源码确认。
+
+### `8 KV heads, TP=8, DCP=4` 的二维布局直觉
+
+这里必须区分 `Q heads` 和 `KV heads`；DCP 是否有价值主要看 `num_kv_heads`。若假设是 MHA，确实有 `8` 个 KV heads：
+
+- 只开 `TP=8` 时，head 维并行度为 8，每个 rank 持有 `1` 个 KV head 的完整 context。
+- 若纯按二维公式把它重排为 `TP=8, DCP=4`，head 维并行度变为 `TP / DCP = 2`；每个 rank 的局部 attention 视图会覆盖 `8 / 2 = 4` 个 KV heads，但每个 head 只持有 `1/4` context。
+- 因而“每 rank 有 4 个 heads”只说对了一半：准确说法是“每 rank 有 4 个 heads 的局部 context shards”，不是 4 个完整 head cache。
+- 单 rank KV 元素量并未下降：`1 × S = 4 × (S/4)`。因此当 `num_kv_heads = TP = 8`、纯 TP 已无 KV 复制时，这种 DCP 重排不会节省 KV Cache，反而增加跨 rank softmax/output 合并通信。
+
+按照本页已有的 vLLM 配置口径，`num_kv_heads=8, TP=8` 时实用 DCP 上限就是 1，因此 `DCP=4` 通常不是有效或有意义的配置。DCP 主要面向 `num_kv_heads < TP` 的 GQA/MQA/MLA；若用户所说的“8 heads”只是 8 个 Q heads，而 KV heads 更少，则必须改用真实 `num_kv_heads` 重新计算。
+
+### `1 KV head, TP=8, DCP=8, EP=8` 是否复制 head
+
+这个配置可逻辑理解为同一批 8 个 ranks 同时组成 TP、DCP 和 EP group；三个 size 不相乘。若没有额外 DP/PP，物理上仍是 8 张卡：
+
+- TP：每个 rank 持有 dense 权重/计算的一个张量分片。
+- EP：每个 rank 持有一部分 experts，并参与 token dispatch/combine。
+- DCP：8 个 ranks 共同处理同一个请求，把唯一 KV head 的 context 切成 8 份。
+
+每个 rank 的局部张量在 head 维上确实仍标记为 `1 KV head`，但这不等于保存了 8 份完整 cache。它们保存的是同一逻辑 KV head 的不同 token shards：
+
+```text
+rank 0: KV head 0 的 token 0, 8, 16, ...
+rank 1: KV head 0 的 token 1, 9, 17, ...
+...
+rank 7: KV head 0 的 token 7, 15, 23, ...
+```
+
+所以每 rank KV 量约为 `1 head × S/8`，8 ranks 合起来才是 `1 head × S`。真正发生多 rank 复制的是纯 `TP=8, DCP=1`：因为单 KV head 无法沿 head 维继续切，每个 TP rank 可能保存 `1 head × S` 的完整 cache。启用 `DCP=8` 后，复制的是很小的当前 Query/必要元数据，历史 KV 主体则沿 context 分片；各 rank 对同一 head 算 partial attention，最后合并 LSE/output。
+
+该拓扑通常意味着 Attention 请求级 DP 宽度为 1：一个请求跨 8 ranks 执行。若还要 `DP Attention=8` 且每个副本内部都是 `TP/DCP=8`，则在不考虑 PP 时需要 64 个 ranks；`EP=8` 如何分组还需由具体框架拓扑决定。
+
 ## 和相邻概念的关系
 
 - 与 [[Tensor Parallelism]]：TP 主要切权重/hidden/head 相关维度；DCP 主要切 decode 阶段的历史 context/KV token 维度。实际部署中常先增大 TP 到性能满意，再加 DCP 减少 KV 重复。

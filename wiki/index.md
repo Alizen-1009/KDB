@@ -32,9 +32,9 @@
 - 原始图片：19
 - 原始代码：1
 - 来源文件：48
-- 实体文件：30
+- 实体文件：31
 - 概念文件：97
-- 报告文件：5
+- 报告文件：13
 - 面试文件：11
 - 卡片文件：0
 - 幻灯片文件：0
@@ -190,10 +190,11 @@
 - [[../wiki/entities/TileRT|TileRT]]
 - [[../wiki/entities/vLLM|vLLM]]
 
-### 模型（3）
+### 模型（4）
 
 - [[../wiki/entities/DeepSeek V4|DeepSeek V4]]
 - [[../wiki/entities/Gemma 4|Gemma 4]]
+- [[../wiki/entities/Kimi K3|Kimi K3]]
 - [[../wiki/entities/Qwen VL|Qwen VL]]
 
 ### 公司（4）
@@ -308,10 +309,18 @@
 
 ## 报告
 
+- [[../output/reports/DCP是什么|DCP是什么]]
+- [[../output/reports/DeepSpeed Ulysses适用场景与DeepSeek关系|DeepSpeed Ulysses适用场景与DeepSeek关系]]
 - [[../output/reports/FlashKDA优化方法与GDN迁移指南|FlashKDA优化方法与GDN迁移指南]]
 - [[../output/reports/Gemma 开源代码结构导读|Gemma 开源代码结构导读]]
+- [[../output/reports/Kimi K3为何采用TP8部署|Kimi K3为何采用TP8部署]]
+- [[../output/reports/Kimi K3权重构成与TP8切分|Kimi K3权重构成与TP8切分]]
+- [[../output/reports/MLA模型常见部署拓扑|MLA模型常见部署拓扑]]
 - [[../output/reports/MoE通信-计算重叠与MegaKernel技术谱系|MoE通信-计算重叠与MegaKernel技术谱系]]
+- [[../output/reports/PCP是什么|PCP是什么]]
 - [[../output/reports/Prefill Attention 的 CUDA 并行映射|Prefill Attention 的 CUDA 并行映射]]
+- [[../output/reports/Triton在Ascend上的支持|Triton在Ascend上的支持]]
+- [[../output/reports/Triton跨芯片支持|Triton跨芯片支持]]
 - [[../output/reports/vLLM CUDA Graph Piecewise 与 Full Decode Only|vLLM CUDA Graph Piecewise 与 Full Decode Only]]
 
 ## 面试备考

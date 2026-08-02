@@ -32,7 +32,8 @@ Wide EP group（experts 分布）
 - 请求被分配到某个 Attention DP rank，该 rank 维护请求生命周期和 KV Cache。
 - 到 MoE 层时，Router 选择逻辑 experts，token activation 被 dispatch 到 expert 所在 EP rank。
 - Expert 计算完成后 combine 回 token 原属的 Attention rank，继续后续层。
-- vLLM 可选 DeepEP、Perplexity kernels 或 NCCL-based AllGather-ReduceScatter 等 All-to-All backend。
+- vLLM 可选 DeepEP、FlashInfer 或 NCCL-based AllGather-ReduceScatter 等 All-to-All backend。
+- vLLM 官方单机示例用 `TP=1, DP=8, EP=8` 部署 DeepSeek-V3：Attention 权重在8个 DP ranks 间复制，expert 权重跨8卡分片。若 `TP>1`，Attention 在每个 DP engine 内走 TP，而 EP size 自动为 `TP×DP`；例如 `TP2/DP4` 仍形成 EP8。
 
 ## 配套优化
 

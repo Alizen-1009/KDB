@@ -26,7 +26,8 @@ updated: 2026-07-26
 
 - DCP 的稳定数学机制是：各 rank 用本地 KV shard 计算 `local_out/local_lse`，再以全局 log-sum-exp 重新缩放并合并输出；不应笼统理解为把完整 KV AllGather 到每张卡。
 - 原文对 DCP group/world size 存在冲突：既称复用 TP group、不增加 GPU，又给出 `TP × DCP` 增加 world size 的例子。本知识库保留现有 vLLM 来源的“复用 TP group”口径，并把 topology/参数约束标为版本相关。
-- Ulysses 交换的不只是 Q head，而是 Q/K/V 一起从 sequence-sharded layout 重排到 head-sharded layout。它受可切分 head/KV-head 数限制；Ring Attention 对 head 数依赖较小，但通信轮数随 CP degree 增长。
+- 原文把 Ulysses 列为 PCP 方案；算法层面它会对 Q/K/V 一起从 sequence-sharded layout 重排到 head-sharded layout，受可切分 head/KV-head 数限制。但 vLLM 官方 `main` commit `1ad5182` 的 PCP 文档与源码未采用/提及 Ulysses，当前 MRV2 MLA PCP 可见的是 partial-Q/full-KV AllGather 路径；因此“Ulysses 是 vLLM PCP backend”属于已被官方源码否定的二手来源外推。
+- Ring Attention 对 head 数依赖较小，但通信轮数随 CP degree 增长；vLLM 官方文档将它列为 partial-Q/partial-KV 的超长输入方向，同时仍注明 PCP 路线处于 active development。
 - 原文的 GPU 利用率、算术强度、单卡上下文极限、PCP 上线版本与 CLI 参数缺少稳定边界，不作为确定事实。
 
 ## 关键概念

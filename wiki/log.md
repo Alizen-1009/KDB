@@ -1165,3 +1165,162 @@
 - 依据原始资料：`raw/papers/k3_tech_report.pdf`
 - 未更新概念页；Kimi K3 原始资料尚未正式 ingest
 - 待核实：GDN 轻量两阶段、fused persistent 变体及动态派发阈值需要实际 benchmark
+
+## [2026-07-30] query | DCP 是什么
+
+- 读取概念页：`Decode Context Parallel`、`Tensor Parallelism`、`DP Attention`
+- 创建报告：`output/reports/DCP是什么.md`
+- 本次 query 复用既有结论：DCP 将同一请求的历史 KV Cache 沿 context/token 维分布到多个 rank，本地计算 partial attention 后通过 LSE 缩放合并精确输出；它补充 TP 在小 KV-head、长上下文 decode 场景下的 KV Cache 重复问题。
+- 待核实：具体 backend 支持、参数约束与 collective 数据流应绑定 vLLM 版本。
+
+## [2026-07-30] query | DCP 是否需要 DP 以及 rank 拓扑
+
+- 读取并更新概念页：`wiki/concepts/Decode Context Parallel.md`
+- 更新报告：`output/reports/DCP是什么.md`
+- 本次 query 澄清：DCP 不依赖 DP；vLLM 中 DCP 复用 TP group，不把 DCP size 再乘到物理卡数。粗略卡数为 DP×PP×TP，DCP=4 仅表示每个 DCP group 有 4 个 local ranks。
+- 待核实：global rank 到 head×context 二维坐标的具体映射顺序依赖 vLLM 版本与 process-group 实现。
+
+## [2026-07-30] query | 单 KV head 的 DP8 TP1 EP8 部署中 DCP 如何组织
+
+- 读取概念页：`Decode Context Parallel`、`DP Attention`、`Wide Expert Parallelism`、`Expert Parallelism`
+- 更新概念页：`wiki/concepts/Decode Context Parallel.md`
+- 更新报告：`output/reports/DCP是什么.md`
+- 本次 query 澄清：DP Attention=8、TP=1、EP=8 时，8 个 attention ranks 分别承载不同请求并各自保存完整单-head/latent KV；由于 TP group 只有一个成员，DCP 只能为 1。固定 8 卡若概念上改为 DPA=2、TP=4、DCP=4、EP=8，则是用请求级并行宽度换单请求 context 四路分片。
+- 待核实：DPA=2、TP=4、DCP=4、EP=8 的组合支持和具体 process-group 映射依赖 vLLM 版本、模型与 backend。
+
+## [2026-07-30] query | 8 heads、TP8、DCP4 时每个 rank 的 head 布局
+
+- 读取并更新概念页：`wiki/concepts/Decode Context Parallel.md`
+- 更新报告：`output/reports/DCP是什么.md`
+- 本次 query 澄清：若是 8 个 KV heads，TP8 无 DCP 时每 rank 保存 1 head×完整 context；按 TP8/DCP4 的二维公式，每 rank 为 4 heads×1/4 context，并非 4 个完整 heads，KV 元素量不变。由于纯 TP 已无 KV 复制，vLLM 中该 DCP 配置通常无效或无意义。
+- 注意：必须区分 Q heads 与 KV heads；DCP 价值和约束主要由 num_kv_heads 决定。
+
+## [2026-07-30] query | 单 KV head 下 TP8 DCP8 EP8 是否复制
+
+- 读取并更新概念页：`wiki/concepts/Decode Context Parallel.md`
+- 更新报告：`output/reports/DCP是什么.md`
+- 本次 query 澄清：1 KV head、TP8、DCP8 时，每 rank 的局部张量虽然仍含同一个逻辑 KV head，但只保存该 head 的 1/8 context，历史 KV 并未完整复制；纯 TP8、DCP1 才可能让完整单-head KV 在 8 ranks 间复制。
+- 拓扑说明：同一批 8 ranks 可同时组成 TP8、DCP8、EP8，size 不相乘；若总共 8 卡则 Attention DP 通常为 1。
+- 待核实：具体模型/backend 对 TP+DCP+EP 组合的支持与通信路径依赖 vLLM 版本。
+
+## [2026-07-30] query | DCP 与 DP Attention 的切分维度类比
+
+- 读取并复用概念页：`Decode Context Parallel`、`DP Attention`
+- 本次 query 澄清：DPA 和 DCP 都可缓解 KV heads 少于 TP size 时的 KV 复制，但 DPA 沿 request/batch 维分流，每个 replica 持有完整请求 context；DCP 在同一 TP group 内把一个请求沿 context/token 维分片，并把有效 head 并行度改为 TP/DCP。
+- 示例：8 卡上 DPA8/TP1/DCP1 是 8 路请求副本；DPA1/TP8/DCP8 是一个请求的 8 路 context 分片；DPA2/TP4/DCP4 是两组请求、每组四路 context 分片。
+
+## [2026-07-30] query | PCP 是什么以及 rank 如何组织
+
+- 读取概念页：`Prefill Context Parallel`、`Ring Attention`、`DeepSpeed Ulysses`、`Decode Context Parallel`
+- 创建报告：`output/reports/PCP是什么.md`
+- 本次 query 复用既有结论：PCP 在 Prefill 阶段把一个长 Prompt 的 Q/K/V token 沿 sequence 分给多个 ranks；Ring 路线固定本地 Q 并轮转 KV，Ulysses 路线通过 All-to-All 在 sequence shard 与 head shard 间转置。
+- 对比结论：DPA 切请求，PCP 切 Prefill Prompt token，DCP 切 Decode 历史 KV token。
+- 待核实：vLLM PCP 的合并状态、正式参数、group topology、backend 以及 PCP+DCP 联合约束。
+
+## [2026-07-30] query | TP8 CP4 下 CP group 与 head 分配
+
+- 读取并复用概念页：`Decode Context Parallel`、`Prefill Context Parallel`、`DeepSpeed Ulysses`、`Ring Attention`
+- 本次 query 澄清：若 CP 指 vLLM DCP，TP8/DCP4 形成 2 个 head shards × 4 个 context shards；每个四-rank DCP group 负责一半 KV heads，每个 rank拥有相同 head IDs 但只保存这些 heads 的 1/4 context，只有整个 group 合起来才拥有这半数 heads 的完整 context。
+- 边界：该说法不能直接泛化到 PCP；Ring 和 Ulysses 的 rank/head 布局不同，且应按 KV heads 而非笼统 attention heads 判断。
+
+## [2026-07-30] query | TP8 PCP4 是否形成两组各一半 heads
+
+- 读取并更新概念页：`wiki/concepts/Prefill Context Parallel.md`
+- 更新报告：`output/reports/PCP是什么.md`
+- 本次 query 澄清：TP8/PCP4 可以在复用同一批 8 ranks 的 Ring-style 二维 mesh 中形成 2 个 head shards×4 个 sequence shards，每个 PCP group 负责一半 heads；但若 TP 与 PCP 正交，则需要 32 ranks，每个 PCP group只对应 H/8 head shard。
+- 即使二维布局相同，PCP 与 DCP 数据流仍不同：PCP 的 Q 也按 sequence 分片并需获取完整因果 KV；DCP 是短 Q 对本地历史 KV 算 partial attention 后合并。
+- 待核实：vLLM PCP 的 world size、TP rank 复用方式和正式 group construction 在当前二手来源中存在冲突，需绑定版本/RFC。
+
+## [2026-07-30] query | 核对 vLLM 官方 PCP 拓扑定义
+
+- 核对官方仓库：vLLM `main` commit `1ad5182ba95a6f1de23b537d57b860082912b28e`（2026-07-29）
+- 核对官方文档：`docs/serving/context_parallel_deployment.md`、`vllm/config/parallel.py`、`vllm/distributed/parallel_state.py`、`vllm/v1/worker/gpu/pcp_manager.py`
+- 更新概念页：`wiki/concepts/Prefill Context Parallel.md`，以官方源码纠正此前未决拓扑
+- 更新实体页：`wiki/entities/vLLM.md`
+- 更新报告：`output/reports/PCP是什么.md`
+- 官方结论：PCP 与 TP 正交并扩张 world size；world_size=PP×TP×PCP，rank layout 为 DP×PP×PCP×TP。TP8/PCP4/PP1/DP1 需要32 ranks，形成4个TP8 groups与8个PCP4 groups，不是8卡内2×4折叠。
+- 实现边界：当前 MRV2 PCP 只支持 MLA；PCP 暂不支持 DP>1；PCP 开启后 DCP 只能取1、PCP或TP×PCP；官方部署文档仍标记 PCP 策略处于 active development。
+- 纠正此前 query：`TP8/PCP4 可以复用8 ranks形成2×4`只是抽象算法上的可能布局，不是当前 vLLM 官方实现。
+
+## [2026-07-30] query | vLLM PCP 是否使用 Ulysses
+
+- 核对官方 `main@1ad5182`：`docs/serving/context_parallel_deployment.md`、`vllm/model_executor/layers/attention/pcp.py`、`vllm/v1/worker/gpu/pcp_manager.py`
+- 更新概念页：`Prefill Context Parallel`、`DeepSpeed Ulysses`
+- 更新来源页：`vllm PCP 与 DCP 深度解析`，标注二手来源把 Ulysses 外推为 vLLM PCP 的冲突
+- 更新实体页：`vLLM`；更新报告：`output/reports/PCP是什么.md`
+- 官方结论：vLLM PCP 文档只列 partial-Q/full-KV AllGather 与 partial-Q/partial-KV Ring 两条路线，没有提到 Ulysses；当前 MRV2 MLA PCP 源码可见的是 AllGather partitioned prefill latent-KV/cache inputs，Ring 仍是 active-development 方向。
+- 解释：Ulysses 依赖 Q/K/V sequence-to-head All-to-All 和可切 head/KV-head 数；当前 vLLM PCP 只支持 MLA，KV-head 很少，因此 Ring/AllGather 比 Ulysses 更自然。
+
+## [2026-07-30] query | MLA 模型常见部署方式
+
+- 核对官方文档：vLLM Data Parallel Deployment、Expert Parallel Deployment、Context Parallel Deployment、DBO design
+- 读取概念页：`MLA`、`DP Attention`、`Wide Expert Parallelism`、`Decode Context Parallel`、`Prefill Context Parallel`
+- 创建报告：`output/reports/MLA模型常见部署拓扑.md`
+- 更新概念页：`wiki/concepts/MLA.md`、`wiki/concepts/Wide Expert Parallelism.md`
+- 官方常见路线：MLA+MoE 高并发 serving 使用 Attention DP + Wide EP；vLLM 8卡示例为 TP1/DP8/EP8。若权重或时延需要 TP，可用 DP×TP 并让 EP size=DP×TP；若单-head latent KV 在 TP 内重复，再加入不扩卡的 DCP。
+- 8卡权衡示例：DP8/TP1/DCP1、DP4/TP2/DCP2、DP2/TP4/DCP4、DP1/TP8/DCP8，分别从多请求吞吐过渡到单请求长 context 容量优先。
+- PCP 不是当前常规默认部署：main@1ad5182 只支持 MLA、扩张 world size、暂不支持 DP>1，适合超长 Prefill TTFT 专项评估。
+- 待核实：混合 DP/TP/DCP/EP 配置的模型/backend/量化支持必须在目标 vLLM release 上启动与压测。
+
+## [2026-07-30] query | DeepSpeed Ulysses 适用场景及与 DeepSeek MLA 的关系
+
+- 核对官方仓库：DeepSpeed `master@5cc06170ff89812a29b25193f0a418f1a18226f0`
+- 核对官方资料：DeepSpeed Ulysses 长序列训练教程、HF/ALST 教程、`ulysses_sp.py` 当前实现
+- 创建报告：`output/reports/DeepSpeed Ulysses适用场景与DeepSeek关系.md`
+- 更新概念页：`DeepSpeed Ulysses`、`Prefill Context Parallel`
+- 名称纠正：DeepSpeed Ulysses 来自 Microsoft DeepSpeed 团队，不是 DeepSeek 提出的技术；它主要服务极长序列训练/SFT，而非 Decode serving。
+- 适用边界：Q heads 必须能被 SP size 整除；当前 HF 实现允许 Hkv 与 SP 互相整除，SP>Hkv 时复制 KV heads，因此 GQA/MQA 可运行但 KV 侧收益下降。
+- Ring 更适合少 KV-head/极长 context：不依赖 head 维可切分并保持 partial KV；Ulysses 更适合 head 足够、All-to-All 强、希望复用本地 FlashAttention 的训练。
+- 待核实：DeepSeek 具体训练版本是否采用 Ulysses/hybrid CP，不能由 MLA 结构反推。
+
+## [2026-07-30] query | Triton 能否运行在其它芯片
+
+- 核对官方仓库：Triton `main@07a1b120fc47bddb859c641772b2ae0ca0ae5fae`
+- 核对官方源码：`setup.py`、`python/triton/backends/compiler.py`、`python/triton/backends/__init__.py`、NVIDIA/AMD tutorial/backend tree
+- 创建报告：`output/reports/Triton跨芯片支持.md`
+- 更新概念页：`wiki/concepts/Triton.md`
+- 官方结论：上游 Triton 当前内置 NVIDIA CUDA 与 AMD HIP/ROCm backends；backend API 和 Python entry points 支持 out-of-tree/downstream plugins，因此其它芯片可由厂商/社区适配，但不属于自动或同等成熟的上游支持。
+- 可移植性边界：通用 tl.load/store/reduce/dot kernel较易迁移，但 tile、num_warps、num_stages、dtype、atomic 与 vendor-specific TMA/WGMMA/MFMA/PTX 路径需要分别调优或重写。
+- CPU interpreter 仅用于调试/正确性验证，不应视为生产高性能 CPU backend。
+
+## [2026-07-30] query | Ascend 芯片能否运行 Triton
+
+- 核对官方项目：`triton-lang/triton-ascend@70635d0de7e80021a64c70b5e0e29cbc8b44173f`
+- 核对官方资料：Triton-Ascend README、安装指南、GPU-to-Ascend migration guide
+- 创建报告：`output/reports/Triton在Ascend上的支持.md`
+- 更新概念页：`wiki/concepts/Triton.md`
+- 官方结论：Ascend 可通过独立 Triton-Ascend 发行版运行 Triton 风格 kernel；当前正式版3.2.1，支持 Atlas A2/A3/950，依赖匹配的 CANN、TorchNPU 与 Python。
+- 迁移边界：host 侧需从 CUDA 切换到 torch_npu/NPU；kernel 需按 AI Core/Vector Core、UB、32/512-byte 对齐、coreDim、tl.dot tile 与 dtype 重新验证和调优。
+- 项目已适配部分 vLLM/SGLang 关键 Triton operators，但不表示任意 kernel 或完整框架可以无修改迁移。
+
+## [2026-07-30] query | Kimi K3 为什么采用 TP8 部署
+
+- 读取官方原始资料：`raw/papers/k3_tech_report.pdf`、MoonshotAI/Kimi-K3 README
+- 核对官方 vLLM：`vllm-project/recipes@72626067` Kimi-K3 recipe、`vllm@1ad5182` K3 model/kernels
+- 创建实体页：`wiki/entities/Kimi K3.md`
+- 创建报告：`output/reports/Kimi K3为何采用TP8部署.md`
+- 更新页面：`wiki/entities/Moonshot AI.md`、`wiki/concepts/LatentMoE.md`
+- 核心结论：TP8 主要由2.8T总权重、104.2B active compute、8-GPU互联域，以及Block AttnRes/LatentMoE围绕TP collective的专用kernel共同驱动，不是因为head数本身。
+- Shape依据：96 heads/8=12，hidden 7168/8=896，latent 3584/8=448，expert hidden 3072/8=384；vLLM SM100 latent-MoE tail fusion当前只支持TP8/TP16。
+- 部署边界：TP8不是唯一拓扑；vLLM recipe还支持TP+EP、DP+EP、TP×DP和PD分离，并在PD示例中Prefill用TP8、Decode用TP1 DEP。
+- 待核实：recipe的约1.68TB是checkpoint发布前估算；最终显存与最优拓扑需按权重、硬件、batch/context和SLO实测。当前vLLM K3 MLA不支持DCP/PCP，不能直接套TP8+DCP8。
+
+## [2026-07-30] query | Kimi K3 是 MLA 为什么仍使用 TP8
+
+- 读取官方规格：Kimi K3 是69层KDA+24层Gated MLA的混合模型，共96个attention heads，并非纯MLA/单head模型
+- 更新实体页：`wiki/entities/Kimi K3.md`
+- 更新报告：`output/reports/Kimi K3为何采用TP8部署.md`
+- 本次 query 澄清：单head指Gated MLA的共享latent KV cache视角，不是Q head或全模型并行维；TP8仍分摊96个Q heads、69层KDA head states、dense/projection/LatentMoE权重与104B级active compute。
+- 代价确认：当前vLLM K3的24层Gated MLA latent KV在纯TP8下会复制8份，且K3 MLA backend明确不支持DCP/PCP；这是真实局部浪费，但不是整个模型都复制。
+- 修复PDF链接格式并重新通过lint。
+
+## [2026-07-30] query | Kimi K3 权重构成以及 MoE/Attention 占比
+
+- 读取官方资料：Kimi K3 Technical Report、MoonshotAI/Kimi-K3 README、vLLM K3 model/MLA实现与官方recipe
+- 创建报告：`output/reports/Kimi K3权重构成与TP8切分.md`
+- 更新实体页：`wiki/entities/Kimi K3.md`
+- 结构估算：单routed expert约3×3584×3072=33.03M；896 experts×92 MoE layers约2.723T，占2.78T约97.9%。含shared experts、latent投影和router后，MoE相关约2.740T/98.6%。
+- 边界：剩余约39.8B/1.4%包含Attention、embedding/LM head、vision encoder、dense首层和norm，不能全部当作Attention精确值。
+- active账本：Top16 routed experts约48.6B；含shared/latent projection/router后MoE active path约66.1B/63.4%，其余Attention+dense模块约38.1B/36.6%。
+- TP8切分：KDA/Q heads为12/rank；纯TP下每rank持有全部896逻辑experts的1/8 tensor shard，TP+EP下约112 experts/rank并用All-to-All。Router、部分low-rank projection和当前Gated MLA latent KV仍复制。
+- 待核实：参数拆分为公开维度推导而非最终checkpoint逐tensor统计；具体weight layout依赖pure TP、EP、MegaMoE和专用fusion backend。

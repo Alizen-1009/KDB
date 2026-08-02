@@ -59,9 +59,19 @@ updated: 2026-06-12
 - [[Decode Context Parallel]] 也是系统并行策略；`vllm并行策略之DCP` 将 MLA decode 视为 DCP 的典型适用场景之一，因为 MLA decode 可呈现接近 MQA 的单 KV head 形态，纯 TP 容易复制 KV cache。
 - 这些策略经常在 DeepSeek/MLA serving 中配合出现，但作用层级不同。
 
+## 常见 serving 拓扑
+
+对 DeepSeek 这类 `MLA + MoE` 模型，vLLM 官方单机示例采用 `TP=1, DP=8, EP=8`：Attention 用8个 DP replicas 分别承载请求和独立 latent KV Cache，experts 跨8 ranks 分片。这是高并发吞吐优先的 [[Wide Expert Parallelism]] 路线。
+
+若 dense/attention 权重单卡放不下，可改为 `DP×TP` 混合拓扑，例如固定8卡的 `DP=4, TP=2, EP=8`；Attention 在每个 DP engine 内走 TP2，experts 仍跨 `DP×TP=8` ranks 做 EP。若 MLA 单 KV head 在 TP ranks 间产生 cache 重复，可在支持的 backend 上加入 `DCP=TP`，例如 `DP4/TP2/DCP2/EP8`。
+
+长上下文单请求容量优先时，可进一步减少 DP、增大 TP/DCP；vLLM 官方以 DeepSeek-R1 的 `TP8+DCP8` 为消除8路 MLA KV duplication 的案例。固定8卡可形成从 `DP8/TP1/DCP1` 到 `DP1/TP8/DCP8` 的连续权衡：前者偏请求吞吐，后者偏单请求 KV context 分片。
+
+官方依据：[Data Parallel Deployment](https://docs.vllm.ai/en/latest/serving/data_parallel_deployment/)、[Expert Parallel Deployment](https://docs.vllm.ai/en/latest/serving/expert_parallel_deployment/)、[Context Parallel Deployment](https://docs.vllm.ai/en/latest/serving/context_parallel_deployment/)。
+
 ## 与 PCP/DCP 的边界
 
-MLA 压缩历史 KV 后，纯 TP 沿 KV-head 维的切分空间更有限，因此 [[Decode Context Parallel]] 可沿 token/context 维减少重复 cache。对 Prefill，[[Prefill Context Parallel]] 切的是长 Prompt 的 sequence computation；是否采用 Ring/Ulysses 以及 latent layout 如何重排，取决于具体 backend，不能用传统 MHA head-shard 公式直接推断。
+MLA 压缩历史 KV 后，纯 TP 沿 KV-head 维的切分空间更有限，因此 [[Decode Context Parallel]] 可沿 token/context 维减少重复 cache。对 Prefill，[[Prefill Context Parallel]] 切的是长 Prompt 的 sequence computation。vLLM `main@1ad5182` 当前 PCP 是 MLA-only 的 partial-Q/full-KV AllGather 路径，Ring Attention 仍是 active-development 方向，未实现 Ulysses；不能用传统 MHA head-shard 公式直接推断 latent layout。
 
 ## 关键权衡
 
