@@ -6,7 +6,41 @@
 
 ---
 
-## 1. 未优化时有哪些投影
+## 1. 技术报告与vLLM源码分别明确了什么
+
+### Kimi K3 Technical Report
+
+技术报告§5.4.2明确描述的Decode融合范围是：
+
+```text
+Short Convolution
+Input Normalization
+Gating
+KDA Recurrence
+Output Normalization
+```
+
+它还明确说投机验证只缓存比State小得多的`projected inputs`，再在片上Replay accepted tokens。这反而说明Input Projection通常先在融合Recurrent Loop外完成，Replay缓存的是Projection结果。
+
+报告没有把`Q/K/V/G/F_A/Beta合成一个Merged GEMM`作为独立算法贡献详细展开，也没有明确声称从`hidden_states`开始的Input Linear已经与KDA Decode Core放进同一个Kernel。技术报告中明确的Projection Fusion主要出现在Stable LatentMoE，而不是KDA Decode段落。
+
+### 开源vLLM
+
+当前检查的vLLM源码明确实现了两层优化：
+
+```text
+1. Merged Input Projection：
+   Q/K/V/G/F_A/Beta由一次Column-Parallel GEMM产生
+
+2. Fused Decode Core：
+   Packed QKV Conv + KDA + Output Gate + RMSNorm
+```
+
+两者之间仍有独立的Decay第二级Projection，最后仍有独立`o_proj`。因此“开源vLLM有KDA投影优化”是成立的，但应叫**Merged Projection + Fused Recurrent Core**，而不是“整层Projection与KDA全部融合成一个Kernel”。
+
+vLLM官方Preview博客使用了“fused KDA projections and convolution”等概括性表述；具体到当前源码，最好以上述Kernel边界为准，并保留Release Branch版本差异。
+
+## 2. 未优化时有哪些投影
 
 KDA从hidden state生成：
 
@@ -34,7 +68,7 @@ x -> f_a -> g_decay
 
 ---
 
-## 2. Merged Input Projection
+## 3. Merged Input Projection
 
 当前vLLM K3源码使用一个Merged Column-Parallel Linear：
 
@@ -80,7 +114,7 @@ g_decay = f_b_proj(f_a)
 
 ---
 
-## 3. K3 TP8下的具体Shape
+## 4. K3 TP8下的具体Shape
 
 公开配置：
 
@@ -119,7 +153,7 @@ Beta:      12   # 每个local head一个
 
 ---
 
-## 4. 为什么一次大GEMM通常优于多个小GEMM
+## 5. 为什么一次大GEMM通常优于多个小GEMM
 
 ### 4.1 少读Hidden State
 
@@ -150,7 +184,7 @@ KDA有69层。每层减少几个Projection Launch后，Prefill和TPOT的累计�
 
 ---
 
-## 5. Packed Q/K/V Layout
+## 6. Packed Q/K/V Layout
 
 Merged Projection的前三段不立即拆成三个独立Tensor，而是先保持：
 
@@ -179,7 +213,7 @@ One packed parameter and cache
 
 ---
 
-## 6. Decode真正融合了什么
+## 7. Decode真正融合了什么
 
 支持Shape和GPU架构时，Decode调用大致为：
 
@@ -224,7 +258,7 @@ Output Projection                 # 单独
 
 ---
 
-## 7. 为什么Decode特别需要这种融合
+## 8. 为什么Decode特别需要这种融合
 
 Decode通常每请求只有一个新Token：
 
@@ -253,7 +287,7 @@ K3有69层KDA，一层多几微小Kernel会在一个Token的完整Forward中重�
 
 ---
 
-## 8. Prefill的融合边界不同
+## 9. Prefill的融合边界不同
 
 Prefill有大量tokens，核心使用FlashKDA或Triton Chunk KDA。
 
@@ -286,7 +320,7 @@ Prefill的Q/K/V Conv仍可见三个逻辑调用，因为FlashKDA希望获得dens
 
 ---
 
-## 9. 权重为什么维护两种Conv Layout
+## 10. 权重为什么维护两种Conv Layout
 
 Prefill/fallback路径与Fully Fused Decode对Conv权重Layout的需求不同。
 
@@ -308,7 +342,7 @@ Prefill/fallback路径与Fully Fused Decode对Conv权重Layout的需求不同。
 
 ---
 
-## 10. 哪些中间Tensor仍然存在
+## 11. 哪些中间Tensor仍然存在
 
 Projection Fusion并不意味着所有中间结果消失：
 
@@ -329,7 +363,7 @@ core output仍要进入o_proj
 
 ---
 
-## 11. 与MLA Gate Projection并行的区别
+## 12. 与MLA Gate Projection并行的区别
 
 两者不要混淆：
 
@@ -345,7 +379,7 @@ KDA的Q/K/V是递推核心输入，不能简单与KDA Core完全并行；只有�
 
 ---
 
-## 12. 最小伪代码
+## 13. 最小伪代码
 
 ```python
 def kda_layer_decode(x, state):
@@ -373,7 +407,7 @@ def kda_layer_decode(x, state):
 
 ---
 
-## 13. 一句话总结
+## 14. 一句话总结
 
 > KDA投影融合的核心不是消灭Projection，而是把共享同一输入`x`的Q/K/V、Full-rank Output Gate、Decay低秩入口和Beta合成一次宽GEMM；Q/K/V保持Packed Layout进入单次Conv更新；Decode再把ShortConv、Normalization、Gate、KDA State读写和Output Norm融合。这样减少重复读取`x`、Kernel Launch、中间HBM流量和动态Layout转换。Prefill因FlashKDA需要dense Q/K/V，融合边界与Decode不同，必须按具体commit区分。
 

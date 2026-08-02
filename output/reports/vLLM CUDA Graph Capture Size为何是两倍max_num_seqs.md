@@ -278,7 +278,42 @@ max_cudagraph_capture_size = min(512,384) = 384
 
 ---
 
-## 8. 最简答案
+## 8. 混入长Prefill时会怎样
+
+如果当前Step的总新Token数超过：
+
+```text
+max_cudagraph_capture_size
+```
+
+Dispatcher会为本次Forward返回`CUDAGraphMode.NONE`，因此不进行CUDA Graph Replay；但`torch.compile`生成的Kernel/Fusion仍可能继续使用，不等于整个执行回到未编译Eager。
+
+模式也很重要：
+
+```text
+FULL_DECODE_ONLY：
+只要是Prefill或Mixed Batch，无论Token数多小都不使用CUDA Graph
+
+PIECEWISE / FULL_AND_PIECEWISE：
+Mixed/Prefill在num_tokens不超过Capture上限且Backend支持时，可使用Piecewise Graph
+超过上限则本次不用Graph
+```
+
+“长”指当前Step实际调度的新Tokens，不是历史Context Length。一个拥有100万Token KV Context的普通Decode请求，本Step仍可能只贡献1个Query Token；一个10万Token Prompt若被Chunked Prefill切成256-token chunks，则每Step只按当前chunk计数。
+
+例如Capture上限512：
+
+```text
+256个Decode Tokens + 512-token Prefill Chunk = 768
+→ 超过512，本次不Replay Graph
+
+128个Decode Tokens + 256-token Prefill Chunk = 384
+→ 在Piecewise模式下仍可能命中Graph
+```
+
+长Prefill本身由大GEMM/Attention主导，CPU Kernel Launch占比相对小，所以大Shape不Capture往往是有意的收益/成本折中。该请求后续进入纯Decode后，仍可重新命中FULL Decode Graph。
+
+## 9. 最简答案
 
 ```text
 max_num_seqs：请求数上限

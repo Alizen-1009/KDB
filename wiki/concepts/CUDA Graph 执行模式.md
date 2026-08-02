@@ -70,6 +70,8 @@ max_capture = min(max_capture, max_num_batched_tokens)
 
 Runtime还会把实际Token数向上Padding到最近Captured Size，例如137 tokens可使用144-token Graph。Graph Shape大于实际Batch在这种情况下也属于正常设计。
 
+若当前Step的总新Token数超过`max_cudagraph_capture_size`，Dispatcher会为本次Forward回退`NONE`；后续较小Batch仍可重新使用Graph。`FULL_DECODE_ONLY`中任何Prefill/Mixed Batch都不用Graph；`PIECEWISE/FULL_AND_PIECEWISE`的Mixed Batch只有在Token数不超上限且Backend支持时才可能Replay Piecewise Graph。这里计算的是本Step Query/Prefill Tokens，不是历史Context Length；Chunked Prefill可把长Prompt拆成多个较小Step。
+
 ## 选择建议
 
 - **混合 serving、chunked prefill、动态 attention backend**：优先 `PIECEWISE`，用部分 graph coverage 换兼容性。

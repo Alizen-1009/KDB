@@ -1460,3 +1460,19 @@
 - 核心区分：max_num_seqs是请求数，CUDA Graph Size是扁平化num_tokens shape；Spec Decode、Prefill/Mixed中每请求可贡献多个tokens。
 - 额外×2是Mixed/Piecewise默认headroom启发式；Uniform FULL Decode keys仍过滤到`max_num_seqs×uniform_decode_query_len`。
 - Runtime实际token数会向上padding到最近capture size；512是控制capture时间/显存的默认cap，不是CUDA硬件限制。
+
+## [2026-08-02] query | 长 Prefill 混入 Batch 时 CUDA Graph 是否失效
+
+- 更新报告：`output/reports/vLLM CUDA Graph Capture Size为何是两倍max_num_seqs.md`
+- 更新概念：`wiki/concepts/CUDA Graph 执行模式.md`
+- 结论：当前Step的num_tokens超过max_cudagraph_capture_size时，本次Forward不Replay CUDA Graph；后续小Batch仍可重新命中。
+- 模式边界：FULL_DECODE_ONLY下任何Prefill/Mixed都不用Graph；PIECEWISE/FULL_AND_PIECEWISE在Mixed Token数不超上限且backend支持时仍可用Piecewise Graph。
+- 澄清：计数是本Step的新Query/Prefill Tokens，不是历史Context Length；Chunked Prefill可控制单Step token shape。
+
+## [2026-08-02] query | KDA Decode 投影优化来自技术报告还是开源 vLLM
+
+- 核对Kimi K3 Technical Report §5.4.2：明确融合ShortConv、Input Norm、Gating、KDA Recurrence、Output Norm，并缓存projected inputs用于Spec Replay；未明确Input Linear与Core同kernel。
+- 核对vLLM commit `1ad5182`：`in_proj_qkvgfab`合并Q/K/V/G/F_A/Beta；`f_b_proj`独立；`fused_kda_decode`融合Packed Conv+KDA+Gate+Norm；`o_proj`独立。
+- 更新报告：`output/reports/KDA投影融合优化.md`
+- 更新概念：`wiki/concepts/KDA.md`
+- 结论：技术报告明确的是Decode Recurrent Core Fusion；Merged Input Projection是开源vLLM实现层优化。官方Preview的概括性“projections and convolution”需按commit校准。

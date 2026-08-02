@@ -104,7 +104,7 @@ vLLM的K3集成进一步将Physical State Block、Scheduler Alignment与Prefix H
 
 ## 投影与Decode融合
 
-vLLM K3将共享输入`x`的Q/K/V、Full-rank Output Gate、Decay低秩入口和Beta合并为一次Merged Column-Parallel GEMM；Decay的第二级低秩Projection因依赖中间量仍单独执行。Q/K/V保持Packed Layout，使Decode可用一次Packed Conv Update，并进一步融合ShortConv、Q/K Norm、Gate、KDA Recurrence、Output Gate与RMSNorm。Input Projection和最终`o_proj`仍是独立GEMM，不能把它描述成整层单一kernel。Prefill因FlashKDA需要dense Q/K/V，融合边界与Decode不同。Shape与源码路径见 [[../../output/reports/KDA投影融合优化|KDA投影融合优化]]。
+Kimi K3技术报告§5.4.2明确的Decode融合范围是ShortConv、Input Norm、Gating、KDA Recurrence与Output Norm；它还通过缓存`projected inputs`来Replay投机接受tokens，未明确声称Input Linear与整个Decode Core同kernel。开源vLLM则进一步明确实现：共享输入`x`的Q/K/V、Full-rank Output Gate、Decay低秩入口和Beta合并为一次Merged Column-Parallel GEMM；Decay第二级Projection仍单独执行。Q/K/V保持Packed Layout，Decode融合ShortConv、Q/K Norm、Gate、KDA Recurrence、Output Gate与RMSNorm；Input Projection和最终`o_proj`仍是独立GEMM。Prefill因FlashKDA需要dense Q/K/V，融合边界与Decode不同。Shape、报告/源码证据边界见 [[../../output/reports/KDA投影融合优化|KDA投影融合优化]]。
 
 ## FlashKDA并行
 
