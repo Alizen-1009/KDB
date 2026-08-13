@@ -34,6 +34,7 @@ updated: 2026-06-12
 - 新来源 `RTP-LLM` 将 `vLLM` 作为模型加载、TTFT、推测解码和多模态吞吐的对比基线；这些对比应限定在原文给出的模型、硬件、并行配置和框架版本下。
 - 新来源 `vllm并行策略之DCP` 补充了 `vLLM` 的 decode context parallel 口径：DCP 复用 TP group，通过 `--decode-context-parallel-size` 在 decode 阶段沿 `seq_len` 维分片 KV cache，适合 `MLA/MQA/GQA` 这类 `num_kv_heads` 较小、纯 TP 容易复制 KV cache 的场景。
 - `vLLM` 的 `--enforce-eager` 与 `cudagraph_mode=NONE` 不完全等价：前者是运行在 eager mode 的总开关，会关闭 `torch.compile` 集成和 CUDA Graphs；后者只关闭 CUDA Graphs，仍可能保留 `torch.compile` / vLLM compile 的其他路径。
+- 截至官方 `main` commit `2dfb8ba`，V1 默认使用 `VLLM_COMPILE` 模式；[[../concepts/Torch Compile|Torch Compile]] 在这里不只是通用 Inductor fusion，还承担自定义 backend、编译缓存、piecewise compilation、shape specialization、custom passes 与 CUDA Graph 分区等职责。Attention 等重型路径通常作为 custom op 保留专用 kernel，因此“热点由手写 kernel 承担”不等于整个框架很少使用 compile。
 - vLLM V1 的 [[../concepts/CUDA Graph 执行模式|CUDA Graph 执行模式]] 区分 workload 与 capture 粒度：`PIECEWISE` 对各类 batch 只 capture graph-safe partitions；`FULL_DECODE_ONLY` 对 uniform decode 使用 full graph，而 prefill 与 mixed batch 不使用 CUDA Graph。
 - `Look Ma, No Bubbles!` 将 vLLM 作为 Llama-3.2-1B、batch size 1、BF16 低延迟 decode baseline，指出在该极窄场景中许多短 kernel 边界会限制可用 HBM 带宽；该结论不能直接外推到高并发 serving。
 - 新来源 `vLLM AFD Plugin` 展示了 vLLM 的外部插件扩展面：在保留调度器、KV Cache、请求生命周期和 OpenAI 兼容接口的同时，可通过 connector 把每个 MoE 切分层的 FFN 执行移到独立服务，让 Attention 与专家容量采用不同 rank 拓扑。

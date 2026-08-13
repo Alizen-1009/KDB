@@ -1476,3 +1476,19 @@
 - 更新报告：`output/reports/KDA投影融合优化.md`
 - 更新概念：`wiki/concepts/KDA.md`
 - 结论：技术报告明确的是Decode Recurrent Core Fusion；Merged Input Projection是开源vLLM实现层优化。官方Preview的概括性“projections and convolution”需按commit校准。
+
+## [2026-08-06] query | 算子融合与 Torch Compile、CUDA Graph 的关系
+
+- 读取概念页：`算子融合`、`Torch Compile`、`CUDA Graph 执行模式`、`CUDA Kernel`、`Occupancy`、`Roofline 模型`
+- 创建报告：`output/reports/算子融合与Torch Compile、CUDA Graph的分层关系.md`
+- 更新概念页：`wiki/concepts/算子融合.md`、`wiki/concepts/Torch Compile.md`，补充分层关系、组合顺序与动态形状/capture 约束
+- 本次 query 澄清：算子融合优化 kernel 内数据流与中间 HBM 往返；`torch.compile` 是可能自动产生融合的图编译入口；CUDA Graph 优化编译后 kernel 序列的提交与重放，本身不融合 kernel。三者可叠加，但应先用 profiling 区分 memory-bound、compute-bound 与 launch-bound。
+
+## [2026-08-06] query | 现代推理框架中的 Torch Compile 作用
+
+- 读取概念/实体页：`Torch Compile`、`算子融合`、`CUDA Graph 执行模式`、`vLLM`、`SGLang`、`TensorRT-LLM`
+- 核对官方实现：vLLM `2dfb8ba`、SGLang `04374ba`、TensorRT-LLM `aafc4eb` 的 `main` 源码与文档
+- 创建报告：`output/reports/现代推理框架中的Torch Compile作用.md`
+- 更新概念/实体页：`wiki/concepts/Torch Compile.md`、`wiki/entities/vLLM.md`、`wiki/entities/SGLang.md`、`wiki/entities/TensorRT-LLM.md`
+- 本次 query 澄清：成熟框架的 Attention/GEMM/MoE 热点主要依赖专用 kernel，使 stock Inductor 自动生成 kernel 的边际收益缩小；但 `torch.compile` 正被用于图捕获、custom passes、轻量融合、shape specialization、编译缓存和 Piecewise CUDA Graph。vLLM V1 默认启用，SGLang/TRT-LLM 也在特定图路径中集成，因此不能概括为“很少使用、基本没作用”。
+- 待核实：官方 `main` 不等同于所有 release；具体收益和默认路径需按生产 commit、本地模型与流量消融。

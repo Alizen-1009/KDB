@@ -25,7 +25,7 @@
 
 ## 资源统计
 
-- 原始文章：59
+- 原始文章：60
 - 原始论文：4
 - 原始仓库：0
 - 原始数据集：0
@@ -34,7 +34,7 @@
 - 来源文件：49
 - 实体文件：33
 - 概念文件：98
-- 报告文件：23
+- 报告文件：25
 - 面试文件：11
 - 卡片文件：0
 - 幻灯片文件：0
@@ -336,6 +336,8 @@
 - [[../output/reports/Triton跨芯片支持|Triton跨芯片支持]]
 - [[../output/reports/vLLM CUDA Graph Capture Size为何是两倍max_num_seqs|vLLM CUDA Graph Capture Size为何是两倍max_num_seqs]]
 - [[../output/reports/vLLM CUDA Graph Piecewise 与 Full Decode Only|vLLM CUDA Graph Piecewise 与 Full Decode Only]]
+- [[../output/reports/现代推理框架中的Torch Compile作用|现代推理框架中的Torch Compile作用]]
+- [[../output/reports/算子融合与Torch Compile、CUDA Graph的分层关系|算子融合与Torch Compile、CUDA Graph的分层关系]]
 
 ## 面试备考
 
