@@ -25,16 +25,16 @@
 
 ## 资源统计
 
-- 原始文章：60
+- 原始文章：62
 - 原始论文：4
 - 原始仓库：0
 - 原始数据集：0
 - 原始图片：19
 - 原始代码：1
-- 来源文件：49
-- 实体文件：33
-- 概念文件：98
-- 报告文件：25
+- 来源文件：50
+- 实体文件：35
+- 概念文件：100
+- 报告文件：26
 - 面试文件：11
 - 卡片文件：0
 - 幻灯片文件：0
@@ -66,14 +66,16 @@
 - [[../wiki/concepts/缓存感知路由|缓存感知路由]]
 - [[../wiki/concepts/递归状态 Prefix Caching|递归状态 Prefix Caching]]
 
-### 推理服务（11）
+### 推理服务（13）
 
 - [[../wiki/concepts/Attention-FFN 分离|Attention-FFN 分离]]
 - [[../wiki/concepts/Chunked Prefill|Chunked Prefill]]
 - [[../wiki/concepts/Constrained Decoding|Constrained Decoding]]
+- [[../wiki/concepts/Context Folding|Context Folding]]
 - [[../wiki/concepts/Continuous Batching|Continuous Batching]]
 - [[../wiki/concepts/LLM Programs|LLM Programs]]
 - [[../wiki/concepts/PD分离|PD分离]]
+- [[../wiki/concepts/Recursive Language Model|Recursive Language Model]]
 - [[../wiki/concepts/SGLang 与 vLLM 对比|SGLang 与 vLLM 对比]]
 - [[../wiki/concepts/vLLM V1 统一调度器|vLLM V1 统一调度器]]
 - [[../wiki/concepts/可插拔 Decode 引擎|可插拔 Decode 引擎]]
@@ -172,7 +174,7 @@
 
 ## 实体页面（按类型）
 
-### 项目（7）
+### 项目（8）
 
 - [[../wiki/entities/DeepEP|DeepEP]]
 - [[../wiki/entities/Engram|Engram]]
@@ -181,6 +183,7 @@
 - [[../wiki/entities/MoonEP|MoonEP]]
 - [[../wiki/entities/NCCL Extensions|NCCL Extensions]]
 - [[../wiki/entities/vLLM AFD Plugin|vLLM AFD Plugin]]
+- [[../wiki/entities/verifiers|verifiers]]
 
 ### 框架（8）
 
@@ -200,11 +203,12 @@
 - [[../wiki/entities/Kimi K3|Kimi K3]]
 - [[../wiki/entities/Qwen VL|Qwen VL]]
 
-### 公司（4）
+### 公司（5）
 
 - [[../wiki/entities/DeepSeek-AI|DeepSeek-AI]]
 - [[../wiki/entities/Google DeepMind|Google DeepMind]]
 - [[../wiki/entities/Moonshot AI|Moonshot AI]]
+- [[../wiki/entities/Prime Intellect|Prime Intellect]]
 - [[../wiki/entities/阿里巴巴|阿里巴巴]]
 
 ### 组织（2）
@@ -232,7 +236,7 @@
 
 ## 来源摘要（按类型）
 
-### 文章（30）
+### 文章（31）
 
 - [[../wiki/sources/2026 年MoE 架构正在发生一次关键变化|2026 年MoE 架构正在发生一次关键变化]]
 - [[../wiki/sources/A Preview of Production-Scale Kimi K3 Support on vLLM|A Preview of Production-Scale Kimi K3 Support on vLLM]]
@@ -250,6 +254,7 @@
 - [[../wiki/sources/Nvidia Rubin架构分析预览|Nvidia Rubin架构分析预览]]
 - [[../wiki/sources/PageAttention代码走读|PageAttention代码走读]]
 - [[../wiki/sources/RTP-LLM|RTP-LLM]]
+- [[../wiki/sources/Recursive Language Models the paradigm of 2026|Recursive Language Models the paradigm of 2026]]
 - [[../wiki/sources/SGLang的KDA管理与Prefix Cache难题|SGLang的KDA管理与Prefix Cache难题]]
 - [[../wiki/sources/SGLang：LLM推理引擎发展新方向|SGLang：LLM推理引擎发展新方向]]
 - [[../wiki/sources/vLLM AFD Plugin 发布：为 MoE 推理拆分 Attention 与 FFN，实现灵活部署|vLLM AFD Plugin 发布：为 MoE 推理拆分 Attention 与 FFN，实现灵活部署]]
@@ -332,6 +337,7 @@
 - [[../output/reports/MoonEP动态冗余Expert机制|MoonEP动态冗余Expert机制]]
 - [[../output/reports/PCP是什么|PCP是什么]]
 - [[../output/reports/Prefill Attention 的 CUDA 并行映射|Prefill Attention 的 CUDA 并行映射]]
+- [[../output/reports/Recursive Language Models 中文导读|Recursive Language Models 中文导读]]
 - [[../output/reports/Triton在Ascend上的支持|Triton在Ascend上的支持]]
 - [[../output/reports/Triton跨芯片支持|Triton跨芯片支持]]
 - [[../output/reports/vLLM CUDA Graph Capture Size为何是两倍max_num_seqs|vLLM CUDA Graph Capture Size为何是两倍max_num_seqs]]

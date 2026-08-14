@@ -1492,3 +1492,20 @@
 - 更新概念/实体页：`wiki/concepts/Torch Compile.md`、`wiki/entities/vLLM.md`、`wiki/entities/SGLang.md`、`wiki/entities/TensorRT-LLM.md`
 - 本次 query 澄清：成熟框架的 Attention/GEMM/MoE 热点主要依赖专用 kernel，使 stock Inductor 自动生成 kernel 的边际收益缩小；但 `torch.compile` 正被用于图捕获、custom passes、轻量融合、shape specialization、编译缓存和 Piecewise CUDA Graph。vLLM V1 默认启用，SGLang/TRT-LLM 也在特定图路径中集成，因此不能概括为“很少使用、基本没作用”。
 - 待核实：官方 `main` 不等同于所有 release；具体收益和默认路径需按生产 commit、本地模型与流量消融。
+
+## [2026-08-14] ingest | Recursive Language Models: the paradigm of 2026
+
+- 读取原始资料：`raw/articles/Recursive Language Models the paradigm of 2026.md`
+- 创建来源页：`wiki/sources/Recursive Language Models the paradigm of 2026.md`
+- 创建概念页：`wiki/concepts/Recursive Language Model.md`、`wiki/concepts/Context Folding.md`
+- 创建实体页：`wiki/entities/Prime Intellect.md`、`wiki/entities/verifiers.md`
+- 更新概念页：`wiki/concepts/LLM Programs.md`，补充 RLM 的程序化控制与上下文隔离
+- 更新主题地图：`wiki/maps/推理服务.md`，补充 Context Folding → RLM 阅读路径
+- 未发现与现有 wiki 的直接冲突；标题中的“2026 paradigm”、训练收益与长期 Agent 能力保留为作者判断或待验证假设
+
+## [2026-08-14] query | Recursive Language Models 中文导读
+
+- 读取来源页：`wiki/sources/Recursive Language Models the paradigm of 2026.md`
+- 读取概念页：`wiki/concepts/Recursive Language Model.md`、`wiki/concepts/Context Folding.md`、`wiki/concepts/LLM Programs.md`
+- 创建中文导读：`output/reports/Recursive Language Models 中文导读.md`
+- 区分实现事实、实验观察与作者关于 RL 训练和长期 Agent 的待验证假设

@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: 推理服务
-sources: 2
+sources: 3
 updated: 2026-05-07
 ---
 
@@ -24,6 +24,7 @@ updated: 2026-05-07
 - 输入和输出更偏结构化：例如图片路径、论文文本、JSON schema、正则表达式约束和评分字段。
 - 在 `SGLang` 中，前端 DSL 嵌入 Python，后端 runtime 可以把多调用程序映射到更高效的执行计划。
 - 和 `vLLM` 对比时，`LLM Programs` 是理解 `SGLang` 差异的关键：差异不是“是否能聊天”，而是系统是否把多调用、控制流、结构化输出等上层调用图纳入 runtime 优化。
+- [[Recursive Language Model]] 是另一类 LLM Program：主模型以 Python REPL 为控制平面，程序化检索外部数据、批量调用 fresh sub-LLM，并把局部结果汇总到可反复编辑的答案变量中。这里的 runtime 目标不只是提高单次生成速度，还包括隔离高 token 工具输出和主动管理上下文。
 
 ## 关键权衡
 
@@ -34,11 +35,14 @@ updated: 2026-05-07
 ## 相关实体
 
 - [[../entities/SGLang]]
+- [[../entities/Prime Intellect]]
+- [[../entities/verifiers]]
 
 ## 相关来源
 
 - [[../sources/SGLang：LLM推理引擎发展新方向]]
 - [[../sources/SGLang 与 vLLM 区别截图整理]]
+- [[../sources/Recursive Language Models the paradigm of 2026]]
 
 ## 相关概念
 
@@ -48,6 +52,8 @@ updated: 2026-05-07
 - [[Speculative Decoding]]
 - [[KV Cache]]
 - [[Prefix Caching]]
+- [[Recursive Language Model]]
+- [[Context Folding]]
 
 ## 研究备注
 
