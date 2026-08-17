@@ -54,6 +54,7 @@ updated: 2026-05-07
 - [[Prefix Caching]]
 - [[Recursive Language Model]]
 - [[Context Folding]]
+- [[Sandbox]]
 
 ## 研究备注
 

@@ -36,7 +36,7 @@ updated: 2026-08-14
 - 单次 REPL 输出默认限制为 8192 字符，迫使模型先过滤数据，而不是把全部输入重新打印进上下文。
 - `llm_batch()` 支持并行调用多个 fresh sub-LLM，让它们分别读取数据分片、执行研究任务或交叉检查结果。
 - Prime Intellect 的变体只把环境工具交给 sub-LLM，以隔离网页、文件等工具产生的大量 token；主 RLM 负责分解、调度与综合。
-- 沙箱可安装任意 pip 包；文中 math-python 环境预装 `numpy`、`scipy` 和 `sympy`。
+- [[Sandbox]] 可安装任意 pip 包；文中 math-python 环境预装 `numpy`、`scipy` 和 `sympy`，同时用隔离边界限制模型生成代码对宿主环境的影响。
 - 最终答案保存在可反复编辑的 `answer["content"]` 中，只有设置 `answer["ready"] = True` 才结束 rollout，因此模型可以检查并局部修订答案。
 - 当前实现的递归深度固定为 1：主 RLM 可以调用 sub-LLM，但 sub-LLM 不能继续递归调用下一层。
 
@@ -56,6 +56,7 @@ updated: 2026-08-14
 - [[Recursive Language Model]]
 - [[Context Folding]]
 - [[LLM Programs]]
+- [[Sandbox]]
 
 ## 相关实体
 

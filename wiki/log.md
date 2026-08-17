@@ -1509,3 +1509,16 @@
 - 读取概念页：`wiki/concepts/Recursive Language Model.md`、`wiki/concepts/Context Folding.md`、`wiki/concepts/LLM Programs.md`
 - 创建中文导读：`output/reports/Recursive Language Models 中文导读.md`
 - 区分实现事实、实验观察与作者关于 RL 训练和长期 Agent 的待验证假设
+
+## [2026-08-14] query | 高并发对单请求 E2E 延迟的影响
+
+- 读取概念页：`wiki/concepts/Continuous Batching.md`、`wiki/concepts/Chunked Prefill.md`、`wiki/concepts/PD分离.md`、`wiki/concepts/Benchmarking.md`
+- 复用既有结论：低负载区增大 batch 可能提高 GPU 利用率，单请求延迟未必立刻上升；接近或超过系统饱和点后，排队时间、每轮 batch 执行时间和 prefill/decode 干扰会使 E2E 增长，且 P99 通常先恶化
+
+## [2026-08-17] query | Sandbox 概念、用途与使用场景
+
+- 读取概念页：`wiki/concepts/Recursive Language Model.md`、`wiki/concepts/LLM Programs.md`
+- 读取来源页：`wiki/sources/Recursive Language Models the paradigm of 2026.md`、`wiki/sources/量化剪枝推理瓶颈Nsight与异构集群面试整理.md`
+- 创建概念页：`wiki/concepts/Sandbox.md`，补充隔离维度、实现层级、Agent 场景和安全边界
+- 更新 RLM、LLM Programs、两份来源页与推理服务主题地图的交叉引用
+- 本次 query 澄清：Sandbox 不是固定产品，也不等同于 Docker；它是按威胁模型约束文件、进程、网络、凭证、资源和生命周期的隔离执行环境

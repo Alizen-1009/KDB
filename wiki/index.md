@@ -33,7 +33,7 @@
 - 原始代码：1
 - 来源文件：50
 - 实体文件：35
-- 概念文件：100
+- 概念文件：101
 - 报告文件：26
 - 面试文件：11
 - 卡片文件：0
@@ -66,7 +66,7 @@
 - [[../wiki/concepts/缓存感知路由|缓存感知路由]]
 - [[../wiki/concepts/递归状态 Prefix Caching|递归状态 Prefix Caching]]
 
-### 推理服务（13）
+### 推理服务（14）
 
 - [[../wiki/concepts/Attention-FFN 分离|Attention-FFN 分离]]
 - [[../wiki/concepts/Chunked Prefill|Chunked Prefill]]
@@ -77,6 +77,7 @@
 - [[../wiki/concepts/PD分离|PD分离]]
 - [[../wiki/concepts/Recursive Language Model|Recursive Language Model]]
 - [[../wiki/concepts/SGLang 与 vLLM 对比|SGLang 与 vLLM 对比]]
+- [[../wiki/concepts/Sandbox|Sandbox]]
 - [[../wiki/concepts/vLLM V1 统一调度器|vLLM V1 统一调度器]]
 - [[../wiki/concepts/可插拔 Decode 引擎|可插拔 Decode 引擎]]
 - [[../wiki/concepts/持久批处理|持久批处理]]
