@@ -25,7 +25,7 @@
 
 ## 资源统计
 
-- 原始文章：62
+- 原始文章：63
 - 原始论文：4
 - 原始仓库：0
 - 原始数据集：0
@@ -33,7 +33,7 @@
 - 原始代码：1
 - 来源文件：50
 - 实体文件：35
-- 概念文件：101
+- 概念文件：102
 - 报告文件：26
 - 面试文件：11
 - 卡片文件：0
@@ -66,7 +66,7 @@
 - [[../wiki/concepts/缓存感知路由|缓存感知路由]]
 - [[../wiki/concepts/递归状态 Prefix Caching|递归状态 Prefix Caching]]
 
-### 推理服务（14）
+### 推理服务（15）
 
 - [[../wiki/concepts/Attention-FFN 分离|Attention-FFN 分离]]
 - [[../wiki/concepts/Chunked Prefill|Chunked Prefill]]
@@ -74,6 +74,7 @@
 - [[../wiki/concepts/Context Folding|Context Folding]]
 - [[../wiki/concepts/Continuous Batching|Continuous Batching]]
 - [[../wiki/concepts/LLM Programs|LLM Programs]]
+- [[../wiki/concepts/Model Context Protocol|Model Context Protocol]]
 - [[../wiki/concepts/PD分离|PD分离]]
 - [[../wiki/concepts/Recursive Language Model|Recursive Language Model]]
 - [[../wiki/concepts/SGLang 与 vLLM 对比|SGLang 与 vLLM 对比]]

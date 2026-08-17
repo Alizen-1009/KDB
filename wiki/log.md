@@ -1522,3 +1522,11 @@
 - 创建概念页：`wiki/concepts/Sandbox.md`，补充隔离维度、实现层级、Agent 场景和安全边界
 - 更新 RLM、LLM Programs、两份来源页与推理服务主题地图的交叉引用
 - 本次 query 澄清：Sandbox 不是固定产品，也不等同于 Docker；它是按威胁模型约束文件、进程、网络、凭证、资源和生命周期的隔离执行环境
+
+## [2026-08-17] query | MCP 服务是什么及主要用途
+
+- 读取现有概念页：`wiki/concepts/LLM Programs.md`、`wiki/concepts/Sandbox.md`、`wiki/concepts/Recursive Language Model.md`
+- 核对官方资料：MCP Introduction、Architecture、Server Primitives、Transports 与 Authorization 规范
+- 创建概念页：`wiki/concepts/Model Context Protocol.md`，补充全名、Host/Client/Server 架构、Tools/Resources/Prompts、传输、安全边界和使用场景
+- 更新 LLM Programs、Sandbox、RLM 与推理服务主题地图的交叉引用
+- 本次 query 澄清：MCP Server 是按 Model Context Protocol 暴露能力的程序，可本地或远程运行；MCP 标准化能力连接，但不替代 API、权限系统或 Sandbox

@@ -55,6 +55,7 @@ updated: 2026-05-07
 - [[Recursive Language Model]]
 - [[Context Folding]]
 - [[Sandbox]]
+- [[Model Context Protocol]]
 
 ## 研究备注
 

@@ -108,6 +108,7 @@ Agent 请求执行代码
 
 - [[Recursive Language Model]]
 - [[LLM Programs]]
+- [[Model Context Protocol]]
 
 ## 研究备注
 

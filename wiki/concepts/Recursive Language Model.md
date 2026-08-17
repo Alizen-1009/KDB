@@ -58,6 +58,7 @@ updated: 2026-08-14
 - [[LLM Programs]]
 - [[Ring Attention]]
 - [[Sandbox]]
+- [[Model Context Protocol]]
 
 ## 研究备注
 
