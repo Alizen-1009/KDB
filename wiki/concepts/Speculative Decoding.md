@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: 投机解码
-sources: 8
+sources: 9
 updated: 2026-07-08
 ---
 
@@ -49,6 +49,7 @@ target logits at position t+k-1 -> score y_k
 - `辅助层 / 多头预测`：在主模型尾部增加额外 heads 或模块来生成候选，如 `Medusa`、`EAGLE`、[[Multi-Token Prediction|MTP]]
 - `数据匹配预测`：利用 prompt 或历史数据中的高频模式直接猜测后续 token，如 `ngram`、`suffix decoding`
 - [[Multi-Token Prediction|MTP]]：既可以是训练辅助目标，也可以在推理时作为候选 token 生成机制；只有进入“候选生成 + target 验证”的执行路径时，才构成 speculative decoding。
+- [[并行投机解码]]：用 diffusion-style / masked-filling drafter 一次并行预测多个未来位置，减少 sequential drafter 的自回归链；[[DFlash]] 用 target hidden context 增强并行草稿，[[DSpark]] 再根据 confidence 与硬件 `SPS(B)` 自适应截断真正进入 target verification 的前缀。
 - `MTP Drafter`：Gemma 4 的具体实现案例，drafter 会利用目标模型 activation、共享 KV cache，并在 E2B/E4B 上用 clustered/sparse LM Head 降低 logits 计算
 - `RTP-LLM` 的模块化框架：把 `ProposeExecutor / ScoreExecutor / SpeculativeSampler / SpeculativeUpdater` 拆开，支持朴素 draft、Prompt Lookup、Eagle、MTP 等路线
 
@@ -58,6 +59,7 @@ target logits at position t+k-1 -> score y_k
 - 效果依赖猜测机制质量、接受率和系统实现开销
 - 如果候选经常在第一次校验就失败，总计算量可能反而高于普通 decode
 - 不同路线的代价结构差异很大：`draft model` 更吃额外模型协同，`辅助层` 更吃训练耦合，`数据匹配` 更依赖场景重复率
+- 并行 drafter 能缩短 proposal 串行链，但固定长块可能把低接受率后缀也送去验证；自适应验证长度可减少浪费，却依赖 confidence 校准、硬件性能模型和额外调度开销。
 
 ## 框架实现影响
 
@@ -69,6 +71,7 @@ target logits at position t+k-1 -> score y_k
 - RTP-LLM 来源强调 C++ 级别的模块化调用可减少 Python/C++ 边界开销；该说法需要结合具体框架版本和 profiler 结果核实
 - 对 GDN/KDA 等递归线性注意力，draft token 不仅会写临时 KV，还会推进 Conv State 与矩阵状态。Rejected token 不能留在主状态中；来源描述 SGLang 先写暂存状态，验证后按实际接受长度提交，精确实现依赖版本。
 - 在 vLLM Prefill + TileRT Decode 的跨引擎 PD 中，TileRT 要从首个 Decode step 启用 MTP，因此 Prefill 侧必须生成并传递 draft-layer KV；目标引擎还需对齐 token position、dtype、layout 和 speculative config。
+- DFlash/DSpark 来源称 vLLM 可通过 `method=dflash/dspark` 部署并行 drafter。DSpark 的 batch 级 prefix scheduler 还会让每个请求使用不同 verify length，因此 runtime 不只管理 KV 回滚，还要联合估计 acceptance benefit 与 target verify batch shape 的硬件效率；正式支持范围需绑定 vLLM commit 核实。
 
 ## 相关实体
 
@@ -88,6 +91,7 @@ target logits at position t+k-1 -> score y_k
 - [[../sources/RTP-LLM]]
 - [[../sources/SGLang的KDA管理与Prefix Cache难题]]
 - [[../sources/vLLM x TileRT Specialized Decode for Latency-Critical Serving]]
+- [[../sources/并行投机解码(DFlashDSpark)的快速理解与vLLM实测]]
 
 ## 相关概念
 
@@ -99,6 +103,9 @@ target logits at position t+k-1 -> score y_k
 - [[线性注意力递归状态]]
 - [[递归状态 Prefix Caching]]
 - [[可插拔 Decode 引擎]]
+- [[并行投机解码]]
+- [[DFlash]]
+- [[DSpark]]
 
 ## 研究备注
 
@@ -107,3 +114,4 @@ target logits at position t+k-1 -> score y_k
 - Gemma 4 的例子提醒：`drafter` 不一定是完全独立的小模型，也可以和 target model 深度耦合，复用 activation/KV cache 来换取更高接受率和更低延迟
 - SGLang 的 API speculative execution 与常规 draft-target speculative decoding 不是同一层机制；前者更偏程序解释器和黑盒 API 调用复用，失败时可能额外消耗 token，触发条件仍待官方资料核实
 - RTP-LLM 中 DeepSeek-V3/MTP、Prompt Lookup 等结果应按任务重复率、接受率、并发和框架版本拆开看；不要只用单个吞吐倍数概括 speculative decoding 的整体收益。
+- 并行投机来源提醒：只看 `num_speculative_tokens` 不足以解释收益，还应报告实际 acceptance length、proposal/verify 各自耗时、总 verify batch、并发和硬件效率曲线。正确验证路径原则上不应被解读为提高 target 模型质量；任务准确率变化应先排查数值非确定性和评测噪声。

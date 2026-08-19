@@ -2,7 +2,7 @@
 type: source
 source_kind: 文章
 topic: 投机解码
-updated:
+updated: 2026-08-17
 ---
 
 # 并行投机解码(DFlash/DSpark)的快速理解与vLLM实测

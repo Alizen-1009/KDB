@@ -2,7 +2,7 @@
 type: entity
 entity_type: 框架
 topic: 推理服务
-sources: 19
+sources: 20
 updated: 2026-06-12
 ---
 
@@ -26,6 +26,7 @@ updated: 2026-06-12
 - 新来源 `MRV2` 进一步说明，`vLLM` 的优化重点不只在 `PagedAttention`，还在于执行核心本身：包括 `persistent batching`、GPU-native input preparation、async-first scheduling 和更模块化的 `ModelState` 抽象。
 - 新增来源还补入了 `vLLM` 在可复现性上的一条工程主线：除了给采样设置 `seed`，还可以通过关闭 `V1 multiprocessing`、开启 `Batch Invariance` 等方式减少调度与 kernel 路径带来的非确定性；但这通常会带来性能回退，且支持范围有限。
 - 新来源补充了 `vLLM` 在 speculative decoding 上的使用面：它不仅支持小 draft model，也支持 `ngram / suffix / MTP / EAGLE` 等多类 speculative 配置，但不同版本和并行策略存在能力边界。
+- DFlash/DSpark 来源进一步称其测试环境中的 vLLM `0.26.0` 可通过 `--speculative-config` 的 `method=dflash/dspark` 部署 [[../concepts/并行投机解码|并行 drafter]]；其中 DSpark 还按 confidence 与硬件 `SPS(B)` 动态选择各请求 verify length。该支持矩阵、CLI 和并行限制尚未按官方源码 commit 复核。
 - 新增截图整理补足了 `vLLM v0 -> vLLM v1` 的调度架构变化：v1 以 `{request_id: num_tokens}` 形式统一 prompt/output token 的每步调度决策，更自然地支持 chunked prefill、prefix caching 和 speculative decoding；但 `token quota`、chunked prefill 默认行为和优先级调度能力都需要按具体版本核实。
 - 新来源 `SGLang：LLM推理引擎发展新方向` 把 `vLLM` 放在推理框架演化史中讨论：它因 `PagedAttention`、PyTorch 生态易用性、开源社区和多硬件支持成为现象级系统，但也可能像早期 `Caffe` 一样在新使用范式和硬件压力下继续被重构。
 - 新增截图整理校正了一个常见误解：`vLLM` 的抽象重心偏 serving engine，但这不等于它只能做单轮简单问答；它也在支持 prefix caching、structured output、speculative decoding、多模态等能力。
@@ -72,6 +73,9 @@ updated: 2026-06-12
 - [[DeepSpeed Ulysses]]
 - [[递归状态 Prefix Caching]]
 - [[KDA]]
+- [[并行投机解码]]
+- [[DFlash]]
+- [[DSpark]]
 
 ## 相关来源
 
@@ -94,6 +98,7 @@ updated: 2026-06-12
 - [[../sources/vLLM x TileRT Specialized Decode for Latency-Critical Serving]]
 - [[../sources/vllm PCP 与 DCP 深度解析]]
 - [[../sources/A Preview of Production-Scale Kimi K3 Support on vLLM]]
+- [[../sources/并行投机解码(DFlashDSpark)的快速理解与vLLM实测]]
 
 ## 冲突与备注
 
@@ -116,3 +121,4 @@ updated: 2026-06-12
 - TileRT 集成依赖 vLLM V1 公共 Connector；跨引擎 KV/sparse index/MTP 状态格式与升级兼容需绑定版本验证。
 - PCP/DCP 二手来源对 world size、`ag_rs` 数据流、PCP 上线版本和参数名存在冲突。官方 `main` commit `1ad5182` 已明确 PCP 扩张 world size、DCP 默认不扩张；但发布版本与 backend 数据流仍需绑定实际 commit。
 - K3官方博客是权重发布前Preview：Non-disaggregated Serving已工作，但FlashKDA Backend Selection、PD/Offload Prefix Cache、EP与Vendor Validation仍在进行；不能把“已集成”自动写成“所有部署路径已完成生产验证”。
+- DFlash/DSpark benchmark 启动命令使用 `vllm/vllm-openai:latest` 且未显式设置 `--tensor-parallel-size`；虽然正文称 vLLM `0.26.0` 和 8×A800 环境，实际 image digest、计算 GPU 数与 TP 拓扑仍待核实，吞吐结果不能视为框架通用基线。

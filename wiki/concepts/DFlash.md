@@ -1,8 +1,8 @@
 ---
 type: concept
 topic: 投机解码
-sources: 0
-updated:
+sources: 1
+updated: 2026-08-17
 ---
 
 # DFlash

@@ -1530,3 +1530,13 @@
 - 创建概念页：`wiki/concepts/Model Context Protocol.md`，补充全名、Host/Client/Server 架构、Tools/Resources/Prompts、传输、安全边界和使用场景
 - 更新 LLM Programs、Sandbox、RLM 与推理服务主题地图的交叉引用
 - 本次 query 澄清：MCP Server 是按 Model Context Protocol 暴露能力的程序，可本地或远程运行；MCP 标准化能力连接，但不替代 API、权限系统或 Sandbox
+
+## [2026-08-17] ingest | 并行投机解码(DFlash/DSpark)的快速理解与vLLM实测
+
+- 读取原始资料：`raw/articles/并行投机解码(DFlashDSpark)的快速理解与vLLM实测.md`
+- 创建来源页：`wiki/sources/并行投机解码(DFlashDSpark)的快速理解与vLLM实测.md`
+- 创建概念页：`wiki/concepts/并行投机解码.md`、`wiki/concepts/DFlash.md`、`wiki/concepts/DSpark.md`
+- 更新概念页：`Speculative Decoding`、`MTP Drafter`、`Benchmarking`、`确定性推理`
+- 更新实体页：`wiki/entities/vLLM.md`、`wiki/entities/kaiyuan.md`
+- 更新主题地图：`wiki/maps/投机解码.md`，补充顺序/模型内 drafter 与并行 drafter 两条阅读路线
+- 未发现与现有 wiki 的直接冲突；来源 benchmark 数字绑定 Qwen3-4B/A800/文章所称 vLLM 0.26.0，实际 GPU 数、TP 配置、image digest 与完整 workload 标为待核实

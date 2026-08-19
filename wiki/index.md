@@ -31,9 +31,9 @@
 - 原始数据集：0
 - 原始图片：19
 - 原始代码：1
-- 来源文件：50
+- 来源文件：51
 - 实体文件：35
-- 概念文件：102
+- 概念文件：105
 - 报告文件：26
 - 面试文件：11
 - 卡片文件：0
@@ -152,11 +152,14 @@
 - [[../wiki/concepts/Sparsity Allocation|Sparsity Allocation]]
 - [[../wiki/concepts/mHC|mHC]]
 
-### 投机解码（3）
+### 投机解码（6）
 
+- [[../wiki/concepts/DFlash|DFlash]]
+- [[../wiki/concepts/DSpark|DSpark]]
 - [[../wiki/concepts/MTP Drafter|MTP Drafter]]
 - [[../wiki/concepts/Multi-Token Prediction|Multi-Token Prediction]]
 - [[../wiki/concepts/Speculative Decoding|Speculative Decoding]]
+- [[../wiki/concepts/并行投机解码|并行投机解码]]
 
 ### 训练与 Scaling（6）
 
@@ -238,7 +241,7 @@
 
 ## 来源摘要（按类型）
 
-### 文章（31）
+### 文章（32）
 
 - [[../wiki/sources/2026 年MoE 架构正在发生一次关键变化|2026 年MoE 架构正在发生一次关键变化]]
 - [[../wiki/sources/A Preview of Production-Scale Kimi K3 Support on vLLM|A Preview of Production-Scale Kimi K3 Support on vLLM]]
@@ -267,6 +270,7 @@
 - [[../wiki/sources/vllm并行策略之DCP(Decode Context Parallel)|vllm并行策略之DCP(Decode Context Parallel)]]
 - [[../wiki/sources/你一定要知道：CUDA优化六要|你一定要知道：CUDA优化六要]]
 - [[../wiki/sources/十分钟读懂旋转编码（RoPE）|十分钟读懂旋转编码（RoPE）]]
+- [[../wiki/sources/并行投机解码(DFlashDSpark)的快速理解与vLLM实测|并行投机解码(DFlashDSpark)的快速理解与vLLM实测]]
 - [[../wiki/sources/彻底搞懂RoPE计算原理：从1D到3D|彻底搞懂RoPE计算原理：从1D到3D]]
 - [[../wiki/sources/推理的非确定性运算及vLLMSGLang控制方式|推理的非确定性运算及vLLMSGLang控制方式]]
 - [[../wiki/sources/还在手写CUDA内核？CODA来了！LLM和新手也能让Transformer跑出光速|还在手写CUDA内核？CODA来了！LLM和新手也能让Transformer跑出光速]]
