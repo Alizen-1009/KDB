@@ -60,6 +60,22 @@ Y[t] = sum_{i=1..K} topk_weight[t, i] * Expert_{topk_idx[t, i]}(X[t])
    - 把 `Y` reshape 回 `[B, S, D]`。
    - 在 Transformer block 中，它通常走 FFN 残差路径：`hidden = hidden + MoE(norm(hidden))`。
 
+## Fused MoE 实现术语
+
+### Populate
+
+`populate` 不是模型数学算子，而是 dispatch metadata 构建：先统计每个 expert 的 route 数并做 prefix sum/padding，再把 `(token,kth)` route 写入对应 expert 的连续物理 row。常见表 `permuted_idx_to_expanded_idx[p]=r` 表示 grouped GEMM 的物理 row `p` 应读取 route `r`，其中 `token=r/top_k`。实现可以据此物化 expert-contiguous activation，也可以让 GEMM loader 直接 gather 原始 `X`。
+
+### Preshuffle
+
+`preshuffle` 是在模型加载或量化阶段，把静态 expert 权重与 scale 从逻辑 `[E,N,K]` 预先变换为目标 kernel 的 tile/K-major、swizzle、FP4 packing、scale interleave 和 alignment 布局。它避免每次 forward 重排，但构成严格的 physical-layout contract：TensorRT、CuTe DSL 或自研 kernel 若期待不同 preshuffle，不能直接复用同一份物理 bytes。
+
+### Epilogue
+
+`epilogue` 是 GEMM mainloop 完成 MMA accumulator 后的后处理。Fused MoE C1 epilogue 可直接执行 `SiLU(gate)×up`，并按 NVFP4 scale group 求 scale、转换、pack 后生成 C2 输入；C2 epilogue则做 accumulator scale/cast、可选 routing weight、store 或 inverse-scatter。多个 expert routes 的最终加权求和也可独立放在 `finalize` kernel。
+
+完整的单卡、TP-only、EP-only 与 EP+TP 数据流见 [[../../output/reports/MoE计算流程与TP-EP实现|MoE 计算流程与 TP/EP 实现]]。
+
 ## Qwen3.5-MoE 形状口径
 
 以 `Qwen3_5MoeForConditionalGeneration` 的 MoE block 为例，文本侧 `hidden_size` 是语言模型主干每个 token 的向量宽度；decoder layer 输入输出、attention 输出、MoE 输入输出、最终 `lm_head` 输入都围绕 `[B, S, hidden_size]`。

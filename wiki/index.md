@@ -34,7 +34,7 @@
 - 来源文件：55
 - 实体文件：41
 - 概念文件：108
-- 报告文件：28
+- 报告文件：31
 - 面试文件：11
 - 卡片文件：0
 - 幻灯片文件：0
@@ -337,10 +337,12 @@
 
 ## 报告
 
+- [[../output/reports/Blackwell相对Hopper的新特性|Blackwell相对Hopper的新特性]]
 - [[../output/reports/DCP是什么|DCP是什么]]
 - [[../output/reports/DeepSpeed Ulysses适用场景与DeepSeek关系|DeepSpeed Ulysses适用场景与DeepSeek关系]]
 - [[../output/reports/FlashKDA为什么能并行|FlashKDA为什么能并行]]
 - [[../output/reports/FlashKDA优化方法与GDN迁移指南|FlashKDA优化方法与GDN迁移指南]]
+- [[../output/reports/Fused MoE NVFP4 v1-v5优化复盘|Fused MoE NVFP4 v1-v5优化复盘]]
 - [[../output/reports/GDN公式与逐步计算|GDN公式与逐步计算]]
 - [[../output/reports/Gemma 开源代码结构导读|Gemma 开源代码结构导读]]
 - [[../output/reports/Hopper架构变化与Persistent Kernel|Hopper架构变化与Persistent Kernel]]
@@ -354,6 +356,7 @@
 - [[../output/reports/Kimi K3的KDA部署与Prefix Cache|Kimi K3的KDA部署与Prefix Cache]]
 - [[../output/reports/LPT在Causal Attention中的调度优化|LPT在Causal Attention中的调度优化]]
 - [[../output/reports/MLA模型常见部署拓扑|MLA模型常见部署拓扑]]
+- [[../output/reports/MoE计算流程与TP-EP实现|MoE计算流程与TP-EP实现]]
 - [[../output/reports/MoE通信-计算重叠与MegaKernel技术谱系|MoE通信-计算重叠与MegaKernel技术谱系]]
 - [[../output/reports/MoonEP动态冗余Expert机制|MoonEP动态冗余Expert机制]]
 - [[../output/reports/PCP是什么|PCP是什么]]

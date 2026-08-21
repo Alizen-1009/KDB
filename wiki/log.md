@@ -1596,3 +1596,38 @@
 - 更新实体页：`wiki/entities/NVIDIA Hopper.md`，补充 FP8 Transformer Engine、thread block cluster、DSMEM、transaction barrier、SMEM/L1、DPX、HBM/L2 与互联变化
 - 更新概念页：`wiki/concepts/Persistent Kernel.md`、`wiki/concepts/GPU执行模型.md`，明确 persistent 不是 Hopper 专属，并补充 cluster-aware 资源权衡
 - 待核实：具体 WGMMA shape/register 约束与 CUTLASS/FlashAttention 是否采用 persistent scheduler 必须绑定对应版本和 commit
+
+## [2026-08-21] query | Blackwell 相对 Hopper 的新特性
+
+- 读取实体与概念页：`NVIDIA Blackwell`、`Tensor Memory`、`Cluster Launch Control`、`Persistent Kernel`
+- 核对 KernelWiki：`tcgen05-mma`、`tmem`、`2sm-cooperative`、`clc`、`nvfp4`，并参考 NVIDIA Blackwell Architecture 与 Tuning Guide
+- 创建报告：`output/reports/Blackwell相对Hopper的新特性.md`
+- 更新实体页：`wiki/entities/NVIDIA Blackwell.md`，补充 tcgen05/TMEM、FP4/FP6 block scaling、2-SM MMA、CLC、第二代 Transformer Engine 与系统级能力
+- 明确边界：TMA、cluster、DSMEM、mbarrier、persistent kernel 在 Hopper 已存在；SM100 能力不能笼统推广到所有 Blackwell SKU
+- 待核实：具体指令与资源限制需绑定 SM target、PTX/CUDA/CUTLASS 版本；所有性能数字需绑定 GPU、dtype、shape、metric、value 和 source
+
+## [2026-08-21] query | Fused MoE NVFP4 v1-v5 优化复盘
+
+- 分析用户提供的 Moe-Qwen3_5-Plus_prefill 优化记录，按 routing、top-k、metadata、NVFP4 epilogue、2CTA/TMA multicast 与 specialization 分类
+- 交叉核对 KernelWiki：`fused-moe`、`tma`、`tmem`、`2sm-cooperative`、`nvfp4`，以及 SM103/vLLM/SGLang 上游 PR 线索
+- 创建报告：`output/reports/Fused MoE NVFP4 v1-v5优化复盘.md`
+- 关键修正：runtime top_k 的 warp-uniform 条件不是 lane divergence；165→161 若仍在同一寄存器分配档位不会提高 occupancy；TMEM 不保证 epilogue 对 MMA 零影响；TMA multicast 填充各 CTA 的本地 SMEM
+- 未回填 wiki：实现细节和性能数字来自用户提供的内部文档，尚缺 shape、commit、测量方法与可复现证据
+- 待核实：SM103 exact-target 兼容性、v0-v5 ablation、2CTA M128/M256 heuristic、determinism 与 preshuffle/layout 契约
+
+## [2026-08-21] query | MoE 计算流程与 TP-EP 实现
+
+- 读取概念页：`MoE`、`Tensor Parallelism`、`Expert Parallelism`、`Wide Expert Parallelism`、`MegaMoE`
+- 参考 KernelWiki：`wiki/kernels/fused-moe.md`，结合前序 SM103 NVFP4 v1-v5 文档解释实现术语
+- 创建报告：`output/reports/MoE计算流程与TP-EP实现.md`
+- 更新概念页：`wiki/concepts/MoE.md`，补充 populate、preshuffle、epilogue 的稳定定义与报告回链
+- 区分 TP：全 experts 的权重 shard + C2 partial all-reduce；EP：部分完整 experts + dispatch/combine All-to-All；并补充 EP+TP 混合路径
+- 待核实：具体框架可能调整 combine 与 TP collective 顺序、物化或融合 token permutation，以及 preshuffle physical layout
+
+## [2026-08-21] query | MoE 计算流程与 TP-EP HTML 导出
+
+- 基于 `output/reports/MoE计算流程与TP-EP实现.md` 创建独立 HTML：`output/reports/MoE计算流程与TP-EP实现.html`
+- 加入 MoE 全链路、Populate route map、Preshuffle layout、C1/C2 Epilogue、TP/EP/混合并行交互标签与对比表
+- 页面无外部依赖，支持响应式布局、键盘可操作 tabs、reduced-motion 与打印样式
+- 使用 Chrome headless 验证桌面/移动截图和 rendered DOM；通过 HTML anchor、ARIA contract、JavaScript 语法、wiki lint 与 git diff 检查
+- 环境未配置 Chrome DevTools MCP，因此以本地 Chrome headless 与静态可访问性审计替代
