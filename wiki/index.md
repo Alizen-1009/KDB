@@ -35,6 +35,7 @@
 - 实体文件：41
 - 概念文件：108
 - 报告文件：31
+- HTML 导出：0
 - 面试文件：11
 - 卡片文件：0
 - 幻灯片文件：0
@@ -356,7 +357,7 @@
 - [[../output/reports/Kimi K3的KDA部署与Prefix Cache|Kimi K3的KDA部署与Prefix Cache]]
 - [[../output/reports/LPT在Causal Attention中的调度优化|LPT在Causal Attention中的调度优化]]
 - [[../output/reports/MLA模型常见部署拓扑|MLA模型常见部署拓扑]]
-- [[../output/reports/MoE计算流程与TP-EP实现|MoE计算流程与TP-EP实现]]
+- [MoE计算流程与TP-EP实现](../output/reports/MoE计算流程与TP-EP实现.html)
 - [[../output/reports/MoE通信-计算重叠与MegaKernel技术谱系|MoE通信-计算重叠与MegaKernel技术谱系]]
 - [[../output/reports/MoonEP动态冗余Expert机制|MoonEP动态冗余Expert机制]]
 - [[../output/reports/PCP是什么|PCP是什么]]
@@ -368,6 +369,10 @@
 - [[../output/reports/vLLM CUDA Graph Piecewise 与 Full Decode Only|vLLM CUDA Graph Piecewise 与 Full Decode Only]]
 - [[../output/reports/现代推理框架中的Torch Compile作用|现代推理框架中的Torch Compile作用]]
 - [[../output/reports/算子融合与Torch Compile、CUDA Graph的分层关系|算子融合与Torch Compile、CUDA Graph的分层关系]]
+
+## HTML 导出
+
+- 暂无
 
 ## 面试备考
 

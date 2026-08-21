@@ -1,6 +1,6 @@
 ---
 name: kb-distill
-description: 把当前多轮对话中已经澄清的技术知识整理成结构化 Markdown，区分来源事实、机制推导与待核实结论，并回填 AI Infra wiki。当用户说“把刚才聊的整理成文档”“沉淀进知识库”“总结这段对话并 ingest”“把上面的问答回填 wiki”时使用。
+description: 把当前多轮对话中已经澄清的技术知识整理成结构化知识输出，区分来源事实、机制推导与待核实结论，并回填 AI Infra wiki；长篇人读报告默认使用自包含 HTML。当用户说“把刚才聊的整理成文档”“沉淀进知识库”“总结这段对话并 ingest”“把上面的问答回填 wiki”时使用。
 ---
 
 # Distill：把技术对话沉淀进知识库
@@ -49,7 +49,7 @@ description: 把当前多轮对话中已经澄清的技术知识整理成结构�
 - 单一稳定机制：新建或局部更新 `wiki/concepts/<概念>.md`。
 - 项目、框架、模型或组织能力：更新 `wiki/entities/<实体>.md`。
 - 对一份真实 raw 资料的摘要：按 `kb-ingest` 创建 `wiki/sources/<标题>.md`，必须包含 `原始文件：`。
-- 跨多个概念的长篇教学文档或架构分析：创建 `output/reports/<标题>.md`，并把稳定结论局部回填 wiki。
+- 跨多个概念的长篇教学文档或架构分析：默认创建 `output/reports/<标题>.html`，并把稳定结论局部回填 wiki；创建前读取全局 `html-artifacts` skill。
 - 面试导向的完整问答：创建 `output/interview/<标题>.md`，并回填稳定概念。
 - 仅为下一 session 延续工作：不要使用本 skill，应使用 `handoff`。
 
@@ -66,8 +66,8 @@ description: 把当前多轮对话中已经澄清的技术知识整理成结构�
 
 1. 先读所有目标页面，理解现有结构后做最小编辑。
 2. 新建页面时使用对应目录 `_TEMPLATE.md` 和 `AGENTS.md` 固定词表。
-3. 长篇报告与概念页分工：报告保留完整论证，概念页只收稳定、结构化、可复用的结论。
-4. 来源页、概念页和实体页之间补双向链接；跨目录使用相对 Obsidian wikilink。
+3. 长篇报告与概念页分工：报告保留完整论证，概念页只收稳定、结构化、可复用的结论。人读报告遵循 `html-artifacts` 的格式 gate：默认只创建 HTML；短线性备忘、Obsidian-native 或机器消费内容才保留 Markdown；不创建同名双份可编辑源。
+4. 来源页、概念页和实体页之间补双向链接；wiki 内跨目录使用相对 Obsidian wikilink，wiki 回链 HTML 使用普通 Markdown 相对链接。
 5. 数字、版本和硬件配置必须紧邻实验边界；对话中的心算可写为推导公式，但不得伪装成 benchmark。
 6. 若新结论与既有页面冲突，保留双方说法及来源，不静默覆盖。
 7. 如果新概念改变主题阅读顺序，只编辑 `wiki/maps/<topic>.md` 的《导读》手写区，不编辑自动区。

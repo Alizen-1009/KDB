@@ -74,7 +74,7 @@ Y[t] = sum_{i=1..K} topk_weight[t, i] * Expert_{topk_idx[t, i]}(X[t])
 
 `epilogue` 是 GEMM mainloop 完成 MMA accumulator 后的后处理。Fused MoE C1 epilogue 可直接执行 `SiLU(gate)×up`，并按 NVFP4 scale group 求 scale、转换、pack 后生成 C2 输入；C2 epilogue则做 accumulator scale/cast、可选 routing weight、store 或 inverse-scatter。多个 expert routes 的最终加权求和也可独立放在 `finalize` kernel。
 
-完整的单卡、TP-only、EP-only 与 EP+TP 数据流见 [[../../output/reports/MoE计算流程与TP-EP实现|MoE 计算流程与 TP/EP 实现]]。
+完整的单卡、TP-only、EP-only 与 EP+TP 数据流见 [MoE 计算流程与 TP/EP 实现](../../output/reports/MoE计算流程与TP-EP实现.html)。
 
 ## Qwen3.5-MoE 形状口径
 

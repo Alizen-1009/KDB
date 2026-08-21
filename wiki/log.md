@@ -1631,3 +1631,19 @@
 - 页面无外部依赖，支持响应式布局、键盘可操作 tabs、reduced-motion 与打印样式
 - 使用 Chrome headless 验证桌面/移动截图和 rendered DOM；通过 HTML anchor、ARIA contract、JavaScript 语法、wiki lint 与 git diff 检查
 - 环境未配置 Chrome DevTools MCP，因此以本地 Chrome headless 与静态可访问性审计替代
+
+## [2026-08-21] maintenance | 人读报告默认 HTML
+
+- 读取全局 skill：`~/.pi/agent/skills/html-artifacts/SKILL.md`，采用其 format gate、单文件、自包含与浏览器验证约定
+- 更新 skills：`kb-query` 与 `kb-distill` 的长篇人读报告默认输出 HTML；`kb-export` 保留 Markdown→Anki TSV 的机器输入契约
+- 更新 schema/docs：`AGENTS.md`、`output/README.md`、`scripts/README.md`
+- 更新索引脚本：识别 HTML 报告，同 stem 时优先 HTML，并新增 `scripts/test_update_index.py`
+- 更新回链：`wiki/concepts/MoE.md` 改为指向 HTML 报告
+
+## [2026-08-21] maintenance | 拆分 HTML Export 与 Anki Cards
+
+- 按用户选择重新定义 `kb-export`：从 wiki/既有 output 生成 `output/exports/<标题>.html` 自包含人读 artifact
+- 新增 `kb-cards`：承接原 `kb-export` 的 Markdown 卡片与 Anki TSV 工作流
+- 更正上一条日志边界：Anki Markdown 契约属于 `kb-cards`，不再属于 `kb-export`
+- 更新 schema/docs：`AGENTS.md`、`output/README.md`、`scripts/README.md`、`scripts/export_cards.py`
+- 更新索引：增加 `output/exports/*.html` 的资源统计与《HTML 导出》区

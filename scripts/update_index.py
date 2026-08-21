@@ -35,8 +35,22 @@ def section(title: str, items: list[str]) -> list[str]:
     return lines
 
 
+def prefer_html_artifacts(files: list[Path]) -> list[Path]:
+    """按目录和 stem 去重报告；同名 HTML 优先于旧 Markdown 副本。"""
+    selected: dict[tuple[Path, str], Path] = {}
+    for path in sorted(files):
+        key = (path.parent, path.stem)
+        current = selected.get(key)
+        if current is None or path.suffix.lower() == ".html":
+            selected[key] = path
+    return sorted(selected.values())
+
+
 def rel_link(path: Path, prefix: str = "../") -> str:
     relative = path.relative_to(ROOT).as_posix()
+    if path.suffix.lower() == ".html":
+        target = f"{prefix}{relative}".replace(" ", "%20").replace("(", "%28").replace(")", "%29")
+        return f"- [{path.stem}]({target})"
     no_suffix = relative[:-3] if relative.endswith(".md") else relative
     return f"- [[{prefix}{no_suffix}|{path.stem}]]"
 
@@ -117,7 +131,10 @@ def main() -> None:
     entity_count = sum(1 for _, f in pages if f.get("type") == "entity")
     source_count = sum(1 for _, f in pages if f.get("type") == "source")
 
-    report_files = list_files(output_dir / "reports", (".md",))
+    report_files = prefer_html_artifacts(
+        list_files(output_dir / "reports", (".md", ".html"))
+    )
+    export_files = list_files(output_dir / "exports", (".html",))
     slide_files = list_files(output_dir / "slides", (".md",))
     interview_files = [
         p for p in list_files(output_dir / "interview", (".md",)) if p.parent.name == "interview"
@@ -160,6 +177,7 @@ def main() -> None:
             f"- 实体文件：{entity_count}",
             f"- 概念文件：{concept_count}",
             f"- 报告文件：{len(report_files)}",
+            f"- HTML 导出：{len(export_files)}",
             f"- 面试文件：{len(interview_files)}",
             f"- 卡片文件：{len(card_files)}",
             f"- 幻灯片文件：{len(slide_files)}",
@@ -172,6 +190,7 @@ def main() -> None:
     lines.extend(section("来源摘要（按类型）", grouped(pages, "source", "source_kind", SOURCE_KINDS)))
     lines.extend(section("最近日志", recent_log_items(wiki_dir / "log.md")))
     lines.extend(section("报告", [rel_link(p) for p in report_files]))
+    lines.extend(section("HTML 导出", [rel_link(p) for p in export_files]))
     lines.extend(section("面试备考", [rel_link(p) for p in interview_files]))
     lines.extend(section("复习卡片", [rel_link(p) for p in card_files]))
     lines.extend(section("幻灯片", [rel_link(p) for p in slide_files]))
