@@ -1576,3 +1576,23 @@
 - 更新概念页：`wiki/concepts/FlashAttention.md`、`wiki/concepts/Tail Effect.md`
 - 机制归纳：用可见 KV tiles 数估算 causal Q tile 成本，descending Q tile 近似固定长度 LPT，并可与 persistent/CLC scheduler 组合
 - 待核实：Atrex FA4 当前 scheduler、2-CTA work-item 编码、已有动态调度能力，以及 LPT 在目标生产 shape 上的收益与 L2 locality 成本
+
+## [2026-08-21] ingest | 译 NVIDIA’s GPUs - 从 Ampere, Hopper 到 Blackwell
+
+- 读取原始资料：`raw/articles/译 NVIDIA’s GPUs - 从 Ampere, Hopper 到 Blackwell.md`，并检查 Pre-Ampere、A100、H100、B200 流水线示意图
+- 创建来源页：`wiki/sources/译 NVIDIA’s GPUs - 从 Ampere, Hopper 到 Blackwell.md`
+- 创建实体页：`wiki/entities/NVIDIA Ampere.md`、`wiki/entities/NVIDIA Hopper.md`
+- 创建概念页：`wiki/concepts/Persistent Kernel.md`
+- 更新实体页：`wiki/entities/NVIDIA Blackwell.md`
+- 更新概念页：`wiki/concepts/GPU执行模型.md`、`wiki/concepts/CUDA内存层次.md`、`wiki/concepts/Tensor Memory.md`、`wiki/concepts/Megakernel.md`、`wiki/concepts/Tail Effect.md`、`wiki/concepts/Cluster Launch Control.md`
+- 更新 GPU 编程主题地图导读，加入 Ampere→Hopper→Blackwell 与 Persistent Kernel→CLC 阅读路径
+- 未发现与现有 wiki 的直接冲突；架构与 SKU 混用、double buffering、launch overhead、Hopper→Blackwell 兼容性和 TMEM write-back 简化均已显式标记待核实
+
+## [2026-08-21] query | Hopper 架构变化与 Persistent Kernel
+
+- 读取概念与实体页：`NVIDIA Hopper`、`Persistent Kernel`、`GPU执行模型`、`CUDA内存层次`
+- 核对一手资料：NVIDIA Hopper Tuning Guide、NVIDIA Hopper Architecture In-Depth
+- 创建报告：`output/reports/Hopper架构变化与Persistent Kernel.md`
+- 更新实体页：`wiki/entities/NVIDIA Hopper.md`，补充 FP8 Transformer Engine、thread block cluster、DSMEM、transaction barrier、SMEM/L1、DPX、HBM/L2 与互联变化
+- 更新概念页：`wiki/concepts/Persistent Kernel.md`、`wiki/concepts/GPU执行模型.md`，明确 persistent 不是 Hopper 专属，并补充 cluster-aware 资源权衡
+- 待核实：具体 WGMMA shape/register 约束与 CUTLASS/FlashAttention 是否采用 persistent scheduler 必须绑定对应版本和 commit

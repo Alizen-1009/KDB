@@ -25,16 +25,16 @@
 
 ## 资源统计
 
-- 原始文章：68
+- 原始文章：69
 - 原始论文：4
 - 原始仓库：0
 - 原始数据集：0
 - 原始图片：19
 - 原始代码：1
-- 来源文件：54
-- 实体文件：39
-- 概念文件：107
-- 报告文件：27
+- 来源文件：55
+- 实体文件：41
+- 概念文件：108
+- 报告文件：28
 - 面试文件：11
 - 卡片文件：0
 - 幻灯片文件：0
@@ -106,7 +106,7 @@
 - [[../wiki/concepts/通信-计算重叠|通信-计算重叠]]
 - [[../wiki/concepts/集合通信|集合通信]]
 
-### GPU 编程（25）
+### GPU 编程（26）
 
 - [[../wiki/concepts/Bank Conflict|Bank Conflict]]
 - [[../wiki/concepts/Block Reduce|Block Reduce]]
@@ -122,6 +122,7 @@
 - [[../wiki/concepts/MegaMoE|MegaMoE]]
 - [[../wiki/concepts/Megakernel|Megakernel]]
 - [[../wiki/concepts/Occupancy|Occupancy]]
+- [[../wiki/concepts/Persistent Kernel|Persistent Kernel]]
 - [[../wiki/concepts/Programmatic Dependent Launch|Programmatic Dependent Launch]]
 - [[../wiki/concepts/Tail Effect|Tail Effect]]
 - [[../wiki/concepts/Tensor Memory|Tensor Memory]]
@@ -239,15 +240,17 @@
 
 - [[../wiki/entities/Stanford CS336|Stanford CS336]]
 
-### 硬件（2）
+### 硬件（4）
 
+- [[../wiki/entities/NVIDIA Ampere|NVIDIA Ampere]]
 - [[../wiki/entities/NVIDIA Blackwell|NVIDIA Blackwell]]
+- [[../wiki/entities/NVIDIA Hopper|NVIDIA Hopper]]
 - [[../wiki/entities/NVIDIA Rubin|NVIDIA Rubin]]
 
 
 ## 来源摘要（按类型）
 
-### 文章（35）
+### 文章（36）
 
 - [[../wiki/sources/2026 年MoE 架构正在发生一次关键变化|2026 年MoE 架构正在发生一次关键变化]]
 - [[../wiki/sources/A Preview of Production-Scale Kimi K3 Support on vLLM|A Preview of Production-Scale Kimi K3 Support on vLLM]]
@@ -282,6 +285,7 @@
 - [[../wiki/sources/并行投机解码(DFlashDSpark)的快速理解与vLLM实测|并行投机解码(DFlashDSpark)的快速理解与vLLM实测]]
 - [[../wiki/sources/彻底搞懂RoPE计算原理：从1D到3D|彻底搞懂RoPE计算原理：从1D到3D]]
 - [[../wiki/sources/推理的非确定性运算及vLLMSGLang控制方式|推理的非确定性运算及vLLMSGLang控制方式]]
+- [[../wiki/sources/译 NVIDIA’s GPUs - 从 Ampere, Hopper 到 Blackwell|译 NVIDIA’s GPUs - 从 Ampere, Hopper 到 Blackwell]]
 - [[../wiki/sources/还在手写CUDA内核？CODA来了！LLM和新手也能让Transformer跑出光速|还在手写CUDA内核？CODA来了！LLM和新手也能让Transformer跑出光速]]
 - [[../wiki/sources/陈巍：DeepSeek 开源Day（1）-FlashMLA 深入分析（收录于：DeepSeek技术详解系列）|陈巍：DeepSeek 开源Day（1）-FlashMLA 深入分析（收录于：DeepSeek技术详解系列）]]
 
@@ -339,6 +343,7 @@
 - [[../output/reports/FlashKDA优化方法与GDN迁移指南|FlashKDA优化方法与GDN迁移指南]]
 - [[../output/reports/GDN公式与逐步计算|GDN公式与逐步计算]]
 - [[../output/reports/Gemma 开源代码结构导读|Gemma 开源代码结构导读]]
+- [[../output/reports/Hopper架构变化与Persistent Kernel|Hopper架构变化与Persistent Kernel]]
 - [[../output/reports/KDA伪代码与输入输出|KDA伪代码与输入输出]]
 - [[../output/reports/KDA投影融合优化|KDA投影融合优化]]
 - [[../output/reports/KDA最小Decode伪代码|KDA最小Decode伪代码]]

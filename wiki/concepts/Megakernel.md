@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: GPU 编程
-sources: 2
+sources: 3
 updated: 2026-06-12
 ---
 
@@ -31,6 +31,14 @@ updated: 2026-06-12
 - Megakernel 的收益不只来自减少中间张量 HBM 往返，还来自消除 kernel 边界本身造成的调度、尾部和 pipeline bubble。
 - 代价也更大：原本由 CUDA kernel launch 隐含保证的数据依赖，需要在 kernel 内显式同步和调度。
 
+## 与 Persistent Kernel 的区别
+
+[[Persistent Kernel]] 描述 worker 生命周期和任务取得方式：一个 CTA/cluster 长期驻留并连续处理多个同类 work tiles。Megakernel 描述融合范围：把多个算子、层甚至整个模型的执行放进一个 kernel。二者可以组合，但不是同义词：
+
+- persistent GEMM/attention 可能只处理同一种算子，因此不是 megakernel；
+- 整模型 megakernel 通常需要长期驻留 worker、内部 scheduler 和显式依赖，因而往往具有 persistent 特征；
+- 两者仍需要至少一次 kernel launch。Persistent kernel 摊销后续 tile 边界，megakernel 则进一步减少算子/层之间的 kernel 边界。
+
 ## 与 MegaMoE 的关系
 
 [[MegaMoE]] 是针对 MoE dispatch/FFN/combine 的 wave 级融合流水；本页的 Megakernel 是跨更长算子链、甚至整模型 forward 的广义模式。MegaMoE 是否由单一 persistent kernel 实现尚未被当前二手来源确认，因此不能仅凭名称把两者等同。
@@ -51,6 +59,7 @@ updated: 2026-06-12
 
 - [[../sources/Look Ma, No Bubbles! Designing a Low-Latency Megakernel for Llama-1B]]
 - [[../sources/MegaMoE — 让 all-to-all 消失]]
+- [[../sources/译 NVIDIA’s GPUs - 从 Ampere, Hopper 到 Blackwell]]
 
 ## 相关概念
 
@@ -64,6 +73,7 @@ updated: 2026-06-12
 - [[Profiling]]
 - [[MegaMoE]]
 - [[通信-计算重叠]]
+- [[Persistent Kernel]]
 
 ## 研究备注
 

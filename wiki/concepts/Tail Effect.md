@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: GPU 编程
-sources: 4
+sources: 5
 updated: 2026-06-12
 ---
 
@@ -23,7 +23,7 @@ updated: 2026-06-12
 - 如果 block 太大、block 数太少或问题规模不合适，就更容易出现 tail effect
 - 一个实用估算框架是先算“满载一波”可并行的 block 数，例如 `SM 数 × 每 SM 驻留 Block 数`
 - 如果总 block 数只比一波满载略多，最后一波很可能只占用很少一部分 SM；若总 block 数远大于满载容量，尾部利用率虽低，但对总时长的影响可能有限
-- 除了调 `grid/block`，还可以通过 `persistent kernel` 让固定数量 block 从全局任务池持续取活，减少尾部波次不均
+- 除了调 `grid/block`，还可以通过 [[Persistent Kernel]] 让固定数量 block 从任务池持续取活，减少尾部波次不均；persistent 仍需一次 kernel launch，只是摊销后续逻辑 tile 的边界
 - [[Cluster Launch Control]] 在 [[../entities/NVIDIA Blackwell]] 上把动态取活下沉为 cluster-level 硬件机制：活跃 cluster 可取消尚未启动的 cluster 并继承其 tile 坐标，减少不规则 tile 成本造成的 straggler；但动态调度的同步成本和缓存局部性仍需单独测量
 - 在多个短 kernel 串联的 LLM decode 中，tail effect 会在每个 kernel 边界重复出现；`Look Ma, No Bubbles!` 来源举例称 Llama-1B down projection 若有 `512` 个 block 而 B200 有 `148` 个 SM，最后一波可能留下大量空闲 SM。
 
@@ -53,6 +53,7 @@ Causal prefill 若直接跳过未来 KV tiles，序列前部 Q tile 的 KV loop 
 - [[../sources/CUDA优化维度框架]]
 - [[../sources/Look Ma, No Bubbles! Designing a Low-Latency Megakernel for Llama-1B]]
 - [[../sources/Dynamic persistent tile scheduling with Cluster Launch Control (CLC) on NVIDIA Blackwell GPUs]]
+- [[../sources/译 NVIDIA’s GPUs - 从 Ampere, Hopper 到 Blackwell]]
 
 ## 相关概念
 
@@ -62,6 +63,7 @@ Causal prefill 若直接跳过未来 KV tiles，序列前部 Q tile 的 KV loop 
 - [[Megakernel]]
 - [[Cluster Launch Control]]
 - [[FlashAttention]]
+- [[Persistent Kernel]]
 
 ## 研究备注
 

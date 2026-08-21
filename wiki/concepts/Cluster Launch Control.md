@@ -77,6 +77,7 @@ updated: 2026-08-21
 - [[CuTe DSL]]
 - [[Occupancy]]
 - [[Megakernel]]
+- [[Persistent Kernel]]
 
 ## 研究备注
 

@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: GPU 编程
-sources: 10
+sources: 11
 updated: 2026-06-12
 ---
 
@@ -27,9 +27,21 @@ updated: 2026-06-12
 - CUDA kernel 之间通常存在严格顺序边界：后一个 kernel 的 block 不会在前一个 kernel 的所有 block 完成前开始执行。这个语义简化了数据依赖管理，但在许多短 kernel 串联时会放大 launch overhead、tail effect 和 load bubble。
 - [[Megakernel]] 通过在单个 kernel 内部自行调度 SM instruction 和同步依赖，绕开部分 kernel 间全局边界，但也把依赖正确性责任交给实现者。
 
+## Ampere→Hopper→Blackwell 的流水线演进
+
+翻译来源提供了一条从 latency hiding 到显式异步流水的代际主线：
+
+- [[../entities/NVIDIA Ampere]]：`cp.async` 让单 CTA 在当前 tile MMA 时预取下一 tile，把 global→shared load 与 compute 重叠。
+- [[../entities/NVIDIA Hopper]]：TMA 负责 tensor tile 搬运，异步 WGMMA 负责 warpgroup MMA；producer/consumer warp specialization 与 [[Persistent Kernel]] 让一个驻留 CTA 连续处理多个 work tiles。
+- [[../entities/NVIDIA Blackwell]]：`tcgen05` 将大型 accumulator 放入 [[Tensor Memory|TMEM]]，降低普通 RF 压力，使 load、MMA 与 output consumption/epilogue 更容易形成跨 tile 三阶段流水。
+
+这不是“每代只运行一个 CTA”。普通 grid 仍可有多个 CTA/cluster；persistent 描述的是 worker 连续领取逻辑 tiles。来源图中的“Only ONE block launched”应理解为一个长期驻留 worker 的示意，而不是全 GPU 只有一个 block。
+
 ## Thread block cluster 与 CLC
 
-[[../entities/NVIDIA Blackwell]] 的 [[Cluster Launch Control]] 把调度粒度扩展到 thread block cluster：一个活跃 cluster 可以原子取消尚未启动的 cluster，并取得后者首个 CTA 的 grid 坐标来接手其 work tile。该机制不是让 CTA 在任意时刻迁移 SM，而是围绕“尚未启动的 cluster launch”做取消与任务继承；同一 cluster 内仍需由 leader scheduler warp、shared-memory 响应、mbarrier 和消费者 warp 协同保证坐标一致。
+[[../entities/NVIDIA Hopper]] 首次在 CUDA 编程层级中加入可选的 thread block cluster：cluster 内 blocks 保证并发调度在同一 GPC 的多个 SM 上，可用 cluster barrier 同步，并通过 Distributed Shared Memory 对彼此 SMEM 执行 load/store/atomic。Portable cluster size 上限为 8；H100 可显式 opt-in 到 nonportable 16，但更大 cluster 可能减少全 GPU active blocks。
+
+[[../entities/NVIDIA Blackwell]] 的 [[Cluster Launch Control]] 进一步把动态调度粒度扩展到 thread block cluster：一个活跃 cluster 可以原子取消尚未启动的 cluster，并取得后者首个 CTA 的 grid 坐标来接手其 work tile。该机制不是让 CTA 在任意时刻迁移 SM，而是围绕“尚未启动的 cluster launch”做取消与任务继承；同一 cluster 内仍需由 leader scheduler warp、shared-memory 响应、mbarrier 和消费者 warp 协同保证坐标一致。
 
 ## Blackwell 异构异步流水
 
@@ -58,6 +70,8 @@ PAI-FA 来源展示了比统一 SIMT 叙事更细的职责分工：Load warps �
 - [[../entities/NVIDIA Rubin]]
 - [[../entities/NVIDIA Blackwell]]
 - [[../entities/CAKE KDA]]
+- [[../entities/NVIDIA Ampere]]
+- [[../entities/NVIDIA Hopper]]
 
 ## 相关来源
 
@@ -71,6 +85,7 @@ PAI-FA 来源展示了比统一 SIMT 叙事更细的职责分工：Load warps �
 - [[../sources/Dynamic persistent tile scheduling with Cluster Launch Control (CLC) on NVIDIA Blackwell GPUs]]
 - [[../sources/PAI-FA｜突破 TMEM 瓶颈：FlashAttention-4 大 Head Dimension (256) 高性能算子实现与优化]]
 - [[../sources/REMINDER FF-KDA & CAKE KDA Highlights]]
+- [[../sources/译 NVIDIA’s GPUs - 从 Ampere, Hopper 到 Blackwell]]
 
 ## 相关概念
 
@@ -88,6 +103,7 @@ PAI-FA 来源展示了比统一 SIMT 叙事更细的职责分工：Load warps �
 - [[Cluster Launch Control]]
 - [[Tensor Memory]]
 - [[KDA]]
+- [[Persistent Kernel]]
 
 ## 研究备注
 

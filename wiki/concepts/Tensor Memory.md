@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: GPU 编程
-sources: 2
+sources: 3
 updated: 2026-08-21
 ---
 
@@ -34,6 +34,12 @@ updated: 2026-08-21
 | Tensor Memory / TMEM | Tensor Core 专用、显式列分配 | `S/O/dQ/dK/dV` 等 MMA accumulator |
 | L1/L2/HBM | 硬件缓存或全局显存 | 全局输入输出、跨 tile 数据来源 |
 
+## 从 Hopper register accumulator 到 Blackwell TMEM
+
+翻译来源把代际变化概括为：[[../entities/NVIDIA Hopper]] WGMMA consumers 需要在普通 register 中长期持有大块 accumulator，容易推高 RF footprint；[[../entities/NVIDIA Blackwell]] 的 `tcgen05` 则把 accumulator 放入 TMEM，使 MMA producer 与 CUDA Core/epilogue consumer 更容易解耦，并让 [[Persistent Kernel]] 跨 tiles 保持更深的软件流水。
+
+这不代表结果可从 TMEM 直接任意写入 GMEM。实际消费通常仍需 `TMEM → RF/SMEM → GMEM`，且 TMEM 支持的指令、layout、分配粒度与访问方向比普通寄存器或 SMEM 更受限制。
+
 ## HeadDim=256 的容量压力
 
 - 对 `128×128` attention tile，`head_dim` 从 128 增至 256 时，`S` 的形状不变，但 `O/dQ/dK/dV` 等沿 head dimension 展开的 accumulator footprint 翻倍。
@@ -56,11 +62,13 @@ updated: 2026-08-21
 - [[../entities/NVIDIA Blackwell]]
 - [[../entities/阿里云 PAI 团队]]
 - [[../entities/CAKE KDA]]
+- [[../entities/NVIDIA Hopper]]
 
 ## 相关来源
 
 - [[../sources/PAI-FA｜突破 TMEM 瓶颈：FlashAttention-4 大 Head Dimension (256) 高性能算子实现与优化]]
 - [[../sources/REMINDER FF-KDA & CAKE KDA Highlights]]
+- [[../sources/译 NVIDIA’s GPUs - 从 Ampere, Hopper 到 Blackwell]]
 
 ## 相关概念
 
@@ -71,6 +79,7 @@ updated: 2026-08-21
 - [[Occupancy]]
 - [[重计算]]
 - [[KDA]]
+- [[Persistent Kernel]]
 
 ## 研究备注
 

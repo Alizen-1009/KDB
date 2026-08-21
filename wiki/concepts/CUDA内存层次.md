@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: GPU 编程
-sources: 8
+sources: 9
 updated: 2026-06-12
 ---
 
@@ -29,6 +29,14 @@ updated: 2026-06-12
 - `Host Memory` 是 CPU 侧内存；pinned host memory 更适合异步 H2D / D2H 拷贝
 - [[Tensor Memory]] 是 Blackwell Tensor Core 数据路径中的专用片上存储，用于承载 `tcgen05` MMA 操作数或 accumulator；它需要显式分配和协作访问，不能按普通 thread-private register 或通用 shared memory 理解
 - [[Megakernel]] 来源提供了一个 shared memory 资源管理案例：把 H100 每个 SM 的部分 shared memory 切成固定页，instruction 显式申请/释放 page，用于在前一段计算收尾时尽早加载下一段权重。
+
+## 架构代际中的异步搬运与 accumulator
+
+- [[../entities/NVIDIA Ampere]] 的 `cp.async` 让线程异步发出 global→shared copy，在单 CTA 内用多级 SMEM buffer 重叠后续 tile load 与当前 MMA。
+- [[../entities/NVIDIA Hopper]] 的 TMA 以 tensor tile 为单位异步执行 global↔shared transfer，减少逐线程地址生成和 load 指令；WGMMA accumulator 仍主要占用普通 register，因此 MMA consumer 的 RF footprint 可能成为约束。
+- [[../entities/NVIDIA Blackwell]] 的 `tcgen05` 把大型 MMA accumulator 移入 [[Tensor Memory|TMEM]]，让 Tensor Core producer 与 RF/SMEM epilogue consumer 使用不同存储角色；但输出仍需显式经过 TMEM→RF/SMEM→GMEM 路径。
+
+这条演进没有消除容量权衡：更深 SMEM stage、更长驻留的 RF/TMEM state 和更大 tile 都可能降低 occupancy。[[Persistent Kernel]] 只是复用这些片上资源与 pipeline，不会让资源限制消失。
 
 ## Blackwell TMEM 数据路径
 
@@ -59,6 +67,8 @@ CAKE KDA M128 来源给出一个极端片上复用案例：五个 preparation st
 - [[../entities/NVIDIA Rubin]]
 - [[../entities/NVIDIA Blackwell]]
 - [[../entities/CAKE KDA]]
+- [[../entities/NVIDIA Ampere]]
+- [[../entities/NVIDIA Hopper]]
 
 ## 相关来源
 
@@ -70,6 +80,7 @@ CAKE KDA M128 来源给出一个极端片上复用案例：五个 preparation st
 - [[../sources/Nvidia Rubin架构分析预览]]
 - [[../sources/PAI-FA｜突破 TMEM 瓶颈：FlashAttention-4 大 Head Dimension (256) 高性能算子实现与优化]]
 - [[../sources/REMINDER FF-KDA & CAKE KDA Highlights]]
+- [[../sources/译 NVIDIA’s GPUs - 从 Ampere, Hopper 到 Blackwell]]
 
 ## 相关概念
 
@@ -83,6 +94,7 @@ CAKE KDA M128 来源给出一个极端片上复用案例：五个 preparation st
 - [[Megakernel]]
 - [[Tensor Memory]]
 - [[KDA]]
+- [[Persistent Kernel]]
 
 ## 研究备注
 
