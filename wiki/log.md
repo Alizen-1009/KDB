@@ -1540,3 +1540,39 @@
 - 更新实体页：`wiki/entities/vLLM.md`、`wiki/entities/kaiyuan.md`
 - 更新主题地图：`wiki/maps/投机解码.md`，补充顺序/模型内 drafter 与并行 drafter 两条阅读路线
 - 未发现与现有 wiki 的直接冲突；来源 benchmark 数字绑定 Qwen3-4B/A800/文章所称 vLLM 0.26.0，实际 GPU 数、TP 配置、image digest 与完整 workload 标为待核实
+
+## [2026-08-21] ingest | Dynamic persistent tile scheduling with Cluster Launch Control (CLC) on NVIDIA Blackwell GPUs
+
+- 读取原始资料：`raw/articles/Dynamic persistent tile scheduling with Cluster Launch Control (CLC) on NVIDIA Blackwell GPUs.md`
+- 创建来源页：`wiki/sources/Dynamic persistent tile scheduling with Cluster Launch Control (CLC) on NVIDIA Blackwell GPUs.md`
+- 创建概念页：`wiki/concepts/Cluster Launch Control.md`
+- 创建实体页：`wiki/entities/NVIDIA Blackwell.md`、`wiki/entities/Colfax Research.md`
+- 更新概念页：`wiki/concepts/Tiling.md`、`wiki/concepts/Tail Effect.md`、`wiki/concepts/GPU执行模型.md`、`wiki/concepts/CuTe DSL.md`
+- 未发现与现有 wiki 的直接冲突；记录 CLC 在均衡 workload 上不保证优于静态 persistent scheduler，且 L2 hit rate 差异根因待核实
+
+## [2026-08-21] ingest | PAI-FA｜突破 TMEM 瓶颈：FlashAttention-4 大 Head Dimension (256) 高性能算子实现与优化
+
+- 读取原始资料：`raw/articles/PAI-FA｜突破 TMEM 瓶颈：FlashAttention-4 大 Head Dimension (256) 高性能算子实现与优化.md`
+- 创建来源页：`wiki/sources/PAI-FA｜突破 TMEM 瓶颈：FlashAttention-4 大 Head Dimension (256) 高性能算子实现与优化.md`
+- 创建概念页：`wiki/concepts/Tensor Memory.md`
+- 创建实体页：`wiki/entities/阿里云 PAI 团队.md`
+- 更新概念页：`wiki/concepts/FlashAttention.md`、`wiki/concepts/CUDA内存层次.md`、`wiki/concepts/GPU执行模型.md`、`wiki/concepts/Tiling.md`、`wiki/concepts/重计算.md`
+- 更新实体页：`wiki/entities/NVIDIA Blackwell.md`、`wiki/entities/阿里巴巴.md`
+- 未发现与现有 wiki 的直接冲突；原文 L20A/L20C、FA3 baseline 与多组峰值吞吐口径不一致，并含 dKdV 变量名笔误，均已显式标记待核实
+
+## [2026-08-21] ingest | REMINDER FF-KDA & CAKE KDA Highlights
+
+- 读取原始资料：`raw/articles/REMINDER FF-KDA & CAKE KDA Highlights.md`，并读取 FF-KDA highlights 配图
+- 创建来源页：`wiki/sources/REMINDER FF-KDA & CAKE KDA Highlights.md`
+- 创建实体页：`wiki/entities/CAKE KDA.md`
+- 更新概念页：`wiki/concepts/KDA.md`、`wiki/concepts/Tensor Memory.md`、`wiki/concepts/CUDA内存层次.md`、`wiki/concepts/Tiling.md`、`wiki/concepts/GPU执行模型.md`
+- 更新实体页：`wiki/entities/FlashKDA.md`、`wiki/entities/FlashInfer.md`、`wiki/entities/NVIDIA Blackwell.md`
+- 未发现与现有 wiki 的直接冲突；FF-KDA 身份与对应 PR、缺失 exponent-anchor 公式、32 warps/CTA 和 2.0512× benchmark 均已标记待核实
+
+## [2026-08-21] distill | LPT 在 Causal Attention 中的调度优化
+
+- 整理当前对话为：`output/reports/LPT在Causal Attention中的调度优化.md`
+- 依据知识页与报告：`wiki/concepts/FlashAttention.md`、`wiki/concepts/Tail Effect.md`、`wiki/concepts/Cluster Launch Control.md`、`output/reports/Prefill Attention 的 CUDA 并行映射.md`
+- 更新概念页：`wiki/concepts/FlashAttention.md`、`wiki/concepts/Tail Effect.md`
+- 机制归纳：用可见 KV tiles 数估算 causal Q tile 成本，descending Q tile 近似固定长度 LPT，并可与 persistent/CLC scheduler 组合
+- 待核实：Atrex FA4 当前 scheduler、2-CTA work-item 编码、已有动态调度能力，以及 LPT 在目标生产 shape 上的收益与 L2 locality 成本

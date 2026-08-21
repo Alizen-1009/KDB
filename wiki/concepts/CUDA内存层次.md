@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: GPU 编程
-sources: 6
+sources: 8
 updated: 2026-06-12
 ---
 
@@ -27,7 +27,18 @@ updated: 2026-06-12
 - `Constant Memory` 适合 warp 内读取相同常量地址；地址分散时收益下降
 - `Texture / Read-only Cache` 适合某些只读、空间局部性较强的访问模式
 - `Host Memory` 是 CPU 侧内存；pinned host memory 更适合异步 H2D / D2H 拷贝
+- [[Tensor Memory]] 是 Blackwell Tensor Core 数据路径中的专用片上存储，用于承载 `tcgen05` MMA 操作数或 accumulator；它需要显式分配和协作访问，不能按普通 thread-private register 或通用 shared memory 理解
 - [[Megakernel]] 来源提供了一个 shared memory 资源管理案例：把 H100 每个 SM 的部分 shared memory 切成固定页，instruction 显式申请/释放 page，用于在前一段计算收尾时尽早加载下一段权重。
+
+## Blackwell TMEM 数据路径
+
+PAI-FA 来源把 FA4 Forward 的主要数据流概括为 `GMEM → SMEM → TMEM → RF/SMEM → GMEM`：TMA/Load warps 负责输入 staging，Tensor Core 在 TMEM 中产生 `S/O` 等 accumulator，CUDA Core 再经 RF 做 Softmax 和 correction。`head_dim=256` 会放大沿 head dimension 展开的 accumulator，因此 tile 和 pipeline stage 必须同时服从 TMEM、SMEM 与 RF 容量，而不能只追求更深双缓冲。
+
+## KDA 的 lifetime-based SMEM aliasing
+
+CAKE KDA M128 来源给出一个极端片上复用案例：五个 preparation stages、两个 output buffers 与 barrier/control 合计约 `227,328 bytes（222 KiB）` SMEM。它没有为每个逻辑 tensor 分配独立 buffer，而是按“首次写入到最后一次读取”的生命周期复用物理区域，例如 raw gate 复用为 centered/decayed Q、raw K 复用为 transformed K、prefix/inverse workspace 后续复用为 `Mqk`/restore factor/V。该方法节省容量，但任一 barrier 或生命周期判断错误都会造成数据覆盖。
+
+来源中的 FF-KDA 图片则展示 global workspace 仍存在时的另一种优化：保留 swizzled physical byte image，以 raw `cp.async.bulk` 搬运，避免 GMEM 两侧的 unswizzle/reswizzle。这减少 layout conversion 和碎片化传输，但没有消除 HBM 往返。
 
 ## Rubin 的动态 L2 生命周期提示
 
@@ -46,6 +57,8 @@ updated: 2026-06-12
 
 - [[../entities/Stanford CS336]]
 - [[../entities/NVIDIA Rubin]]
+- [[../entities/NVIDIA Blackwell]]
+- [[../entities/CAKE KDA]]
 
 ## 相关来源
 
@@ -55,6 +68,8 @@ updated: 2026-06-12
 - [[../sources/CUDA优化维度框架]]
 - [[../sources/Look Ma, No Bubbles! Designing a Low-Latency Megakernel for Llama-1B]]
 - [[../sources/Nvidia Rubin架构分析预览]]
+- [[../sources/PAI-FA｜突破 TMEM 瓶颈：FlashAttention-4 大 Head Dimension (256) 高性能算子实现与优化]]
+- [[../sources/REMINDER FF-KDA & CAKE KDA Highlights]]
 
 ## 相关概念
 
@@ -66,6 +81,8 @@ updated: 2026-06-12
 - [[内存合并访问]]
 - [[Tiling]]
 - [[Megakernel]]
+- [[Tensor Memory]]
+- [[KDA]]
 
 ## 研究备注
 

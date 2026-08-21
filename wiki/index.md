@@ -25,16 +25,16 @@
 
 ## 资源统计
 
-- 原始文章：63
+- 原始文章：68
 - 原始论文：4
 - 原始仓库：0
 - 原始数据集：0
 - 原始图片：19
 - 原始代码：1
-- 来源文件：51
-- 实体文件：35
-- 概念文件：105
-- 报告文件：26
+- 来源文件：54
+- 实体文件：39
+- 概念文件：107
+- 报告文件：27
 - 面试文件：11
 - 卡片文件：0
 - 幻灯片文件：0
@@ -106,7 +106,7 @@
 - [[../wiki/concepts/通信-计算重叠|通信-计算重叠]]
 - [[../wiki/concepts/集合通信|集合通信]]
 
-### GPU 编程（23）
+### GPU 编程（25）
 
 - [[../wiki/concepts/Bank Conflict|Bank Conflict]]
 - [[../wiki/concepts/Block Reduce|Block Reduce]]
@@ -114,6 +114,7 @@
 - [[../wiki/concepts/CUDA Graph 执行模式|CUDA Graph 执行模式]]
 - [[../wiki/concepts/CUDA Kernel|CUDA Kernel]]
 - [[../wiki/concepts/CUDA内存层次|CUDA内存层次]]
+- [[../wiki/concepts/Cluster Launch Control|Cluster Launch Control]]
 - [[../wiki/concepts/CuTe DSL|CuTe DSL]]
 - [[../wiki/concepts/GPU执行模型|GPU执行模型]]
 - [[../wiki/concepts/Grid-stride Loop|Grid-stride Loop]]
@@ -123,6 +124,7 @@
 - [[../wiki/concepts/Occupancy|Occupancy]]
 - [[../wiki/concepts/Programmatic Dependent Launch|Programmatic Dependent Launch]]
 - [[../wiki/concepts/Tail Effect|Tail Effect]]
+- [[../wiki/concepts/Tensor Memory|Tensor Memory]]
 - [[../wiki/concepts/Tiling|Tiling]]
 - [[../wiki/concepts/Torch Compile|Torch Compile]]
 - [[../wiki/concepts/Triton|Triton]]
@@ -179,8 +181,9 @@
 
 ## 实体页面（按类型）
 
-### 项目（8）
+### 项目（9）
 
+- [[../wiki/entities/CAKE KDA|CAKE KDA]]
 - [[../wiki/entities/DeepEP|DeepEP]]
 - [[../wiki/entities/Engram|Engram]]
 - [[../wiki/entities/FlashKDA|FlashKDA]]
@@ -216,10 +219,12 @@
 - [[../wiki/entities/Prime Intellect|Prime Intellect]]
 - [[../wiki/entities/阿里巴巴|阿里巴巴]]
 
-### 组织（2）
+### 组织（4）
 
+- [[../wiki/entities/Colfax Research|Colfax Research]]
 - [[../wiki/entities/HazyResearch|HazyResearch]]
 - [[../wiki/entities/vLLM Team|vLLM Team]]
+- [[../wiki/entities/阿里云 PAI 团队|阿里云 PAI 团队]]
 
 ### 人物（6）
 
@@ -234,19 +239,21 @@
 
 - [[../wiki/entities/Stanford CS336|Stanford CS336]]
 
-### 硬件（1）
+### 硬件（2）
 
+- [[../wiki/entities/NVIDIA Blackwell|NVIDIA Blackwell]]
 - [[../wiki/entities/NVIDIA Rubin|NVIDIA Rubin]]
 
 
 ## 来源摘要（按类型）
 
-### 文章（32）
+### 文章（35）
 
 - [[../wiki/sources/2026 年MoE 架构正在发生一次关键变化|2026 年MoE 架构正在发生一次关键变化]]
 - [[../wiki/sources/A Preview of Production-Scale Kimi K3 Support on vLLM|A Preview of Production-Scale Kimi K3 Support on vLLM]]
 - [[../wiki/sources/CUDA优化维度框架|CUDA优化维度框架]]
 - [[../wiki/sources/DeepSeekV4中RoPE设计解析|DeepSeekV4中RoPE设计解析]]
+- [[../wiki/sources/Dynamic persistent tile scheduling with Cluster Launch Control (CLC) on NVIDIA Blackwell GPUs|Dynamic persistent tile scheduling with Cluster Launch Control (CLC) on NVIDIA Blackwell GPUs]]
 - [[../wiki/sources/Flash Attention 详细解释推演与Pytorch代码实现|Flash Attention 详细解释推演与Pytorch代码实现]]
 - [[../wiki/sources/Gemma 4 核心技术深度解析：PLE、Shared KV Cache 与全模态架构|Gemma 4 核心技术深度解析：PLE、Shared KV Cache 与全模态架构]]
 - [[../wiki/sources/Gemma 4：Drafter 详解|Gemma 4：Drafter 详解]]
@@ -257,7 +264,9 @@
 - [[../wiki/sources/Model Runner V2 A Modular and Faster Core for vLLM|Model Runner V2 A Modular and Faster Core for vLLM]]
 - [[../wiki/sources/NVIDIA 开源 NCCL Extensions：把 MoE 专家路由与跨 Mesh 权重重分片推进到 GPU 设备侧|NVIDIA 开源 NCCL Extensions：把 MoE 专家路由与跨 Mesh 权重重分片推进到 GPU 设备侧]]
 - [[../wiki/sources/Nvidia Rubin架构分析预览|Nvidia Rubin架构分析预览]]
+- [[../wiki/sources/PAI-FA｜突破 TMEM 瓶颈：FlashAttention-4 大 Head Dimension (256) 高性能算子实现与优化|PAI-FA｜突破 TMEM 瓶颈：FlashAttention-4 大 Head Dimension (256) 高性能算子实现与优化]]
 - [[../wiki/sources/PageAttention代码走读|PageAttention代码走读]]
+- [[../wiki/sources/REMINDER FF-KDA & CAKE KDA Highlights|REMINDER FF-KDA & CAKE KDA Highlights]]
 - [[../wiki/sources/RTP-LLM|RTP-LLM]]
 - [[../wiki/sources/Recursive Language Models the paradigm of 2026|Recursive Language Models the paradigm of 2026]]
 - [[../wiki/sources/SGLang的KDA管理与Prefix Cache难题|SGLang的KDA管理与Prefix Cache难题]]
@@ -338,6 +347,7 @@
 - [[../output/reports/Kimi K3技术报告后续阅读重点|Kimi K3技术报告后续阅读重点]]
 - [[../output/reports/Kimi K3权重构成与TP8切分|Kimi K3权重构成与TP8切分]]
 - [[../output/reports/Kimi K3的KDA部署与Prefix Cache|Kimi K3的KDA部署与Prefix Cache]]
+- [[../output/reports/LPT在Causal Attention中的调度优化|LPT在Causal Attention中的调度优化]]
 - [[../output/reports/MLA模型常见部署拓扑|MLA模型常见部署拓扑]]
 - [[../output/reports/MoE通信-计算重叠与MegaKernel技术谱系|MoE通信-计算重叠与MegaKernel技术谱系]]
 - [[../output/reports/MoonEP动态冗余Expert机制|MoonEP动态冗余Expert机制]]

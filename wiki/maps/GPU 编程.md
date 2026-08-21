@@ -19,7 +19,7 @@ topic: GPU 编程
 
 <!-- BEGIN AUTO：以下由 scripts/update_index.py 生成，改动会被覆盖 -->
 
-## 概念（23）
+## 概念（25）
 
 - [[../concepts/Bank Conflict|Bank Conflict]]
 - [[../concepts/Block Reduce|Block Reduce]]
@@ -27,6 +27,7 @@ topic: GPU 编程
 - [[../concepts/CUDA Graph 执行模式|CUDA Graph 执行模式]]
 - [[../concepts/CUDA Kernel|CUDA Kernel]]
 - [[../concepts/CUDA内存层次|CUDA内存层次]]
+- [[../concepts/Cluster Launch Control|Cluster Launch Control]]
 - [[../concepts/CuTe DSL|CuTe DSL]]
 - [[../concepts/GPU执行模型|GPU执行模型]]
 - [[../concepts/Grid-stride Loop|Grid-stride Loop]]
@@ -36,6 +37,7 @@ topic: GPU 编程
 - [[../concepts/Occupancy|Occupancy]]
 - [[../concepts/Programmatic Dependent Launch|Programmatic Dependent Launch]]
 - [[../concepts/Tail Effect|Tail Effect]]
+- [[../concepts/Tensor Memory|Tensor Memory]]
 - [[../concepts/Tiling|Tiling]]
 - [[../concepts/Torch Compile|Torch Compile]]
 - [[../concepts/Triton|Triton]]
@@ -45,21 +47,28 @@ topic: GPU 编程
 - [[../concepts/动态共享内存|动态共享内存]]
 - [[../concepts/算子融合|算子融合]]
 
-## 实体（5）
+## 实体（9）
 
+- [[../entities/CAKE KDA|CAKE KDA]]
+- [[../entities/Colfax Research|Colfax Research]]
 - [[../entities/FlashInfer|FlashInfer]]
 - [[../entities/FlashKDA|FlashKDA]]
 - [[../entities/HazyResearch|HazyResearch]]
 - [[../entities/Megakernels|Megakernels]]
+- [[../entities/NVIDIA Blackwell|NVIDIA Blackwell]]
 - [[../entities/NVIDIA Rubin|NVIDIA Rubin]]
+- [[../entities/阿里云 PAI 团队|阿里云 PAI 团队]]
 
-## 来源（10）
+## 来源（13）
 
 - [[../sources/CUDA优化维度框架|CUDA优化维度框架]]
 - [[../sources/CUDA内存层次与动态共享内存问答整理|CUDA内存层次与动态共享内存问答整理]]
+- [[../sources/Dynamic persistent tile scheduling with Cluster Launch Control (CLC) on NVIDIA Blackwell GPUs|Dynamic persistent tile scheduling with Cluster Launch Control (CLC) on NVIDIA Blackwell GPUs]]
 - [[../sources/Look Ma, No Bubbles! Designing a Low-Latency Megakernel for Llama-1B|Look Ma, No Bubbles! Designing a Low-Latency Megakernel for Llama-1B]]
 - [[../sources/MegaMoE — 让 all-to-all 消失|MegaMoE — 让 all-to-all 消失]]
 - [[../sources/Nvidia Rubin架构分析预览|Nvidia Rubin架构分析预览]]
+- [[../sources/PAI-FA｜突破 TMEM 瓶颈：FlashAttention-4 大 Head Dimension (256) 高性能算子实现与优化|PAI-FA｜突破 TMEM 瓶颈：FlashAttention-4 大 Head Dimension (256) 高性能算子实现与优化]]
+- [[../sources/REMINDER FF-KDA & CAKE KDA Highlights|REMINDER FF-KDA & CAKE KDA Highlights]]
 - [[../sources/你一定要知道：CUDA优化六要|你一定要知道：CUDA优化六要]]
 - [[../sources/多卡GPU监控与SM执行模型面试整理|多卡GPU监控与SM执行模型面试整理]]
 - [[../sources/斯坦福CS336 Lecture 5 - GPUs|斯坦福CS336 Lecture 5 - GPUs]]

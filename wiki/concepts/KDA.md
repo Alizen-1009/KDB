@@ -2,7 +2,7 @@
 type: concept
 topic: 注意力机制
 updated: 2026-08-02
-sources: 1
+sources: 2
 ---
 
 # KDA
@@ -110,6 +110,12 @@ Kimi K3技术报告§5.4.2明确的Decode融合范围是ShortConv、Input Norm�
 
 逐token递推可写成仿射transition `S_t=M_t S_{t-1}+B_t`。仿射变换可结合，因此segments可用prefix scan组合；chunk内部通过UT transform改写为causal lower-triangular GEMM。[[../entities/FlashKDA|FlashKDA]]进一步用CUTLASS/Tensor Core实现，并重叠块内token计算与块间状态传播。完整推导见 [[../../output/reports/FlashKDA为什么能并行|FlashKDA为什么能并行]]。
 
+## CAKE KDA 全融合 Prefill
+
+[[../entities/CAKE KDA]] 在 B200/SM100a 上提供另一种 prefill 调度：不把 chunk preparation 与 recurrence 拆成 K1/K2 两个 kernels，而是在单 CTA 内由五组 producer 预先准备五个 32-token chunks，再由 consumer 严格按顺序推进 FP32 recurrent state。固定 exponent anchor 让 chunk 32 的 BF16 Q/K 因子保持在可用范围内，并在 `Mqk` 中抵消；state 跨 chunks 常驻 [[Tensor Memory|TMEM]]，chunk-local 中间量通过五级 SMEM ring 和 lifetime aliasing 留在片上。
+
+这与 [[../entities/FlashKDA|FlashKDA]] 两阶段方案形成互补：FlashKDA 的 K1 可沿 chunks×heads 提供更高 preparation 并行度，但需要 global workspace；CAKE 消除 workspace/HBM 往返，却让整体 grid 更直接受 batch×heads 限制。小 batch 或少 heads 时，两阶段或 shape-aware dispatch 仍可能更合适。
+
 ## 伪代码
 
 Decode `T=1` 且上游已算好 `q/k/v/alpha/beta` 时，优先看 [[../../output/reports/KDA最小Decode伪代码|KDA最小Decode伪代码]]；完整输入投影、Conv State、batch/sequence与K-last布局再看 [[../../output/reports/KDA伪代码与输入输出|KDA伪代码与输入输出]]。
@@ -120,10 +126,12 @@ Decode `T=1` 且上游已算好 `q/k/v/alpha/beta` 时，优先看 [[../../outpu
 - [[Chunked Gated Delta Rule]]
 - [[混合注意力]]
 - [[MLA]]
+- [[Tensor Memory]]
 
 ## 相关来源
 
 - [[../sources/A Preview of Production-Scale Kimi K3 Support on vLLM]]
+- [[../sources/REMINDER FF-KDA & CAKE KDA Highlights]]
 
 ## 官方资料
 
