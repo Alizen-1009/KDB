@@ -9,7 +9,7 @@ updated: 2026-08-17
 
 ## 定义
 
-`DFlash` 是一种 diffusion-style [[并行投机解码]]方法：drafter 以 anchor token 和多个 mask positions 为输入，并行预测一段候选 token；为弥补小 drafter 的能力不足，它从 target model 的中间 hidden states 提取额外上下文并注入 draft Attention。
+`DFlash` 是一种基于 **single-step block diffusion drafter** 的 [[并行投机解码]]方法：drafter 以 target 给出的 anchor token 和多个 mask positions 为输入，用一次 forward 并行预测一段候选 token；它不是常规扩散模型那样反复执行多轮 denoising。为弥补小 drafter 的能力不足，它从 target model 的中间 hidden states 提取额外上下文并注入 draft Attention。
 
 ## 它解决什么问题
 
@@ -23,10 +23,10 @@ updated: 2026-08-17
 
 1. Target model 对当前 prefix forward，产生一个新 token 作为 drafter anchor。
 2. 从 target 若干中间层抽取 hidden states，并融合成 `H_ctx`。
-3. Drafter 输入 anchor 与若干 mask positions，形成 draft hidden `H_d`。
-4. 每层 Attention 中，Query 只来自 `H_d`；投影后的 target context 与 draft hidden 拼成 `[H_ctx || H_d]`，供 K/V 读取。
-5. Drafter 在多个 mask 位置并行输出 logits，并通过与 target 共享的 LM head 产生候选。
-6. Target model 按普通 speculative decoding 规则验证候选前缀。
+3. Drafter 输入 anchor 与若干 mask positions，形成 draft hidden `H_d`；同一 block 内 mask positions 可做双向 Attention，但不会根据本轮已经预测出的 token 再迭代去噪。
+4. 每层 Attention 中，Query 只来自 `H_d`；投影后的 target context 与 draft hidden 拼成 `[H_ctx || H_d]`，供 K/V 读取。Target context 的 K/V 可缓存并跨 drafting round 复用。
+5. Drafter 在多个 mask 位置一次并行输出 logits，并通过与 target 共享的 LM head 产生候选。
+6. Target model 按普通 speculative decoding 规则验证候选前缀；drafter 只负责提案，不直接决定最终输出。
 
 ## 为什么 target hidden 有帮助
 
@@ -68,5 +68,5 @@ updated: 2026-08-17
 
 ## 研究备注
 
-- 当前机制来自二手技术文章；需用 `z-lab/dflash` 官方 repo / 论文核对 target hidden fusion、共享 LM head、mask schedule 和训练损失。
+- 已按 [DFlash 原论文](https://arxiv.org/abs/2602.06036) 核对 single-step block diffusion、block 内双向 Attention、target hidden 持久 K/V 注入与位置加权训练损失；具体 checkpoint / runtime 配置仍应绑定版本。
 - 来源称 vLLM 可直接以 `method=dflash` 部署，但正式版本、CLI 与并行支持范围待源码验证。

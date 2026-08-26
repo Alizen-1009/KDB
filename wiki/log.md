@@ -1647,3 +1647,11 @@
 - 更正上一条日志边界：Anki Markdown 契约属于 `kb-cards`，不再属于 `kb-export`
 - 更新 schema/docs：`AGENTS.md`、`output/README.md`、`scripts/README.md`、`scripts/export_cards.py`
 - 更新索引：增加 `output/exports/*.html` 的资源统计与《HTML 导出》区
+
+## [2026-08-26] query | DFlash 与 DSpark 投机解码机制
+
+- 读取概念页：`DFlash`、`DSpark`、`并行投机解码`、`Speculative Decoding`
+- 读取来源页：`并行投机解码(DFlashDSpark)的快速理解与vLLM实测`
+- 参考原论文：DFlash arXiv:2602.06036、DSpark arXiv:2607.05147
+- 更新概念页：`wiki/concepts/DFlash.md`、`wiki/concepts/DSpark.md`，补充 single-step block diffusion、半自回归修正、STS 与 hardware-aware scheduler
+- 待核实：vLLM 正式支持版本及是否完整实现 DSpark 论文 scheduler / STS 流程

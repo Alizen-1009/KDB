@@ -9,7 +9,7 @@ updated: 2026-08-17
 
 ## 定义
 
-`DSpark` 是在 [[DFlash]] 式并行 drafter 基础上加入顺序 token 建模、条件 confidence 和 Hardware-Aware Prefix Scheduler 的 [[并行投机解码]]方法。它允许 drafter 先产生较长候选，再只选择预计能提高吞吐的前缀交给 target model 验证。
+`DSpark` 是在 [[DFlash]] 式并行 drafter 基础上加入轻量顺序修正、条件 confidence 和 Hardware-Aware Prefix Scheduler 的**半自回归** [[并行投机解码]]方法。它允许 drafter 先产生较长候选，再只选择预计能提高吞吐的前缀交给 target model 验证。
 
 ## 它解决什么问题
 
@@ -20,11 +20,12 @@ updated: 2026-08-17
 ## 核心流程
 
 1. Target 对 prefix forward，产生 anchor token 和可供 drafter 使用的中间 context。
-2. Parallel block 根据 anchor 与 mask positions 并行计算多个未来位置的中间 logits。
-3. Sequential block 从左到右生成候选 token，并输出每个位置的条件 confidence `c_k`。
-4. Scheduler 根据 confidence 和离线/预先 profile 的硬件 `SPS(B)` 曲线，为 batch 中每个请求选择验证长度 `l_r`。
-5. 只有选中的候选前缀进入 target verification；低价值后缀直接丢弃。
-6. Target 从左到右连续接受，通过第一个失败位置后丢弃剩余候选，并产生替代或 bonus token。
+2. Parallel backbone 根据 anchor 与 mask positions 一次计算多个未来位置的基础 logits。
+3. 轻量 Sequential head 从左到右给基础 logits 加入依赖已采样前缀的修正项，再生成候选 token；默认可用只依赖前一 token 的低秩 Markov head，也可用累计块内历史的 RNN head。
+4. Confidence head 输出每个位置的条件 confidence `c_k`；原论文再用 Sequential Temperature Scaling（STS）校准累计前缀概率。
+5. Scheduler 根据 confidence 和启动时 profile / cache 的硬件 `SPS(B)` 曲线，为 batch 中每个请求选择验证长度 `l_r`。
+6. 只有选中的候选前缀进入 target verification；低价值后缀直接丢弃。
+7. Target 仍按标准 speculative verification 从左到右接受；首个失败位置之后的候选被丢弃，并由 target 产生替代或 bonus token。
 
 ## Hardware-Aware Prefix Scheduler
 
@@ -93,5 +94,5 @@ Scheduler 将“为某请求再增加一位验证”的候选按前缀存活概�
 
 ## 研究备注
 
-- 需要阅读 DSpark 原论文 `arXiv:2607.05147`，核对 sequential block 的具体结构、confidence 训练/校准方式、scheduler 最优性边界和 sampling correctness。
-- 来源称 vLLM 可直接以 `method=dspark` 部署，但正式支持版本、CLI、CUDA Graph 与 TP/DP 限制待源码验证。
+- 已按 [DSpark 原论文](https://arxiv.org/abs/2607.05147) 核对半自回归 Markov/RNN 修正、conditional confidence、STS 校准与 Hardware-Aware Prefix Scheduler；生产实现与论文算法的具体差异仍需绑定代码版本。
+- 来源称 vLLM 可直接以 `method=dspark` 部署，但正式支持版本、CLI、CUDA Graph、TP/DP 限制，以及是否完整实现论文 scheduler / STS 流程，仍待源码验证。
