@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="从投机解码基础出发，详细解释 DFlash 的单步块扩散草稿器，以及 DSpark 的半自回归修正、置信度校准和硬件感知前缀调度。">
+  <title>DFlash 与 DSpark：扩散式投机解码详解</title>
+  <style>
+    :root {
+      --bg: #f3f0e8;
+      --paper: #fffdf8;
+      --ink: #19202a;
+      --muted: #66707d;
+      --line: #d9d5cb;
+      --line-strong: #b9b4a8;
+      --target: #243f73;
+      --target-soft: #e8eef9;
+      --dflash: #126e72;
+      --dflash-soft: #e1f3f1;
+      --dspark: #b8512e;
+      --dspark-soft: #faeae3;
+      --verify: #7b4db0;
+      --verify-soft: #f0e8f8;
+      --warn: #8d650b;
+      --warn-soft: #fff5d9;
+      --good: #166a45;
+      --shadow: 0 18px 54px rgba(38, 42, 47, .10);
+      --radius: 18px;
+      --display: "Avenir Next", "Noto Sans SC", "PingFang SC", sans-serif;
+      --body: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+      --mono: "SFMono-Regular", "Cascadia Code", "JetBrains Mono", monospace;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 10% 4%, rgba(18,110,114,.08), transparent 24rem),
+        radial-gradient(circle at 95% 24%, rgba(184,81,46,.07), transparent 30rem),
+        var(--bg);
+      font-family: var(--body);
+      line-height: 1.72;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: var(--target); text-underline-offset: 3px; }
+    button { font: inherit; }
+    code, pre, .mono { font-family: var(--mono); }
+    :focus-visible { outline: 3px solid rgba(36,63,115,.35); outline-offset: 3px; }
+
+    .shell {
+      display: grid;
+      grid-template-columns: 244px minmax(0, 980px);
+      gap: 42px;
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 26px 30px 88px;
+    }
+    .rail {
+      position: sticky;
+      top: 24px;
+      align-self: start;
+      height: calc(100vh - 48px);
+      display: flex;
+      flex-direction: column;
+      padding: 22px 17px;
+      border: 1px solid rgba(185,180,168,.75);
+      border-radius: 20px;
+      background: rgba(255,253,248,.88);
+      backdrop-filter: blur(16px);
+      box-shadow: 0 10px 34px rgba(38,42,47,.07);
+    }
+    .brand {
+      display: flex;
+      gap: 11px;
+      align-items: center;
+      padding: 0 7px 19px;
+      border-bottom: 1px solid var(--line);
+      font: 760 14px/1.25 var(--display);
+    }
+    .brand-mark {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border-radius: 11px;
+      color: white;
+      background: linear-gradient(135deg, var(--dflash) 0 49%, var(--dspark) 51% 100%);
+      font: 800 11px/1 var(--mono);
+    }
+    .toc-label {
+      margin: 19px 8px 8px;
+      color: var(--muted);
+      font: 700 11px/1 var(--mono);
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+    .toc { display: grid; gap: 3px; }
+    .toc a {
+      padding: 7px 9px;
+      border-radius: 8px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 13px;
+      line-height: 1.35;
+    }
+    .toc a:hover, .toc a.active { color: var(--target); background: var(--target-soft); }
+    .rail-meta {
+      margin-top: auto;
+      padding: 14px 8px 0;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    main { min-width: 0; }
+    .hero {
+      position: relative;
+      overflow: hidden;
+      min-height: 430px;
+      padding: 62px 58px 50px;
+      border-radius: 30px;
+      color: #fff;
+      background: #172231;
+      box-shadow: var(--shadow);
+    }
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(115deg, transparent 54%, rgba(18,110,114,.55) 54.2% 54.7%, transparent 54.9%),
+        linear-gradient(42deg, transparent 63%, rgba(184,81,46,.55) 63.2% 63.8%, transparent 64%),
+        radial-gradient(circle at 82% 26%, rgba(255,255,255,.78) 0 1px, transparent 2px),
+        radial-gradient(circle at 72% 74%, rgba(255,255,255,.55) 0 1px, transparent 2px);
+      background-size: 100% 100%, 100% 100%, 24px 24px, 31px 31px;
+      opacity: .52;
+    }
+    .eyebrow {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      color: #b8dcd8;
+      font: 750 12px/1 var(--mono);
+      letter-spacing: .11em;
+      text-transform: uppercase;
+    }
+    .eyebrow::before { content: ""; width: 28px; height: 2px; background: #63c2b9; }
+    h1 {
+      position: relative;
+      max-width: 760px;
+      margin: 24px 0 20px;
+      font: 780 clamp(40px, 6vw, 72px)/1.04 var(--display);
+      letter-spacing: -.055em;
+    }
+    .hero p {
+      position: relative;
+      max-width: 700px;
+      margin: 0;
+      color: #ced7e2;
+      font-size: 17px;
+    }
+    .hero-chips { position: relative; display: flex; flex-wrap: wrap; gap: 9px; margin-top: 32px; }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 11px;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 999px;
+      background: rgba(255,255,255,.06);
+      color: #e7edf4;
+      font-size: 12px;
+    }
+    .chip-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+
+    section { scroll-margin-top: 24px; margin-top: 58px; padding: 0 10px; }
+    .section-head {
+      display: grid;
+      grid-template-columns: 58px 1fr;
+      gap: 18px;
+      align-items: start;
+      margin-bottom: 26px;
+    }
+    .section-no { padding-top: 7px; color: var(--target); font: 750 13px/1 var(--mono); }
+    h2 { margin: 0 0 8px; font: 760 clamp(28px, 4vw, 39px)/1.18 var(--display); letter-spacing: -.038em; }
+    h3 { margin: 30px 0 11px; font: 730 21px/1.3 var(--display); letter-spacing: -.02em; }
+    h3.subhead { margin: 0 0 7px; font: 740 16px/1.35 var(--display); letter-spacing: 0; }
+    .lede { margin: 0; color: var(--muted); font-size: 15px; }
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--paper);
+      box-shadow: 0 10px 32px rgba(38,42,47,.05);
+    }
+
+    .answer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .answer-card { padding: 24px; border-top: 5px solid; }
+    .answer-card.dflash { border-top-color: var(--dflash); }
+    .answer-card.dspark { border-top-color: var(--dspark); }
+    .answer-card .label { color: var(--muted); font: 720 11px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; }
+    .answer-card strong { display: block; margin: 9px 0 10px; font: 760 24px/1.28 var(--display); }
+    .answer-card p { margin: 0; color: var(--muted); }
+    .keyline {
+      margin-top: 16px;
+      padding: 20px 23px;
+      border-left: 5px solid var(--target);
+      border-radius: 0 14px 14px 0;
+      background: var(--target-soft);
+      font-size: 17px;
+    }
+
+    .base-flow, .flow-grid {
+      display: grid;
+      gap: 10px;
+      padding: 18px;
+      overflow-x: auto;
+    }
+    .base-flow { grid-template-columns: repeat(5, minmax(145px, 1fr)); }
+    .flow-grid { grid-template-columns: repeat(6, minmax(138px, 1fr)); }
+    .flow-step {
+      position: relative;
+      min-height: 138px;
+      padding: 17px 15px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fff;
+    }
+    .flow-step:not(:last-child)::after {
+      content: "→";
+      position: absolute;
+      z-index: 2;
+      top: 50%;
+      right: -17px;
+      width: 24px;
+      color: var(--line-strong);
+      background: var(--paper);
+      text-align: center;
+      font: 700 17px/1 var(--mono);
+    }
+    .flow-step .n { color: var(--muted); font: 750 11px/1 var(--mono); }
+    .flow-step strong { display: block; margin: 10px 0 7px; font: 730 16px/1.28 var(--display); }
+    .flow-step p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.55; }
+    .flow-step.target { background: var(--target-soft); border-color: #bdcbe3; }
+    .flow-step.dflash { background: var(--dflash-soft); border-color: #abd3ce; }
+    .flow-step.dspark { background: var(--dspark-soft); border-color: #e5b9a8; }
+    .flow-step.verify { background: var(--verify-soft); border-color: #cdb7e2; }
+
+    .token-demo { padding: 24px; }
+    .token-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 12px 0; }
+    .token {
+      min-width: 58px;
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+      text-align: center;
+      font: 690 13px/1 var(--mono);
+    }
+    .token.anchor { color: #fff; background: var(--target); border-color: var(--target); }
+    .token.mask { color: var(--dflash); background: var(--dflash-soft); border-color: #abd3ce; }
+    .token.accept { color: var(--good); background: #e5f4eb; border-color: #acd1ba; }
+    .token.reject { color: #9f2f2f; background: #fae9e9; border-color: #e0b6b6; text-decoration: line-through; }
+    .arrow-note { color: var(--muted); font-size: 13px; }
+
+    .split { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    .mini { padding: 22px; }
+    .mini ul { margin: 12px 0 0; padding-left: 19px; }
+    .mini li + li { margin-top: 7px; }
+    .accent-dflash { border-top: 4px solid var(--dflash); }
+    .accent-dspark { border-top: 4px solid var(--dspark); }
+    .accent-verify { border-top: 4px solid var(--verify); }
+
+    .formula {
+      overflow-x: auto;
+      padding: 18px 20px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #1d2632;
+      color: #ecf2f8;
+      font: 13px/1.75 var(--mono);
+      white-space: pre-wrap;
+    }
+    .formula .hi-d { color: #75d3c8; }
+    .formula .hi-s { color: #ffad8d; }
+    .formula .hi-v { color: #d4b9ef; }
+
+    .tabs { padding: 18px; }
+    .tablist { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+    .tab-button {
+      border: 1px solid var(--line-strong);
+      border-radius: 999px;
+      padding: 9px 14px;
+      color: var(--muted);
+      background: #fff;
+      cursor: pointer;
+    }
+    .tab-button[aria-selected="true"] { color: #fff; border-color: var(--target); background: var(--target); }
+    .tab-panel { padding: 22px; border-radius: 14px; background: #fff; border: 1px solid var(--line); }
+    .tab-panel[hidden] { display: none; }
+
+    .confidence { padding: 22px; }
+    .confidence-row {
+      display: grid;
+      grid-template-columns: 90px minmax(160px, 1fr) 72px 92px;
+      gap: 12px;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .confidence-row:last-child { border-bottom: 0; }
+    .bar { height: 10px; overflow: hidden; border-radius: 999px; background: #e6e2d9; }
+    .bar > span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--dspark), #e49a6f); }
+    .status { font-size: 12px; font-weight: 720; }
+    .status.keep { color: var(--good); }
+    .status.drop { color: #9f2f2f; }
+    .caption { margin: 12px 0 0; color: var(--muted); font-size: 12px; }
+
+    .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius); background: var(--paper); }
+    table { width: 100%; min-width: 760px; border-collapse: collapse; }
+    th, td { padding: 15px 16px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+    th { color: var(--muted); background: #f4f1e9; font: 730 12px/1.35 var(--mono); letter-spacing: .03em; }
+    tr:last-child td { border-bottom: 0; }
+    td:first-child { font-weight: 720; }
+
+    .tradeoff-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .tradeoff { padding: 21px; }
+    .tradeoff .tag { display: inline-block; margin-bottom: 11px; padding: 5px 8px; border-radius: 7px; background: var(--warn-soft); color: var(--warn); font: 720 11px/1 var(--mono); }
+    .tradeoff p { margin: 0; color: var(--muted); font-size: 14px; }
+
+    .callout {
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 13px;
+      margin-top: 16px;
+      padding: 19px 21px;
+      border: 1px solid #e5cf8f;
+      border-radius: 14px;
+      background: var(--warn-soft);
+    }
+    .callout .icon { font: 800 20px/1 var(--mono); color: var(--warn); }
+    .callout p { margin: 0; }
+
+    details { border-top: 1px solid var(--line); }
+    details:first-child { border-top: 0; }
+    summary { cursor: pointer; padding: 16px 20px; font-weight: 720; }
+    details > div { padding: 0 20px 18px; color: var(--muted); }
+
+    .sources { margin: 0; padding: 0; list-style: none; }
+    .sources li { padding: 15px 0; border-bottom: 1px solid var(--line); }
+    .sources li:last-child { border-bottom: 0; }
+    .sources strong { display: block; margin-bottom: 3px; }
+    .sources span { color: var(--muted); font-size: 13px; }
+    footer { margin: 64px 10px 0; padding-top: 22px; border-top: 1px solid var(--line-strong); color: var(--muted); font-size: 12px; }
+
+    @media (max-width: 980px) {
+      .shell { display: block; padding: 18px 18px 70px; }
+      .rail { position: relative; top: 0; width: 100%; height: auto; margin-bottom: 24px; }
+      .toc { grid-template-columns: repeat(3, 1fr); }
+      .rail-meta { margin-top: 16px; }
+      .hero { padding: 48px 38px 42px; }
+      .tradeoff-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 680px) {
+      .shell { padding: 10px 10px 58px; }
+      .rail { padding: 16px 13px; }
+      .toc { grid-template-columns: 1fr 1fr; }
+      .hero { min-height: 0; padding: 38px 24px 34px; border-radius: 22px; }
+      h1 { font-size: 39px; }
+      section { margin-top: 46px; padding: 0 4px; }
+      .section-head { grid-template-columns: 42px 1fr; gap: 10px; }
+      .answer-grid, .split { grid-template-columns: 1fr; }
+      .confidence-row { grid-template-columns: 68px 1fr 48px; }
+      .confidence-row .status { grid-column: 2 / 4; }
+      .flow-step:not(:last-child)::after { display: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition: none !important; animation: none !important; }
+    }
+    @media print {
+      :root { --bg: #fff; --paper: #fff; }
+      body { background: #fff; font-size: 10.5pt; }
+      .shell { display: block; max-width: none; padding: 0; }
+      .rail { display: none; }
+      .hero { min-height: 0; padding: 34px; box-shadow: none; break-after: avoid; }
+      section { margin-top: 34px; break-inside: avoid; }
+      .panel, .table-wrap { box-shadow: none; }
+      .tablist { display: none; }
+      .tab-panel[hidden] { display: block; margin-top: 12px; }
+      a { color: #000; text-decoration: none; }
+      footer { margin-top: 32px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <aside class="rail" aria-label="报告导航">
+      <div class="brand"><span class="brand-mark">D/S</span><span>并行投机解码<br>机制导读</span></div>
+      <div class="toc-label">Contents</div>
+      <nav class="toc">
+        <a href="#answer">先给结论</a>
+        <a href="#baseline">投机解码基础</a>
+        <a href="#dflash">DFlash</a>
+        <a href="#dspark">DSpark</a>
+        <a href="#compare">对比</a>
+        <a href="#runtime">工程含义</a>
+        <a href="#sources">来源与边界</a>
+      </nav>
+      <div class="rail-meta">自包含 HTML · 可直接分享<br>核心机制按原论文核对</div>
+    </aside>
+
+    <main>
+      <header class="hero">
+        <div class="eyebrow">Speculative decoding explainer</div>
+        <h1>DFlash 与 DSpark<br>到底怎样加速生成？</h1>
+        <p>从“先猜、再验”的投机解码出发，拆解单步块扩散草稿器、半自回归顺序修正，以及为什么验证长度必须同时考虑置信度与硬件效率。</p>
+        <div class="hero-chips" aria-label="核心标签">
+          <span class="chip" style="color:#75d3c8"><span class="chip-dot"></span>DFlash：一次并行填块</span>
+          <span class="chip" style="color:#ffad8d"><span class="chip-dot"></span>DSpark：并行 + 顺序修正</span>
+          <span class="chip" style="color:#d4b9ef"><span class="chip-dot"></span>Target：最终验证者</span>
+        </div>
+      </header>
+
+      <section id="answer">
+        <div class="section-head">
+          <div class="section-no">01</div>
+          <div><h2>先回答最容易混淆的问题</h2><p class="lede">两者都借用了 diffusion-style 并行填充，但只有 DFlash 可以直接叫单步块扩散 drafter；DSpark 已经是混合式、半自回归架构。</p></div>
+        </div>
+        <div class="answer-grid">
+          <article class="panel answer-card dflash">
+            <div class="label">DFlash</div>
+            <strong>单步块扩散式草稿器</strong>
+            <p>输入一个可靠的 anchor token 和多个 mask position，用一次 forward 同时预测整段候选。它不是图像扩散那样反复执行几十轮去噪。</p>
+          </article>
+          <article class="panel answer-card dspark">
+            <div class="label">DSpark</div>
+            <strong>并行骨干 + 轻量顺序修正</strong>
+            <p>保留 DFlash 的并行 backbone，再让 Markov/RNN head 逐位置修正 logits，并依据置信度和硬件曲线裁剪验证前缀。</p>
+          </article>
+        </div>
+        <div class="keyline"><strong>一句话：</strong>DFlash 重点解决“草稿生成太串行”；DSpark 继续解决“并行草稿后缀不连贯，而且固定长度验证浪费 Target 算力”。两者最终都必须由 Target LLM 验证。</div>
+      </section>
+
+      <section id="baseline">
+        <div class="section-head">
+          <div class="section-no">02</div>
+          <div><h2>共同底座：投机解码是“先猜，再验”</h2><p class="lede">真正昂贵的是大 Target 模型逐 token 前进。投机解码试图用便宜机制一次猜多个 token，再让 Target 用一个小 chunk forward 并行评分。</p></div>
+        </div>
+        <div class="panel base-flow" aria-label="投机解码通用流程">
+          <div class="flow-step target"><span class="n">STEP 1</span><strong>已有 Prefix</strong><p>Target 已经处理完上下文，KV Cache 可复用。</p></div>
+          <div class="flow-step dflash"><span class="n">STEP 2</span><strong>Drafter 猜候选</strong><p>便宜模型提出 y₁…yₖ，不直接写入最终输出。</p></div>
+          <div class="flow-step verify"><span class="n">STEP 3</span><strong>Target 并行评分</strong><p>把普通 qlen=1 变成小 qlen=k 的 verification。</p></div>
+          <div class="flow-step verify"><span class="n">STEP 4</span><strong>连续接受</strong><p>从左到右接受，遇到第一个失败位置停止。</p></div>
+          <div class="flow-step target"><span class="n">STEP 5</span><strong>提交或回滚</strong><p>保留通过的 KV，丢弃拒绝后缀，再进入下一轮。</p></div>
+        </div>
+        <div class="panel token-demo" style="margin-top:14px">
+          <h3 style="margin-top:0">一个最小例子</h3>
+          <p class="lede">假设草稿器提出 4 个 token，而 Target 只认可前两个：</p>
+          <div class="token-row" aria-label="草稿 token">
+            <span class="token anchor">anchor</span><span class="arrow-note">→ draft</span>
+            <span class="token mask">我</span><span class="token mask">喜欢</span><span class="token mask">苹果</span><span class="token mask">。</span>
+          </div>
+          <div class="token-row" aria-label="验证结果">
+            <span class="token anchor">anchor</span><span class="arrow-note">→ verify</span>
+            <span class="token accept">我 ✓</span><span class="token accept">喜欢 ✓</span><span class="token reject">苹果 ✗</span><span class="token reject">。 ✗</span>
+          </div>
+          <p class="caption">拒绝发生在第 3 位时，第 4 位即使“碰巧合理”也不能直接保留，因为它依赖的前缀已经改变。严格 sampling 场景还需要 speculative sampling 的接受/替代分布，才能保持 Target 分布不变。</p>
+        </div>
+      </section>
+
+      <section id="dflash">
+        <div class="section-head">
+          <div class="section-no">03</div>
+          <div><h2>DFlash：用一次 block diffusion 并行生成草稿</h2><p class="lede">它不让小 drafter 自回归运行 k 次，而是把未来位置全部 mask，一次算出整个 block 的 logits。</p></div>
+        </div>
+        <div class="panel flow-grid" aria-label="DFlash 流程">
+          <div class="flow-step target"><span class="n">01</span><strong>Target 产生 Anchor</strong><p>Target 先给出一个可靠 token，同时暴露若干中间层 hidden states。</p></div>
+          <div class="flow-step target"><span class="n">02</span><strong>融合 Target Context</strong><p>多层 hidden 拼接、投影、RMSNorm，得到 H_ctx。</p></div>
+          <div class="flow-step dflash"><span class="n">03</span><strong>Anchor + Masks</strong><p>形如 [anchor, MASK, MASK, …] 的固定 block。</p></div>
+          <div class="flow-step dflash"><span class="n">04</span><strong>一次并行 Forward</strong><p>所有 mask position 同时产生 hidden 与 logits。</p></div>
+          <div class="flow-step verify"><span class="n">05</span><strong>Target Verification</strong><p>Target 对候选 block 做 causal 并行评分。</p></div>
+          <div class="flow-step target"><span class="n">06</span><strong>接受 + Bonus</strong><p>提交最长可接受前缀，并生成替代或 bonus token。</p></div>
+        </div>
+
+        <div class="split" style="margin-top:15px">
+          <article class="panel mini accent-dflash">
+            <h3 class="subhead">为什么叫 diffusion-style？</h3>
+            <ul>
+              <li>干净的 anchor 作为条件，未来位置以 mask 表示。</li>
+              <li>一个 block 内的 mask positions 可做双向 Attention。</li>
+              <li>模型学习从被 mask 的 block 恢复后续 token。</li>
+            </ul>
+          </article>
+          <article class="panel mini accent-verify">
+            <h3 class="subhead">为什么又不是传统扩散模型？</h3>
+            <ul>
+              <li>没有长达几十步的 noise → denoise 迭代。</li>
+              <li>一次 forward 就直接输出整个 block。</li>
+              <li>正确性来自 Target 验证，而不是 drafter 自身。</li>
+            </ul>
+          </article>
+        </div>
+
+        <h3>Target hidden 并不是简单拼到输入，而是持续注入每一层 Attention</h3>
+        <div class="formula" aria-label="DFlash target context 注入公式"><span class="hi-d">H_ctx</span> = RMSNorm(W_c · [H_target^(l₁); … ; H_target^(l₅)])
+
+Q_i = W_i^Q · H_draft
+K_i = [W_i^K · <span class="hi-d">H_ctx</span> ; W_i^K · H_draft]
+V_i = [W_i^V · <span class="hi-d">H_ctx</span> ; W_i^V · H_draft]</div>
+        <p class="caption">直观理解：draft token 发出 Query，但每层都能从 Target 已编码好的语义上下文和当前 draft block 中读取 K/V。Target context 的 K/V 还可缓存并跨 drafting round 复用。</p>
+
+        <div class="callout">
+          <div class="icon">!</div>
+          <p><strong>DFlash 的关键弱点：</strong>所有候选虽然在 block 内可以互相 Attention，但它们是同一次 forward 同时输出的，后面位置不能根据“本轮实际采样出的前一个 token”重新条件化。因此越靠后的候选越容易出现多模态冲突和 acceptance decay。</p>
+        </div>
+      </section>
+
+      <section id="dspark">
+        <div class="section-head">
+          <div class="section-no">04</div>
+          <div><h2>DSpark：先并行铺底，再顺序修正，再决定验多少</h2><p class="lede">DSpark 没有放弃 DFlash 的并行优势，而是在 logits 之后增加一个远轻于 Transformer backbone 的顺序依赖通道。</p></div>
+        </div>
+        <div class="panel flow-grid" aria-label="DSpark 流程">
+          <div class="flow-step target"><span class="n">01</span><strong>Target Context</strong><p>与 DFlash 类似，提供 anchor 和语义上下文。</p></div>
+          <div class="flow-step dflash"><span class="n">02</span><strong>并行 Backbone</strong><p>一次得到所有未来位置的基础 logits U₁…Uγ。</p></div>
+          <div class="flow-step dspark"><span class="n">03</span><strong>Sequential Head</strong><p>Markov/RNN head 根据已采样前缀修正每一位。</p></div>
+          <div class="flow-step dspark"><span class="n">04</span><strong>Confidence + STS</strong><p>估计条件接受率，并校准前缀存活概率。</p></div>
+          <div class="flow-step dspark"><span class="n">05</span><strong>硬件感知裁剪</strong><p>根据 SPS(B) 给不同请求选择不同验证长度。</p></div>
+          <div class="flow-step verify"><span class="n">06</span><strong>Target 验证</strong><p>只有选中前缀进入标准 speculative verification。</p></div>
+        </div>
+
+        <div class="panel tabs" style="margin-top:15px">
+          <div class="tablist" role="tablist" aria-label="DSpark 三个新增模块">
+            <button class="tab-button" role="tab" aria-selected="true" aria-controls="tab-seq" id="btn-seq">顺序修正</button>
+            <button class="tab-button" role="tab" aria-selected="false" aria-controls="tab-conf" id="btn-conf">置信度</button>
+            <button class="tab-button" role="tab" aria-selected="false" aria-controls="tab-sched" id="btn-sched">硬件调度</button>
+          </div>
+          <div class="tab-panel" role="tabpanel" id="tab-seq" aria-labelledby="btn-seq">
+            <h3 class="subhead">1. 顺序修正：恢复块内 token 依赖</h3>
+            <p>并行 backbone 先给第 k 位一个基础 logits <code>U_k</code>。轻量 head 再依据已经采样的前缀加入偏置 <code>B_k</code>：</p>
+            <div class="formula">p_k(v | x₀, x&lt;k) = softmax(<span class="hi-d">U_k(v)</span> + <span class="hi-s">B_k(x₀, x&lt;k, v)</span>)</div>
+            <p>默认 Markov head 只依赖前一个 token，并用低秩矩阵降低成本；RNN head 可以累计更完整的块内历史。关键要求是顺序 head 的耗时远小于并行 backbone。</p>
+          </div>
+          <div class="tab-panel" role="tabpanel" id="tab-conf" aria-labelledby="btn-conf" hidden>
+            <h3 class="subhead">2. 条件置信度：预测“这一位值得继续验吗”</h3>
+            <p><code>c_k</code> 估计的是：在前面 token 都被接受的条件下，第 k 位也会被 Target 接受的概率。整个前缀活到第 j 位的概率近似为：</p>
+            <div class="formula"><span class="hi-s">a_j</span> = ∏(i=1…j) c_i</div>
+            <p>乘积会随位置快速下降。原论文还使用 Sequential Temperature Scaling（STS）校准累计概率，缓解 raw confidence 过度自信。</p>
+          </div>
+          <div class="tab-panel" role="tabpanel" id="tab-sched" aria-labelledby="btn-sched" hidden>
+            <h3 class="subhead">3. Hardware-Aware Prefix Scheduler：收益与成本一起算</h3>
+            <p>多验证一个 token 可能增加期望接受量，但也会增大 Target 本轮的 token batch。调度器使用预先 profile 的 <code>SPS(B)</code> 曲线估计不同 shape 下每秒能跑多少 verification step：</p>
+            <div class="formula">B = Σ_r (1 + l_r)
+τ = Σ_r (1 + Σ_j≤l_r a_r,j)
+<span class="hi-v">Θ = τ · SPS(B)</span></div>
+            <p>它为每个请求贪心扩展验证前缀；只有预计能提高总吞吐 Θ 的候选才继续加入。</p>
+          </div>
+        </div>
+
+        <h3>为什么不能只设一个固定 num_speculative_tokens？</h3>
+        <div class="panel confidence" aria-label="概念性置信度裁剪示例">
+          <div class="confidence-row"><strong>token 1</strong><div class="bar"><span style="width:96%"></span></div><span class="mono">0.96</span><span class="status keep">送去验证</span></div>
+          <div class="confidence-row"><strong>token 2</strong><div class="bar"><span style="width:91%"></span></div><span class="mono">0.91</span><span class="status keep">送去验证</span></div>
+          <div class="confidence-row"><strong>token 3</strong><div class="bar"><span style="width:78%"></span></div><span class="mono">0.78</span><span class="status keep">可能保留</span></div>
+          <div class="confidence-row"><strong>token 4</strong><div class="bar"><span style="width:42%"></span></div><span class="mono">0.42</span><span class="status drop">高负载时裁掉</span></div>
+          <div class="confidence-row"><strong>token 5</strong><div class="bar"><span style="width:19%"></span></div><span class="mono">0.19</span><span class="status drop">直接裁掉</span></div>
+          <p class="caption">这是帮助理解的示意，不是论文 benchmark。真实决策看累计前缀存活概率与具体硬件的 SPS(B)，不是简单使用固定 confidence threshold。</p>
+        </div>
+      </section>
+
+      <section id="compare">
+        <div class="section-head">
+          <div class="section-no">05</div>
+          <div><h2>把三条路线放在一起比较</h2><p class="lede">传统小模型 drafter、DFlash 与 DSpark 的差异主要在候选生成的串行深度、块内依赖，以及是否动态控制验证成本。</p></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>维度</th><th>传统自回归 Drafter</th><th>DFlash</th><th>DSpark</th></tr></thead>
+            <tbody>
+              <tr><td>生成方式</td><td>y₁ → y₂ → … → yₖ</td><td>一次并行预测整个 masked block</td><td>并行基础 logits + 轻量顺序修正</td></tr>
+              <tr><td>草稿串行链</td><td>长度约随 k 增长</td><td>主干近似一次 forward</td><td>主干并行，附加廉价顺序 head</td></tr>
+              <tr><td>块内真实 token 依赖</td><td>天然存在</td><td>缺少“按实际采样前缀再条件化”</td><td>由 Markov/RNN head 恢复</td></tr>
+              <tr><td>Target context</td><td>取决于实现</td><td>多层 hidden 作为每层持久 K/V</td><td>继承 DFlash 式并行 backbone</td></tr>
+              <tr><td>验证长度</td><td>通常固定或启发式</td><td>常见为固定/预设 block</td><td>按 confidence + SPS(B) 动态选择</td></tr>
+              <tr><td>最终正确性</td><td colspan="3">都依赖 Target 的标准 verification / rejection sampling；drafter 不拥有最终决定权</td></tr>
+              <tr><td>主要风险</td><td>drafter 自身延迟抵消收益</td><td>suffix acceptance decay、长块浪费</td><td>顺序 head、置信度校准与在线调度复杂度</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="runtime">
+        <div class="section-head">
+          <div class="section-no">06</div>
+          <div><h2>工程上真正决定是否加速的因素</h2><p class="lede">算法能一次猜更多 token，不等于服务系统一定更快。收益取决于 proposal、verification、KV 状态和 batch shape 的整体账本。</p></div>
+        </div>
+        <div class="tradeoff-grid">
+          <article class="panel tradeoff"><span class="tag">ACCEPTANCE</span><h3 class="subhead">平均接受长度</h3><p>草稿越准，每次昂贵 Target step 能前进越多 token。后缀接受率低时，增大 block 只会制造无效计算。</p></article>
+          <article class="panel tradeoff"><span class="tag">LATENCY</span><h3 class="subhead">Drafter 自身成本</h3><p>DFlash 减少串行 forward；DSpark 又加入顺序 head。新增模块必须显著便宜于省下来的 Target decode steps。</p></article>
+          <article class="panel tradeoff"><span class="tag">SHAPE</span><h3 class="subhead">Verification 的硬件效率</h3><p>qlen=k 的小 chunk 不总比 qlen=1 划算。并发、TP、CUDA Graph、kernel 和总 token batch 都会改变 SPS(B)。</p></article>
+          <article class="panel tradeoff"><span class="tag">STATE</span><h3 class="subhead">KV Cache 提交与回滚</h3><p>候选 token 会产生 speculative KV slots。接受后提交，拒绝后回滚或覆盖，不能污染后续上下文。</p></article>
+          <article class="panel tradeoff"><span class="tag">CALIBRATION</span><h3 class="subhead">Confidence 是否可信</h3><p>过度自信会把低价值后缀送去 Target；过度保守会提前截断本可接受的 token，浪费 drafter 能力。</p></article>
+          <article class="panel tradeoff"><span class="tag">SERVING</span><h3 class="subhead">吞吐与单请求延迟并非一回事</h3><p>单请求最优 block length 未必是 continuous batching 下的全局最优。DSpark 的 scheduler 正是在优化 batch 级收益。</p></article>
+        </div>
+
+        <div class="keyline"><strong>评测时至少同时看：</strong>acceptance length、draft latency、verify latency、effective tokens per step、总吞吐、TPOT、TTFT、并发与输入/输出长度分布。只报“num speculative tokens”或单一倍数不足以解释收益。</div>
+      </section>
+
+      <section id="sources">
+        <div class="section-head">
+          <div class="section-no">07</div>
+          <div><h2>来源、事实边界与延伸阅读</h2><p class="lede">机制以原论文为主，知识库页面承担中文结构化索引。框架支持范围与生产实现仍需要绑定具体 commit。</p></div>
+        </div>
+        <div class="panel" style="padding:8px 22px">
+          <ol class="sources">
+            <li><strong><a href="https://arxiv.org/abs/2602.06036">DFlash 原论文</a></strong><span>核对 single-step block diffusion、random anchor、Target hidden 持久 K/V 注入、块内 Attention 与位置加权训练目标。</span></li>
+            <li><strong><a href="https://arxiv.org/abs/2607.05147">DSpark 原论文</a></strong><span>核对 semi-autoregressive Markov/RNN head、conditional confidence、STS 与 Hardware-Aware Prefix Scheduler。</span></li>
+            <li><strong><a href="https://github.com/deepseek-ai/DeepSpec">DeepSpec 官方仓库</a></strong><span>提供 DSpark 训练/评估代码与部分模型配置、checkpoint；生产 serving 路径是否完整覆盖论文算法需逐版本核实。</span></li>
+            <li><strong><a href="../../wiki/concepts/DFlash.md">知识库：DFlash</a> · <a href="../../wiki/concepts/DSpark.md">DSpark</a> · <a href="../../wiki/concepts/Speculative Decoding.md">Speculative Decoding</a></strong><span>中文概念页与相关来源回链。</span></li>
+          </ol>
+        </div>
+        <div class="panel" style="margin-top:15px">
+          <details open><summary>已知事实</summary><div>DFlash 是单步 block diffusion drafter；DSpark 在并行 backbone 后加入轻量顺序修正、置信度与硬件感知调度；最终候选仍由 Target 验证。</div></details>
+          <details><summary>性能权衡</summary><div>理论收益来自更短的 proposal 串行链、更高接受长度和更少无效验证；实际收益由模型、请求分布、硬件、并行拓扑、kernel 与 runtime 实现共同决定。</div></details>
+          <details><summary>待核实</summary><div>vLLM 等 serving 框架在哪个正式版本完整支持 DFlash/DSpark，以及是否实现论文级 STS 与硬件感知 scheduler，需要绑定源码 commit、配置与 benchmark 环境验证。</div></details>
+        </div>
+      </section>
+
+      <footer>生成目的：帮助快速建立 DFlash / DSpark 的正确心智模型。HTML 是 wiki 与原论文的派生阅读界面，不是新的事实来源。</footer>
+    </main>
+  </div>
+
+  <script>
+    (() => {
+      const tabs = [...document.querySelectorAll('[role="tab"]')];
+      const panels = [...document.querySelectorAll('[role="tabpanel"]')];
+      function activate(tab) {
+        tabs.forEach(t => {
+          const selected = t === tab;
+          t.setAttribute('aria-selected', String(selected));
+          t.tabIndex = selected ? 0 : -1;
+        });
+        panels.forEach(p => { p.hidden = p.id !== tab.getAttribute('aria-controls'); });
+      }
+      tabs.forEach((tab, index) => {
+        tab.addEventListener('click', () => activate(tab));
+        tab.addEventListener('keydown', event => {
+          if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+          event.preventDefault();
+          let next = index;
+          if (event.key === 'ArrowRight') next = (index + 1) % tabs.length;
+          if (event.key === 'ArrowLeft') next = (index - 1 + tabs.length) % tabs.length;
+          if (event.key === 'Home') next = 0;
+          if (event.key === 'End') next = tabs.length - 1;
+          activate(tabs[next]);
+          tabs[next].focus();
+        });
+      });
+
+      const tocLinks = [...document.querySelectorAll('.toc a')];
+      const sections = tocLinks.map(a => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+      if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver(entries => {
+          entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+            tocLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === `#${entry.target.id}`));
+          });
+        }, { rootMargin: '-20% 0px -70% 0px' });
+        sections.forEach(section => observer.observe(section));
+      }
+    })();
+  </script>
+</body>
+</html>

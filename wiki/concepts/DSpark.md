@@ -76,6 +76,10 @@ Scheduler 将“为某请求再增加一位验证”的候选按前缀存活概�
 
 这些数字属于来源 benchmark，环境与方法配置尚不足以独立复现或外推。
 
+## 相关报告
+
+- [DFlash 与 DSpark 投机解码详解](../../output/reports/DFlash与DSpark投机解码详解.html)
+
 ## 相关实体
 
 - [[../entities/vLLM]]

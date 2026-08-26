@@ -34,7 +34,7 @@
 - 来源文件：55
 - 实体文件：41
 - 概念文件：108
-- 报告文件：31
+- 报告文件：32
 - HTML 导出：0
 - 面试文件：11
 - 卡片文件：0
@@ -340,6 +340,7 @@
 
 - [[../output/reports/Blackwell相对Hopper的新特性|Blackwell相对Hopper的新特性]]
 - [[../output/reports/DCP是什么|DCP是什么]]
+- [DFlash与DSpark投机解码详解](../output/reports/DFlash与DSpark投机解码详解.html)
 - [[../output/reports/DeepSpeed Ulysses适用场景与DeepSeek关系|DeepSpeed Ulysses适用场景与DeepSeek关系]]
 - [[../output/reports/FlashKDA为什么能并行|FlashKDA为什么能并行]]
 - [[../output/reports/FlashKDA优化方法与GDN迁移指南|FlashKDA优化方法与GDN迁移指南]]

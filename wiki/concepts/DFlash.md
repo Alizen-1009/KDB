@@ -50,6 +50,10 @@ updated: 2026-08-17
 
 这些数字没有完整并发、长度分布、TP 配置和稳定版本信息，只能作为来源实验观察。
 
+## 相关报告
+
+- [DFlash 与 DSpark 投机解码详解](../../output/reports/DFlash与DSpark投机解码详解.html)
+
 ## 相关实体
 
 - [[../entities/vLLM]]

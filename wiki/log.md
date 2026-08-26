@@ -1655,3 +1655,12 @@
 - 参考原论文：DFlash arXiv:2602.06036、DSpark arXiv:2607.05147
 - 更新概念页：`wiki/concepts/DFlash.md`、`wiki/concepts/DSpark.md`，补充 single-step block diffusion、半自回归修正、STS 与 hardware-aware scheduler
 - 待核实：vLLM 正式支持版本及是否完整实现 DSpark 论文 scheduler / STS 流程
+
+## [2026-08-26] query | DFlash 与 DSpark 投机解码详解
+
+- 读取概念页：`DFlash`、`DSpark`、`并行投机解码`、`Speculative Decoding`
+- 参考原论文：DFlash arXiv:2602.06036、DSpark arXiv:2607.05147，以及 DeepSpec 官方仓库
+- 创建报告：`output/reports/DFlash与DSpark投机解码详解.html`
+- 更新概念页：`wiki/concepts/DFlash.md`、`wiki/concepts/DSpark.md`，增加报告回链
+- 浏览器验证：Chrome Headless 桌面 1440px、窄屏 500px、交互 tab、DOM/heading、页面脚本错误与打印 PDF
+- 待核实：vLLM 正式支持版本及是否完整实现 DSpark 论文 scheduler / STS 流程
