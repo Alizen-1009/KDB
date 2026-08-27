@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: 模型架构
-sources: 1
+sources: 2
 updated: 2026-04-23
 ---
 
@@ -23,6 +23,10 @@ updated: 2026-04-23
 - 用可学习映射控制 residual stream 到 layer input 的读出、layer output 回写到 stream，以及 stream 之间的混合
 - 这些额外映射本身计算量不大，但会持续作用在跨层组合映射上
 
+## 与 Gated Residual 的边界
+
+[[Gated Residual|GR]] 与 HC 都把 residual stream 扩为多分支，但表达力放置不同：GR 用四分支、逐分支逐 channel sigmoid gated read 与逐分支动态标量 write，并移除 `Hres` 分支混合矩阵；每个 block 的 attention 与 MLP 各有独立 GR。论文在 `25B-A3B`、`560B` tokens 的消融中观察到 GR loss/平均分为 `1.590/54.66`，dynamic mHC 为 `1.594/54.47`；这是特定设置下的接近结果，不能推出 GR 普遍优于 HC/mHC。
+
 ## 关键权衡
 
 - 表达力和拓扑灵活性增强，而且理论上不需要按主干 FLOPs 等比例扩张
@@ -32,16 +36,19 @@ updated: 2026-04-23
 ## 相关实体
 
 - [[../entities/DeepSeek-AI]]
+- [[../entities/Qwen3.8-Flash-Next]]
 
 ## 相关来源
 
 - [[../sources/mHC: Manifold-Constrained Hyper-Connections]]
+- [[../sources/On the Design of Qwen3.8-Next Architecture：Evaluation, Efficiency, and Training Stability]]
 
 ## 相关概念
 
 - [[mHC]]
 - [[算子融合]]
 - [[重计算]]
+- [[Gated Residual]]
 
 ## 研究备注
 

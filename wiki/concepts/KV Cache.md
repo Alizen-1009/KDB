@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: KV Cache
-sources: 16
+sources: 19
 updated: 2026-06-21
 ---
 
@@ -32,6 +32,10 @@ updated: 2026-06-21
 KV Cache 按 token/page 保存显式历史，已保存的每行 K/V 可以作为独立前缀记录复用。GDN/KDA 等线性注意力则用 [[线性注意力递归状态]] 压缩历史：Conv State 保存短卷积窗口，矩阵状态保存推进到当前边界后的长期聚合结果。后者大小不随上下文线性增长，但不能自然提供任意 token 边界回退，因此 Prefix Cache 需要 [[递归状态 Prefix Caching|递归状态 checkpoint]]。
 
 混合 MLA/KDA 模型会同时维护 Token KV Pool 与按请求分配的递归状态槽；“统一缓存”通常指逻辑前缀树与生命周期协调，不表示两类状态具有相同物理布局或恢复粒度。
+
+[[DeepSeek Sparse Attention|DSA]] 不把历史 latent KV cache 变成固定状态，而是继续保存历史 MLA entries，再由 lightning indexer 为每个 query 选择 top-`2048` entries 参与核心 attention。它减少的是每次 core attention 实际读取/计算的历史集合，不能表述为 KV cache 容量随上下文不再增长；indexer 仍需面向历史序列打分。
+
+[[TTT Layer]] 又把固定大小状态扩展为在线学习器的权重：历史通过自监督梯度更新写入线性模型或 MLP 参数。它不保存显式 token K/V，也不等同于 GDN/KDA 的结构化 gated recurrence。状态容量可保持不随上下文增长，但梯度计算、权重写入、checkpoint、请求迁移和拒绝回滚的成本需要单独处理。
 
 ## 跨引擎 PD 状态交接
 
@@ -97,6 +101,8 @@ KV Cache 按 token/page 保存显式历史，已保存的每行 K/V 可以作为
 - [[../entities/Nvidia Dynamo]]
 - [[../entities/SGLang]]
 - [[../entities/RTP-LLM]]
+- [[../entities/TTT-LM]]
+- [[../entities/DeepSeek-V3.2-Exp]]
 
 ## 相关来源
 
@@ -116,6 +122,9 @@ KV Cache 按 token/page 保存显式历史，已保存的每行 K/V 可以作为
 - [[../sources/vllm并行策略之DCP(Decode Context Parallel)]]
 - [[../sources/SGLang的KDA管理与Prefix Cache难题]]
 - [[../sources/vLLM x TileRT Specialized Decode for Latency-Critical Serving]]
+- [[../sources/【LLM2】Standford TTT模型(Learn at Test Time)]]
+- [[../sources/一文通透TTT：Learning to “Learn at Test Time”，让RNN的隐藏层变成可学习的函数，把T]]
+- [[../sources/DeepSeek-V3.2-Exp：Boosting Long-Context Efficiency with DeepSeek Sparse Attention]]
 
 ## 相关概念
 
@@ -136,6 +145,8 @@ KV Cache 按 token/page 保存显式历史，已保存的每行 K/V 可以作为
 - [[线性注意力递归状态]]
 - [[递归状态 Prefix Caching]]
 - [[可插拔 Decode 引擎]]
+- [[TTT Layer]]
+- [[DeepSeek Sparse Attention]]
 
 ## 研究备注
 

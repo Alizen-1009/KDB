@@ -1664,3 +1664,94 @@
 - 更新概念页：`wiki/concepts/DFlash.md`、`wiki/concepts/DSpark.md`，增加报告回链
 - 浏览器验证：Chrome Headless 桌面 1440px、窄屏 500px、交互 tab、DOM/heading、页面脚本错误与打印 PDF
 - 待核实：vLLM 正式支持版本及是否完整实现 DSpark 论文 scheduler / STS 流程
+
+## [2026-08-26] ingest | DSpark：结合半自回归生成与置信度调度的投机解码技术
+
+- 读取原始资料：`raw/articles/DSpark：结合半自回归生成与置信度调度的投机解码技术.md`
+- 创建来源页：`wiki/sources/DSpark：结合半自回归生成与置信度调度的投机解码技术.md`
+- 更新概念页：`wiki/concepts/DSpark.md`、`wiki/concepts/DFlash.md`、`wiki/concepts/Speculative Decoding.md`
+- 更新实体页：`wiki/entities/DeepSeek V4.md`、`wiki/entities/DeepSeek-AI.md`
+- 澄清：DFlash block 内并非计算上完全独立，但不会根据本轮实际采样前缀重新条件化
+- 待核实：离线 benchmark 细项、V4 生产流量配置，以及 DeepSpec 是否完整开源 STS 与硬件感知 scheduler
+
+## [2026-08-26] query | Code w Claude London 2026 中文翻译
+
+- 读取原始资料：`raw/articles/Code w Claude London 2026 Rethinking how we build.md`
+- 创建中文阅读版：`output/reports/Code w Claude London 2026：重新思考我们的构建方式.html`
+- 保留原文链接、产品状态与图片说明；未修改 raw 中疑似错误的 published 日期
+- 浏览器验证：Chrome Headless 桌面 1360px、窄屏 500px、HTML 结构、关键译文章节与打印 PDF
+
+## [2026-08-26] query | Claude Skills 完整构建指南中文翻译
+
+- 读取介绍页：`raw/articles/A complete guide to building skills for Claude.md`
+- 下载并完整读取官方 33 页 PDF：`The Complete Guide to Building Skills for Claude`
+- 创建中文全文阅读版：`output/reports/Claude Skills 完整构建指南（中文翻译）.html`
+- 保留全部章节、代码、YAML、表格、故障排查与资源链接；未修改 raw 中疑似错误的 published 日期
+- 验证：25 个内容覆盖标记、31 个代码块、HTML 锚点/标题/本地链接、无远程依赖、桌面 1440px、窄屏 500px 与 42 页打印输出
+
+## [2026-08-26] query | Claude Code 动态工作流 Harness 中文翻译
+
+- 完整读取原文：`raw/articles/A harness for every task dynamic workflows in Claude Code.md`
+- 创建中文全文阅读版：`output/reports/Claude Code 动态工作流：为每项任务定制 Harness（中文翻译）.html`
+- 保留 8 个示例提示词、6 种工作流模式、10 类用例、限制、技巧、链接和作者署名
+- 将 9 张远程图片替换为对应小节的自包含说明卡；未修改 raw 中疑似错误的 published 日期
+- 验证：28 个内容覆盖标记、8 个提示词卡、9 个配图说明、HTML 锚点/标题/本地链接、无远程依赖、桌面 1440px、窄屏 500px 与 11 页打印输出
+
+## [2026-08-26] ingest | TTT：Learning to Learn at Test Time 两篇解读
+
+- 读取原始资料：`raw/articles/【LLM2】Standford TTT模型(Learn at Test Time).md`、`raw/articles/一文通透TTT：Learning to “Learn at Test Time”，让RNN的隐藏层变成可学习的函数，把T.md`
+- 核对原论文：`Learning to (Learn at Test Time): RNNs with Expressive Hidden States`（arXiv:2407.04620）
+- 创建来源页：`wiki/sources/【LLM2】Standford TTT模型(Learn at Test Time).md`、`wiki/sources/一文通透TTT：Learning to “Learn at Test Time”，让RNN的隐藏层变成可学习的函数，把T.md`
+- 创建概念页：`wiki/concepts/TTT Layer.md`
+- 创建实体页：`wiki/entities/TTT-LM.md`
+- 更新概念页：`wiki/concepts/线性注意力递归状态.md`、`wiki/concepts/KV Cache.md`；更新 `wiki/maps/模型架构.md` 导读
+- 冲突澄清：内循环是多视图重建而非 next-token prediction；模型规模为 350M 而非 250M；TTT-Linear 只在严格特例下等价 linear attention
+- 待核实：最新 repo/checkpoint、训练与推理 kernel、serving 状态管理及更大规模 benchmark
+
+## [2026-08-26] query | TTT 模型学习指南
+
+- 读取概念页：`wiki/concepts/TTT Layer.md`、`wiki/concepts/线性注意力递归状态.md`、`wiki/concepts/KV Cache.md`
+- 读取实体与来源页：`wiki/entities/TTT-LM.md` 及两篇 TTT 解读来源页
+- 创建报告：`output/reports/TTT模型学习指南.html`
+- 内容覆盖：状态心智模型、单 token 流程、核心公式、标量手算、内外循环、TTT-Linear/MLP、mini-batch/dual form、理论边界、benchmark、推理工程、误区与 8 道自测
+- 未新增需回填的稳定结论；工程章节已显式标注为推导
+- 待核实：最新 repo/checkpoint、训练与推理 kernel、runtime 状态管理和更大规模 benchmark
+- 验证：静态结构与链接、无远程依赖、桌面 1440px、窄屏 500px、15 页打印输出，浏览器无脚本错误
+
+## [2026-08-27] ingest | On the Design of Qwen3.8-Next Architecture
+
+- 完整读取原始论文：`raw/papers/qwen3.8-Next.pdf`（28 页）
+- 创建来源页：`wiki/sources/On the Design of Qwen3.8-Next Architecture：Evaluation, Efficiency, and Training Stability.md`
+- 创建模型实体：`wiki/entities/Qwen3.8-Flash-Next.md`
+- 创建概念页：`Qwen Sparse Attention`、`Gated Residual`、`N-gram Embedding`、`Muon Optimizer`
+- 更新注意力概念：`混合注意力`、`线性注意力递归状态`、`RoPE`
+- 更新模型架构概念：`Conditional Memory`、`Hyper-Connections`、`mHC`、`Attention Residuals`
+- 更新训练概念：`Critical Batch Size`、`Scaling Laws`；更新实体 `阿里巴巴` 和三个主题地图导读
+- 命名澄清：文件名 qwen3.8-Next、论文标题 Qwen3.8-Next Architecture、正文模型 Qwen3.8-Flash-Next；397B/17B 基线为 Qwen3.7-Plus-Base
+- 未发现与现有 wiki 的直接事实冲突；保留 loss/downstream、pretraining/post-training 与 kernel/end-to-end 口径差异
+- 待核实：最终绝对训练 token/FLOPs、n-gram 寻址与 host-memory 指标、Canzona 开源状态及生产 runtime 支持
+
+## [2026-08-27] ingest | DeepSeek-V3.2-Exp: Boosting Long-Context Efficiency with DeepSeek Sparse Attention
+
+- 完整读取原始论文：`raw/papers/DeepSeek_V3_2.pdf`（6 页）
+- 创建来源页：`wiki/sources/DeepSeek-V3.2-Exp：Boosting Long-Context Efficiency with DeepSeek Sparse Attention.md`
+- 创建概念页：`wiki/concepts/DeepSeek Sparse Attention.md`
+- 创建模型实体：`wiki/entities/DeepSeek-V3.2-Exp.md`
+- 更新概念页：`Qwen Sparse Attention`、`MLA`、`KV Cache`、`RoPE`、`Benchmarking`
+- 更新实体：`DeepSeek-AI`；更新注意力机制、模型架构、性能分析主题地图导读
+- 未发现直接事实冲突；明确 DSA token-level O(L²) indexer 与 QSA micro-block O(L²/r) indexer 的边界
+- 评测边界：能力差异受 reasoning output length 影响；H800 服务成本图按 $2/GPU-hour 换算且短 prefill 使用 masked MHA，不估读曲线数字
+- 待核实：indexer shape/FP8 细节、精确服务指标、真实流量 failure cases 与大规模生产验证
+
+## [2026-08-27] ingest | GLM-5 系列模型架构演进：DSA、IndexShare、KDA 与 mHC
+
+- 原样复制外部资料到 `raw/articles/glm-5-architecture-evolution.md`，SHA-256 `20872c20213a035bfa4d59c123e607cf8adac730954a9d396ae54ec30f480b4f`
+- 创建来源页：`wiki/sources/glm-5-architecture-evolution.md`
+- 创建概念页：`wiki/concepts/IndexShare.md`
+- 创建实体页：`GLM-5 系列`、`GLM-5.3-Flash`、`Z.ai`
+- 更新注意力与架构概念：`DeepSeek Sparse Attention`、`KDA`、`MLA`、`混合注意力`、`mHC`、`RoPE`、`Qwen Sparse Attention`
+- 更新投机解码概念：`Multi-Token Prediction`；区分跨层 IndexShare 与 MTP iteration sharing
+- 更新 `vLLM`：支持矩阵绑定 commit `94d96e2446d6`，未把通用 KDA 路径误写成 GLM-5.3-Flash 原生支持
+- 更新注意力机制、模型架构、投机解码主题地图导读
+- 未发现与现有 wiki 的直接事实冲突；显式记录 GLM-5.1/5.3 后训练边界、Flash 独立 Base、K-pool 与 QSA 公式边界
+- 待核实：GLM-5.3 独立 config、Flash K-pool 完整公式、IndexShare 2.9× 本地复测及未来 vLLM 支持

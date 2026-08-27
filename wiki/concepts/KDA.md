@@ -2,7 +2,7 @@
 type: concept
 topic: 注意力机制
 updated: 2026-08-02
-sources: 2
+sources: 3
 ---
 
 # KDA
@@ -95,6 +95,19 @@ Kimi K3混合部署同时维护两类cache：KDA的固定大小`Conv State + Mat
 
 vLLM的K3集成进一步将Physical State Block、Scheduler Alignment与Prefix Hash Unit解耦：大状态块内部仍可注册细粒度Prefix Endpoint，但只有MLA KV、Matrix State和ShortConv State对同一个`num_computed_tokens`有效时才算命中。命中checkpoint必须Copy-on-Write为请求私有Running State。
 
+## GLM-5.3-Flash 配置案例
+
+[[../entities/GLM-5.3-Flash]] 在 `45` 个文本层中使用 `34` 个 KDA 层与 `11` 个 DSA 层，约为 `3:1`；DSA 位于 layers `3/7/.../43`，最后的 layer `44` 是 KDA。其 KDA 配置为：
+
+```text
+num_heads              = 64
+head_dim               = 128
+short_conv_kernel_size = 4
+gate_lower_bound       = -5.0
+```
+
+这里 KDA 用固定大小 recurrent state 低成本聚合历史，周期性的 [[DeepSeek Sparse Attention|DSA]] 保留显式 top-k token 检索能力。该配置案例不改变本页从 Kimi K3 资料整理出的 KDA 机制定义。
+
 ## 工程权衡
 
 - Channel-wise decay 比 scalar GDN 更有表达力，不同 key channels 可有不同记忆长度。
@@ -120,6 +133,11 @@ Kimi K3技术报告§5.4.2明确的Decode融合范围是ShortConv、Input Norm�
 
 Decode `T=1` 且上游已算好 `q/k/v/alpha/beta` 时，优先看 [[../../output/reports/KDA最小Decode伪代码|KDA最小Decode伪代码]]；完整输入投影、Conv State、batch/sequence与K-last布局再看 [[../../output/reports/KDA伪代码与输入输出|KDA伪代码与输入输出]]。
 
+## 相关实体
+
+- [[../entities/Kimi K3]]
+- [[../entities/GLM-5.3-Flash]]
+
 ## 相关概念
 
 - [[线性注意力递归状态]]
@@ -132,6 +150,7 @@ Decode `T=1` 且上游已算好 `q/k/v/alpha/beta` 时，优先看 [[../../outpu
 
 - [[../sources/A Preview of Production-Scale Kimi K3 Support on vLLM]]
 - [[../sources/REMINDER FF-KDA & CAKE KDA Highlights]]
+- [[../sources/glm-5-architecture-evolution]]
 
 ## 官方资料
 

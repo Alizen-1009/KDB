@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: 投机解码
-sources: 1
+sources: 2
 updated: 2026-08-17
 ---
 
@@ -68,6 +68,8 @@ Scheduler 将“为某请求再增加一位验证”的候选按前缀存活概�
 
 ## 来源 Benchmark
 
+### vLLM 二手实测
+
 来源在 Qwen3-4B、A800 和其所称 vLLM `0.26.0` 环境中报告：
 
 - `num_speculative_tokens=7`：`584.07 tok/s`，约为 Baseline 的 `2.55x`。
@@ -76,6 +78,16 @@ Scheduler 将“为某请求再增加一位验证”的候选按前缀存活概�
 
 这些数字属于来源 benchmark，环境与方法配置尚不足以独立复现或外推。
 
+### 论文解读来源
+
+[[../sources/DSpark：结合半自回归生成与置信度调度的投机解码技术]] 转述论文结果：
+
+- 在 Qwen3 4B/8B/14B、Gemma4-12B 与多类任务上，宏观平均接受长度相对 Eagle3 提升 `26.7%–30.9%`，相对 DFlash 提升 `16.3%–18.4%`。
+- 轻量顺序模块的额外 drafting 延迟为 `0.2%–1.3%`。
+- 来源称 DSpark 已用于 DeepSeek-V4 Flash / Pro 预览版线上流量；相同系统吞吐下，单用户生成速度分别提升 `60%–85%` 与 `57%–78%`。
+
+这些数字均是来源声称；本文未提供足够的逐模型表格、硬件、流量、并发、baseline 与 SLA 配置，不能直接外推到其他 serving workload。
+
 ## 相关报告
 
 - [DFlash 与 DSpark 投机解码详解](../../output/reports/DFlash与DSpark投机解码详解.html)
@@ -83,10 +95,13 @@ Scheduler 将“为某请求再增加一位验证”的候选按前缀存活概�
 ## 相关实体
 
 - [[../entities/vLLM]]
+- [[../entities/DeepSeek V4]]
+- [[../entities/DeepSeek-AI]]
 
 ## 相关来源
 
 - [[../sources/并行投机解码(DFlashDSpark)的快速理解与vLLM实测]]
+- [[../sources/DSpark：结合半自回归生成与置信度调度的投机解码技术]]
 
 ## 相关概念
 
@@ -100,3 +115,4 @@ Scheduler 将“为某请求再增加一位验证”的候选按前缀存活概�
 
 - 已按 [DSpark 原论文](https://arxiv.org/abs/2607.05147) 核对半自回归 Markov/RNN 修正、conditional confidence、STS 校准与 Hardware-Aware Prefix Scheduler；生产实现与论文算法的具体差异仍需绑定代码版本。
 - 来源称 vLLM 可直接以 `method=dspark` 部署，但正式支持版本、CLI、CUDA Graph、TP/DP 限制，以及是否完整实现论文 scheduler / STS 流程，仍待源码验证。
+- DeepSeek-V4 生产部署和线上速度提升目前来自论文解读文章；在缺少官方完整 workload、硬件与 baseline 配置时，应标记为来源声称。

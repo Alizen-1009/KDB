@@ -1,0 +1,554 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Claude Code 动态工作流：为每项任务定制 Harness（中文全文翻译阅读版）</title>
+  <style>
+    :root {
+      --bg: #f5f2eb;
+      --surface: #fffdf8;
+      --surface-2: #eee9de;
+      --ink: #22201d;
+      --muted: #6c665e;
+      --line: #d9d1c3;
+      --accent: #9b4f2f;
+      --accent-2: #e8d1c1;
+      --code-bg: #282521;
+      --code-ink: #fff8ee;
+      --warning-bg: #fff3d3;
+      --warning-line: #b57a12;
+      --quote-bg: #f1ebe2;
+      --shadow: 0 12px 34px rgba(45, 35, 25, 0.08);
+      --reading: 74ch;
+      --radius: 16px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #171512;
+        --surface: #201d19;
+        --surface-2: #2a2621;
+        --ink: #f3eee6;
+        --muted: #b9b0a4;
+        --line: #403a32;
+        --accent: #e39772;
+        --accent-2: #563626;
+        --code-bg: #0f0e0c;
+        --code-ink: #fff7ec;
+        --warning-bg: #352b14;
+        --warning-line: #d3a142;
+        --quote-bg: #2a251f;
+        --shadow: 0 12px 34px rgba(0, 0, 0, 0.25);
+      }
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 5.5rem; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--bg);
+      font-family: ui-serif, "Songti SC", "Noto Serif CJK SC", "Source Han Serif SC", Georgia, serif;
+      line-height: 1.78;
+      text-rendering: optimizeLegibility;
+    }
+    a { color: var(--accent); text-decoration-thickness: 0.08em; text-underline-offset: 0.18em; }
+    a:hover { text-decoration-thickness: 0.13em; }
+    a:focus-visible, summary:focus-visible {
+      outline: 3px solid var(--accent);
+      outline-offset: 4px;
+      border-radius: 4px;
+    }
+    code {
+      padding: 0.12em 0.36em;
+      border-radius: 5px;
+      color: var(--code-ink);
+      background: var(--code-bg);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.9em;
+      overflow-wrap: anywhere;
+    }
+    h1, h2, h3 {
+      line-height: 1.25;
+      letter-spacing: -0.02em;
+      text-wrap: balance;
+    }
+    h1 { margin: 0.35rem 0 1rem; font-size: clamp(2.15rem, 6vw, 4.9rem); max-width: 16ch; }
+    h2 { margin: 4.5rem 0 1.2rem; font-size: clamp(1.65rem, 3.2vw, 2.45rem); }
+    h3 { margin: 2.8rem 0 0.8rem; font-size: clamp(1.22rem, 2vw, 1.55rem); }
+    p { margin: 0 0 1.12rem; }
+    ul { padding-left: 1.35rem; }
+    li + li { margin-top: 0.72rem; }
+
+    .hero {
+      border-bottom: 1px solid var(--line);
+      background:
+        radial-gradient(circle at 82% 16%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 32rem),
+        var(--surface);
+    }
+    .hero-inner { width: min(1180px, calc(100% - 2rem)); margin: 0 auto; padding: clamp(3.5rem, 9vw, 8rem) 0 3.5rem; }
+    .eyebrow {
+      margin: 0;
+      color: var(--accent);
+      font-family: ui-sans-serif, system-ui, sans-serif;
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+    .dek { max-width: 64ch; font-size: clamp(1.08rem, 2vw, 1.32rem); color: var(--muted); }
+    .meta-row { display: flex; flex-wrap: wrap; gap: 0.55rem; margin-top: 1.6rem; }
+    .meta-chip {
+      display: inline-flex;
+      align-items: center;
+      min-height: 2rem;
+      padding: 0.25rem 0.72rem;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--surface) 80%, transparent);
+      color: var(--muted);
+      font-family: ui-sans-serif, system-ui, sans-serif;
+      font-size: 0.82rem;
+    }
+    .date-note {
+      max-width: 78ch;
+      margin: 2rem 0 0;
+      padding: 1rem 1.15rem;
+      border-left: 4px solid var(--warning-line);
+      border-radius: 0 10px 10px 0;
+      background: var(--warning-bg);
+      font-family: ui-sans-serif, system-ui, sans-serif;
+      font-size: 0.92rem;
+    }
+
+    .mobile-toc { display: none; }
+    .page-grid {
+      display: grid;
+      grid-template-columns: 240px minmax(0, var(--reading));
+      justify-content: center;
+      gap: clamp(2rem, 5vw, 5.5rem);
+      width: min(1180px, calc(100% - 2rem));
+      margin: 0 auto;
+      padding: 3rem 0 6rem;
+    }
+    .toc {
+      position: sticky;
+      top: 1.5rem;
+      align-self: start;
+      max-height: calc(100vh - 3rem);
+      overflow: auto;
+      padding: 1rem 0;
+      font-family: ui-sans-serif, system-ui, sans-serif;
+      font-size: 0.84rem;
+    }
+    .toc-title { margin: 0 0 0.75rem; color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.13em; text-transform: uppercase; }
+    .toc ul { margin: 0; padding: 0; list-style: none; }
+    .toc li + li { margin-top: 0.32rem; }
+    .toc a { display: block; padding: 0.28rem 0.5rem; border-left: 2px solid var(--line); color: var(--muted); text-decoration: none; }
+    .toc a:hover { border-left-color: var(--accent); color: var(--ink); }
+    .toc .sub a { padding-left: 1rem; font-size: 0.78rem; }
+    main { min-width: 0; }
+
+    .guide {
+      margin: 0 0 3rem;
+      padding: 1.3rem;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+    .guide h2 { margin: 0 0 0.35rem; font-size: 1.25rem; }
+    .guide > p { color: var(--muted); font-size: 0.92rem; }
+    .guide-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; margin-top: 1rem; }
+    .guide-card { padding: 0.9rem; border-radius: 11px; background: var(--surface-2); }
+    .guide-card strong { display: block; margin-bottom: 0.15rem; font-family: ui-sans-serif, system-ui, sans-serif; }
+    .guide-card span { color: var(--muted); font-size: 0.88rem; }
+
+    .prompt-grid { display: grid; gap: 1rem; }
+    .prompt-card {
+      position: relative;
+      margin: 0;
+      padding: 1.25rem 1.25rem 1.15rem 3.6rem;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--surface);
+      box-shadow: 0 5px 18px rgba(45, 35, 25, 0.05);
+    }
+    .prompt-card::before {
+      content: attr(data-number);
+      position: absolute;
+      left: 1rem;
+      top: 1.05rem;
+      width: 1.8rem;
+      height: 1.8rem;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      color: var(--surface);
+      background: var(--accent);
+      font: 800 0.78rem/1 ui-sans-serif, system-ui, sans-serif;
+    }
+    .prompt-card p { margin: 0; font-size: 1.02rem; }
+
+    .figure-note {
+      margin: 1.6rem 0;
+      padding: 1rem 1.1rem;
+      border: 1px dashed var(--line);
+      border-radius: 12px;
+      color: var(--muted);
+      background: var(--surface-2);
+      font-family: ui-sans-serif, system-ui, sans-serif;
+      font-size: 0.88rem;
+    }
+    .figure-note strong { color: var(--ink); }
+
+    .failure-list { list-style: none; padding: 0; }
+    .failure-list li { padding: 1rem 1.1rem; border-left: 4px solid var(--accent); background: var(--quote-bg); }
+    .failure-list li + li { margin-top: 0.8rem; }
+
+    .table-wrap { margin: 1.4rem 0 2rem; overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; }
+    table { width: 100%; border-collapse: collapse; background: var(--surface); font-size: 0.91rem; }
+    caption { padding: 0.9rem 1rem; text-align: left; color: var(--muted); background: var(--surface-2); font-family: ui-sans-serif, system-ui, sans-serif; font-weight: 700; }
+    th, td { padding: 0.8rem 0.9rem; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+    th { font-family: ui-sans-serif, system-ui, sans-serif; font-size: 0.8rem; }
+    tbody tr:last-child td { border-bottom: 0; }
+
+    .callout {
+      margin: 1.6rem 0;
+      padding: 1.1rem 1.2rem;
+      border-left: 4px solid var(--warning-line);
+      border-radius: 0 12px 12px 0;
+      background: var(--warning-bg);
+    }
+    .callout strong { font-family: ui-sans-serif, system-ui, sans-serif; }
+    .closing-quote {
+      margin: 2rem 0;
+      padding: 1.4rem 1.5rem;
+      border-left: 4px solid var(--accent);
+      background: var(--quote-bg);
+      font-style: italic;
+    }
+    .byline { padding-top: 1rem; border-top: 1px solid var(--line); color: var(--muted); }
+    .source-footer {
+      border-top: 1px solid var(--line);
+      background: var(--surface);
+    }
+    .source-footer-inner { width: min(980px, calc(100% - 2rem)); margin: 0 auto; padding: 2.2rem 0; }
+    .source-footer h2 { margin: 0 0 0.75rem; font-size: 1.15rem; }
+    .source-footer ul { margin: 0; font-family: ui-sans-serif, system-ui, sans-serif; font-size: 0.9rem; }
+
+    @media (max-width: 860px) {
+      html { scroll-padding-top: 5rem; }
+      .hero-inner { padding-top: 4.25rem; }
+      .page-grid { display: block; padding-top: 1.4rem; }
+      .toc { display: none; }
+      .mobile-toc {
+        display: block;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        border-bottom: 1px solid var(--line);
+        background: color-mix(in srgb, var(--surface) 94%, transparent);
+        backdrop-filter: blur(10px);
+        font-family: ui-sans-serif, system-ui, sans-serif;
+      }
+      .mobile-toc details { width: min(100% - 2rem, 760px); margin: 0 auto; }
+      .mobile-toc summary { cursor: pointer; padding: 0.85rem 0; font-weight: 800; }
+      .mobile-toc nav { max-height: 58vh; overflow: auto; padding: 0 0 1rem; }
+      .mobile-toc ul { columns: 2; margin: 0; padding-left: 1.2rem; }
+      .mobile-toc li { break-inside: avoid; margin: 0.22rem 0; }
+      .guide-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 560px) {
+      .mobile-toc ul { columns: 1; }
+      .prompt-card { padding-left: 3.2rem; }
+      h2 { margin-top: 3.6rem; }
+      th, td { min-width: 9rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+    }
+
+    @media print {
+      :root { --bg: #fff; --surface: #fff; --surface-2: #f5f2ed; --ink: #000; --muted: #444; --line: #bbb; --accent: #6f321c; --code-bg: #eee; --code-ink: #000; --warning-bg: #fff8df; --quote-bg: #f5f2ed; }
+      @page { margin: 16mm 14mm; }
+      body { background: #fff; font-size: 10.5pt; }
+      .hero-inner, .page-grid, .source-footer-inner { width: 100%; }
+      .hero-inner { padding: 1rem 0 1.4rem; }
+      .mobile-toc, .toc, .guide { display: none !important; }
+      .page-grid { display: block; padding: 0; }
+      h1 { font-size: 27pt; }
+      h2 { margin-top: 2rem; break-after: avoid; }
+      h3 { break-after: avoid; }
+      p, li, .prompt-card, .figure-note, .callout { orphans: 3; widows: 3; }
+      .prompt-card, .figure-note, .callout, tr { break-inside: avoid; box-shadow: none; }
+      a { color: inherit; }
+      a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 0.75em; overflow-wrap: anywhere; }
+      .source-footer { margin-top: 2rem; }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-inner">
+      <p class="eyebrow">中文全文翻译阅读版</p>
+      <h1>为每项任务定制 Harness：Claude Code 中的动态工作流</h1>
+      <p class="dek">原题：<span lang="en">A harness for every task: dynamic workflows in Claude Code</span>。本文按原文顺序完整翻译，保留全部示例提示词、模式、用例、限制、技巧、链接、结尾与作者署名。</p>
+      <div class="meta-row" aria-label="文档信息">
+        <span class="meta-chip">全文翻译</span>
+        <span class="meta-chip">Claude Code</span>
+        <span class="meta-chip">动态工作流</span>
+        <span class="meta-chip">自包含 HTML</span>
+      </div>
+      <p class="date-note"><strong>日期说明：</strong>本地 raw frontmatter 标注的 <code>published: 2001-06-02</code> 与文章中的 2026 年上下文明显不一致。为避免误导，本阅读版不展示该发布日期，也不修改 raw 原文件。</p>
+    </div>
+  </header>
+
+  <div class="mobile-toc">
+    <details>
+      <summary>目录与章节导航</summary>
+      <nav aria-label="移动端目录">
+        <ul>
+          <li><a href="#example-prompts">示例提示词</a></li>
+          <li><a href="#how-it-works">如何运作</a></li>
+          <li><a href="#why-workflows">为什么使用</a></li>
+          <li><a href="#dynamic-vs-static">动态与静态</a></li>
+          <li><a href="#patterns">常用模式</a></li>
+          <li><a href="#use-cases">用例</a></li>
+          <li><a href="#when-not-to-use">何时不使用</a></li>
+          <li><a href="#tips">构建技巧</a></li>
+          <li><a href="#discovery">新的探索起点</a></li>
+        </ul>
+      </nav>
+    </details>
+  </div>
+
+  <div class="page-grid">
+    <aside class="toc" aria-label="文章目录">
+      <p class="toc-title">全文目录</p>
+      <nav>
+        <ul>
+          <li><a href="#example-prompts">示例提示词</a></li>
+          <li><a href="#how-it-works">动态工作流如何运作</a></li>
+          <li><a href="#why-workflows">为什么要用动态工作流</a></li>
+          <li><a href="#dynamic-vs-static">动态与静态工作流</a></li>
+          <li><a href="#patterns">有帮助的模式</a></li>
+          <li class="sub"><a href="#classify-and-act">分类后行动</a></li>
+          <li class="sub"><a href="#fan-out-and-synthesize">扇出并综合</a></li>
+          <li class="sub"><a href="#adversarial-verification">对抗式验证</a></li>
+          <li class="sub"><a href="#generate-and-filter">生成并过滤</a></li>
+          <li class="sub"><a href="#tournament">锦标赛</a></li>
+          <li class="sub"><a href="#loop-until-done">循环直至完成</a></li>
+          <li><a href="#use-cases">用例</a></li>
+          <li><a href="#when-not-to-use">何时不使用</a></li>
+          <li><a href="#tips">构建技巧</a></li>
+          <li><a href="#discovery">新的探索起点</a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <main id="main-content">
+      <section class="guide" aria-labelledby="guide-title">
+        <h2 id="guide-title">导航性导读</h2>
+        <p>以下仅帮助定位全文，不替代任何原文内容。完整译文从下一段开始。</p>
+        <div class="guide-grid">
+          <div class="guide-card"><strong>先看可能性</strong><span>8 个提示词展示工作流可处理的任务形态。</span></div>
+          <div class="guide-card"><strong>再看机制</strong><span>JavaScript 编排、subagent、模型选择与 worktree 隔离。</span></div>
+          <div class="guide-card"><strong>按模式理解</strong><span>分类、fan-out、验证、过滤、锦标赛与循环。</span></div>
+          <div class="guide-card"><strong>最后判断边界</strong><span>结合用例、token 成本与构建技巧决定是否采用。</span></div>
+        </div>
+      </section>
+
+      <p>上周，我们在 Claude Code 中发布了<a href="https://code.claude.com/docs/en/workflows">动态工作流（dynamic workflows）</a>。这里的 dynamic workflow，是指在运行时针对手头任务生成并执行专用编排逻辑的工作流。Claude 现在可以即时编写自己的<a href="https://code.claude.com/docs/en/glossary#agentic-harness">代理运行框架（Harness）</a>，也就是包裹模型、工具、上下文与调度逻辑的执行外壳，并为当前任务量身定制。</p>
+
+      <p>虽然 Claude Code 的默认 Harness 是为编码而构建的，但它对许多其他类型的任务同样有用，因为事实证明，很多任务都很像编码任务。不过，对某些类别的任务，为了达到最佳表现，我们一直需要在 Claude Code 之上构建定制 Harness，例如<a href="https://support.claude.com/en/articles/11088861-using-research-on-claude">研究（Research）</a>、<a href="https://support.claude.com/en/articles/11932705-automated-security-reviews-in-claude-code">安全分析</a>、<a href="https://code.claude.com/docs/en/agent-teams">代理团队（agent teams）</a>或<a href="https://code.claude.com/docs/en/code-review">代码审查（Code Review）</a>。</p>
+
+      <p>工作流让你能够在 Claude Code 之上动态创建 Harness，使 Claude 可以更原生地解决上述所有问题。你也可以与他人共享并复用这些工作流。</p>
+
+      <p>本文会介绍我最初使用工作流的经历与收获，帮助你充分利用它们。请记住，最佳实践仍在发展中：动态工作流往往会使用更多 token，最适合复杂且高价值的任务。</p>
+
+      <section aria-labelledby="example-prompts">
+        <h2 id="example-prompts">示例提示词</h2>
+        <p>在深入技术细节之前，我想先用几条示例提示词开场，帮助你思考工作流的各种可能性：</p>
+        <div class="prompt-grid">
+          <blockquote class="prompt-card" data-number="01"><p>“这个测试大概每 50 次运行会失败 1 次。搭建一个工作流来复现它。围绕这个竞态提出彼此竞争的理论，而且在证据只支持其中一个理论之前不要停下。”</p></blockquote>
+          <blockquote class="prompt-card" data-number="02"><p>“使用工作流，检查我最近 50 个会话，挖掘那些我反复做出的纠正，并把反复出现的内容变成 <code>CLAUDE.md</code> 规则。”</p></blockquote>
+          <blockquote class="prompt-card" data-number="03"><p>“使用工作流，深入检查过去六个月 Slack 中的 #incidents，找出那些反复出现、却没有人提交工单的根因。”</p></blockquote>
+          <blockquote class="prompt-card" data-number="04"><p>“拿我的商业计划跑一个工作流，让不同的 agent 分别从投资者、客户和竞争对手的视角把它彻底批判一遍。”</p></blockquote>
+          <blockquote class="prompt-card" data-number="05"><p>“这里有一个包含 80 份简历的文件夹。使用工作流，按后端职位的要求对它们排序，并复核排名前十的简历。请用 AskUserQuestion 工具采访我，以确定评判标准。”</p></blockquote>
+          <blockquote class="prompt-card" data-number="06"><p>“我需要给这个 CLI 工具起名。使用工作流集思广益，提出一批候选项，再通过锦标赛选出前三名。”</p></blockquote>
+          <blockquote class="prompt-card" data-number="07"><p>“使用工作流，把我们的 User model 在所有地方都重命名为 Account。”</p></blockquote>
+          <blockquote class="prompt-card" data-number="08"><p>“使用工作流检查我的博客文章草稿，并对照代码库验证每一项技术主张；我不想发布任何错误内容。”</p></blockquote>
+        </div>
+      </section>
+
+      <section aria-labelledby="how-it-works">
+        <h2 id="how-it-works">动态工作流如何运作</h2>
+        <p>动态工作流会执行一个 JavaScript 文件，其中包含几个特殊函数，用来生成并协调<a href="https://code.claude.com/docs/en/sub-agents">子代理（subagents）</a>。subagent 是拥有独立上下文和聚焦目标、由主流程派生出来执行子任务的 agent：</p>
+        <aside class="figure-note" aria-label="原文配图占位"><strong>原文配图</strong>｜所在小节：“动态工作流如何运作”。为保持 HTML 自包含，此处不加载原文远程图片，也不对图片细节作推测性描述。</aside>
+        <p>动态工作流也包含 JSON、Math 和 Array 等标准 JavaScript 功能，以帮助处理数据。</p>
+        <p>尤其值得了解的是，动态工作流可以决定一个 agent 使用哪个模型，以及 subagent 是否在自己的 Git 工作树（worktree，即与其他任务隔离的独立检出目录）中运行，让 Claude 能够选择任务所需的智能水平与隔离程度。</p>
+        <p>如果工作流被中断——例如用户主动中断或退出终端——恢复会话后，工作流可以从中断处继续。</p>
+      </section>
+
+      <section aria-labelledby="why-workflows">
+        <h2 id="why-workflows">为什么要用动态工作流</h2>
+        <p>当你要求 Claude Code 的默认 Harness 执行一项任务时，它需要在同一个上下文窗口中同时完成规划和执行。对许多编码任务而言，这种方式非常有效，但面对长时间运行、大规模并行、高度结构化和／或对抗性的任务时，它可能失效。</p>
+        <p>原因在于：Claude 在单个上下文窗口中处理复杂任务的时间越长，就越容易出现几种特定的失败模式：</p>
+        <ul class="failure-list">
+          <li><strong>代理式懈怠（agentic laziness）</strong>：Claude 在完成一项格外复杂、包含多个部分的任务之前就停下来，并在只取得部分进展后宣称工作已经完成。例如，在一次安全审查的 50 个项目中只处理了 35 个。</li>
+          <li><strong>自我偏好偏差（self-preferential bias）</strong>：Claude 倾向于偏爱自己产出的结果或发现，尤其是在被要求依据某项量规验证或评判这些结果时。</li>
+          <li><strong>目标漂移（goal drift）</strong>：经过许多轮交互后，任务逐渐失去对原始目标的忠实度，尤其是在上下文压缩之后。每一步摘要都会造成信息损失，边界情况要求或“不要做 X”之类的约束可能会丢失。</li>
+        </ul>
+        <p>创建工作流有助于应对这些问题：它会编排相互分离的 Claude subagent，让每个 subagent 拥有自己的上下文窗口以及聚焦、隔离的目标。</p>
+      </section>
+
+      <section aria-labelledby="dynamic-vs-static">
+        <h2 id="dynamic-vs-static">动态工作流与静态工作流</h2>
+        <p>你此前可能已经使用 Claude Agent SDK 或 <code>claude -p</code> 创建过静态工作流，用来协调多个 Claude Code 实例。</p>
+        <p>但由于静态工作流需要覆盖所有边界情况，它们通常更加通用。借助 <a href="https://www.anthropic.com/news/claude-opus-4-8">Claude Opus 4.8</a> 和动态工作流，Claude 现在已经足够智能，能够为你的用例编写量身定制的 Harness。</p>
+        <aside class="figure-note" aria-label="原文配图占位"><strong>原文配图</strong>｜所在小节：“动态工作流与静态工作流”。为保持 HTML 自包含，此处不加载原文远程图片，也不对图片细节作推测性描述。</aside>
+      </section>
+
+      <section aria-labelledby="patterns">
+        <h2 id="patterns">使用动态工作流时有帮助的模式</h2>
+        <p>只要直接要求 Claude 创建工作流，你就可以开始使用动态工作流；也可以使用触发词 <code>ultracode</code>，以确保 Claude Code 创建一个工作流。</p>
+        <p>不过，为动态工作流的运作方式建立一套心智模型，会帮助你理解何时使用它们，以及如何通过提示词给 Claude 适当引导。</p>
+        <p>Claude 在构建工作流时，可能会采用并组合以下几种常见模式：</p>
+        <aside class="figure-note" aria-label="原文配图占位"><strong>原文配图</strong>｜所在小节：“使用动态工作流时有帮助的模式”。为保持 HTML 自包含，此处不加载原文远程图片，也不对图片细节作推测性描述。</aside>
+
+        <div class="table-wrap">
+          <table>
+            <caption>模式速查（译者整理；完整原文译文见表后各小节）</caption>
+            <thead><tr><th scope="col">模式</th><th scope="col">核心动作</th><th scope="col">适合的问题形态</th></tr></thead>
+            <tbody>
+              <tr><td>分类后行动</td><td>判类，再路由</td><td>不同类别需要不同处理方式</td></tr>
+              <tr><td>扇出并综合</td><td>拆分、并行、汇总</td><td>许多小步骤或需隔离上下文</td></tr>
+              <tr><td>对抗式验证</td><td>独立 agent 按标准挑错</td><td>结果需要严格复核</td></tr>
+              <tr><td>生成并过滤</td><td>批量生成、去重、筛选</td><td>创意或候选方案探索</td></tr>
+              <tr><td>锦标赛</td><td>多方案同题竞争、成对裁判</td><td>需要从不同方法中选优</td></tr>
+              <tr><td>循环直至完成</td><td>反复派生 agent，直到满足停止条件</td><td>工作量事先未知</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 id="classify-and-act">分类后行动（Classify-and-act）</h3>
+        <p>使用一个分类器 agent 判断任务类型，再根据任务类型路由到不同的 agent 或不同的行为。也可以在流程末尾使用分类器来决定输出。</p>
+
+        <h3 id="fan-out-and-synthesize">扇出并综合（Fan-out-and-synthesize）</h3>
+        <p>把一项任务拆成许多更小的步骤，为每个步骤运行一个 agent，然后综合这些结果。这里的扇出（fan-out）是指把工作并行分派给多个独立执行单元。这种模式尤其适合存在大量较小步骤的情况，或每个步骤都能从独立、干净的上下文窗口中受益，从而避免相互干扰或交叉污染的情况。综合步骤是一道屏障：它会等待所有 fan-out agent 完成，再把它们的结构化输出合并为一个结果。</p>
+
+        <h3 id="adversarial-verification">对抗式验证（Adversarial verification）</h3>
+        <p>对每个被派生出来的 agent，再派生一个独立 agent，依据量规或标准对其输出进行对抗式验证（adversarial verification，即主动寻找错误、反例与不满足标准之处的独立复核）。</p>
+
+        <h3 id="generate-and-filter">生成并过滤（Generate-and-filter）</h3>
+        <p>围绕某个主题生成一批想法，再依据量规或验证结果过滤它们，去除重复项，只返回质量最高且经过检验的想法。</p>
+
+        <h3 id="tournament">锦标赛（Tournament）</h3>
+        <p>不是拆分工作，而是让 agent 围绕同一项工作展开竞争。派生 N 个 agent，让它们分别采用不同方法尝试同一任务。随后，由提示词或模型通过一个裁判 agent 对结果进行成对评判，直到选出胜者。</p>
+
+        <h3 id="loop-until-done">循环直至完成（Loop until done）</h3>
+        <p>对于工作量未知的任务，不要预设固定轮数；改为循环派生 agent，直到满足停止条件——例如不再出现新发现，或日志中不再有错误。</p>
+      </section>
+
+      <section aria-labelledby="use-cases">
+        <h2 id="use-cases">用例</h2>
+        <p>请创造性地思考何时以及如何要求 Claude Code 创建动态工作流。我发现，工作流有时在非技术工作中甚至更有用。</p>
+
+        <h3 id="migrations-refactors">迁移与重构</h3>
+        <p><a href="https://bun.com/">Bun</a> 使用工作流完成了从 Zig 到 Rust 的重写。你可以在 <a href="https://x.com/jarredsumner/status/2060050578026189172">Jarred 的 X 帖子串</a>中进一步了解具体做法，也可以查看我们如何在百万行级代码库上执行 <a href="https://claude.com/blog/ai-code-migration">AI 代码迁移</a>。</p>
+        <p>关键是把任务拆成一系列需要逐项处理的步骤，例如调用点、失败的测试、模块等。针对每个修复，在一个 worktree 中派生 subagent 完成修改；再让另一个 agent 进行对抗式审查，最后合并这些修改。可以考虑明确要求 agent 不要使用资源密集型命令，这样你就能尽可能提高并行度，而不会耗尽本机资源。</p>
+
+        <h3 id="deep-research">深度研究</h3>
+        <p>我们在 Claude Code 内发布了一个使用动态工作流的深度研究 skill（<code>/deep-research</code>）。具体来说，它会 fan-out 多项网页搜索、获取来源、对来源中的主张进行对抗式验证，并综合生成一份带引文的报告。</p>
+        <p>不过，这类研究不只适用于网页搜索。例如，你可以要求 Claude 根据 Slack 中的上下文汇编状态报告，或通过深入探索代码库来研究某项功能的工作方式。</p>
+
+        <h3 id="deep-verification">深度验证</h3>
+        <aside class="figure-note" aria-label="原文配图占位"><strong>原文配图</strong>｜所在小节：“深度验证”。为保持 HTML 自包含，此处不加载原文远程图片，也不对图片细节作推测性描述。</aside>
+        <p>另一方面，如果你有一份报告，希望检查其中引用的每一项事实性主张并为其寻找来源，那么可以生成这样一个工作流：先由一个 agent 识别全部事实性主张，再为每项主张派生一个 subagent 进行详细核查。你还可以让一个验证 agent 检查负责来源核查的 subagent，以确认它所采用的来源质量足够高。</p>
+
+        <h3 id="sorting">排序</h3>
+        <aside class="figure-note" aria-label="原文配图占位"><strong>原文配图</strong>｜所在小节：“排序”。为保持 HTML 自包含，此处不加载原文远程图片，也不对图片细节作推测性描述。</aside>
+        <p>你可能有一个项目列表，想依据某种你认为 Claude Code 擅长评估的定性指标对它排序，例如按 bug 严重程度排列支持工单。但是，如果你试图在一个提示词中对 1000 多行数据排序，质量会下降，而且内容无法装入上下文。作为替代，可以运行锦标赛、搭建由成对比较 agent 组成的流水线（比较判断比绝对评分更可靠），或先并行分桶排序再合并。每次比较都由独立 agent 完成，因此确定性的循环负责维护对阵结构，只有当前运行顺序留在上下文中。</p>
+
+        <h3 id="memory-rule-adherence">记忆与规则遵循</h3>
+        <aside class="figure-note" aria-label="原文配图占位"><strong>原文配图</strong>｜所在小节：“记忆与规则遵循”。为保持 HTML 自包含，此处不加载原文远程图片，也不对图片细节作推测性描述。</aside>
+        <p>如果你有一组 Claude 经常漏掉或难以遵循的特定规则，即使把这些规则写入 <code>CLAUDE.md</code> 也无济于事（原文此处写作 <code>CLAUDE.mds</code>），那么可以创建一个工作流，列出必须由验证 agent 检查的规则——每条规则对应一个验证者。再创建一个持怀疑态度的人格 subagent 来审查这些规则、确认它们是否合理，有助于避免出现过多误报。</p>
+        <p>反向操作也同样可行：从最近的会话和代码审查评论中挖掘你反复做出的纠正，让并行 agent 对它们聚类，对每个候选规则进行对抗式验证（这条规则真的能够避免一次实际错误吗？），然后把通过筛选的规则提炼回 <code>CLAUDE.md</code>。</p>
+
+        <h3 id="root-cause-investigation">根因调查</h3>
+        <p>调试的最佳做法，是提出几个彼此独立的假设并逐一检验；但如果你只使用一个上下文窗口，Claude 可能陷入自我偏好偏差。</p>
+        <p>工作流可以在结构上阻止这种情况：派生多个 agent，让它们从互不重叠的证据中生成假设。例如，可以分别为日志、文件和数据设置独立 agent。随后，每个假设都可以交由一组验证者与反驳者审视。</p>
+        <p>这不只适用于代码。工作流可以用于销售（为什么三月份的销售额下降了？）、数据工程（为什么这条流水线失败了？）或任何事后复盘。</p>
+
+        <h3 id="triaging-at-scale">规模化分诊</h3>
+        <aside class="figure-note" aria-label="原文配图占位"><strong>原文配图</strong>｜所在小节：“规模化分诊”。为保持 HTML 自包含，此处不加载原文远程图片，也不对图片细节作推测性描述。</aside>
+        <p>每个团队都有支持队列、bug 报告或某种其他积压事项，人类无法把它们全部处理完。</p>
+        <p>分诊工作流会对每个项目分类，与已经跟踪的事项去重，然后采取行动。这可能意味着尝试修复，也可能意味着升级给人类用户处理。</p>
+        <p>隔离（quarantine）是分诊工作流的一种实用模式。它禁止那些读取不受信任公开内容的 agent 执行高权限操作；这些高权限操作改由负责根据信息采取行动的 agent 完成。</p>
+        <p>把分诊工作流与 <code>/loop</code> 结合起来，让 Claude 持续执行这项工作。</p>
+
+        <h3 id="exploration-taste">探索与品味</h3>
+        <p>当你需要探索一个解决方案的不同路径时，工作流会很有用；尤其是设计或命名这类依赖品味、又能从量规中受益的问题。</p>
+        <p>可以尝试要求 Claude 探索一批解决方案，并为审查 agent 提供一套关于优秀方案应具备哪些特征的量规。当审查 agent 认为方案已经满足标准时，任务才算完成。也可以依据这套量规，通过锦标赛对方案进行排序或选择。</p>
+
+        <h3 id="evals">评测（Evals）</h3>
+        <p>你可以为特定任务运行轻量评测：在 worktree 中派生独立 agent，再派生比较 agent，依据量规比较并评定具体输出。例如，可以先评估你创建的一项 skill 是否符合特定标准，再据此加以改进。</p>
+
+        <h3 id="model-routing">模型与智能路由</h3>
+        <p>创建一个针对你的任务调优的分类器 agent，由它决定使用哪个模型。当任务会涉及许多工具调用时，这种做法很有帮助：在执行之前先开展研究，可以确定最适合这项工作的模型。</p>
+        <p>例如，对于“解释 auth 模块如何工作”这项任务，最佳模型取决于 auth 模块包含多少文件以及代码库的整体形态。分类器 agent 可以完成这项研究，再根据任务的预期复杂度把它路由给 Sonnet 或 Opus。</p>
+      </section>
+
+      <section aria-labelledby="when-not-to-use">
+        <h2 id="when-not-to-use">何时不应使用动态工作流</h2>
+        <div class="callout"><strong>限制与成本：</strong>工作流仍是新事物。虽然在许多用例中，它们能够带来超出常规水平的结果，但并非每项任务都需要工作流，而且工作流最终可能使用多得多的 token。</div>
+        <p>最好以创造性的方式使用工作流，推动 Claude Code 去完成你以前没有尝试过的事情。对于常规编码任务，请试着问自己：它真的需要更多算力吗？例如，大多数传统编码任务并不需要一个由 5 名审查者组成的评审组。</p>
+        <p>同样的判断也适用于更高一层的架构层面：<a href="https://claude.com/blog/building-multi-agent-systems-when-and-how-to-use-them">多 agent 与单 agent</a> 的选择遵循相似逻辑——并行与专业化必须证明，其收益足以覆盖协调成本。</p>
+      </section>
+
+      <section aria-labelledby="tips">
+        <h2 id="tips">构建动态工作流的技巧</h2>
+
+        <h3 id="prompting">提示词设计</h3>
+        <p>在动态工作流的提示词中写得足够详细，并使用上文介绍的具体技术，能够取得最佳结果。</p>
+        <p>工作流并不只适用于大型任务。你可以提示模型使用“快速工作流（quick workflow）”。例如，你可以针对某项假设创建一次快速的对抗式审查。</p>
+
+        <h3 id="goal-loop">与 <code>/goal</code> 和 <code>/loop</code> 结合</h3>
+        <p>当工作流可以重复执行时——例如分诊、研究或验证——可将它与 <code>/loop</code> 结合，以固定间隔运行；再使用 <code>/goal</code> 设置一项硬性的完成要求。</p>
+
+        <h3 id="token-budgets">Token 使用预算</h3>
+        <p>你可以为动态工作流设置明确的 token 使用预算，以限制一项任务消耗的 token 数量。可以在提示词中给出类似“use 10k tokens”的预算，这会设置使用上限。</p>
+
+        <h3 id="saving-sharing">保存与共享动态工作流</h3>
+        <p>你可以在工作流菜单中按下“s”来保存工作流。可以把它们签入 <code>~/.claude/workflows</code>，也可以通过 skill 分发。</p>
+        <aside class="figure-note" aria-label="原文配图占位"><strong>原文配图</strong>｜所在小节：“保存与共享动态工作流”（保存工作流段落之后）。为保持 HTML 自包含，此处不加载原文远程图片，也不对图片细节作推测性描述。</aside>
+        <p>要通过 skill 共享工作流，请把 JavaScript 工作流文件放进该 skill 的文件夹中，并在 <a href="http://skill.md/"><code>SKILL.md</code></a> 中引用它们。为了获得更高灵活性，你可能会希望提示 Claude：把 skill 中的工作流视为模板，而不是必须逐字照搬执行的脚本。</p>
+        <aside class="figure-note" aria-label="原文配图占位"><strong>原文配图</strong>｜所在小节：“保存与共享动态工作流”（通过 skill 分享段落之后）。为保持 HTML 自包含，此处不加载原文远程图片，也不对图片细节作推测性描述。</aside>
+      </section>
+
+      <section aria-labelledby="discovery">
+        <h2 id="discovery">一个新的探索起点</h2>
+        <p>工作流是一种扩展 Claude Code 的实用新方式。我鼓励你把它们视为一个起点，用来探索让 Claude 帮助你完成任务的新方法。关于如何以最佳方式使用工作流，仍有许多内容有待发现。请告诉我你发现了什么。</p>
+        <blockquote class="closing-quote">关于 Harness 首先应该包含什么，请参阅我们用于构建 Claude 的三种<a href="https://claude.com/blog/harnessing-claudes-intelligence"> Harness 设计模式</a>。</blockquote>
+        <p class="byline"><em>本文由 Thariq Shihipar 和 Sid Bidasaria 撰写。两人均为 Anthropic 技术人员，从事 Claude Code 相关工作。</em></p>
+      </section>
+    </main>
+  </div>
+
+  <footer class="source-footer">
+    <div class="source-footer-inner">
+      <h2>来源与本地文件</h2>
+      <ul>
+        <li><a href="https://claude.com/blog/a-harness-for-every-task-dynamic-workflows-in-claude-code">官方原文：A harness for every task: dynamic workflows in Claude Code</a></li>
+        <li><a href="../../raw/articles/A%20harness%20for%20every%20task%20dynamic%20workflows%20in%20Claude%20Code.md">本地 raw：raw/articles/A harness for every task dynamic workflows in Claude Code.md</a></li>
+      </ul>
+    </div>
+  </footer>
+</body>
+</html>

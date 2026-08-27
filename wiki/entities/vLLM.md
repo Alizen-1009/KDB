@@ -2,7 +2,7 @@
 type: entity
 entity_type: 框架
 topic: 推理服务
-sources: 20
+sources: 21
 updated: 2026-06-12
 ---
 
@@ -45,6 +45,9 @@ updated: 2026-06-12
 - 新增 PCP/DCP 解读补充 Context Parallel 路线：DCP 面向 Decode KV context 分片；PCP 面向单个超长 Prefill 的 sequence 并行。官方 `main` commit `1ad5182` 中 PCP 是与 TP 正交、会扩张 world size 的维度：`world_size = PP × PCP × TP`，rank 顺序为 `DP × PP × PCP × TP`；当前 MRV2 实现只支持 MLA，源码采用 partial-Q/full-KV 的 PCP-group AllGather 路径。官方文档另列 partial-Q/partial-KV Ring Attention 方向，但两条策略仍标为 active development；官方仓库当前未实现/提及 Ulysses。
 - Kimi K3 Preview记录了vLLM对混合KDA–MLA Cache的核心扩展：将Physical State Block、Scheduler Alignment与Prefix-match Unit解耦；MLA KV、KDA Matrix State与ShortConv State必须对同一个`num_computed_tokens`有效，命中后通过Copy-on-Write恢复为请求私有Running State。该能力属于可复用于其他Hybrid Attention模型的核心基础设施，而不是K3特例补丁。
 
+- GLM 架构整理核对 commit `94d96e2446d6`：[[GLM-5 系列|GLM-5 / 5.1 / 5.2]] 注册为 `GlmMoeDsaForCausalLM`，CUDA 路径复用 `vllm/models/deepseek_v32/` 的 DSA 实现；通用兼容类位于 `vllm/model_executor/models/deepseek_v2.py`，其中 GLM 类是 `DeepseekV2ForCausalLM` 子类。`index_topk_freq`、`index_topk_pattern`、`index_skip_topk_offset` 的读取位置见该来源列出的 `deepseek_v32/attention.py` 与 `deepseek_v2.py`。
+- 同一 commit 已有面向 Kimi K3 的 NVIDIA / AMD 通用 KDA 路径及 `third_party/flash_linear_attention` 实现，但没有找到 [[GLM-5.3-Flash]] 的 `Glm5NextForConditionalGeneration` / `glm5_next` 原生注册。因此这只能证明“已有通用 KDA”，不能证明该 commit 支持 GLM-5.3-Flash；未来版本需重新核实。
+
 ## 相关概念
 
 - [[Continuous Batching]]
@@ -76,6 +79,9 @@ updated: 2026-06-12
 - [[并行投机解码]]
 - [[DFlash]]
 - [[DSpark]]
+- [[../concepts/DeepSeek Sparse Attention]]
+- [[../concepts/IndexShare]]
+- [[../concepts/MLA]]
 
 ## 相关来源
 
@@ -99,6 +105,7 @@ updated: 2026-06-12
 - [[../sources/vllm PCP 与 DCP 深度解析]]
 - [[../sources/A Preview of Production-Scale Kimi K3 Support on vLLM]]
 - [[../sources/并行投机解码(DFlashDSpark)的快速理解与vLLM实测]]
+- [[../sources/glm-5-architecture-evolution]]
 
 ## 冲突与备注
 
@@ -122,3 +129,4 @@ updated: 2026-06-12
 - PCP/DCP 二手来源对 world size、`ag_rs` 数据流、PCP 上线版本和参数名存在冲突。官方 `main` commit `1ad5182` 已明确 PCP 扩张 world size、DCP 默认不扩张；但发布版本与 backend 数据流仍需绑定实际 commit。
 - K3官方博客是权重发布前Preview：Non-disaggregated Serving已工作，但FlashKDA Backend Selection、PD/Offload Prefix Cache、EP与Vendor Validation仍在进行；不能把“已集成”自动写成“所有部署路径已完成生产验证”。
 - DFlash/DSpark benchmark 启动命令使用 `vllm/vllm-openai:latest` 且未显式设置 `--tensor-parallel-size`；虽然正文称 vLLM `0.26.0` 和 8×A800 环境，实际 image digest、计算 GPU 数与 TP 拓扑仍待核实，吞吐结果不能视为框架通用基线。
+- GLM 支持矩阵只对应 commit `94d96e2446d6`：该 commit 支持 `GlmMoeDsaForCausalLM` 路线，但未找到 `Glm5NextForConditionalGeneration` / `glm5_next` 注册；不能把后续 release、外部分支或通用 KDA kernel 的存在倒推为该 commit 原生支持 GLM-5.3-Flash。

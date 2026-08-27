@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: 模型架构
-sources: 2
+sources: 3
 updated: 2026-05-17
 ---
 
@@ -27,6 +27,12 @@ updated: 2026-05-17
 - 将门控后的记忆结果作为残差支路注入主干，而不是替代 attention / FFN / MoE
 - 在官方 demo 中，这条路径被具体实现为：`CompressedTokenizer -> NgramHashMapping -> MultiHeadEmbedding -> gate -> ShortConv -> residual`
 
+## Qwen n-gram 与 Engram 的边界
+
+[[../entities/Qwen3.8-Flash-Next]] 也把局部 n-gram 作为确定性寻址键，在 Layer 2 通过单层 [[N-gram Embedding]] 从加速器外的 `51B` 参数表补充静态容量，并让 host prefetch 与 Layer 1 计算重叠。这与 Engram 都属于 conditional memory，但 Qwen3.8 论文没有披露具体 n-gram 阶数、slot/hash、压缩或 hidden-state gate 机制；不能把 Engram/demo 的哈希与门控实现直接写成 Qwen 的实现。
+
+Qwen 的扩表实验还显示：固定 MoE 时从 `20×` 扩到 `200×` vocabulary scale，loss `1.553→1.526`，但多数下游准确率饱和或波动，中文任务较持续改善。论文称额外 FLOPs/latency 可忽略，却未给带宽、延迟或命中率。
+
 ## 关键权衡
 
 - 能把静态模式与动态推理解耦，但需要维护巨大的静态表和潜在的哈希碰撞
@@ -37,15 +43,18 @@ updated: 2026-05-17
 ## 相关实体
 
 - [[../entities/Engram]]
+- [[../entities/Qwen3.8-Flash-Next]]
 
 ## 相关来源
 
 - [[../sources/Conditional Memory via Scalable Lookup: A New Axis of Sparsity for Large Language Models]]
 - [[../sources/engram_demo_v1]]
+- [[../sources/On the Design of Qwen3.8-Next Architecture：Evaluation, Efficiency, and Training Stability]]
 
 ## 相关概念
 
 - [[Sparsity Allocation]]
+- [[N-gram Embedding]]
 
 ## 研究备注
 

@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: 性能分析
-sources: 2
+sources: 3
 updated: 2026-04-23
 ---
 
@@ -33,6 +33,13 @@ updated: 2026-04-23
 - speculative decoding 还应报告 acceptance length、draft/verify 分段耗时、verify batch shape 和 Baseline 的完全相同配置。
 - accuracy 对比需要区分模型/算法变化与 dynamic batch 引起的数值非确定性；temperature=0 也不自动等于 batch-invariant。
 
+## Sparse Attention 评测口径
+
+DeepSeek-V3.2-Exp 的资料补充了两个常见混杂因素：
+
+- **能力分数与输出长度**：GPQA、HLE、HMMT 2025 的差距伴随 V3.2-Exp 生成更少 reasoning tokens；相近输出长度的中间 checkpoint 会缩小差距。比较 sparse/dense 模型时应同时报告 reasoning length、token budget、停止条件和 checkpoint。
+- **服务成本与价格假设**：论文 Figure 3 来自 H800 集群实际服务 benchmark，并按 `$2/GPU-hour` 换算；短序列 prefill 还使用 masked MHA mode 模拟 DSA。没有精确表格时，不应从曲线估读并固化美元数字，也不能脱离 GPU 价格、batch 和服务实现比较。
+
 ## 关键权衡
 
 - Benchmarking 给你“快不快”，但不直接告诉你“为什么快”或“慢在哪”
@@ -42,11 +49,13 @@ updated: 2026-04-23
 
 - [[../entities/Stanford CS336]]
 - [[../entities/vLLM]]
+- [[../entities/DeepSeek-V3.2-Exp]]
 
 ## 相关来源
 
 - [[../sources/斯坦福CS336 Lecture 6 - Benchmarking, Profiling, and Kernel Writing]]
 - [[../sources/并行投机解码(DFlashDSpark)的快速理解与vLLM实测]]
+- [[../sources/DeepSeek-V3.2-Exp：Boosting Long-Context Efficiency with DeepSeek Sparse Attention]]
 
 ## 相关概念
 
@@ -54,6 +63,7 @@ updated: 2026-04-23
 - [[Roofline 模型]]
 - [[Speculative Decoding]]
 - [[确定性推理]]
+- [[DeepSeek Sparse Attention]]
 
 ## 研究备注
 

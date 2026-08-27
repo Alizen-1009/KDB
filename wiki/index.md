@@ -25,16 +25,16 @@
 
 ## 资源统计
 
-- 原始文章：69
-- 原始论文：5
+- 原始文章：76
+- 原始论文：8
 - 原始仓库：0
 - 原始数据集：0
 - 原始图片：19
 - 原始代码：1
-- 来源文件：55
-- 实体文件：41
-- 概念文件：108
-- 报告文件：32
+- 来源文件：61
+- 实体文件：47
+- 概念文件：115
+- 报告文件：35
 - HTML 导出：0
 - 面试文件：11
 - 卡片文件：0
@@ -42,16 +42,19 @@
 
 ## 概念页面（按主题）
 
-### 注意力机制（11）
+### 注意力机制（14）
 
 - [[../wiki/concepts/CSA-HCA|CSA-HCA]]
 - [[../wiki/concepts/Chunked Gated Delta Rule|Chunked Gated Delta Rule]]
+- [[../wiki/concepts/DeepSeek Sparse Attention|DeepSeek Sparse Attention]]
 - [[../wiki/concepts/Flash Decoding|Flash Decoding]]
 - [[../wiki/concepts/FlashAttention|FlashAttention]]
 - [[../wiki/concepts/FlashMLA|FlashMLA]]
+- [[../wiki/concepts/IndexShare|IndexShare]]
 - [[../wiki/concepts/KDA|KDA]]
 - [[../wiki/concepts/MLA|MLA]]
 - [[../wiki/concepts/Online Softmax|Online Softmax]]
+- [[../wiki/concepts/Qwen Sparse Attention|Qwen Sparse Attention]]
 - [[../wiki/concepts/Ring Attention|Ring Attention]]
 - [[../wiki/concepts/混合注意力|混合注意力]]
 - [[../wiki/concepts/线性注意力递归状态|线性注意力递归状态]]
@@ -142,18 +145,21 @@
 - [[../wiki/concepts/Profiling|Profiling]]
 - [[../wiki/concepts/Roofline 模型|Roofline 模型]]
 
-### 模型架构（11）
+### 模型架构（14）
 
 - [[../wiki/concepts/Attention Residuals|Attention Residuals]]
 - [[../wiki/concepts/Conditional Memory|Conditional Memory]]
 - [[../wiki/concepts/Double-Wide MLP|Double-Wide MLP]]
+- [[../wiki/concepts/Gated Residual|Gated Residual]]
 - [[../wiki/concepts/Hyper-Connections|Hyper-Connections]]
 - [[../wiki/concepts/LatentMoE|LatentMoE]]
 - [[../wiki/concepts/MoE|MoE]]
+- [[../wiki/concepts/N-gram Embedding|N-gram Embedding]]
 - [[../wiki/concepts/Per-Layer Embeddings|Per-Layer Embeddings]]
 - [[../wiki/concepts/PreNorm Dilution|PreNorm Dilution]]
 - [[../wiki/concepts/RMSNorm|RMSNorm]]
 - [[../wiki/concepts/Sparsity Allocation|Sparsity Allocation]]
+- [[../wiki/concepts/TTT Layer|TTT Layer]]
 - [[../wiki/concepts/mHC|mHC]]
 
 ### 投机解码（6）
@@ -165,10 +171,11 @@
 - [[../wiki/concepts/Speculative Decoding|Speculative Decoding]]
 - [[../wiki/concepts/并行投机解码|并行投机解码]]
 
-### 训练与 Scaling（6）
+### 训练与 Scaling（7）
 
 - [[../wiki/concepts/Chinchilla Scaling|Chinchilla Scaling]]
 - [[../wiki/concepts/Critical Batch Size|Critical Batch Size]]
+- [[../wiki/concepts/Muon Optimizer|Muon Optimizer]]
 - [[../wiki/concepts/Scaling Laws|Scaling Laws]]
 - [[../wiki/concepts/数据缩放定律|数据缩放定律]]
 - [[../wiki/concepts/混合精度训练与推理|混合精度训练与推理]]
@@ -183,7 +190,7 @@
 
 ## 实体页面（按类型）
 
-### 项目（9）
+### 项目（10）
 
 - [[../wiki/entities/CAKE KDA|CAKE KDA]]
 - [[../wiki/entities/DeepEP|DeepEP]]
@@ -192,6 +199,7 @@
 - [[../wiki/entities/Megakernels|Megakernels]]
 - [[../wiki/entities/MoonEP|MoonEP]]
 - [[../wiki/entities/NCCL Extensions|NCCL Extensions]]
+- [[../wiki/entities/TTT-LM|TTT-LM]]
 - [[../wiki/entities/vLLM AFD Plugin|vLLM AFD Plugin]]
 - [[../wiki/entities/verifiers|verifiers]]
 
@@ -206,19 +214,24 @@
 - [[../wiki/entities/TileRT|TileRT]]
 - [[../wiki/entities/vLLM|vLLM]]
 
-### 模型（4）
+### 模型（8）
 
 - [[../wiki/entities/DeepSeek V4|DeepSeek V4]]
+- [[../wiki/entities/DeepSeek-V3.2-Exp|DeepSeek-V3.2-Exp]]
+- [[../wiki/entities/GLM-5 系列|GLM-5 系列]]
+- [[../wiki/entities/GLM-5.3-Flash|GLM-5.3-Flash]]
 - [[../wiki/entities/Gemma 4|Gemma 4]]
 - [[../wiki/entities/Kimi K3|Kimi K3]]
 - [[../wiki/entities/Qwen VL|Qwen VL]]
+- [[../wiki/entities/Qwen3.8-Flash-Next|Qwen3.8-Flash-Next]]
 
-### 公司（5）
+### 公司（6）
 
 - [[../wiki/entities/DeepSeek-AI|DeepSeek-AI]]
 - [[../wiki/entities/Google DeepMind|Google DeepMind]]
 - [[../wiki/entities/Moonshot AI|Moonshot AI]]
 - [[../wiki/entities/Prime Intellect|Prime Intellect]]
+- [[../wiki/entities/Z.ai|Z.ai]]
 - [[../wiki/entities/阿里巴巴|阿里巴巴]]
 
 ### 组织（4）
@@ -251,11 +264,12 @@
 
 ## 来源摘要（按类型）
 
-### 文章（36）
+### 文章（40）
 
 - [[../wiki/sources/2026 年MoE 架构正在发生一次关键变化|2026 年MoE 架构正在发生一次关键变化]]
 - [[../wiki/sources/A Preview of Production-Scale Kimi K3 Support on vLLM|A Preview of Production-Scale Kimi K3 Support on vLLM]]
 - [[../wiki/sources/CUDA优化维度框架|CUDA优化维度框架]]
+- [[../wiki/sources/DSpark：结合半自回归生成与置信度调度的投机解码技术|DSpark：结合半自回归生成与置信度调度的投机解码技术]]
 - [[../wiki/sources/DeepSeekV4中RoPE设计解析|DeepSeekV4中RoPE设计解析]]
 - [[../wiki/sources/Dynamic persistent tile scheduling with Cluster Launch Control (CLC) on NVIDIA Blackwell GPUs|Dynamic persistent tile scheduling with Cluster Launch Control (CLC) on NVIDIA Blackwell GPUs]]
 - [[../wiki/sources/Flash Attention 详细解释推演与Pytorch代码实现|Flash Attention 详细解释推演与Pytorch代码实现]]
@@ -275,12 +289,15 @@
 - [[../wiki/sources/Recursive Language Models the paradigm of 2026|Recursive Language Models the paradigm of 2026]]
 - [[../wiki/sources/SGLang的KDA管理与Prefix Cache难题|SGLang的KDA管理与Prefix Cache难题]]
 - [[../wiki/sources/SGLang：LLM推理引擎发展新方向|SGLang：LLM推理引擎发展新方向]]
+- [[../wiki/sources/glm-5-architecture-evolution|glm-5-architecture-evolution]]
 - [[../wiki/sources/vLLM AFD Plugin 发布：为 MoE 推理拆分 Attention 与 FFN，实现灵活部署|vLLM AFD Plugin 发布：为 MoE 推理拆分 Attention 与 FFN，实现灵活部署]]
 - [[../wiki/sources/vLLM Large Scale Serving DeepSeek @ 2.2k toksH200 with Wide-EP|vLLM Large Scale Serving DeepSeek @ 2.2k toksH200 with Wide-EP]]
 - [[../wiki/sources/vLLM x TileRT Specialized Decode for Latency-Critical Serving|vLLM x TileRT Specialized Decode for Latency-Critical Serving]]
 - [[../wiki/sources/vLLM皇冠上的明珠：深入浅出理解PagedAttention CUDA实现|vLLM皇冠上的明珠：深入浅出理解PagedAttention CUDA实现]]
 - [[../wiki/sources/vllm PCP 与 DCP 深度解析|vllm PCP 与 DCP 深度解析]]
 - [[../wiki/sources/vllm并行策略之DCP(Decode Context Parallel)|vllm并行策略之DCP(Decode Context Parallel)]]
+- [[../wiki/sources/【LLM2】Standford TTT模型(Learn at Test Time)|【LLM2】Standford TTT模型(Learn at Test Time)]]
+- [[../wiki/sources/一文通透TTT：Learning to “Learn at Test Time”，让RNN的隐藏层变成可学习的函数，把T|一文通透TTT：Learning to “Learn at Test Time”，让RNN的隐藏层变成可学习的函数，把T]]
 - [[../wiki/sources/你一定要知道：CUDA优化六要|你一定要知道：CUDA优化六要]]
 - [[../wiki/sources/十分钟读懂旋转编码（RoPE）|十分钟读懂旋转编码（RoPE）]]
 - [[../wiki/sources/并行投机解码(DFlashDSpark)的快速理解与vLLM实测|并行投机解码(DFlashDSpark)的快速理解与vLLM实测]]
@@ -290,11 +307,13 @@
 - [[../wiki/sources/还在手写CUDA内核？CODA来了！LLM和新手也能让Transformer跑出光速|还在手写CUDA内核？CODA来了！LLM和新手也能让Transformer跑出光速]]
 - [[../wiki/sources/陈巍：DeepSeek 开源Day（1）-FlashMLA 深入分析（收录于：DeepSeek技术详解系列）|陈巍：DeepSeek 开源Day（1）-FlashMLA 深入分析（收录于：DeepSeek技术详解系列）]]
 
-### 论文（4）
+### 论文（6）
 
 - [[../wiki/sources/Attention Residuals|Attention Residuals]]
 - [[../wiki/sources/Conditional Memory via Scalable Lookup: A New Axis of Sparsity for Large Language Models|Conditional Memory via Scalable Lookup: A New Axis of Sparsity for Large Language Models]]
+- [[../wiki/sources/DeepSeek-V3.2-Exp：Boosting Long-Context Efficiency with DeepSeek Sparse Attention|DeepSeek-V3.2-Exp：Boosting Long-Context Efficiency with DeepSeek Sparse Attention]]
 - [[../wiki/sources/Look Ma, No Bubbles! Designing a Low-Latency Megakernel for Llama-1B|Look Ma, No Bubbles! Designing a Low-Latency Megakernel for Llama-1B]]
+- [[../wiki/sources/On the Design of Qwen3.8-Next Architecture：Evaluation, Efficiency, and Training Stability|On the Design of Qwen3.8-Next Architecture：Evaluation, Efficiency, and Training Stability]]
 - [[../wiki/sources/mHC: Manifold-Constrained Hyper-Connections|mHC: Manifold-Constrained Hyper-Connections]]
 
 ### 课程（6）
@@ -339,6 +358,8 @@
 ## 报告
 
 - [[../output/reports/Blackwell相对Hopper的新特性|Blackwell相对Hopper的新特性]]
+- [Claude Code 动态工作流：为每项任务定制 Harness（中文翻译）](../output/reports/Claude%20Code%20动态工作流：为每项任务定制%20Harness（中文翻译）.html)
+- [Claude Skills 完整构建指南（中文翻译）](../output/reports/Claude%20Skills%20完整构建指南（中文翻译）.html)
 - [[../output/reports/DCP是什么|DCP是什么]]
 - [DFlash与DSpark投机解码详解](../output/reports/DFlash与DSpark投机解码详解.html)
 - [[../output/reports/DeepSpeed Ulysses适用场景与DeepSeek关系|DeepSpeed Ulysses适用场景与DeepSeek关系]]
@@ -364,6 +385,7 @@
 - [[../output/reports/PCP是什么|PCP是什么]]
 - [[../output/reports/Prefill Attention 的 CUDA 并行映射|Prefill Attention 的 CUDA 并行映射]]
 - [[../output/reports/Recursive Language Models 中文导读|Recursive Language Models 中文导读]]
+- [TTT模型学习指南](../output/reports/TTT模型学习指南.html)
 - [[../output/reports/Triton在Ascend上的支持|Triton在Ascend上的支持]]
 - [[../output/reports/Triton跨芯片支持|Triton跨芯片支持]]
 - [[../output/reports/vLLM CUDA Graph Capture Size为何是两倍max_num_seqs|vLLM CUDA Graph Capture Size为何是两倍max_num_seqs]]

@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: 投机解码
-sources: 9
+sources: 10
 updated: 2026-07-08
 ---
 
@@ -72,6 +72,7 @@ target logits at position t+k-1 -> score y_k
 - 对 GDN/KDA 等递归线性注意力，draft token 不仅会写临时 KV，还会推进 Conv State 与矩阵状态。Rejected token 不能留在主状态中；来源描述 SGLang 先写暂存状态，验证后按实际接受长度提交，精确实现依赖版本。
 - 在 vLLM Prefill + TileRT Decode 的跨引擎 PD 中，TileRT 要从首个 Decode step 启用 MTP，因此 Prefill 侧必须生成并传递 draft-layer KV；目标引擎还需对齐 token position、dtype、layout 和 speculative config。
 - DFlash/DSpark 来源称 vLLM 可通过 `method=dflash/dspark` 部署并行 drafter。DSpark 的 batch 级 prefix scheduler 还会让每个请求使用不同 verify length，因此 runtime 不只管理 KV 回滚，还要联合估计 acceptance benefit 与 target verify batch shape 的硬件效率；正式支持范围需绑定 vLLM commit 核实。
+- [[../sources/DSpark：结合半自回归生成与置信度调度的投机解码技术]] 称 DSpark 已用于 DeepSeek-V4 Flash / Pro 预览版线上流量，并在相同系统吞吐下提高单用户生成速度。该案例说明生产调度目标是 throughput-latency Pareto frontier，而不是单请求 acceptance length 最大化；具体提升数字仍需绑定官方 workload 与 baseline。
 
 ## 相关实体
 
@@ -80,6 +81,8 @@ target logits at position t+k-1 -> score y_k
 - [[../entities/Gemma 4]]
 - [[../entities/SGLang]]
 - [[../entities/RTP-LLM]]
+- [[../entities/DeepSeek V4]]
+- [[../entities/DeepSeek-AI]]
 
 ## 相关来源
 
@@ -92,6 +95,7 @@ target logits at position t+k-1 -> score y_k
 - [[../sources/SGLang的KDA管理与Prefix Cache难题]]
 - [[../sources/vLLM x TileRT Specialized Decode for Latency-Critical Serving]]
 - [[../sources/并行投机解码(DFlashDSpark)的快速理解与vLLM实测]]
+- [[../sources/DSpark：结合半自回归生成与置信度调度的投机解码技术]]
 
 ## 相关概念
 
@@ -115,3 +119,4 @@ target logits at position t+k-1 -> score y_k
 - SGLang 的 API speculative execution 与常规 draft-target speculative decoding 不是同一层机制；前者更偏程序解释器和黑盒 API 调用复用，失败时可能额外消耗 token，触发条件仍待官方资料核实
 - RTP-LLM 中 DeepSeek-V3/MTP、Prompt Lookup 等结果应按任务重复率、接受率、并发和框架版本拆开看；不要只用单个吞吐倍数概括 speculative decoding 的整体收益。
 - 并行投机来源提醒：只看 `num_speculative_tokens` 不足以解释收益，还应报告实际 acceptance length、proposal/verify 各自耗时、总 verify batch、并发和硬件效率曲线。正确验证路径原则上不应被解读为提高 target 模型质量；任务准确率变化应先排查数值非确定性和评测噪声。
+- DSpark 的线上来源进一步提醒：离线平均接受长度、单用户 tok/s、系统总吞吐与 SLA 下的 Pareto frontier 是不同指标；生产结果不能只用一个 acceptance 或 speedup 数字概括。

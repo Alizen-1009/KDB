@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: 投机解码
-sources: 1
+sources: 2
 updated: 2026-08-17
 ---
 
@@ -34,6 +34,10 @@ updated: 2026-08-17
 
 这会让 drafter 与 target 深度耦合：需要确定抽取哪些层、怎样融合、如何投影，以及 runtime 如何把这些 activation 交给 drafter。
 
+## 与 DSpark 对比时的表述边界
+
+[[../sources/DSpark：结合半自回归生成与置信度调度的投机解码技术]] 将 DFlash 简化为“各 token 独立预测”。更准确的说法是：DFlash 同一 block 内的 mask positions 可以双向 Attention，因此 hidden computation 并非彼此完全独立；但它们在一次 forward 中同时输出，后面位置不会根据本轮**实际采样出的前序 token**再次条件化。[[DSpark]] 的轻量顺序头主要补的是后一种依赖。
+
 ## 关键权衡
 
 - 并行 proposal 减少 draft 串行延迟，但 target hidden extraction 和 drafter context Attention 会增加计算与显存流量。
@@ -61,6 +65,7 @@ updated: 2026-08-17
 ## 相关来源
 
 - [[../sources/并行投机解码(DFlashDSpark)的快速理解与vLLM实测]]
+- [[../sources/DSpark：结合半自回归生成与置信度调度的投机解码技术]]
 
 ## 相关概念
 
