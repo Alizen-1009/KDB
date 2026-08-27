@@ -1755,3 +1755,9 @@
 - 更新注意力机制、模型架构、投机解码主题地图导读
 - 未发现与现有 wiki 的直接事实冲突；显式记录 GLM-5.1/5.3 后训练边界、Flash 独立 Base、K-pool 与 QSA 公式边界
 - 待核实：GLM-5.3 独立 config、Flash K-pool 完整公式、IndexShare 2.9× 本地复测及未来 vLLM 支持
+
+## [2026-08-27] query | 先进大模型架构知识图谱
+
+- 创建自包含 HTML 报告 output/reports/先进大模型架构知识图谱.html，统一比较 MLA 双模式、MSA/DSA/QSA/NSA/CSA/HCA、GDN/KDA、IndexShare、mHC、Engram、N-gram Embedding、AttnRes 与 LatentMoE。
+- 按当前 DeepSeek V4 官方 Transformers 文档修正 CSA/HCA 边界：CSA 为低倍率重叠压缩后稀疏选择，HCA 为高倍率非重叠压缩后 dense 读取；旧 C128A/RoPE 解析保留为版本相关二手线索。
+- 更新 CSA-HCA、DeepSeek V4、注意力机制与模型架构导航；完成桌面、500px 窄屏、17 页打印、矩阵交互、锚点、本地链接、JS 与无远程依赖验证。

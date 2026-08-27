@@ -5,31 +5,43 @@ sources: 1
 updated: 2026-05-17
 ---
 
-# CSA/HCA
+# CSA 与 HCA
 
 ## 定义
 
-`CSA/HCA` 是本文所称 DeepSeek V4 中带 KV 压缩的 attention 结构；在当前知识库语境中，它主要用于讨论压缩 KV、`MQA/KV 共享` 与 [[RoPE]] 的兼容问题。
+根据当前 DeepSeek V4 官方 Transformers 文档，`CSA` 与 `HCA` 是两种不同的长程压缩注意力层，而不是同一个结构的两个名字：
 
-## 它解决什么问题
+- `CSA`：`Compressed Sparse Attention`，先做低倍率压缩，再用 Indexer 稀疏选择压缩条目。
+- `HCA`：`Heavily Compressed Attention`，先做高倍率压缩，不使用 Indexer，而是对全部可见压缩条目做 dense attention。
 
-- 多个 token 的 KV 状态被压缩为更少的 KV 状态，以降低 cache 与 attention 访问成本
-- `MQA` 风格的 KV 共享可以进一步减少缓存，但会让 K/V 共用表示下的位置编码处理变复杂
-- 压缩 attention 需要在保留相对位置信息的同时，避免 V 路径被 RoPE 的绝对相位污染
+## 共同骨架
 
-## 核心机制
+- 两者都建立在共享 `K=V` 的 MQA 路径上，并保留独立的 local sliding-window `K=V` 支路，以维护细粒度局部依赖。
+- 长程 compressor 产生的条目与 local branch 一起进入核心 attention；区别主要在压缩强度、窗口是否重叠，以及是否经过稀疏选择。
+- 因此它们既不同于只压缩 KV 表示的 [[MLA]]，也不同于直接在原始 token 上做 top-k 的 [[DeepSeek Sparse Attention|DSA]]。
 
-- 文章以 HCA 为例，指出 RoPE 相关位置包括窗口通道 `SWA` 的 KV、`C128A` 压缩器输出的压缩 KV、上采样后的 Q，以及 attention 输出 O
-- 对压缩 KV，推荐在压缩后施加 RoPE：每个压缩块选择一个标定位置，再按该位置计算旋转角
-- 文中示例为 `C128A` 每 128 个 KV 状态压缩成 1 个 KV 状态，HCA 对第 `t` 个压缩块采用起始位置 `128 * t`
-- 对共享 KV 中被旋转的 V 路径，HCA 通过对输出 O 做逆旋转，减少绝对位置项残留，使输出更接近相对位置形式
-- `P` 不直接旋转，因为 attention probability 是标量权重矩阵，不具备 RoPE 所需的 `head_dim` 二维旋转平面
+## CSA：低压缩后再稀疏选择
+
+- 官方 Transformers 默认压缩率为 `m=4`，使用 overlapping windows 形成较细粒度的 compressed pool。
+- Lightning Indexer 对 query 与压缩条目打分，每个 query 只 gather top-`index_topk` 条目进入长程核心 attention。
+- 其状态除 local sliding-window KV 外，还包括 compressor overlap state、compressed pool 与 Indexer state。
+
+## HCA：重压缩后的 Dense Attention
+
+- 官方 Transformers 默认压缩率为 `m'=128`，使用 non-overlapping windows 形成更粗粒度的 compressed entries。
+- HCA 没有 Indexer；每个 query 可以关注全部因果可见的压缩条目，并同时使用 local sliding-window branch。
+- 它通过更激进的压缩直接缩短长程序列，换取更粗的远程分辨率。
+
+## 早期 RoPE 解析中的补充线索
+
+现有来源页来自官方结构公开前的二手解析，其中以 `C128A` 为例讨论：压缩后为每个块选择位置标尺再施加 RoPE，并对共享 K/V 场景下的输出逆旋转进行推导。这些内容可作为位置编码实现思路，但具体 `C128A` 命名、起始位置 `128*t` 与输出逆旋转仍需绑定正式模型版本和源码，不能覆盖上述官方 CSA/HCA 定义。
 
 ## 关键权衡
 
-- 压缩后旋转需要人为选择块位置标尺，例如起始点、终点或中点；规则必须在训练与推理中保持一致
-- 起始位置 `128 * t` 简单且确定，但压缩块内部 token 的细粒度位置会被折叠，真实效果需要结合模型训练和实现验证
-- 输出逆旋转保留了 KV 共享的存储优势，但增加了位置编码路径的实现复杂度
+- CSA 保留更细的远程分辨率，但需要 overlapping compressor、Indexer、top-k gather 和对应 cache state。
+- HCA 移除 Indexer、状态更简单，但高倍率压缩会折叠更多 token 级细节；对 compressed entries 的 dense attention 仍随条目数增长。
+- 两者都依赖 local branch 为近期 token 保底；不能只按长程压缩率推断端到端质量或速度。
+- 压缩条目的 RoPE 标尺、cache layout、dtype 与层调度都可能随模型版本变化，应绑定 checkpoint config 和实现核实。
 
 ## 相关实体
 
@@ -40,13 +52,21 @@ updated: 2026-05-17
 
 - [[../sources/DeepSeekV4中RoPE设计解析]]
 
+## 官方资料
+
+- [DeepSeek V4 Transformers 文档](https://huggingface.co/docs/transformers/model_doc/deepseek_v4)
+- [先进大模型架构知识图谱](../../output/reports/先进大模型架构知识图谱.html)
+
 ## 相关概念
 
 - [[RoPE]]
 - [[MLA]]
 - [[KV Cache]]
+- [[DeepSeek Sparse Attention]]
+- [[mHC]]
 
 ## 研究备注
 
-- 当前页面基于单篇解析文章整理，`CSA/HCA` 与 `C128A` 的正式定义、代码接口和 tensor shape 仍需按公开源码或论文进一步核实。
-- 后续可补一张从 `Q/K/V -> 压缩 KV -> RoPE -> attention -> 输出逆旋转` 的流程图，帮助区分 QK score 位置项和 PV/O 路径位置项。
+- 当前正式定义已按 DeepSeek V4 官方 Transformers 文档更新；旧来源中的 `C128A` 与 RoPE 推导仍作为二手实现线索保留。
+- `m=4`、`m'=128` 是当前官方文档默认值，不应外推为所有 V4 checkpoint 或后续版本的固定配置。
+- 具体 Indexer、compressor、RoPE 与 cache tensor shape 仍应绑定 checkpoint config 和实现版本。
