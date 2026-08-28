@@ -25,15 +25,15 @@
 
 ## 资源统计
 
-- 原始文章：76
+- 原始文章：77
 - 原始论文：8
 - 原始仓库：0
 - 原始数据集：0
 - 原始图片：19
 - 原始代码：1
-- 来源文件：61
+- 来源文件：62
 - 实体文件：47
-- 概念文件：115
+- 概念文件：116
 - 报告文件：36
 - HTML 导出：0
 - 面试文件：11
@@ -171,11 +171,12 @@
 - [[../wiki/concepts/Speculative Decoding|Speculative Decoding]]
 - [[../wiki/concepts/并行投机解码|并行投机解码]]
 
-### 训练与 Scaling（7）
+### 训练与 Scaling（8）
 
 - [[../wiki/concepts/Chinchilla Scaling|Chinchilla Scaling]]
 - [[../wiki/concepts/Critical Batch Size|Critical Batch Size]]
 - [[../wiki/concepts/Muon Optimizer|Muon Optimizer]]
+- [[../wiki/concepts/RL 训推不一致|RL 训推不一致]]
 - [[../wiki/concepts/Scaling Laws|Scaling Laws]]
 - [[../wiki/concepts/数据缩放定律|数据缩放定律]]
 - [[../wiki/concepts/混合精度训练与推理|混合精度训练与推理]]
@@ -264,7 +265,7 @@
 
 ## 来源摘要（按类型）
 
-### 文章（40）
+### 文章（41）
 
 - [[../wiki/sources/2026 年MoE 架构正在发生一次关键变化|2026 年MoE 架构正在发生一次关键变化]]
 - [[../wiki/sources/A Preview of Production-Scale Kimi K3 Support on vLLM|A Preview of Production-Scale Kimi K3 Support on vLLM]]
@@ -285,6 +286,7 @@
 - [[../wiki/sources/PAI-FA｜突破 TMEM 瓶颈：FlashAttention-4 大 Head Dimension (256) 高性能算子实现与优化|PAI-FA｜突破 TMEM 瓶颈：FlashAttention-4 大 Head Dimension (256) 高性能算子实现与优化]]
 - [[../wiki/sources/PageAttention代码走读|PageAttention代码走读]]
 - [[../wiki/sources/REMINDER FF-KDA & CAKE KDA Highlights|REMINDER FF-KDA & CAKE KDA Highlights]]
+- [[../wiki/sources/RLTraining Inference Mismatch|RLTraining Inference Mismatch]]
 - [[../wiki/sources/RTP-LLM|RTP-LLM]]
 - [[../wiki/sources/Recursive Language Models the paradigm of 2026|Recursive Language Models the paradigm of 2026]]
 - [[../wiki/sources/SGLang的KDA管理与Prefix Cache难题|SGLang的KDA管理与Prefix Cache难题]]

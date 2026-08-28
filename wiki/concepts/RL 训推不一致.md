@@ -1,8 +1,8 @@
 ---
 type: concept
 topic: 训练与 Scaling
-sources: 0
-updated:
+sources: 1
+updated: 2026-08-28
 ---
 
 # RL 训推不一致

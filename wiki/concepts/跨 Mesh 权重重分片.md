@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: 并行与分布式
-sources: 1
+sources: 2
 updated: 2026-07-25
 ---
 

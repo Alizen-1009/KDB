@@ -2,7 +2,7 @@
 type: source
 source_kind: 文章
 topic: 训练与 Scaling
-updated:
+updated: 2026-08-28
 ---
 
 # RLTraining Inference Mismatch

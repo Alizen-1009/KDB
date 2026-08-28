@@ -1766,3 +1766,16 @@
 
 - 基于 Kimi K3 Technical Report §5.1.2 解释 KCP：每个序列分段被压缩为累计 transition 与从零生成的 local state，再通过仿射 prefix scan 恢复各 rank 的精确 incoming state。
 - 更新 KDA 概念页，补充一次 AllGather 的固定大小 fragments、与加法型线性注意力/softmax CP/DCP/单卡 SM-level CP 的边界。
+
+## [2026-08-28] ingest | RLTraining Inference Mismatch
+
+- 读取原始资料：`raw/articles/RLTraining Inference Mismatch.md`（675 行）
+- 创建来源页：`wiki/sources/RLTraining Inference Mismatch.md`
+- 创建概念页：`wiki/concepts/RL 训推不一致.md`
+- 更新概念页：`跨 Mesh 权重重分片`、`混合精度训练与推理`、`确定性推理`
+- 更新训练与 Scaling 主题地图导读；明确原文 shift/mask 示例错误、KL 配方与固定阈值均未提升为通用结论
+
+## [2026-08-28] query | RL 训推不一致入门解释
+
+- 基于 `RL 训推不一致` 概念页解释 Rollout 与 Trainer 对同一条件 logprob 的对齐目标，以及 importance ratio 被系统偏差扭曲的机制。
+- 按根因修复、数值执行对齐、TIS/拒绝采样缓解和 MoE Router Replay 四层整理解决方法；强调无条件统一阈值不存在。
