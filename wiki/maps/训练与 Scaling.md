@@ -11,7 +11,7 @@ topic: 训练与 Scaling
 
 - **预算分配**：[[../concepts/Scaling Laws|Scaling Laws]] → [[../concepts/Chinchilla Scaling|Chinchilla Scaling]] → [[../concepts/数据缩放定律|数据缩放定律]] → [[../concepts/Critical Batch Size|Critical Batch Size]]
 - **省显存换算力**：[[../concepts/重计算|重计算]]、[[../concepts/混合精度训练与推理|混合精度训练与推理]]
-- **在线 RL 闭环正确性**：[[../concepts/RL 训推不一致|RL 训推不一致]] —— 对齐 Rollout 与 Trainer 的条件 logprob，区分 token/mask/权重版本错误和可接受的 kernel 数值漂移；权重同步数据通路再转到 [[../concepts/跨 Mesh 权重重分片|跨 Mesh 权重重分片]]。
+- **在线 RL 闭环正确性**：[[../concepts/RL 训推不一致|RL 训推不一致]] —— 对齐 Rollout 与 Trainer 的条件 logprob，区分 token/mask/权重版本错误和可接受的 kernel 数值漂移；初学者可先读[RL 训推不一致入门指南](../../output/reports/RL训推不一致入门指南.html)，权重同步数据通路再转到 [[../concepts/跨 Mesh 权重重分片|跨 Mesh 权重重分片]]。
 
 并行策略在 [[并行与分布式]]，这里只放规模与预算侧。
 

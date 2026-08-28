@@ -121,6 +121,10 @@ ratio_t = exp(delta_t) ≈ 1
 - 允许多大误差取决于 dtype、模型、序列长度、后端、token 分布和 RL loss 对 ratio 的敏感性，不存在脱离条件的统一阈值。
 - 对异步 RL，old/new policy 本来可以不同；关键是区分算法预期的 policy staleness 与实现错误造成的同版本偏差。
 
+## 学习报告
+
+- [RL 训推不一致入门指南](../../output/reports/RL训推不一致入门指南.html)：面向 PPO/GRPO 初学者的闭环心智模型、Ratio 计算器、分层解决方法与 22 项调试清单。
+
 ## 相关来源
 
 - [[../sources/RLTraining Inference Mismatch]]

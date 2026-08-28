@@ -1779,3 +1779,11 @@
 
 - 基于 `RL 训推不一致` 概念页解释 Rollout 与 Trainer 对同一条件 logprob 的对齐目标，以及 importance ratio 被系统偏差扭曲的机制。
 - 按根因修复、数值执行对齐、TIS/拒绝采样缓解和 MoE Router Replay 四层整理解决方法；强调无条件统一阈值不存在。
+
+## [2026-08-28] query | RL 训推不一致入门指南
+
+- 读取概念页：`RL 训推不一致`、`跨 Mesh 权重重分片`、`混合精度训练与推理`、`确定性推理`
+- 创建自包含 HTML：`output/reports/RL训推不一致入门指南.html`，包含 RL 闭环、条件 logprob 对齐、Ratio 计算器、六类根因、TIS/R3 边界与 22 项调试清单
+- 更新概念页与训练与 Scaling 主题地图，补充 HTML 回链
+- 完成 1440px、500px、14 页打印、Ratio/错误输入/重置、清单进度与重置、锚点、本地链接、JS 和无远程依赖验证
+- 待核实：框架配置名、rollout correction 模式和 Router Replay 支持组合需绑定 VeRL/NeMo RL 版本

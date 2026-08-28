@@ -1,0 +1,942 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="面向 PPO/GRPO 初学工程师的 RL 训推不一致工程机制、诊断漏斗与调试清单。">
+  <title>RL 训推不一致入门指南</title>
+  <style>
+    :root {
+      --paper: #f4efe4;
+      --paper-deep: #e9e0cf;
+      --ink: #132b46;
+      --ink-soft: #425469;
+      --line: #b8ad99;
+      --line-dark: #766f62;
+      --danger: #a2322b;
+      --danger-bg: #f6dfd9;
+      --good: #266a4a;
+      --good-bg: #dcebe1;
+      --note: #7a5b18;
+      --note-bg: #f3e8c6;
+      --white: #fffdf7;
+      --shadow: 0 12px 28px rgba(19, 43, 70, .10);
+      --sidebar: 17rem;
+      --reading: 76rem;
+      --radius: 6px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 1.25rem; }
+    body {
+      margin: 0;
+      background:
+        linear-gradient(rgba(19,43,70,.035) 1px, transparent 1px) 0 0 / 100% 1.75rem,
+        var(--paper);
+      color: var(--ink);
+      font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      line-height: 1.72;
+      text-rendering: optimizeLegibility;
+    }
+    a { color: #174f82; text-underline-offset: .2em; }
+    a:hover { text-decoration-thickness: 2px; }
+    a:focus-visible, button:focus-visible, input:focus-visible, summary:focus-visible {
+      outline: 3px solid #ca7b20;
+      outline-offset: 3px;
+    }
+    .skip-link {
+      position: fixed;
+      left: 1rem;
+      top: 1rem;
+      z-index: 100;
+      transform: translateY(-180%);
+      background: var(--ink);
+      color: white;
+      padding: .6rem .9rem;
+      border-radius: 4px;
+    }
+    .skip-link:focus { transform: translateY(0); }
+    code, pre, .formula, .mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    }
+    code { background: rgba(19,43,70,.07); padding: .08em .28em; border-radius: 3px; }
+    pre {
+      margin: .8rem 0;
+      padding: 1rem;
+      overflow-x: auto;
+      background: #11263b;
+      color: #edf4f8;
+      border-left: 5px solid #6184a2;
+      border-radius: 4px;
+      line-height: 1.55;
+      tab-size: 2;
+      white-space: pre;
+    }
+    kbd { border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 3px; padding: .05rem .3rem; background: var(--white); }
+    p { margin: .65rem 0 1rem; }
+    ul, ol { padding-left: 1.25rem; }
+    li + li { margin-top: .35rem; }
+    h1, h2, h3, h4 { line-height: 1.24; letter-spacing: -.018em; text-wrap: balance; }
+    h1 { font-size: clamp(2.2rem, 6vw, 4.8rem); margin: 0; max-width: 12ch; }
+    h2 { font-size: clamp(1.65rem, 3vw, 2.45rem); margin: 0 0 1.25rem; }
+    h3 { font-size: 1.22rem; margin: 1.5rem 0 .65rem; }
+    h4 { font-size: 1rem; margin: 1.15rem 0 .35rem; }
+    h2 .section-no { font: 700 .8rem/1 ui-monospace, monospace; letter-spacing: .08em; color: var(--danger); display: block; margin-bottom: .55rem; }
+
+    .layout { display: grid; grid-template-columns: var(--sidebar) minmax(0, 1fr); }
+    .sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      padding: 1.5rem 1.25rem;
+      background: #e8dfcf;
+      border-right: 1px solid var(--line);
+    }
+    .brand { font-weight: 800; font-size: .95rem; margin-bottom: .25rem; }
+    .brand-sub { color: var(--ink-soft); font-size: .78rem; margin-bottom: 1.25rem; }
+    .sidebar nav a {
+      display: block;
+      padding: .34rem .5rem;
+      margin: .08rem 0;
+      border-left: 3px solid transparent;
+      color: var(--ink-soft);
+      text-decoration: none;
+      font-size: .86rem;
+    }
+    .sidebar nav a:hover, .sidebar nav a:focus-visible { color: var(--ink); border-left-color: var(--danger); background: rgba(255,255,255,.35); }
+    .reading-time { margin-top: 1.2rem; padding-top: 1rem; border-top: 1px solid var(--line); font-size: .78rem; color: var(--ink-soft); }
+    main { min-width: 0; }
+    .page { max-width: var(--reading); margin: 0 auto; padding: 0 clamp(1.1rem, 4vw, 4.5rem) 6rem; }
+    .top-nav { display: none; }
+
+    .hero {
+      min-height: 76vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 5rem 0 3rem;
+      border-bottom: 3px double var(--line-dark);
+    }
+    .eyebrow { text-transform: uppercase; letter-spacing: .16em; font-weight: 800; font-size: .75rem; color: var(--danger); }
+    .subtitle { font-size: clamp(1.12rem, 2vw, 1.55rem); max-width: 38rem; margin: 1.1rem 0; color: var(--ink-soft); }
+    .hero-note { max-width: 49rem; padding: .85rem 1rem; border-left: 5px solid var(--note); background: rgba(255,253,247,.58); }
+    .hero-meta { display: flex; flex-wrap: wrap; gap: .65rem 1.3rem; margin-top: 1.5rem; color: var(--ink-soft); font-size: .88rem; }
+
+    .section { padding: 4.2rem 0 1rem; border-bottom: 1px solid var(--line); }
+    .lede { font-size: 1.12rem; max-width: 62rem; color: #263e57; }
+    .one-line {
+      margin: 1.5rem 0 2.2rem;
+      padding: 1.2rem 1.35rem;
+      background: var(--ink);
+      color: #f8f2e7;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      font-size: 1.2rem;
+    }
+    .one-line strong { color: #fff; }
+    .tag {
+      display: inline-block;
+      border: 1px solid currentColor;
+      border-radius: 999px;
+      padding: .13rem .48rem;
+      font-size: .72rem;
+      line-height: 1.3;
+      font-weight: 800;
+      letter-spacing: .03em;
+      vertical-align: .12em;
+      white-space: nowrap;
+    }
+    .tag.fact { color: var(--good); background: var(--good-bg); }
+    .tag.example { color: #795718; background: var(--note-bg); }
+    .tag.wiki { color: #365b7c; background: #dfebf2; }
+    .tag.version { color: #70406c; background: #eee1ed; }
+    .tag.risk { color: var(--danger); background: var(--danger-bg); }
+
+    .role-strip { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid var(--line-dark); background: rgba(255,253,247,.46); }
+    .role { padding: 1rem; border-right: 1px solid var(--line); }
+    .role:last-child { border-right: 0; }
+    .role b { display: block; margin-bottom: .25rem; }
+    .role span { color: var(--ink-soft); font-size: .88rem; }
+
+    .figure { margin: 1.8rem 0; }
+    .figure-frame { border: 1px solid var(--line-dark); background: var(--white); padding: .8rem; box-shadow: 5px 5px 0 var(--paper-deep); }
+    .figure figcaption { margin-top: .6rem; color: var(--ink-soft); font-size: .84rem; }
+    .svg-desktop, .svg-mobile { display: block; width: 100%; height: auto; }
+    .svg-mobile { display: none; }
+    .scroll-hint { display: none; color: var(--ink-soft); font-size: .78rem; margin: .35rem 0 0; }
+
+    .definition-box { border-top: 2px solid var(--ink); border-bottom: 2px solid var(--ink); padding: 1.15rem 0; margin: 1.25rem 0; }
+    .formula {
+      display: block;
+      overflow-x: auto;
+      padding: .9rem 1rem;
+      margin: .9rem 0;
+      background: rgba(255,253,247,.72);
+      border: 1px solid var(--line);
+      font-size: 1.05rem;
+      white-space: nowrap;
+    }
+    .good-note, .danger-note, .method-note {
+      padding: .9rem 1rem;
+      margin: 1rem 0;
+      border-left: 5px solid;
+    }
+    .good-note { border-color: var(--good); background: var(--good-bg); }
+    .danger-note { border-color: var(--danger); background: var(--danger-bg); }
+    .method-note { border-color: var(--note); background: var(--note-bg); }
+
+    .alignment-seq { margin: 1.2rem 0; overflow-x: auto; }
+    .alignment-seq svg { min-width: 690px; width: 100%; height: auto; display: block; }
+    .alignment-mobile { display: none; }
+
+    .calculator {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(17rem, 1.1fr);
+      gap: 1.25rem;
+      padding: 1.25rem;
+      margin: 1.5rem 0;
+      background: var(--white);
+      border: 2px solid var(--ink);
+      box-shadow: 7px 7px 0 rgba(19,43,70,.12);
+    }
+    .calc-form { display: grid; gap: .85rem; align-content: start; }
+    label { font-weight: 750; }
+    .input-help { display: block; color: var(--ink-soft); font-size: .78rem; font-weight: 400; }
+    input[type="number"] {
+      width: 100%;
+      min-height: 2.8rem;
+      margin-top: .25rem;
+      padding: .55rem .65rem;
+      color: var(--ink);
+      background: #fff;
+      border: 1px solid var(--line-dark);
+      border-radius: 3px;
+      font: inherit;
+    }
+    button {
+      min-height: 2.65rem;
+      padding: .58rem .85rem;
+      color: white;
+      background: var(--ink);
+      border: 2px solid var(--ink);
+      border-radius: 3px;
+      font: 750 .9rem/1.2 inherit;
+      cursor: pointer;
+    }
+    button:hover { background: #234c71; }
+    .secondary { color: var(--ink); background: transparent; }
+    .secondary:hover { color: white; }
+    .calc-output { border-left: 1px solid var(--line); padding-left: 1.25rem; }
+    .metric-row { display: grid; grid-template-columns: 7rem 1fr; gap: .6rem; align-items: baseline; padding: .65rem 0; border-bottom: 1px solid var(--line); }
+    .metric-row output { font: 800 1.4rem/1 ui-monospace, monospace; }
+    .calc-error { min-height: 1.5em; color: var(--danger); font-weight: 750; }
+    .print-only { display: none; }
+
+    .table-wrap { overflow-x: auto; margin: 1.2rem 0; border: 1px solid var(--line-dark); background: var(--white); }
+    table { width: 100%; min-width: 760px; border-collapse: collapse; font-size: .91rem; }
+    caption { text-align: left; padding: .8rem; font-weight: 800; border-bottom: 1px solid var(--line); }
+    th, td { text-align: left; vertical-align: top; padding: .75rem .8rem; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    th:last-child, td:last-child { border-right: 0; }
+    thead th { background: #e3e9eb; }
+    tbody tr:last-child td { border-bottom: 0; }
+    .table-hint { margin: -.85rem 0 1rem; color: var(--ink-soft); font-size: .78rem; }
+
+    .root-list { border-top: 2px solid var(--ink); margin-top: 1.4rem; }
+    .root-item { display: grid; grid-template-columns: 13rem minmax(0, 1fr); gap: 1.2rem; padding: 1.35rem 0; border-bottom: 1px solid var(--line-dark); }
+    .root-title { margin: 0; font-size: 1.02rem; }
+    .root-num { display: block; font: 800 .74rem/1.2 ui-monospace, monospace; color: var(--danger); margin-bottom: .35rem; }
+    .root-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+    .root-grid dl { margin: 0; }
+    .root-grid dt { font-weight: 850; margin-bottom: .25rem; }
+    .root-grid dd { margin: 0; color: var(--ink-soft); }
+
+    .funnel { margin: 1.4rem 0; counter-reset: funnel; }
+    .funnel-step {
+      position: relative;
+      display: grid;
+      grid-template-columns: 3rem minmax(0, 1fr);
+      gap: .8rem;
+      padding: 0 0 1.15rem;
+    }
+    .funnel-step::before {
+      counter-increment: funnel;
+      content: counter(funnel);
+      display: grid;
+      place-items: center;
+      width: 2.3rem;
+      height: 2.3rem;
+      border: 2px solid var(--ink);
+      border-radius: 50%;
+      background: var(--paper);
+      font: 800 1rem/1 ui-monospace, monospace;
+      z-index: 1;
+    }
+    .funnel-step:not(:last-child)::after { content: ""; position: absolute; left: 1.08rem; top: 2.2rem; bottom: -.05rem; border-left: 2px solid var(--line-dark); }
+    .funnel-copy { padding: .3rem 0 .8rem; border-bottom: 1px dashed var(--line); }
+    .funnel-copy b { display: block; }
+    .branch { margin-top: .45rem; color: var(--ink-soft); font-size: .88rem; }
+    .branch strong { color: var(--danger); }
+
+    .layer-matrix { border-top: 2px solid var(--ink); }
+    .layer-row { display: grid; grid-template-columns: 7.5rem minmax(0, 1fr) 16rem; gap: 1rem; padding: 1.25rem 0; border-bottom: 1px solid var(--line-dark); }
+    .layer-letter { font: 900 2rem/1 ui-monospace, monospace; color: var(--ink); }
+    .layer-letter small { display: block; font: 800 .78rem/1.3 inherit; margin-top: .4rem; }
+    .layer-boundary { color: var(--ink-soft); font-size: .88rem; }
+
+    .code-grid { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(15rem, .65fr); gap: 1rem; align-items: start; }
+    .artifact-fields { border: 1px solid var(--line-dark); padding: 1rem; background: rgba(255,253,247,.6); }
+    .artifact-fields ul { margin-bottom: 0; }
+
+    .monitor-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.3rem; }
+    .monitor-axis { border-top: 4px solid var(--ink); padding-top: .8rem; }
+    .monitor-axis.danger-axis { border-color: var(--danger); }
+    .spark {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      align-items: end;
+      height: 5rem;
+      gap: .25rem;
+      margin: .7rem 0;
+      border-bottom: 1px solid var(--line-dark);
+    }
+    .spark span { background: var(--good); min-height: .2rem; }
+    .spark.bad span { background: var(--danger); }
+
+    .myths { counter-reset: myths; display: grid; grid-template-columns: 1fr 1fr; border-top: 2px solid var(--ink); }
+    .myth { counter-increment: myths; padding: 1rem; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .myth:nth-child(even) { border-right: 0; }
+    .myth::before { content: "误区 " counter(myths, decimal-leading-zero); display: block; color: var(--danger); font: 800 .75rem/1.2 ui-monospace, monospace; margin-bottom: .35rem; }
+    .myth b { display: block; }
+    .myth p { color: var(--ink-soft); margin: .25rem 0 0; }
+
+    .checklist-shell { border: 2px solid var(--ink); background: var(--white); }
+    .checklist-head { position: sticky; top: 0; z-index: 2; display: flex; justify-content: space-between; gap: 1rem; align-items: center; padding: .9rem 1rem; background: var(--ink); color: white; }
+    .progress-group { flex: 1; }
+    .progress-text { display: block; font-weight: 800; margin-bottom: .3rem; }
+    .progress-track { height: .55rem; border: 1px solid rgba(255,255,255,.7); background: rgba(255,255,255,.15); }
+    .progress-bar { display: block; height: 100%; width: 0; background: #8dccaa; transition: width .2s ease; }
+    .checklist-reset { min-height: 2.3rem; background: transparent; border-color: white; }
+    .check-stage { display: grid; grid-template-columns: 9rem minmax(0, 1fr); border-top: 1px solid var(--line); }
+    .check-stage:first-of-type { border-top: 0; }
+    .stage-title { padding: 1rem; background: #e9e5da; font-weight: 900; }
+    .stage-items { padding: .45rem 1rem; }
+    .check-row { display: flex; gap: .7rem; align-items: flex-start; padding: .65rem 0; border-bottom: 1px dotted var(--line); font-weight: 500; }
+    .check-row:last-child { border-bottom: 0; }
+    .check-row input { flex: 0 0 auto; width: 1.15rem; height: 1.15rem; margin-top: .28rem; accent-color: var(--good); }
+    .check-row span { flex: 1; }
+
+    .evidence-grid { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--line-dark); }
+    .evidence-cell { padding: 1rem; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .evidence-cell:nth-child(even) { border-right: 0; }
+    .evidence-cell:nth-last-child(-n+2) { border-bottom: 0; }
+    .evidence-cell h3 { margin-top: 0; }
+    .source-list { padding-left: 0; list-style: none; }
+    .source-list li { padding: .65rem 0; border-bottom: 1px dotted var(--line); }
+    .source-list li:last-child { border-bottom: 0; }
+    .source-type { display: block; color: var(--ink-soft); font-size: .78rem; }
+    footer { padding-top: 2rem; color: var(--ink-soft); font-size: .82rem; }
+
+    @media (max-width: 950px) {
+      .layout { display: block; }
+      .sidebar { display: none; }
+      .top-nav {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        display: flex;
+        gap: .35rem;
+        overflow-x: auto;
+        padding: .55rem .7rem;
+        background: rgba(232,223,207,.96);
+        border-bottom: 1px solid var(--line-dark);
+        backdrop-filter: blur(8px);
+      }
+      .top-nav a { flex: 0 0 auto; padding: .45rem .65rem; color: var(--ink); text-decoration: none; border: 1px solid var(--line); border-radius: 999px; font-size: .78rem; background: var(--paper); }
+      html { scroll-padding-top: 4.2rem; }
+      .role-strip { grid-template-columns: 1fr 1fr; }
+      .role:nth-child(2) { border-right: 0; }
+      .role:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+      .root-item { grid-template-columns: 1fr; gap: .7rem; }
+      .layer-row { grid-template-columns: 6rem minmax(0, 1fr); }
+      .layer-boundary { grid-column: 2; }
+      .code-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 650px) {
+      body { background-size: 100% 1.55rem; }
+      .page { padding-inline: 1rem; }
+      .hero { min-height: auto; padding: 4.5rem 0 2.5rem; }
+      .section { padding-top: 3.2rem; }
+      .role-strip, .calculator, .monitor-grid, .myths, .evidence-grid { grid-template-columns: 1fr; }
+      .role { border-right: 0; border-bottom: 1px solid var(--line); }
+      .role:last-child { border-bottom: 0; }
+      .calc-output { border-left: 0; border-top: 1px solid var(--line); padding: 1rem 0 0; }
+      .root-grid { grid-template-columns: 1fr; gap: .8rem; }
+      .layer-row { grid-template-columns: 1fr; }
+      .layer-boundary { grid-column: 1; }
+      .myth, .myth:nth-child(even), .evidence-cell, .evidence-cell:nth-child(even), .evidence-cell:nth-last-child(-n+2) { border-right: 0; border-bottom: 1px solid var(--line); }
+      .evidence-cell:last-child { border-bottom: 0; }
+      .check-stage { grid-template-columns: 1fr; }
+      .stage-title { padding: .65rem 1rem; border-bottom: 1px solid var(--line); }
+      .checklist-head { align-items: flex-end; }
+      .svg-desktop { display: none; }
+      .svg-mobile { display: block; }
+      .alignment-seq { display: none; }
+      .alignment-mobile { display: block; overflow-x: visible; }
+      .alignment-mobile svg { width: 100%; height: auto; display: block; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .001ms !important; animation-duration: .001ms !important; }
+    }
+
+    @media print {
+      @page { margin: 15mm; }
+      :root { --paper: #fff; --white: #fff; }
+      body { background: #fff; color: #000; font-size: 9.5pt; }
+      .sidebar, .top-nav, .skip-link, button, .no-print, .input-help, .calc-error, .progress-track { display: none !important; }
+      .layout { display: block; }
+      .page { max-width: none; padding: 0; }
+      .hero { min-height: 0; padding: 0 0 1.5rem; }
+      .section { padding: 1.5rem 0 .4rem; break-inside: auto; }
+      h1 { font-size: 30pt; }
+      h2 { font-size: 18pt; break-after: avoid; }
+      h3, h4 { break-after: avoid; }
+      p, li { orphans: 3; widows: 3; }
+      .figure, .calculator, .definition-box, .root-item, .layer-row, .artifact-fields, .monitor-axis, .myth, .evidence-cell, .check-stage { break-inside: avoid; }
+      .calculator { display: block; box-shadow: none; }
+      .calc-form, .calc-output { display: none; }
+      .print-only { display: block; }
+      .checklist-head { position: static; background: #fff; color: #000; border-bottom: 2px solid #000; }
+      .checklist-shell { border-color: #000; }
+      .check-row input { appearance: none; width: .85rem; height: .85rem; border: 1px solid #000; }
+      a { color: #000; text-decoration: underline; }
+      .source-list a[href]::after, .evidence-grid a[href]::after { content: " (" attr(href) ")"; font-size: 7.5pt; overflow-wrap: anywhere; }
+      pre { color: #000; background: #f5f5f5; border-color: #555; white-space: pre-wrap; }
+      .svg-desktop { display: block; }
+      .svg-mobile { display: none; }
+      .tag { border-color: #555; color: #000 !important; background: transparent !important; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">跳到正文</a>
+  <div class="layout">
+    <aside class="sidebar" aria-label="章节导航">
+      <div class="brand">RL TIM / 调试手册</div>
+      <div class="brand-sub">15–20 分钟 · 工程机制指南</div>
+      <nav>
+        <a href="#mental-model">01 闭环心智模型</a>
+        <a href="#definition">02 什么叫不一致</a>
+        <a href="#equivalence">03 Decode 与 Full Forward</a>
+        <a href="#ratio">04 为什么伤害 PPO/GRPO</a>
+        <a href="#boundaries">05 四种相邻概念</a>
+        <a href="#root-causes">06 六类根因</a>
+        <a href="#funnel">07 排查漏斗</a>
+        <a href="#solutions">08 分层解决方法</a>
+        <a href="#minimum-test">09 最小一致性测试</a>
+        <a href="#monitoring">10 监控什么</a>
+        <a href="#myths">11 常见误区</a>
+        <a href="#checklist">12 调试清单</a>
+        <a href="#evidence">13 来源与边界</a>
+      </nav>
+      <div class="reading-time">目标：读完后能解释 mismatch、先查什么，以及何时考虑 TIS / R3。</div>
+    </aside>
+
+    <main id="main-content">
+      <nav class="top-nav" aria-label="窄屏章节导航">
+        <a href="#mental-model">闭环</a><a href="#definition">定义</a><a href="#equivalence">对齐</a><a href="#ratio">Ratio</a><a href="#root-causes">根因</a><a href="#funnel">漏斗</a><a href="#solutions">方法</a><a href="#minimum-test">测试</a><a href="#checklist">清单</a><a href="#evidence">来源</a>
+      </nav>
+      <div class="page">
+        <header class="hero">
+          <div class="eyebrow">Experimental notebook · RL systems</div>
+          <h1>RL 训推不一致入门指南</h1>
+          <p class="subtitle">为什么同一个模型会给同一批 token 算出不同概率，以及如何修复</p>
+          <div class="hero-note"><strong>适用范围：</strong>这是给刚接触 PPO / GRPO 的工程师准备的工程机制指南。它提供诊断顺序与方法边界，<strong>不提供脱离模型、dtype、后端、序列长度和算法的无条件统一阈值</strong>。</div>
+          <div class="hero-meta"><span>阅读任务：建立正确心智模型</span><span>预计：15–20 分钟</span><span><span class="tag wiki">wiki 归纳</span> + <span class="tag fact">一手资料</span></span></div>
+        </header>
+
+        <section class="section" id="mental-model" aria-labelledby="mental-model-title">
+          <h2 id="mental-model-title"><span class="section-no">01 / LOOP</span>先记住一句话</h2>
+          <div class="one-line"><strong>训推一致性不是要求两个程序“长得一样”，而是要求同一策略快照在同一条件上下文上，对同一 token 给出同一条件概率语义。</strong></div>
+          <div class="role-strip" aria-label="强化学习闭环的四个角色">
+            <div class="role"><b>Rollout engine</b><span>用行为策略生成真实 token IDs，并记录 old logprob 与采样元数据。</span></div>
+            <div class="role"><b>Reward</b><span>对 response 打分或验证，不应悄悄改变被训练的 token 轨迹。</span></div>
+            <div class="role"><b>Trainer</b><span>teacher forcing 重算 logprob，构造 PPO / GRPO loss 并更新参数。</span></div>
+            <div class="role"><b>Weight Sync</b><span>把新策略权重传回 Rollout；传输完成不等于原子版本切换完成。</span></div>
+          </div>
+
+          <figure class="figure avoid-break">
+            <div class="figure-frame">
+              <svg class="svg-desktop" viewBox="0 0 1000 350" role="img" aria-labelledby="loop-svg-title loop-svg-desc">
+                <title id="loop-svg-title">RL 训练闭环与双向数据流</title>
+                <desc id="loop-svg-desc">Rollout 将 token、logprob 和元数据经 Reward 送入 Trainer，Trainer 更新后经 Weight Sync 将版本化权重送回 Rollout。</desc>
+                <defs>
+                  <marker id="arrow-blue" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#132b46"/></marker>
+                  <marker id="arrow-green" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#266a4a"/></marker>
+                </defs>
+                <rect x="45" y="112" width="190" height="108" rx="8" fill="#fffdf7" stroke="#132b46" stroke-width="3"/>
+                <text x="140" y="148" text-anchor="middle" font-size="22" font-weight="800" fill="#132b46">Rollout engine</text>
+                <text x="140" y="178" text-anchor="middle" font-size="15" fill="#425469">生成 token IDs</text>
+                <text x="140" y="200" text-anchor="middle" font-size="15" fill="#425469">保存 behavior logprob</text>
+                <rect x="303" y="112" width="170" height="108" rx="8" fill="#fffdf7" stroke="#132b46" stroke-width="3"/>
+                <text x="388" y="148" text-anchor="middle" font-size="22" font-weight="800" fill="#132b46">Reward</text>
+                <text x="388" y="178" text-anchor="middle" font-size="15" fill="#425469">评分 / 验证</text>
+                <text x="388" y="200" text-anchor="middle" font-size="15" fill="#425469">产生 advantage 信号</text>
+                <rect x="541" y="112" width="190" height="108" rx="8" fill="#fffdf7" stroke="#132b46" stroke-width="3"/>
+                <text x="636" y="148" text-anchor="middle" font-size="22" font-weight="800" fill="#132b46">Trainer</text>
+                <text x="636" y="178" text-anchor="middle" font-size="15" fill="#425469">重算 logprob / loss</text>
+                <text x="636" y="200" text-anchor="middle" font-size="15" fill="#425469">optimizer update</text>
+                <rect x="799" y="112" width="160" height="108" rx="8" fill="#eef5ef" stroke="#266a4a" stroke-width="3"/>
+                <text x="879" y="148" text-anchor="middle" font-size="22" font-weight="800" fill="#266a4a">Weight Sync</text>
+                <text x="879" y="178" text-anchor="middle" font-size="15" fill="#425469">reshard / barrier</text>
+                <text x="879" y="200" text-anchor="middle" font-size="15" fill="#425469">atomic version</text>
+                <path d="M235 150 L298 150" fill="none" stroke="#132b46" stroke-width="3" marker-end="url(#arrow-blue)"/>
+                <path d="M473 150 L536 150" fill="none" stroke="#132b46" stroke-width="3" marker-end="url(#arrow-blue)"/>
+                <text x="388" y="80" text-anchor="middle" font-size="16" font-weight="800" fill="#132b46">Rollout → Trainer</text>
+                <text x="388" y="100" text-anchor="middle" font-size="14" fill="#425469">token IDs · old logprob · reward · metadata</text>
+                <path d="M731 178 L794 178" fill="none" stroke="#266a4a" stroke-width="3" marker-end="url(#arrow-green)"/>
+                <path d="M879 225 C879 310, 140 310, 140 225" fill="none" stroke="#266a4a" stroke-width="4" marker-end="url(#arrow-green)"/>
+                <text x="510" y="294" text-anchor="middle" font-size="16" font-weight="800" fill="#266a4a">Trainer → Rollout：version N+1 权重</text>
+                <text x="510" y="326" text-anchor="middle" font-size="14" fill="#425469">闭环边界：一条 response 生成中通常不应随意换权重</text>
+              </svg>
+              <svg class="svg-mobile" viewBox="0 0 360 720" role="img" aria-labelledby="loop-mobile-title loop-mobile-desc">
+                <title id="loop-mobile-title">纵向 RL 训练闭环</title>
+                <desc id="loop-mobile-desc">Rollout 到 Reward 到 Trainer，再经 Weight Sync 将新版本权重回传 Rollout。</desc>
+                <defs><marker id="arrow-mobile" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#132b46"/></marker><marker id="arrow-mobile-good" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#266a4a"/></marker></defs>
+                <rect x="55" y="25" width="250" height="100" rx="7" fill="#fffdf7" stroke="#132b46" stroke-width="3"/><text x="180" y="60" text-anchor="middle" font-size="21" font-weight="800" fill="#132b46">Rollout engine</text><text x="180" y="88" text-anchor="middle" font-size="14" fill="#425469">token IDs + behavior logprob</text>
+                <path d="M180 128 L180 178" stroke="#132b46" stroke-width="3" marker-end="url(#arrow-mobile)"/><text x="194" y="150" font-size="12" fill="#425469">token / logprob ↓</text>
+                <rect x="55" y="185" width="250" height="90" rx="7" fill="#fffdf7" stroke="#132b46" stroke-width="3"/><text x="180" y="222" text-anchor="middle" font-size="21" font-weight="800" fill="#132b46">Reward</text><text x="180" y="249" text-anchor="middle" font-size="14" fill="#425469">评分 / 验证</text>
+                <path d="M180 278 L180 328" stroke="#132b46" stroke-width="3" marker-end="url(#arrow-mobile)"/>
+                <rect x="55" y="335" width="250" height="100" rx="7" fill="#fffdf7" stroke="#132b46" stroke-width="3"/><text x="180" y="372" text-anchor="middle" font-size="21" font-weight="800" fill="#132b46">Trainer</text><text x="180" y="400" text-anchor="middle" font-size="14" fill="#425469">recompute → loss → update</text>
+                <path d="M180 438 L180 488" stroke="#266a4a" stroke-width="3" marker-end="url(#arrow-mobile-good)"/>
+                <rect x="55" y="495" width="250" height="90" rx="7" fill="#eef5ef" stroke="#266a4a" stroke-width="3"/><text x="180" y="532" text-anchor="middle" font-size="21" font-weight="800" fill="#266a4a">Weight Sync</text><text x="180" y="559" text-anchor="middle" font-size="14" fill="#425469">reshard + atomic version</text>
+                <path d="M305 540 C348 540, 348 73, 310 73" fill="none" stroke="#266a4a" stroke-width="3" marker-end="url(#arrow-mobile-good)"/><text x="339" y="320" transform="rotate(90 339 320)" text-anchor="middle" font-size="13" font-weight="800" fill="#266a4a">version N+1 权重 ↑</text>
+                <text x="180" y="645" text-anchor="middle" font-size="15" font-weight="800" fill="#132b46">两条方向不同的数据流</text><text x="180" y="675" text-anchor="middle" font-size="13" fill="#425469">轨迹向 Trainer；权重向 Rollout</text>
+              </svg>
+            </div>
+            <figcaption><span class="tag wiki">wiki 归纳</span> 完整闭环里有两条方向相反的数据流：轨迹与概率向 Trainer，更新后权重向 Rollout。</figcaption>
+          </figure>
+        </section>
+
+        <section class="section" id="definition" aria-labelledby="definition-title">
+          <h2 id="definition-title"><span class="section-no">02 / DEFINITION</span>什么叫“不一致”</h2>
+          <div class="definition-box">
+            <p><strong>一致性测试的三个固定条件：</strong>同一 policy snapshot、同一 token IDs、同一条件上下文（历史 token、mask、position、logprob 语义一致）。</p>
+            <span class="formula">对每个 response token 比较：log π<sub>θ</sub>(y<sub>t</sub> | x, y<sub>&lt;t</sub>)</span>
+            <p>如果 Rollout 与 Trainer 对这同一个条件概率给出系统性不同的 per-token logprob，就是训练—推理执行路径的不一致。</p>
+          </div>
+          <div class="good-note"><strong>预期差异：</strong>optimizer update 之后，<code>new policy</code> 与冻结的 <code>old policy</code> 不同，本来就是 PPO / GRPO 要测量的策略变化。</div>
+          <div class="danger-note"><strong>错误基线：</strong>拿更新后的 Trainer 与更新前 Rollout 直接比较，再把差异都叫 mismatch。正确基线必须在<strong>无 optimizer update</strong>或<strong>冻结 snapshot</strong>下测；异步系统还必须记录 policy version / staleness。</div>
+        </section>
+
+        <section class="section" id="equivalence" aria-labelledby="equivalence-title">
+          <h2 id="equivalence-title"><span class="section-no">03 / ALIGNMENT</span>为什么逐 token decode 与一次 full forward 理论等价</h2>
+          <p class="lede">Decoder-only causal LM 无论是 Rollout 的 prefill + decode，还是 Trainer 的 teacher forcing full forward，计算的都是同一个自回归分解。执行调度不同，不等于概率定义不同。</p>
+          <figure class="figure avoid-break">
+            <div class="figure-frame">
+              <div class="alignment-seq">
+                <svg viewBox="0 0 900 295" role="img" aria-labelledby="align-title align-desc">
+                  <title id="align-title">prompt 与 response 的 causal shift 对齐</title><desc id="align-desc">序列 x1 x2 y1 y2 y3 中，x2 位置的 logits 预测 y1，y1 位置的 logits 预测 y2，y2 位置的 logits 预测 y3。</desc>
+                  <defs><marker id="align-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#a2322b"/></marker></defs>
+                  <text x="35" y="48" font-size="16" font-weight="800" fill="#132b46">input IDs</text>
+                  <rect x="155" y="20" width="105" height="58" fill="#e4eaf0" stroke="#132b46"/><rect x="260" y="20" width="105" height="58" fill="#e4eaf0" stroke="#132b46"/><rect x="365" y="20" width="105" height="58" fill="#dcebe1" stroke="#266a4a"/><rect x="470" y="20" width="105" height="58" fill="#dcebe1" stroke="#266a4a"/><rect x="575" y="20" width="105" height="58" fill="#dcebe1" stroke="#266a4a"/>
+                  <text x="207" y="56" text-anchor="middle" font-size="20" font-weight="800" fill="#132b46">x1</text><text x="312" y="56" text-anchor="middle" font-size="20" font-weight="800" fill="#132b46">x2</text><text x="417" y="56" text-anchor="middle" font-size="20" font-weight="800" fill="#266a4a">y1</text><text x="522" y="56" text-anchor="middle" font-size="20" font-weight="800" fill="#266a4a">y2</text><text x="627" y="56" text-anchor="middle" font-size="20" font-weight="800" fill="#266a4a">y3</text>
+                  <line x1="365" y1="12" x2="365" y2="248" stroke="#766f62" stroke-width="2" stroke-dasharray="6 6"/><text x="345" y="274" text-anchor="end" font-size="14" fill="#425469">prompt</text><text x="385" y="274" font-size="14" fill="#266a4a">response</text>
+                  <text x="35" y="145" font-size="16" font-weight="800" fill="#132b46">next-token logits</text>
+                  <rect x="260" y="112" width="105" height="58" fill="#fffdf7" stroke="#a2322b" stroke-width="2"/><rect x="365" y="112" width="105" height="58" fill="#fffdf7" stroke="#a2322b" stroke-width="2"/><rect x="470" y="112" width="105" height="58" fill="#fffdf7" stroke="#a2322b" stroke-width="2"/>
+                  <text x="312" y="145" text-anchor="middle" font-size="15" font-weight="800" fill="#a2322b">logits[x2]</text><text x="417" y="145" text-anchor="middle" font-size="15" font-weight="800" fill="#a2322b">logits[y1]</text><text x="522" y="145" text-anchor="middle" font-size="15" font-weight="800" fill="#a2322b">logits[y2]</text>
+                  <path d="M312 171 C312 210, 417 192, 417 222" fill="none" stroke="#a2322b" stroke-width="3" marker-end="url(#align-arrow)"/><path d="M417 171 C417 210, 522 192, 522 222" fill="none" stroke="#a2322b" stroke-width="3" marker-end="url(#align-arrow)"/><path d="M522 171 C522 210, 627 192, 627 222" fill="none" stroke="#a2322b" stroke-width="3" marker-end="url(#align-arrow)"/>
+                  <text x="417" y="244" text-anchor="middle" font-size="18" font-weight="800" fill="#266a4a">y1</text><text x="522" y="244" text-anchor="middle" font-size="18" font-weight="800" fill="#266a4a">y2</text><text x="627" y="244" text-anchor="middle" font-size="18" font-weight="800" fill="#266a4a">y3</text>
+                  <text x="760" y="123" text-anchor="middle" font-size="15" fill="#425469">关键：向右 shift 一位</text><text x="760" y="151" text-anchor="middle" font-size="15" fill="#425469">首个 response logp</text><text x="760" y="176" text-anchor="middle" font-size="15" font-weight="800" fill="#a2322b">来自最后一个 prompt 位置</text>
+                </svg>
+              </div>
+              <div class="alignment-mobile">
+                <svg viewBox="0 0 340 490" role="img" aria-labelledby="align-mobile-title align-mobile-desc">
+                  <title id="align-mobile-title">纵向 causal shift 对齐</title><desc id="align-mobile-desc">x2 的 logits 预测 y1，y1 的 logits 预测 y2，y2 的 logits 预测 y3。</desc>
+                  <text x="20" y="35" font-size="15" font-weight="800" fill="#132b46">完整输入：x1 x2 | y1 y2 y3</text>
+                  <rect x="25" y="68" width="290" height="88" fill="#fffdf7" stroke="#132b46"/><text x="45" y="98" font-size="15" fill="#425469">最后一个 prompt 位置</text><text x="45" y="128" font-size="19" font-weight="800" fill="#a2322b">logits[x2] → y1</text>
+                  <rect x="25" y="180" width="290" height="88" fill="#fffdf7" stroke="#132b46"/><text x="45" y="210" font-size="15" fill="#425469">第一个 response 位置</text><text x="45" y="240" font-size="19" font-weight="800" fill="#a2322b">logits[y1] → y2</text>
+                  <rect x="25" y="292" width="290" height="88" fill="#fffdf7" stroke="#132b46"/><text x="45" y="322" font-size="15" fill="#425469">第二个 response 位置</text><text x="45" y="352" font-size="19" font-weight="800" fill="#a2322b">logits[y2] → y3</text>
+                  <text x="25" y="426" font-size="15" font-weight="800" fill="#266a4a">response 切片从 prompt_len − 1 开始</text><text x="25" y="455" font-size="14" fill="#425469">不是从 prompt_len 开始</text>
+                </svg>
+              </div>
+            </div>
+            <figcaption><span class="tag example">教学示例</span> <code>x1 x2 | y1 y2 y3</code>：<code>logits[x2]→y1</code>、<code>logits[y1]→y2</code>、<code>logits[y2]→y3</code>。</figcaption>
+          </figure>
+          <div class="danger-note"><strong>不要混淆两张 mask：</strong><code>prompt loss mask</code> 可以让 prompt 不进入 RL loss；<code>attention mask</code> 仍必须让 response 看见完整 prompt。<strong>prompt loss mask ≠ attention mask</strong>。</div>
+        </section>
+
+        <section class="section" id="ratio" aria-labelledby="ratio-title">
+          <h2 id="ratio-title"><span class="section-no">04 / IMPACT</span>为什么会伤害 PPO / GRPO</h2>
+          <p>常见 ratio 形式可写为：</p>
+          <span class="formula">ratio = exp(train_logp − rollout_logp)</span>
+          <p>当 snapshot 冻结且还没发生 optimizer update 时，本来希望 <code>delta≈0</code>、<code>ratio≈1</code>。执行路径 mismatch 会把系统差异伪装成策略变化，进而扭曲 clipping、advantage 加权与相关监控。指数映射还会让 logprob 差异呈非线性放大。</p>
+
+          <div class="calculator" id="ratio-calculator" aria-labelledby="calculator-title">
+            <div class="calc-form">
+              <h3 id="calculator-title">Ratio 本地计算器 <span class="tag example">教学示例</span></h3>
+              <label for="rollout-logp">Rollout logprob
+                <span class="input-help">范围仅用于防止误输入：−100 到 0，步长 0.1</span>
+                <input id="rollout-logp" name="rollout-logp" type="number" min="-100" max="0" step="0.1" value="-2.2" inputmode="decimal">
+              </label>
+              <label for="trainer-logp">Trainer logprob
+                <span class="input-help">范围仅用于防止误输入：−100 到 0，步长 0.1</span>
+                <input id="trainer-logp" name="trainer-logp" type="number" min="-100" max="0" step="0.1" value="-2.0" inputmode="decimal">
+              </label>
+              <button id="calc-reset" type="button" class="secondary" aria-label="重置 ratio 计算器为默认教学示例">重置默认示例</button>
+              <div id="calc-error" class="calc-error" role="alert"></div>
+            </div>
+            <div class="calc-output" aria-live="polite" aria-atomic="true">
+              <div class="metric-row"><span>delta</span><output id="delta-output" for="rollout-logp trainer-logp">0.2000</output></div>
+              <div class="metric-row"><span>ratio</span><output id="ratio-output" for="rollout-logp trainer-logp">1.2214</output></div>
+              <p id="ratio-meaning">该 token 在 Trainer 路径下的概率约为 Rollout 的 1.22 倍。这里只是数学映射，不代表安全或危险阈值。</p>
+              <p class="method-note"><strong>边界：</strong>默认值 <code>−2.2</code> 与 <code>−2.0</code> 是教学假设，不是 benchmark，也不是任何框架的健康线。</p>
+            </div>
+            <div class="print-only"><strong>默认教学示例：</strong>rollout = −2.2，trainer = −2.0，因此 delta = 0.2，ratio = exp(0.2) ≈ 1.2214。该数值不是 benchmark 或通用阈值。</div>
+          </div>
+        </section>
+
+        <section class="section" id="boundaries" aria-labelledby="boundaries-title">
+          <h2 id="boundaries-title"><span class="section-no">05 / BOUNDARIES</span>它和 KL、policy update、推理不确定性有什么区别</h2>
+          <div class="table-wrap" role="region" aria-label="四类相邻概念对照表" tabindex="0">
+            <table>
+              <caption>先确认“谁和谁比较”，再解释指标</caption>
+              <thead><tr><th>概念</th><th>比较对象</th><th>差异是否预期</th><th>首要问题</th></tr></thead>
+              <tbody>
+                <tr><td><strong>训推 mismatch</strong></td><td>同一 snapshot 的 Rollout 路径 vs Trainer 路径</td><td><span class="tag risk">不应系统偏离</span></td><td>token、shift、mask、position、权重版本与执行路径是否同义？</td></tr>
+                <tr><td><strong>正常 optimizer update</strong></td><td>current/new policy vs frozen old policy</td><td><span class="tag fact">预期变化</span></td><td>更新幅度与 objective 是否符合算法设计？</td></tr>
+                <tr><td><strong>actor–reference KL</strong></td><td>actor policy vs reference policy</td><td><span class="tag fact">算法量</span></td><td>策略是否偏离 reference；它不是训推一致性的直接指标。</td></tr>
+                <tr><td><strong>同一路径非确定性</strong></td><td>同一 engine、相同输入与配置的重复运行</td><td><span class="tag version">实现相关</span></td><td>seed、batch 形态、kernel、规约顺序是否可复现？可复现也不保证跨 engine 一致。</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="table-hint">表格较宽；窄屏可横向滚动。键盘用户聚焦表格区域后可用方向键或触控板查看。</p>
+        </section>
+
+        <section class="section" id="root-causes" aria-labelledby="root-causes-title">
+          <h2 id="root-causes-title"><span class="section-no">06 / ROOT CAUSES</span>六类根因：症状 → 最小检查 → 典型修复</h2>
+          <p class="lede">顺序有意从语义层走向数值层。先证明两边在算同一个东西，再讨论浮点与 kernel。</p>
+          <div class="root-list">
+            <article class="root-item">
+              <h3 class="root-title"><span class="root-num">ROOT 01</span>Token / chat template / BOS–EOS / stop</h3>
+              <div class="root-grid"><dl><dt>症状</dt><dd>首尾 token、assistant header 或截断附近集中偏差；长度偶尔差一。</dd></dl><dl><dt>最小检查</dt><dd>逐个比较 Rollout 保存的 <code>prompt_token_ids</code>、<code>response_token_ids</code>、stop token 归属；禁止 detokenize 后再 tokenize。</dd></dl><dl><dt>典型修复</dt><dd>直接复用真实 IDs；固定 chat template、BOS/EOS 与 generation prompt 规则；明确 stop token 是否进入 response。</dd></dl></div>
+            </article>
+            <article class="root-item">
+              <h3 class="root-title"><span class="root-num">ROOT 02</span>Causal shift 与 attention / loss mask</h3>
+              <div class="root-grid"><dl><dt>症状</dt><dd>所有 response token 整体错一位；首 token 最明显；padding 或 packing 边界异常。</dd></dl><dl><dt>最小检查</dt><dd>手算一条短样本，确认 <code>logits[prompt_len−1]→response[0]</code>；分别打印 response loss mask 与 attention mask。</dd></dl><dl><dt>典型修复</dt><dd>用 <code>logits[:, :-1]</code> 对 <code>ids[:, 1:]</code>；让 response 可见完整 prompt；隔离 packed sequence 边界。</dd></dl></div>
+            </article>
+            <article class="root-item">
+              <h3 class="root-title"><span class="root-num">ROOT 03</span>Raw vs processed logits / temperature / top-p / top-k</h3>
+              <div class="root-grid"><dl><dt>症状</dt><dd>高概率 token 看似接近，受 suppression、penalty 或截断影响的 token 明显偏离。</dd></dl><dl><dt>最小检查</dt><dd>关闭 temperature、top-k/top-p、repetition penalty、token suppression；明确保存的是 raw model logprob 还是行为采样分布 logprob。</dd></dl><dl><dt>典型修复</dt><dd>统一 logprob 语义；若要校正行为策略，就完整保存 processor 配置与处理后的概率定义。</dd></dl></div>
+            </article>
+            <article class="root-item">
+              <h3 class="root-title"><span class="root-num">ROOT 04</span>Position / RoPE / padding / packing / KV cache</h3>
+              <div class="root-grid"><dl><dt>症状</dt><dd>误差随位置增长；left/right padding、长上下文或 cache page 边界处跳变。</dd></dl><dl><dt>最小检查</dt><dd>对比 position IDs、RoPE scaling、padding side、sequence boundaries、cache dtype 与写入范围；先禁用 prefix/paged cache。</dd></dl><dl><dt>典型修复</dt><dd>对齐 position/config；显式携带每条序列位置元数据；修复 packing isolation 与 KV cache 边界。</dd></dl></div>
+            </article>
+            <article class="root-item">
+              <h3 class="root-title"><span class="root-num">ROOT 05</span>Policy version / LoRA / 量化 / 权重同步 / staleness</h3>
+              <div class="root-grid"><dl><dt>症状</dt><dd>同批样本按 worker 或 policy version 分群；同步后仍偏；adapter/量化开关改变结果。</dd></dl><dl><dt>最小检查</dt><dd>记录 policy version、权重 hash/epoch、LoRA merge 状态、量化配置；在 barrier 后做 frozen zero-update。</dd></dl><dl><dt>典型修复</dt><dd>原子版本切换；轨迹绑定生成版本；同步 base、adapter 与量化参数。跨 Mesh reshard 只负责数据路径，不替代版本语义。</dd></dl></div>
+            </article>
+            <article class="root-item">
+              <h3 class="root-title"><span class="root-num">ROOT 06</span>Dtype / kernel / TP reduction / dynamic batch</h3>
+              <div class="root-grid"><dl><dt>症状</dt><dd>同一语义下仍有尾部异常；误差随 batch、TP degree、Flash/Paged backend 或低精度改变。</dd></dl><dl><dt>最小检查</dt><dd>单卡、高精度、eager、固定 batch，无量化/Flash/Paged；再一次只恢复一个变量。</dd></dl><dl><dt>典型修复</dt><dd>统一 precision/backend；采用 deterministic 或 batch-invariant 路径做基线；必要时调整规约与 softmax/log-softmax 精度。</dd></dl></div>
+            </article>
+          </div>
+        </section>
+
+        <section class="section" id="funnel" aria-labelledby="funnel-title">
+          <h2 id="funnel-title"><span class="section-no">07 / FUNNEL</span>排查漏斗：先修语义，再谈补偿</h2>
+          <p class="lede">每一步都应保留一个可复现的小样本。若失败，先在当前层修复；通过后才恢复下一层复杂度。</p>
+          <div class="funnel" aria-label="训推不一致排查决策树">
+            <div class="funnel-step"><div class="funnel-copy"><b>保存 Rollout 原始 artifacts</b><span>真实 prompt/response token IDs、per-token logprob、policy version、sampling/position/mask 元数据。</span><div class="branch"><strong>缺字段？</strong> 先补观测性，不要靠文本重建轨迹。</div></div></div>
+            <div class="funnel-step"><div class="funnel-copy"><b>Frozen zero-update test</b><span>冻结同一 snapshot，权重同步后不做 optimizer update，重算同一批 token。</span><div class="branch"><strong>通过？</strong> 差异更可能来自预期 policy update / staleness；<strong>失败？</strong> 继续向下。</div></div></div>
+            <div class="funnel-step"><div class="funnel-copy"><b>单卡 + 高精度 + eager + 无 processor</b><span>关闭 temperature/top-k/top-p/penalty、量化、Flash/Paged cache、并行和动态 batching。</span><div class="branch"><strong>仍失败？</strong> 高概率是 token / shift / mask / position / 权重语义错误。</div></div></div>
+            <div class="funnel-step"><div class="funnel-copy"><b>Token → causal shift → mask</b><span>字节级核对 IDs；验证首个 response token 来自最后 prompt 位置；分开 attention 与 loss mask。</span><div class="branch"><strong>原则：</strong>任何语义错误都必须在这里消掉，TIS 不能替你修错 token。</div></div></div>
+            <div class="funnel-step"><div class="funnel-copy"><b>Position → policy version</b><span>核对 position/RoPE/padding/packing 元数据，再核对 LoRA、量化权重与原子版本切换。</span><div class="branch"><strong>按组看：</strong>按 worker、batch、backend、policy version 切片，寻找系统分群。</div></div></div>
+            <div class="funnel-step"><div class="funnel-copy"><b>逐项恢复性能路径</b><span>一次恢复一项：Flash → Paged/KV quant → TP/EP → quant → dynamic/continuous batching。</span><div class="branch"><strong>每恢复一项：</strong>重跑同一 frozen corpus，比较 delta 尾部与随位置走势。</div></div></div>
+          </div>
+          <div class="danger-note"><strong>决策规则：</strong>先消除错 token、错 shift、错 mask、错位置与错权重版本；只有在语义基线正确、执行差异不可完全消除或 off-policy 本来就是设计的一部分时，才评估 TIS / rejection / masking。</div>
+        </section>
+
+        <section class="section" id="solutions" aria-labelledby="solutions-title">
+          <h2 id="solutions-title"><span class="section-no">08 / METHODS</span>解决方法分层矩阵</h2>
+          <div class="layer-matrix">
+            <article class="layer-row">
+              <div class="layer-letter">A<small>根因消除</small></div>
+              <div><strong>优先级最高。</strong>复用 exact token IDs；正确 causal shift / mask；统一 raw 或 processed logprob 语义；使用原子 weight version；对齐 position、RoPE、padding、packing 与 config。</div>
+              <div class="layer-boundary"><span class="tag fact">首选</span><br>能修就不要补偿。这里解决的是“算错东西”。</div>
+            </article>
+            <article class="layer-row">
+              <div class="layer-letter">B<small>数值执行对齐</small></div>
+              <div>在诊断基线中使用同 precision / backend；选择 deterministic 或 batch-invariant 路径；从单卡高精度/eager 基线逐项恢复低精度、kernel、TP/EP 与 batching。</div>
+              <div class="layer-boundary"><span class="tag wiki">wiki 归纳</span><br>严格路径可能牺牲吞吐，适合作为校准基线，不一定适合永久生产。</div>
+            </article>
+            <article class="layer-row">
+              <div class="layer-letter">C<small>算法缓解</small></div>
+              <div>
+                <strong>TIS / IS reweight、rejection、masking：</strong>
+                <span class="formula">ρ = π<sub>train</sub> / π<sub>rollout</sub></span>
+                对 correction ratio 截断可抑制极端权重与方差；拒绝或 masking 可移除高 mismatch token / sequence。
+              </div>
+              <div class="layer-boundary"><span class="tag version">版本相关</span><br>截断会引入偏差或改变有效优化问题；只能缓解 off-policy 影响，<strong>不能修复错 token / 错 mask</strong>。VeRL 的具体模式、聚合层级与配置以对应版本官方文档为准。</div>
+            </article>
+            <article class="layer-row">
+              <div class="layer-letter">D<small>MoE 专项</small></div>
+              <div><strong>Router Replay / R3：</strong>在 Rollout 保存每个 token 的 expert assignments（或路由选择），训练 forward 时 replay，使两条路径选择同一组专家；训练侧仍可基于训练 logits 计算门控权重并保留梯度路径。</div>
+              <div class="layer-boundary"><span class="tag fact">一手资料</span> <span class="tag version">版本相关</span><br>不适用于 dense；增加 payload、packing/CP 对齐与回放复杂度。NeMo RL 当前支持的 policy/trainer/rollout 组合以官方 Router Replay 文档为准。</div>
+            </article>
+          </div>
+          <div class="table-wrap" role="region" aria-label="何时使用 TIS 或 R3" tabindex="0">
+            <table>
+              <caption>什么时候用 TIS / R3？</caption>
+              <thead><tr><th>观察</th><th>先做什么</th><th>可考虑</th><th>不要误用</th></tr></thead>
+              <tbody>
+                <tr><td>dense 或 MoE；语义已对齐，但 rollout/train 执行栈仍有 off-policy gap 或异步 staleness</td><td>用 frozen 基线量化 delta/ratio 与尾部；校准阈值和粒度</td><td>TIS / IS、rejection 或 masking</td><td>不要拿它掩盖 retokenize、off-by-one、mask、版本 bug</td></tr>
+                <tr><td>MoE；路由选择在 rollout 与 training 之间不一致，并显著贡献 mismatch</td><td>先证明 token/position/权重一致，并保存 route identity</td><td>R3 / Router Replay；可与其它策略独立评估</td><td>dense 没有 expert routing；R3 也不会修 token/mask/kernel 的所有问题</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="table-hint">表格较宽；窄屏可横向滚动。</p>
+        </section>
+
+        <section class="section" id="minimum-test" aria-labelledby="minimum-test-title">
+          <h2 id="minimum-test-title"><span class="section-no">09 / MINIMUM TEST</span>最小一致性测试</h2>
+          <p><span class="tag example">伪代码</span> 下方不绑定任何框架 API。真实 tensor shape、padding、mask、device 与 gather API 必须按你的框架适配。</p>
+          <div class="code-grid">
+            <div>
+<pre aria-label="正确 causal shift 的最小伪代码"><code>ids = cat(prompt_ids, response_ids)
+logp_next = log_softmax(model(ids).logits[:, :-1], dim=-1)
+targets = ids[:, 1:]
+token_logp = gather(logp_next, targets)
+response_logp = token_logp[:, prompt_len - 1 : prompt_len - 1 + response_len]</code></pre>
+<pre aria-label="框架无关的一致性检查伪代码"><code># PSEUDOCODE — freeze one policy snapshot; no optimizer update
+artifact = load_rollout_artifact(sample_id)
+assert exact_equal(artifact.prompt_token_ids, prompt_ids)
+assert exact_equal(artifact.response_token_ids, response_ids)
+assert artifact.policy_version == loaded_policy_version
+
+trainer_logp = recompute_with_correct_shift(artifact)
+delta = trainer_logp - artifact.rollout_logprobs
+ratio = exp(delta)
+
+report_distribution(delta, ratio)
+report_by_token_position(delta)
+report_by_group(delta, keys=[
+    "backend", "batch_shape", "policy_version"
+])
+# Do not reduce the diagnosis to one average or one universal threshold.</code></pre>
+            </div>
+            <aside class="artifact-fields" aria-label="必须保存的 rollout artifacts">
+              <h3>每条轨迹至少保存</h3>
+              <ul>
+                <li><code>prompt_token_ids</code></li>
+                <li><code>response_token_ids</code></li>
+                <li><code>prompt_len</code></li>
+                <li><code>rollout_logprobs</code>（注明 raw / processed）</li>
+                <li><code>policy_version</code></li>
+                <li><code>sampling_config</code></li>
+                <li>position / mask metadata</li>
+                <li>建议追加：backend、dtype、batch shape、LoRA/quant 配置、stop reason</li>
+              </ul>
+            </aside>
+          </div>
+          <div class="method-note"><strong>验收语义：</strong>这个测试不是要求所有生产路径 bitwise identical，而是先建立一条可解释的 frozen baseline，再用分布、尾部和分组证据判断真实路径的偏差是否系统性地影响 ratio。</div>
+        </section>
+
+        <section class="section" id="monitoring" aria-labelledby="monitoring-title">
+          <h2 id="monitoring-title"><span class="section-no">10 / METRICS</span>监控什么：不只看平均值</h2>
+          <div class="monitor-grid">
+            <div class="monitor-axis">
+              <h3>Delta 与方向</h3>
+              <ul><li><code>delta mean</code>：是否有整体正/负方向</li><li><code>MAE</code>：平均绝对差</li><li><code>p95 / p99 / max</code>：尾部和极端 token</li><li>按 token 位置画趋势：是否累积或在边界跳变</li></ul>
+              <div class="spark" aria-hidden="true"><span style="height:12%"></span><span style="height:15%"></span><span style="height:14%"></span><span style="height:17%"></span><span style="height:16%"></span><span style="height:18%"></span><span style="height:17%"></span><span style="height:20%"></span></div>
+              <small>示意：无明显方向、尾部受控。不是阈值图。</small>
+            </div>
+            <div class="monitor-axis danger-axis">
+              <h3>Ratio 与分组</h3>
+              <ul><li><code>exp(delta)</code> 的中心、尾部与非对称性</li><li>按 backend、batch shape、worker 分组</li><li>按 policy version / staleness 分组</li><li>按序列长度、token 位置、TP/EP 配置分组</li></ul>
+              <div class="spark bad" aria-hidden="true"><span style="height:10%"></span><span style="height:14%"></span><span style="height:18%"></span><span style="height:28%"></span><span style="height:40%"></span><span style="height:56%"></span><span style="height:78%"></span><span style="height:100%"></span></div>
+              <small>示意：随位置扩大，需要优先查 position/cache/累积数值路径。</small>
+            </div>
+          </div>
+          <div class="danger-note"><strong>禁止单指标结论：</strong>不要只看一个平均相对误差。logprob 接近 0 时，相对误差的分母会让指标不稳定；平均值还会掩盖正负抵消和重尾。不存在脱离模型、dtype、序列长度、后端、token 分布与 RL objective 的通用健康阈值。</div>
+        </section>
+
+        <section class="section" id="myths" aria-labelledby="myths-title">
+          <h2 id="myths-title"><span class="section-no">11 / MYTHS</span>初学者常见误区</h2>
+          <div class="myths">
+            <article class="myth"><b>“训练只输入 response 就够了。”</b><p>错误。response 的条件概率依赖完整 prompt 与已生成 prefix；除非框架显式复用了正确 cache/上下文。</p></article>
+            <article class="myth"><b>“Prefill/decode 和 full forward 本来就不是同一概率。”</b><p>错误。只要历史 token、权重、mask、position 与 logits 语义一致，它们实现同一自回归条件概率。</p></article>
+            <article class="myth"><b>“Prompt 不进 loss，所以也不进 attention。”</b><p>错误。loss mask 与 attention mask 不同；response 必须看见 prompt。</p></article>
+            <article class="myth"><b>“固定 seed 就能解决一致性。”</b><p>错误。seed 主要约束采样随机性；batch-dependent kernel、规约顺序、token/position/权重错误仍在。</p></article>
+            <article class="myth"><b>“平均误差很小，就一定安全。”</b><p>错误。尾部 token、方向偏差与 advantage / clipping 的交互可能更关键。</p></article>
+            <article class="myth"><b>“TIS 能修所有 bug。”</b><p>错误。TIS 只能重加权或限制 off-policy 影响，不能把错 token、错 shift、错 mask 变对。</p></article>
+            <article class="myth"><b>“MoE 的 R3 也适用于 dense。”</b><p>错误。R3 回放的是 expert assignment；dense 模型没有对应路由机制。</p></article>
+            <article class="myth"><b>“Actor–reference KL 就是训推一致性指标。”</b><p>错误。它比较两种 policy；一致性基线比较同一预期 policy 的两条执行路径。</p></article>
+            <article class="myth"><b>“把 rollout 文本重新 tokenize 也可以。”</b><p>错误。文本往返可能改变空格、特殊 token、模板边界或不可逆规范化；应保存并复用原始 IDs。</p></article>
+          </div>
+        </section>
+
+        <section class="section" id="checklist" aria-labelledby="checklist-title">
+          <h2 id="checklist-title"><span class="section-no">12 / RUNBOOK</span>一页式可勾选调试清单</h2>
+          <p>状态只存在当前页面内存中；刷新即清空，<strong>不会写入 localStorage</strong>。无 JavaScript 时，下面全部条目仍可阅读并手工勾记。</p>
+          <div class="checklist-shell">
+            <div class="checklist-head">
+              <div class="progress-group" aria-live="polite"><span id="check-progress" class="progress-text">已完成 0 / 22（0%）</span><div class="progress-track" aria-hidden="true"><span id="check-progress-bar" class="progress-bar"></span></div></div>
+              <button id="check-reset" class="checklist-reset" type="button" aria-label="重置全部调试清单复选框">重置</button>
+            </div>
+            <div class="check-stage">
+              <div class="stage-title">阶段 1<br>语义</div>
+              <div class="stage-items">
+                <label class="check-row"><input type="checkbox" data-check><span>保存并复用 Rollout 的 exact <code>prompt_token_ids</code> 与 <code>response_token_ids</code>。</span></label>
+                <label class="check-row"><input type="checkbox" data-check><span>记录 <code>prompt_len</code>、response_len、stop reason 与特殊 token 归属。</span></label>
+                <label class="check-row"><input type="checkbox" data-check><span>确认没有 detokenize → retokenize 往返。</span></label>
+                <label class="check-row"><input type="checkbox" data-check><span>手算首个 response token：它来自 <code>logits[prompt_len−1]</code>。</span></label>
+                <label class="check-row"><input type="checkbox" data-check><span>确认 <code>logits[:, :-1]</code> 与 <code>ids[:, 1:]</code> causal shift。</span></label>
+                <label class="check-row"><input type="checkbox" data-check><span>分开核对 response/loss mask 与 attention mask；response 可见完整 prompt。</span></label>
+                <label class="check-row"><input type="checkbox" data-check><span>关闭所有 logits processor，并明确比较 raw 还是 processed logprob。</span></label>
+              </div>
+            </div>
+            <div class="check-stage">
+              <div class="stage-title">阶段 2<br>权重</div>
+              <div class="stage-items">
+                <label class="check-row"><input type="checkbox" data-check><span>冻结 snapshot，在无 optimizer update 条件下运行一致性测试。</span></label>
+                <label class="check-row"><input type="checkbox" data-check><span>每条轨迹携带 <code>policy_version</code>，区分预期 staleness 与同版本偏差。</span></label>
+                <label class="check-row"><input type="checkbox" data-check><span>确认 Weight Sync barrier 与原子版本切换，不只检查通信完成。</span></label>
+                <label class="check-row"><input type="checkbox" data-check><span>核对 base weights、LoRA/adapter merge 状态和量化配置。</span></label>
+                <label class="check-row"><input type="checkbox" data-check><span>核对 position IDs、RoPE、padding side、packing boundary 与 cache 元数据。</span></label>
+              </div>
+            </div>
+            <div class="check-stage">
+              <div class="stage-title">阶段 3<br>数值</div>
+              <div class="stage-items">
+                <label class="check-row"><input type="checkbox" data-check><span>建立单卡、高精度、eager、固定 batch 的简化基线。</span></label>
+                <label class="check-row"><input type="checkbox" data-check><span>暂时关闭 Flash/Paged Attention、KV cache 量化与动态 batching。</span></label>
+                <label class="check-row"><input type="checkbox" data-check><span>比较 delta mean / MAE / p95 / p99 / max 与正负方向。</span></label>
+                <label class="check-row"><input type="checkbox" data-check><span>画 delta 随 token 位置与 ratio 分布，而不是只看平均相对误差。</span></label>
+                <label class="check-row"><input type="checkbox" data-check><span>按 backend、batch shape、worker、TP/EP、policy version 分组。</span></label>
+                <label class="check-row"><input type="checkbox" data-check><span>一次只恢复一个性能变量，并重跑同一 frozen corpus。</span></label>
+              </div>
+            </div>
+            <div class="check-stage">
+              <div class="stage-title">阶段 4<br>算法</div>
+              <div class="stage-items">
+                <label class="check-row"><input type="checkbox" data-check><span>确认所有语义 bug 已修复，再评估 TIS / rejection / masking。</span></label>
+                <label class="check-row"><input type="checkbox" data-check><span>用本地基线校准 correction ratio 的粒度与阈值，不照搬统一数字。</span></label>
+                <label class="check-row"><input type="checkbox" data-check><span>记录截断/拒绝后的有效样本量、ratio 尾部与优化偏差。</span></label>
+                <label class="check-row"><input type="checkbox" data-check><span>仅在 MoE 路由已证明是主要根因时评估 R3 / Router Replay。</span></label>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="evidence" aria-labelledby="evidence-title">
+          <h2 id="evidence-title"><span class="section-no">13 / EVIDENCE</span>来源与证据边界</h2>
+          <div class="evidence-grid">
+            <article class="evidence-cell"><h3>已知事实 <span class="tag fact">一手资料 / 基础机制</span></h3><p>自回归 causal shift、同 snapshot 的 token 级条件概率定义、ratio 的指数关系，以及 Router Replay 保存并回放 MoE 路由选择，均可由代码级推导、官方文档或论文方法描述核验。</p></article>
+            <article class="evidence-cell"><h3>实现差异 <span class="tag version">版本相关</span></h3><p>VeRL rollout correction 的模式、聚合层级、配置名；NeMo RL Router Replay 支持的 rollout/trainer 组合与 payload 路径都可能随版本变化，必须以所用版本官方文档和源码为准。</p></article>
+            <article class="evidence-cell"><h3>性能权衡 <span class="tag wiki">wiki 归纳</span></h3><p>高精度、deterministic / batch-invariant kernel 与简化并行有助于建立诊断基线，但可能牺牲吞吐、并发与部署效率；应逐项恢复而非永久全关。</p></article>
+            <article class="evidence-cell"><h3>待核实 / 不提升为通用事实 <span class="tag risk">边界</span></h3><p>固定 KL、β、误差或 ratio 阈值；某个 dtype / kernel 的统一安全线；未经绑定版本的框架 API；单篇实验中的性能数字，都不作为本指南的普适结论。</p></article>
+          </div>
+
+          <div class="danger-note"><strong>原始文章勘误：</strong>文章前部示例存在“未 shift 就 gather 同位置 token”的错误；<code>response_mask = input_ids &gt;= tokenizer.vocab_size</code> 对合法 token IDs 基本恒为假，也不能作为真实 response mask。本报告采用文章后文正确的 <code>logits[:, :-1]</code> 对 <code>ids[:, 1:]</code> 口径。固定 KL / β / 误差阈值不作为通用事实。</div>
+
+          <h3>仓库内回链</h3>
+          <ul class="source-list">
+            <li><a href="../../wiki/concepts/RL%20训推不一致.md">RL 训推不一致</a><span class="source-type">核心概念 · wiki 归纳</span></li>
+            <li><a href="../../wiki/sources/RLTraining%20Inference%20Mismatch.md">RLTraining Inference Mismatch</a><span class="source-type">来源摘要 · 包含勘误与待确认边界</span></li>
+            <li><a href="../../wiki/concepts/跨%20Mesh%20权重重分片.md">跨 Mesh 权重重分片</a><span class="source-type">权重流、reshard 与 policy version 边界</span></li>
+            <li><a href="../../wiki/concepts/混合精度训练与推理.md">混合精度训练与推理</a><span class="source-type">低精度差异与高精度基线</span></li>
+            <li><a href="../../wiki/concepts/确定性推理.md">确定性推理</a><span class="source-type">采样随机性、计算非确定性与跨路径一致性的边界</span></li>
+            <li><a href="../../raw/articles/RLTraining%20Inference%20Mismatch.md">原始文章：RLTraining Inference Mismatch</a><span class="source-type">原始材料 · 保留原文事实痕迹</span></li>
+          </ul>
+
+          <h3>官方与论文补充</h3>
+          <ul class="source-list">
+            <li><a href="https://verl.readthedocs.io/en/latest/algo/rollout_corr.html" target="_blank" rel="noopener">VeRL Rollout Correction</a><span class="source-type"><span class="tag fact">一手资料</span> <span class="tag version">版本相关</span> TIS / IS / rejection 的实现与配置边界</span></li>
+            <li><a href="https://docs.nvidia.com/nemo/rl/latest/guides/router-replay.html" target="_blank" rel="noopener">NeMo RL Router Replay</a><span class="source-type"><span class="tag fact">一手资料</span> <span class="tag version">版本相关</span> 当前 R3 集成、payload、fallback 与支持范围</span></li>
+            <li><a href="https://arxiv.org/html/2510.11370v1" target="_blank" rel="noopener">R3 paper: Stabilizing MoE RL by Aligning Training and Inference Routers</a><span class="source-type"><span class="tag fact">一手资料</span> MoE 路由回放方法与实验边界</span></li>
+            <li><a href="https://arxiv.org/html/2605.14220v1" target="_blank" rel="noopener">TIM diagnostic paper: Diagnosing Training Inference Mismatch in LLM RL</a><span class="source-type"><span class="tag fact">一手资料</span> zero-mismatch 诊断、TIS/RS 补偿与局限</span></li>
+          </ul>
+          <p class="method-note">这些外链只是供核验的方法边界与版本说明；本 HTML 不加载任何远程 CSS、JavaScript、字体、图片或数据，页面计算全部在本地完成。</p>
+        </section>
+
+        <footer>
+          <p>阅读完成标准：你能用“同 snapshot、同 token、同条件上下文的 per-token logprob”定义 mismatch；能从 artifacts → frozen baseline → 语义 → 权重 → 数值逐层排查；知道 TIS 是 off-policy 缓解、R3 是 MoE 路由专项，而不是通用修 bug 工具。</p>
+        </footer>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    (() => {
+      'use strict';
+
+      const rolloutInput = document.getElementById('rollout-logp');
+      const trainerInput = document.getElementById('trainer-logp');
+      const deltaOutput = document.getElementById('delta-output');
+      const ratioOutput = document.getElementById('ratio-output');
+      const meaningOutput = document.getElementById('ratio-meaning');
+      const calcError = document.getElementById('calc-error');
+      const calcReset = document.getElementById('calc-reset');
+
+      const isValidLogp = (value) => Number.isFinite(value) && value >= -100 && value <= 0;
+
+      const updateCalculator = () => {
+        const rollout = Number(rolloutInput.value);
+        const trainer = Number(trainerInput.value);
+        if (rolloutInput.value.trim() === '' || trainerInput.value.trim() === '' || !isValidLogp(rollout) || !isValidLogp(trainer)) {
+          calcError.textContent = '请输入 −100 到 0 之间的有效 logprob。';
+          deltaOutput.textContent = '—';
+          ratioOutput.textContent = '—';
+          meaningOutput.textContent = '修正输入后会在这里显示本地计算结果。';
+          return;
+        }
+
+        calcError.textContent = '';
+        const delta = trainer - rollout;
+        const ratio = Math.exp(delta);
+        deltaOutput.textContent = delta.toFixed(4);
+        ratioOutput.textContent = ratio.toFixed(4);
+
+        let direction = '两条路径给出的该 token 概率相同';
+        if (delta > 0) direction = `该 token 在 Trainer 路径下的概率约为 Rollout 的 ${ratio.toFixed(2)} 倍`;
+        if (delta < 0) direction = `该 token 在 Trainer 路径下的概率约为 Rollout 的 ${ratio.toFixed(2)} 倍（更低）`;
+        meaningOutput.textContent = `${direction}。这里只是数学映射，不代表安全或危险阈值。`;
+      };
+
+      [rolloutInput, trainerInput].forEach((input) => input.addEventListener('input', updateCalculator));
+      calcReset.addEventListener('click', () => {
+        rolloutInput.value = '-2.2';
+        trainerInput.value = '-2.0';
+        updateCalculator();
+        rolloutInput.focus();
+      });
+
+      const checks = Array.from(document.querySelectorAll('[data-check]'));
+      const progressText = document.getElementById('check-progress');
+      const progressBar = document.getElementById('check-progress-bar');
+      const checkReset = document.getElementById('check-reset');
+
+      const updateChecklist = () => {
+        const completed = checks.filter((item) => item.checked).length;
+        const percent = checks.length ? Math.round((completed / checks.length) * 100) : 0;
+        progressText.textContent = `已完成 ${completed} / ${checks.length}（${percent}%）`;
+        progressBar.style.width = `${percent}%`;
+      };
+
+      checks.forEach((item) => item.addEventListener('change', updateChecklist));
+      checkReset.addEventListener('click', () => {
+        checks.forEach((item) => { item.checked = false; });
+        updateChecklist();
+        checks[0]?.focus();
+      });
+
+      updateCalculator();
+      updateChecklist();
+    })();
+  </script>
+</body>
+</html>

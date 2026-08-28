@@ -34,7 +34,7 @@
 - 来源文件：62
 - 实体文件：47
 - 概念文件：116
-- 报告文件：36
+- 报告文件：37
 - HTML 导出：0
 - 面试文件：11
 - 卡片文件：0
@@ -386,6 +386,7 @@
 - [[../output/reports/MoonEP动态冗余Expert机制|MoonEP动态冗余Expert机制]]
 - [[../output/reports/PCP是什么|PCP是什么]]
 - [[../output/reports/Prefill Attention 的 CUDA 并行映射|Prefill Attention 的 CUDA 并行映射]]
+- [RL训推不一致入门指南](../output/reports/RL训推不一致入门指南.html)
 - [[../output/reports/Recursive Language Models 中文导读|Recursive Language Models 中文导读]]
 - [TTT模型学习指南](../output/reports/TTT模型学习指南.html)
 - [[../output/reports/Triton在Ascend上的支持|Triton在Ascend上的支持]]
