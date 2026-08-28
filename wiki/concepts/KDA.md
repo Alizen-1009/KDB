@@ -123,6 +123,22 @@ Kimi K3技术报告§5.4.2明确的Decode融合范围是ShortConv、Input Norm�
 
 逐token递推可写成仿射transition `S_t=M_t S_{t-1}+B_t`。仿射变换可结合，因此segments可用prefix scan组合；chunk内部通过UT transform改写为causal lower-triangular GEMM。[[../entities/FlashKDA|FlashKDA]]进一步用CUTLASS/Tensor Core实现，并重叠块内token计算与块间状态传播。完整推导见 [[../../output/reports/FlashKDA为什么能并行|FlashKDA为什么能并行]]。
 
+## KDA Context Parallelism（KCP）
+
+KCP 面向长序列训练与 Prefill：把同一序列的连续 segments 分给不同 GPU。由于 KDA 的 Delta Rule 会让每段先变换 incoming state，再加入本段写入，不能像加法型线性注意力那样只对“从零开始的 local state”做 prefix sum。
+
+每个 rank 先独立把本段压缩成一个仿射变换：
+
+```text
+F_i(S) = A_i S + S_tilde_i
+A_i         = 本段所有 M_t 的累计 transition，形状 [d_k,d_k]
+S_tilde_i   = 本段从 S=0 开始产生的 state，形状 [d_k,d_v]
+```
+
+仿射变换按 `(A₂,S₂)∘(A₁,S₁)=(A₂A₁, A₂S₁+S₂)` 结合，因此可用 prefix scan 恢复每个 rank 的精确 incoming state。Kimi K3 报告中的实现让各 rank 本地计算 `A_i/S_tilde_i`，再用一次 AllGather 交换这些固定大小 fragments；通信量不随序列长度增长，但会随 CP ranks、heads 与状态维度增长，且 `[d_k,d_k]` transition 的计算和组合并非免费。
+
+这与 softmax CP 交换随上下文增长的 KV blocks 不同，也不同于 decode 阶段分片历史 KV 的 DCP。单卡内部的 SM-level CP 使用同一仿射分段思想但不跨 GPU；KCP 专指跨设备版本。完整部署说明见 [[../../output/reports/Kimi K3的KDA部署与Prefix Cache|Kimi K3的KDA部署与Prefix Cache]]。
+
 ## CAKE KDA 全融合 Prefill
 
 [[../entities/CAKE KDA]] 在 B200/SM100a 上提供另一种 prefill 调度：不把 chunk preparation 与 recurrence 拆成 K1/K2 两个 kernels，而是在单 CTA 内由五组 producer 预先准备五个 32-token chunks，再由 consumer 严格按顺序推进 FP32 recurrent state。固定 exponent anchor 让 chunk 32 的 BF16 Q/K 因子保持在可用范围内，并在 `Mqk` 中抵消；state 跨 chunks 常驻 [[Tensor Memory|TMEM]]，chunk-local 中间量通过五级 SMEM ring 和 lifetime aliasing 留在片上。
@@ -154,7 +170,7 @@ Decode `T=1` 且上游已算好 `q/k/v/alpha/beta` 时，优先看 [[../../outpu
 
 ## 官方资料
 
-- [Kimi K3 Technical Report](../../raw/papers/k3_tech_report.pdf)，§2.1.1
+- [Kimi K3 Technical Report](../../raw/papers/k3_tech_report.pdf)，§2.1.1、§5.1.2
 - [MoonshotAI/Kimi-K3](https://github.com/MoonshotAI/Kimi-K3)
 
 ## 待核实

@@ -38,6 +38,14 @@ Training Mesh 更新策略，得到 version N+1
 
 权重通常在训练 step、Rollout iteration 或模型版本边界切换，不会在同一条 response 生成到一半时随意替换。异步 RL 可以容忍不同 worker 使用稍旧版本，但策略陈旧度、版本一致性和切换时机属于上层 runtime 问题，不由重分片原语决定。
 
+## 权重同步与 Logprob 一致性
+
+[[RL 训推不一致]] 为这条链路增加了一个语义验收条件：M2N 完成字节传输和 shard 布局转换，不等于 Rollout 已原子切换到 Trainer 预期的 policy version。轨迹至少要能关联生成它的权重版本、真实 token IDs 和 old logprob；Trainer 也要明确是在重算同版本基线，还是有意比较更新后/陈旧策略。
+
+在“刚同步且尚未 optimizer update”的一致性测试中，Rollout 与 Trainer 对同一 token 轨迹应满足 `train_logp-rollout_logp≈0`、importance ratio 接近 `1`。若不满足，需要继续排查 adapter/量化权重、同步 barrier、版本切换、token/mask/position 和两侧 kernel，而不能只凭通信完成事件断言策略一致。
+
+异步 RL 中 old/new policy 不同可以是算法预期；真正的问题是未记录的 policy staleness，或名义上同版本但执行结果系统性偏离。
+
 ## 为什么两个 Mesh 布局会不同
 
 训练侧需要参数、梯度、Optimizer state、反向激活，常按大规模训练效率选择 `DP + TP + PP + FSDP/ZeRO + EP`。Rollout 推理侧没有 backward，但受 KV Cache、decode latency、continuous batching 和专家吞吐影响，可能采用不同的 `DP/TP/PP/EP` 配比。
@@ -137,6 +145,7 @@ M2N 方向：
 ## 相关来源
 
 - [[../sources/NVIDIA 开源 NCCL Extensions：把 MoE 专家路由与跨 Mesh 权重重分片推进到 GPU 设备侧]]
+- [[../sources/RLTraining Inference Mismatch]]
 
 ## 相关概念
 
@@ -145,6 +154,7 @@ M2N 方向：
 - [[流水线并行]]
 - [[集合通信]]
 - [[通信-计算重叠]]
+- [[RL 训推不一致]]
 
 ## 研究备注
 
