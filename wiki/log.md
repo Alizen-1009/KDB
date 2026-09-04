@@ -1787,3 +1787,9 @@
 - 更新概念页与训练与 Scaling 主题地图，补充 HTML 回链
 - 完成 1440px、500px、14 页打印、Ratio/错误输入/重置、清单进度与重置、锚点、本地链接、JS 和无远程依赖验证
 - 待核实：框架配置名、rollout correction 模式和 Router Replay 支持组合需绑定 VeRL/NeMo RL 版本
+
+## [2026-09-04] query | Qwen3.8-Next Gated Residual 中 gate 的含义
+
+- 读取概念页：`wiki/concepts/Gated Residual.md`、实体页 `wiki/entities/Qwen3.8-Flash-Next.md` 与论文来源页
+- 核对官方技术报告第 2.2 节公式（29）–（36）
+- 本次 query 澄清：GR 的 gate 是由当前四路 residual state 动态生成的软乘法权重；read gate 按分支、按 channel 控制子层读取，write gate 按分支控制子层输出写回；它不是 MoE router、硬开关，也不是 GDN 内部的状态门
