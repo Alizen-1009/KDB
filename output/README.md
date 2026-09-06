@@ -6,7 +6,7 @@
 
 - `reports/`：架构分析、技术综述、benchmark 对比、研究备忘；长篇人读报告默认是自包含 HTML，短线性或 Obsidian-native 备忘可用 Markdown
 - `exports/`：从 wiki 或既有 output 编译出的可分享、自包含 HTML；由 `kb-export` 生成
-- `interview/`：面试备考——题目拆解、专题稿、复盘；`interview/code/` 是配套的手撕代码
+- [[interview/README|interview/ 面试备考]]：题目拆解、专题稿、复盘；逐题收录与复习从 [[interview/秋招问题汇总/README|秋招问题汇总]] 开始，旧原稿保留作长答案参考
 - `slides/`：Marp 幻灯片
 - `visuals/`：图表、流程图、可视化图片
 - `cards/`：复习卡片（Markdown 问答，可读可回链）；由 `kb-cards` 生成，`cards/anki/` 是转换出的 Anki 导入文件

@@ -1793,3 +1793,17 @@
 - 读取概念页：`wiki/concepts/Gated Residual.md`、实体页 `wiki/entities/Qwen3.8-Flash-Next.md` 与论文来源页
 - 核对官方技术报告第 2.2 节公式（29）–（36）
 - 本次 query 澄清：GR 的 gate 是由当前四路 residual state 动态生成的软乘法权重；read gate 按分支、按 channel 控制子层读取，write gate 按分支控制子层输出写回；它不是 MoE router、硬开关，也不是 GDN 内部的状态门
+
+## [2026-09-04] query | Qwen3.8-Next 的 GR、Engram 与 N-gram 区别
+
+- 读取概念页：`Gated Residual`、`N-gram Embedding`、`Conditional Memory`
+- 读取实体页：`Qwen3.8-Flash-Next`、`Engram`
+- 本次 query 澄清：GR 是四分支残差流的动态读写机制；N-gram 是连续 n 个 token 的局部模式，N-gram Embedding 是以其为键的参数查表；Engram 是 DeepSeek 提出的、以 N-gram 查表为核心并加入压缩、哈希、门控与卷积融合的具体 Conditional Memory 模块。Qwen 的 N-gram Embedding 与 Engram 属于同类方向，但论文未披露足够实现细节，不能直接等同。
+
+## [2026-09-05] interview | 整理历史面试资料为秋招逐题题库
+
+- 完整盘点 output/interview 下 11 份原稿，从 175 个候选问题归并为 146 道通用题和 12 个个人项目/行为提示；保留原稿原路径与全部正文。
+- 创建 output/interview/README.md 与 output/interview/秋招问题汇总/README.md；新增 6 个技术专题、个人题单、原稿题目对照及 146 个问题页，更新 output/README.md 入口。
+- 123 道题提炼历史短答并标为整理中，23 道题保持待整理；逐题保留原稿章节回链、同义问法和核实边界，没有新建事实来源页或补造个人经历。
+- 风险标注：旧框架命名、CUDA Graph/Fluid API、未证实加速倍率、教学代码边界；纠正前向激活峰值账本和通信重叠必然节省显存的误读。未恢复已删除的两份代码，未读写 my_resume。
+- 校验：11 份原稿 SHA-256 不变；候选问题映射无遗漏；新导航/问题页内部链接及章节锚点可解析。未逐题独立核验技术事实、运行代码或复测 benchmark。

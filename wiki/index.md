@@ -36,7 +36,7 @@
 - 概念文件：116
 - 报告文件：37
 - HTML 导出：0
-- 面试文件：11
+- 面试文件：12
 - 卡片文件：0
 - 幻灯片文件：0
 
@@ -404,6 +404,7 @@
 ## 面试备考
 
 - [[../output/interview/AI Infra面试题全答（二）|AI Infra面试题全答（二）]]
+- [[../output/interview/README|README]]
 - [[../output/interview/多卡GPU监控与SM执行模型面试整理|多卡GPU监控与SM执行模型面试整理]]
 - [[../output/interview/多卡与推理系统面试梳理|多卡与推理系统面试梳理]]
 - [[../output/interview/大模型系统面试题全答|大模型系统面试题全答]]

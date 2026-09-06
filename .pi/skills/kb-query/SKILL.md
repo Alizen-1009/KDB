@@ -1,11 +1,13 @@
 ---
 name: kb-query
-description: 基于 wiki/ 回答研究问题——架构对比、性能归因、机制拆解、实现路线评估——默认产出 output/reports/ 下的自包含 HTML 报告（面试向的放 output/interview/，幻灯片放 output/slides/），并把高价值结论回填 wiki/。当用户说 query / 出个报告 / 写篇对比，或提出“对比 X 与 Y”“为什么 X 更快”这类研究问题时使用。
+description: 基于 wiki/ 回答研究问题——架构对比、性能归因、机制拆解、实现路线评估——默认产出 output/reports/ 下的自包含 HTML 报告（面试向的放 output/interview/，幻灯片放 output/slides/），并把高价值结论回填 wiki/。当用户说 query / 出个报告 / 写篇对比，或提出“对比 X 与 Y”“为什么 X 更快”这类研究问题时使用。逐题收录、批量题单与已有题目的答案维护使用 kb-interview；普通面试聊天不自动落盘。
 ---
 
 # Query：基于 wiki 产出研究输出
 
 ## 开始前
+
+先区分研究输出与题库维护：用户要求收录面试题、收集系列题或更新已有问题页时，读取 `../kb-interview/SKILL.md` 并按其流程执行；普通面试提问仅在对话中回答，不自动生成报告、回填或记日志。
 
 读 `AGENTS.md` 的《写作标准》——尤其是“区分原文说法 / 实现细节 / 实验观察 / LLM 归纳”和“不伪造 benchmark 数字”。
 
