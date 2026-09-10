@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: 模型架构
-sources: 3
+sources: 4
 updated: 2026-05-06
 ---
 
@@ -37,16 +37,22 @@ updated: 2026-05-06
 
 K3的93层网络若朴素实现Block AttnRes，会增加跨层表示读写、归约和Normalization Launch。vLLM Preview称Release Branch已集成Triton与NVIDIA Kernel，在支持shape上融合Residual Update、AttnRes Mixing和Output RMSNorm，并用Sequence Parallel分片跨rank流量；文章只称早期Kernel结果积极，端到端收益仍在不同Prefill长度和并行配置下测量。
 
+## 与 Gated Residual 的特定对比
+
+Qwen3.8 论文只在特定 `28` 层设置下比较 [[Gated Residual|GR]] 与 AttnRes：未加 GatedNorm 的 Full AttnRes 与 GR（结构本身包含 gated read/GatedNorm）的最终训练 loss 都为 `1.762`；给 Full AttnRes 加 GatedNorm 后为 `1.758`。Block AttnRes 在 `S=2/4` 时分别为 `1.770/1.773`，加入 GatedNorm 后为 `1.766/1.768`。这些并非完全同构的配置，不能推出 GR 与 AttnRes 的普遍优劣；二者机制也不同，AttnRes 对历史层输出做 depth-wise softmax attention，GR 则读写四分支 residual accumulators。
+
 ## 相关实体
 
 - [[../entities/Moonshot AI]]
 - [[../entities/vLLM]]
+- [[../entities/Qwen3.8-Flash-Next]]
 
 ## 相关来源
 
 - [[../sources/Attention Residuals]]
 - [[../sources/Kimi新作《Attention Residuals》：对Transformer中残差结构的调整]]
 - [[../sources/A Preview of Production-Scale Kimi K3 Support on vLLM]]
+- [[../sources/On the Design of Qwen3.8-Next Architecture：Evaluation, Efficiency, and Training Stability]]
 
 ## 相关概念
 
@@ -55,6 +61,7 @@ K3的93层网络若朴素实现Block AttnRes，会增加跨层表示读写、归
 - [[Scaling Laws]]
 - [[Online Softmax]]
 - [[mHC]]
+- [[Gated Residual]]
 
 ## 研究备注
 

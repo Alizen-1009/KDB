@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: 训练与 Scaling
-sources: 3
+sources: 4
 updated: 2026-05-06
 ---
 
@@ -22,6 +22,13 @@ updated: 2026-05-06
 - 常用 power-law 形式描述数据、模型、compute 与误差之间的关系
 - 用拟合到的小规模规律预测更大规模下的资源配置和性能走势
 
+## Qwen3.8-Flash-Next 的超参数外推验证
+
+- 新架构与 [[Muon Optimizer|Muon]] 改变了 near-optimal batch size 和 learning rate，论文因此重新拟合 Qwen3.5 系列使用的超参数 scaling law，而不是直接沿用旧配方。
+- `20` 层 `10.8B-A0.89B`、`4T` tokens 验证中，`B=25.2M` 的 loss 为 `1.5702`，旧 `B=12.6M` 为 `1.5774`，`B=37.7M` 为 `1.5707`；从 `6.3M` warmup 到 `25.2M` 不更好且多 `18.8%` optimizer steps。
+- `48` 层 `156B-A7B`、`419B` tokens 验证中，预测配置为 `B=8.4M / LR=1.76e-3`，旧配方为 `4.2M / 6.8e-4`；预测配置最终 loss 优 `7.8e-3`，七项平均准确率为 `60.55 vs 56.41`。
+- 预测点附近的四组设置最终 loss 相差不超过 `7e-4`，且只各做一次下游评测；论文明确把细小排名视为观测噪声。以上验证只支持该模型族与训练配方内的外推，不能变成通用 batch/LR 定律。
+
 ## 关键权衡
 
 - 能显著降低大模型试错成本
@@ -30,18 +37,21 @@ updated: 2026-05-06
 ## 相关实体
 
 - [[../entities/Stanford CS336]]
+- [[../entities/Qwen3.8-Flash-Next]]
 
 ## 相关来源
 
 - [[../sources/斯坦福CS336 Lecture 9 - Scaling laws basics]]
 - [[../sources/Attention Residuals]]
 - [[../sources/Kimi新作《Attention Residuals》：对Transformer中残差结构的调整]]
+- [[../sources/On the Design of Qwen3.8-Next Architecture：Evaluation, Efficiency, and Training Stability]]
 
 ## 相关概念
 
 - [[数据缩放定律]]
 - [[Critical Batch Size]]
 - [[Chinchilla Scaling]]
+- [[Muon Optimizer]]
 
 ## 研究备注
 

@@ -2,7 +2,7 @@
 type: concept
 topic: 注意力机制
 updated: 2026-08-02
-sources: 1
+sources: 3
 ---
 
 # KDA
@@ -95,6 +95,19 @@ Kimi K3混合部署同时维护两类cache：KDA的固定大小`Conv State + Mat
 
 vLLM的K3集成进一步将Physical State Block、Scheduler Alignment与Prefix Hash Unit解耦：大状态块内部仍可注册细粒度Prefix Endpoint，但只有MLA KV、Matrix State和ShortConv State对同一个`num_computed_tokens`有效时才算命中。命中checkpoint必须Copy-on-Write为请求私有Running State。
 
+## GLM-5.3-Flash 配置案例
+
+[[../entities/GLM-5.3-Flash]] 在 `45` 个文本层中使用 `34` 个 KDA 层与 `11` 个 DSA 层，约为 `3:1`；DSA 位于 layers `3/7/.../43`，最后的 layer `44` 是 KDA。其 KDA 配置为：
+
+```text
+num_heads              = 64
+head_dim               = 128
+short_conv_kernel_size = 4
+gate_lower_bound       = -5.0
+```
+
+这里 KDA 用固定大小 recurrent state 低成本聚合历史，周期性的 [[DeepSeek Sparse Attention|DSA]] 保留显式 top-k token 检索能力。该配置案例不改变本页从 Kimi K3 资料整理出的 KDA 机制定义。
+
 ## 工程权衡
 
 - Channel-wise decay 比 scalar GDN 更有表达力，不同 key channels 可有不同记忆长度。
@@ -110,9 +123,36 @@ Kimi K3技术报告§5.4.2明确的Decode融合范围是ShortConv、Input Norm�
 
 逐token递推可写成仿射transition `S_t=M_t S_{t-1}+B_t`。仿射变换可结合，因此segments可用prefix scan组合；chunk内部通过UT transform改写为causal lower-triangular GEMM。[[../entities/FlashKDA|FlashKDA]]进一步用CUTLASS/Tensor Core实现，并重叠块内token计算与块间状态传播。完整推导见 [[../../output/reports/FlashKDA为什么能并行|FlashKDA为什么能并行]]。
 
+## KDA Context Parallelism（KCP）
+
+KCP 面向长序列训练与 Prefill：把同一序列的连续 segments 分给不同 GPU。由于 KDA 的 Delta Rule 会让每段先变换 incoming state，再加入本段写入，不能像加法型线性注意力那样只对“从零开始的 local state”做 prefix sum。
+
+每个 rank 先独立把本段压缩成一个仿射变换：
+
+```text
+F_i(S) = A_i S + S_tilde_i
+A_i         = 本段所有 M_t 的累计 transition，形状 [d_k,d_k]
+S_tilde_i   = 本段从 S=0 开始产生的 state，形状 [d_k,d_v]
+```
+
+仿射变换按 `(A₂,S₂)∘(A₁,S₁)=(A₂A₁, A₂S₁+S₂)` 结合，因此可用 prefix scan 恢复每个 rank 的精确 incoming state。Kimi K3 报告中的实现让各 rank 本地计算 `A_i/S_tilde_i`，再用一次 AllGather 交换这些固定大小 fragments；通信量不随序列长度增长，但会随 CP ranks、heads 与状态维度增长，且 `[d_k,d_k]` transition 的计算和组合并非免费。
+
+这与 softmax CP 交换随上下文增长的 KV blocks 不同，也不同于 decode 阶段分片历史 KV 的 DCP。单卡内部的 SM-level CP 使用同一仿射分段思想但不跨 GPU；KCP 专指跨设备版本。完整部署说明见 [[../../output/reports/Kimi K3的KDA部署与Prefix Cache|Kimi K3的KDA部署与Prefix Cache]]。
+
+## CAKE KDA 全融合 Prefill
+
+[[../entities/CAKE KDA]] 在 B200/SM100a 上提供另一种 prefill 调度：不把 chunk preparation 与 recurrence 拆成 K1/K2 两个 kernels，而是在单 CTA 内由五组 producer 预先准备五个 32-token chunks，再由 consumer 严格按顺序推进 FP32 recurrent state。固定 exponent anchor 让 chunk 32 的 BF16 Q/K 因子保持在可用范围内，并在 `Mqk` 中抵消；state 跨 chunks 常驻 [[Tensor Memory|TMEM]]，chunk-local 中间量通过五级 SMEM ring 和 lifetime aliasing 留在片上。
+
+这与 [[../entities/FlashKDA|FlashKDA]] 两阶段方案形成互补：FlashKDA 的 K1 可沿 chunks×heads 提供更高 preparation 并行度，但需要 global workspace；CAKE 消除 workspace/HBM 往返，却让整体 grid 更直接受 batch×heads 限制。小 batch 或少 heads 时，两阶段或 shape-aware dispatch 仍可能更合适。
+
 ## 伪代码
 
 Decode `T=1` 且上游已算好 `q/k/v/alpha/beta` 时，优先看 [[../../output/reports/KDA最小Decode伪代码|KDA最小Decode伪代码]]；完整输入投影、Conv State、batch/sequence与K-last布局再看 [[../../output/reports/KDA伪代码与输入输出|KDA伪代码与输入输出]]。
+
+## 相关实体
+
+- [[../entities/Kimi K3]]
+- [[../entities/GLM-5.3-Flash]]
 
 ## 相关概念
 
@@ -120,14 +160,17 @@ Decode `T=1` 且上游已算好 `q/k/v/alpha/beta` 时，优先看 [[../../outpu
 - [[Chunked Gated Delta Rule]]
 - [[混合注意力]]
 - [[MLA]]
+- [[Tensor Memory]]
 
 ## 相关来源
 
 - [[../sources/A Preview of Production-Scale Kimi K3 Support on vLLM]]
+- [[../sources/REMINDER FF-KDA & CAKE KDA Highlights]]
+- [[../sources/glm-5-architecture-evolution]]
 
 ## 官方资料
 
-- [Kimi K3 Technical Report](../../raw/papers/k3_tech_report.pdf)，§2.1.1
+- [Kimi K3 Technical Report](../../raw/papers/k3_tech_report.pdf)，§2.1.1、§5.1.2
 - [MoonshotAI/Kimi-K3](https://github.com/MoonshotAI/Kimi-K3)
 
 ## 待核实

@@ -1,0 +1,1369 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Anthropic《The Complete Guide to Building Skills for Claude》33 页英文指南的完整中文翻译阅读版。">
+  <title>Claude Skills 完整构建指南（中文全文翻译阅读版）</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #fbfaf7;
+      --surface: #ffffff;
+      --ink: #20201e;
+      --muted: #62615d;
+      --line: #d8d4cc;
+      --accent: #a3422a;
+      --accent-dark: #74301f;
+      --accent-soft: #f6e9e3;
+      --blue: #245e73;
+      --blue-soft: #e8f1f4;
+      --code-bg: #202523;
+      --code-ink: #f1f2ed;
+      --shadow: 0 10px 28px rgba(43, 38, 31, .08);
+      --radius: 12px;
+      --reading: 78ch;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 1.5rem; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: ui-serif, Georgia, "Noto Serif CJK SC", "Songti SC", "STSong", serif;
+      line-height: 1.75;
+      text-rendering: optimizeLegibility;
+    }
+    a { color: var(--accent-dark); text-decoration-thickness: .08em; text-underline-offset: .18em; }
+    a:hover { color: var(--accent); }
+    a:focus-visible, summary:focus-visible { outline: 3px solid #e8a487; outline-offset: 3px; border-radius: 3px; }
+    .skip-link {
+      position: fixed; z-index: 100; left: 1rem; top: .75rem; transform: translateY(-180%);
+      background: var(--ink); color: #fff; padding: .6rem .9rem; border-radius: 6px;
+    }
+    .skip-link:focus { transform: translateY(0); }
+    .masthead {
+      color: #fff;
+      background: linear-gradient(135deg, #282521 0%, #4a3028 62%, #7e3825 100%);
+      border-bottom: 5px solid #d58a6f;
+    }
+    .masthead-inner { max-width: 1180px; margin: 0 auto; padding: 4.2rem 2rem 3.7rem; }
+    .eyebrow {
+      display: inline-block; margin: 0 0 1rem; padding: .25rem .65rem;
+      border: 1px solid rgba(255,255,255,.42); border-radius: 999px;
+      font-family: ui-sans-serif, system-ui, sans-serif; font-size: .78rem; letter-spacing: .1em;
+    }
+    h1 { max-width: 900px; margin: 0; font-size: clamp(2.25rem, 5vw, 4.6rem); line-height: 1.08; letter-spacing: -.035em; }
+    .subtitle { max-width: 760px; margin: 1.25rem 0 0; color: #f5eae4; font-size: 1.08rem; }
+    .meta-row { display: flex; flex-wrap: wrap; gap: .65rem; margin-top: 1.4rem; font-family: ui-sans-serif, system-ui, sans-serif; }
+    .meta-row span { padding: .3rem .65rem; background: rgba(255,255,255,.1); border-radius: 5px; font-size: .85rem; }
+    .mobile-toc { display: none; max-width: 880px; margin: 1rem auto 0; padding: 0 1rem; font-family: ui-sans-serif, system-ui, sans-serif; }
+    .mobile-toc details { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
+    .mobile-toc summary { cursor: pointer; padding: .85rem 1rem; font-weight: 700; }
+    .mobile-toc ol { margin: 0; padding: 0 1.2rem 1rem 2.3rem; }
+    .layout { display: grid; grid-template-columns: 255px minmax(0, 1fr); gap: 3.25rem; max-width: 1180px; margin: 0 auto; padding: 2.6rem 2rem 5rem; }
+    .toc { align-self: start; position: sticky; top: 1rem; max-height: calc(100vh - 2rem); overflow: auto; padding: 1.1rem 1.15rem 1.3rem; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); font-family: ui-sans-serif, system-ui, sans-serif; }
+    .toc strong { display: block; margin-bottom: .55rem; color: var(--muted); font-size: .78rem; letter-spacing: .11em; text-transform: uppercase; }
+    .toc ol { margin: 0; padding-left: 1.25rem; }
+    .toc li { margin: .42rem 0; font-size: .9rem; line-height: 1.4; }
+    .toc a { color: var(--ink); text-decoration: none; }
+    .toc a:hover { color: var(--accent); text-decoration: underline; }
+    main { min-width: 0; max-width: 850px; }
+    article > section { margin: 0 0 5rem; }
+    h2 { margin: 0 0 1.35rem; padding-bottom: .6rem; border-bottom: 2px solid var(--line); font-size: clamp(1.8rem, 3vw, 2.55rem); line-height: 1.2; letter-spacing: -.02em; }
+    h2 .chapter { display: block; margin-bottom: .2rem; color: var(--accent); font-family: ui-sans-serif, system-ui, sans-serif; font-size: .75rem; letter-spacing: .11em; text-transform: uppercase; }
+    h3 { margin: 2.6rem 0 .8rem; font-size: 1.35rem; line-height: 1.35; color: #34312d; }
+    p { max-width: var(--reading); margin: .7rem 0 1rem; }
+    ul, ol { max-width: var(--reading); padding-left: 1.45rem; }
+    li { margin: .3rem 0; }
+    li > ul, li > ol { margin-top: .3rem; }
+    .lead { font-size: 1.12rem; line-height: 1.8; }
+    .note, .tip, .warning {
+      max-width: var(--reading); margin: 1.25rem 0; padding: 1rem 1.15rem;
+      border-left: 4px solid var(--blue); background: var(--blue-soft); border-radius: 0 8px 8px 0;
+    }
+    .tip { border-left-color: var(--accent); background: var(--accent-soft); }
+    .warning { border-left-color: #8b5b00; background: #fff5dc; }
+    .note strong, .tip strong, .warning strong { font-family: ui-sans-serif, system-ui, sans-serif; }
+    .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin: 1.2rem 0; }
+    .card { min-width: 0; padding: 1rem 1.15rem; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+    .card > :first-child { margin-top: 0; }
+    .card > :last-child { margin-bottom: 0; }
+    .label { color: var(--accent-dark); font-family: ui-sans-serif, system-ui, sans-serif; font-weight: 750; }
+    .table-wrap { max-width: 100%; overflow-x: auto; margin: 1.25rem 0; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+    table { width: 100%; min-width: 620px; border-collapse: collapse; font-family: ui-sans-serif, system-ui, sans-serif; font-size: .92rem; line-height: 1.55; }
+    th, td { padding: .78rem .85rem; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+    th { background: #eeeae3; color: #393631; font-weight: 750; }
+    tr:last-child td { border-bottom: 0; }
+    code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; }
+    :not(pre) > code { padding: .08em .32em; border-radius: 4px; background: #ece9e2; color: #633321; font-size: .9em; overflow-wrap: anywhere; }
+    pre { max-width: 100%; overflow-x: auto; margin: 1rem 0 1.35rem; padding: 1rem 1.1rem; border: 1px solid #3d4843; border-radius: 9px; background: var(--code-bg); color: var(--code-ink); font-size: .87rem; line-height: 1.58; tab-size: 2; box-shadow: inset 0 1px 0 rgba(255,255,255,.06); }
+    pre code { color: inherit; }
+    .compare-good { border-top: 4px solid #39765d; }
+    .compare-bad { border-top: 4px solid #a94436; }
+    .checklist { list-style: none; padding-left: 0; }
+    .checklist li { position: relative; padding-left: 1.75rem; }
+    .checklist li::before { content: "□"; position: absolute; left: 0; top: -.05rem; color: var(--accent-dark); font-family: ui-sans-serif, system-ui, sans-serif; font-size: 1.1rem; }
+    .pattern { margin: 1.4rem 0 2rem; padding: 1.25rem 1.3rem; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+    .pattern h3 { margin-top: 0; }
+    .pattern .techniques { margin-top: 1rem; padding-top: .75rem; border-top: 1px solid var(--line); }
+    .source-note { margin: 0 0 2rem; padding: 1rem 1.2rem; border: 1px dashed #b5aa9d; border-radius: var(--radius); background: #fffdf9; font-size: .92rem; color: #4e4a44; }
+    footer { border-top: 1px solid var(--line); background: #eeeae3; }
+    .footer-inner { max-width: 1180px; margin: 0 auto; padding: 2rem; }
+    .footer-inner p { max-width: 900px; }
+    .back-top { font-family: ui-sans-serif, system-ui, sans-serif; font-size: .9rem; }
+    @media (max-width: 880px) {
+      .masthead-inner { padding: 3rem 1.2rem 2.7rem; }
+      .mobile-toc { display: block; }
+      .layout { display: block; padding: 1.5rem 1.1rem 4rem; }
+      .toc { display: none; }
+      main { max-width: 100%; }
+      .grid-2 { grid-template-columns: 1fr; }
+      article > section { margin-bottom: 4rem; }
+    }
+    @media (max-width: 520px) {
+      body { line-height: 1.68; }
+      h1 { font-size: 2.2rem; }
+      h2 { font-size: 1.7rem; }
+      h3 { font-size: 1.22rem; }
+      pre { margin-left: -.35rem; margin-right: -.35rem; padding: .85rem; font-size: .8rem; }
+      .card, .pattern { padding: .9rem; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    }
+    @media print {
+      @page { margin: 16mm 14mm; }
+      body { background: #fff; color: #000; font-size: 10.5pt; line-height: 1.55; }
+      .masthead { background: none; color: #000; border-bottom: 2px solid #000; }
+      .masthead-inner { max-width: none; padding: 0 0 1rem; }
+      .subtitle, .eyebrow { color: #000; border-color: #777; }
+      .meta-row span { background: none; border: 1px solid #aaa; }
+      .mobile-toc, .toc, .skip-link, .back-top { display: none !important; }
+      .layout { display: block; max-width: none; padding: 1.2rem 0 0; }
+      main { max-width: none; }
+      article > section { break-before: page; margin: 0; }
+      article > section:first-child { break-before: auto; }
+      h2, h3 { break-after: avoid; }
+      pre, table, .card, .pattern, .note, .tip, .warning { break-inside: avoid; box-shadow: none; }
+      pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #f2f2f2; color: #000; border-color: #888; }
+      a { color: #000; text-decoration: underline; }
+      a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 8pt; overflow-wrap: anywhere; }
+      footer { background: none; }
+    }
+  </style>
+</head>
+<body id="top">
+  <a class="skip-link" href="#main-content">跳到正文</a>
+  <header class="masthead">
+    <div class="masthead-inner">
+      <p class="eyebrow">中文全文翻译阅读版</p>
+      <h1>Claude Skills 完整构建指南</h1>
+      <p class="subtitle">《The Complete Guide to Building Skills for Claude》33 页英文指南的忠实中文翻译，完整保留章节、示例、代码、表格、排错清单与资源链接。</p>
+      <div class="meta-row" aria-label="文档信息">
+        <span>原文：Anthropic</span>
+        <span>范围：PDF 全部 33 页</span>
+        <span>形式：自包含 HTML5</span>
+      </div>
+    </div>
+  </header>
+
+  <nav class="mobile-toc" aria-label="移动端目录">
+    <details>
+      <summary>目录（点击展开）</summary>
+      <ol>
+        <li><a href="#introduction">引言</a></li>
+        <li><a href="#fundamentals">基础知识</a></li>
+        <li><a href="#planning-design">规划与设计</a></li>
+        <li><a href="#testing-iteration">测试与迭代</a></li>
+        <li><a href="#distribution-sharing">分发与分享</a></li>
+        <li><a href="#patterns-troubleshooting">模式与故障排查</a></li>
+        <li><a href="#resources-references">资源与参考</a></li>
+      </ol>
+    </details>
+  </nav>
+
+  <div class="layout">
+    <aside class="toc" aria-label="章节目录">
+      <strong>目录</strong>
+      <ol>
+        <li><a href="#introduction">引言</a></li>
+        <li><a href="#fundamentals">基础知识</a></li>
+        <li><a href="#planning-design">规划与设计</a></li>
+        <li><a href="#testing-iteration">测试与迭代</a></li>
+        <li><a href="#distribution-sharing">分发与分享</a></li>
+        <li><a href="#patterns-troubleshooting">模式与故障排查</a></li>
+        <li><a href="#resources-references">资源与参考</a></li>
+      </ol>
+    </aside>
+
+    <main id="main-content">
+      <article>
+        <div class="source-note">
+          <strong>译者说明：</strong>本页是中文全文翻译阅读版，不是摘要或改写。代码中的字段名、命令、路径、工具名与文件名按原文保留。仓库本地介绍页的 frontmatter 写有 <code>published: 2001-01-29</code>，与“Skills 在十月发布”以及 PDF 的 2026 年上下文明显不一致；因此本译文不展示该日期，也未修改 <code>raw/</code> 中的原文件。
+        </div>
+
+        <section id="introduction" aria-labelledby="introduction-title">
+          <h2 id="introduction-title"><span class="chapter">Introduction</span>引言</h2>
+          <p class="lead"><a href="https://claude.com/blog/skills">Skill（技能）</a>是一组指令——封装成一个简单的文件夹——用于教 Claude 如何处理特定任务或工作流。Skill 是根据你的具体需求定制 Claude 的最强大方式之一。你不必在每次对话中重新解释自己的偏好、流程和领域专长，而可以只教 Claude 一次，并在之后每次使用时持续受益。</p>
+          <p>当你有可重复的工作流时，Skill 尤其有用：根据规格生成前端设计、以一致的方法开展研究、创建符合团队风格指南的文档，或编排多步骤流程。Skill 能很好地配合 Claude 的内置能力，例如代码执行和文档创建。对于构建 MCP 集成的人，Skill 还增加了另一层强大能力，帮助把原始的工具访问转变为可靠且经过优化的工作流。</p>
+          <p>本指南涵盖构建有效 Skill 所需了解的一切——从规划与结构，到测试与分发。无论你是为自己、团队还是社区构建 Skill，都能在全文中找到实用模式和真实案例。</p>
+
+          <h3>你将学到什么</h3>
+          <ul>
+            <li>Skill 结构的技术要求与最佳实践</li>
+            <li>独立 Skill 与 MCP 增强工作流的模式</li>
+            <li>我们观察到在不同用例中表现良好的模式</li>
+            <li>如何测试、迭代和分发 Skill</li>
+          </ul>
+
+          <h3>本指南面向谁</h3>
+          <ul>
+            <li>希望 Claude 始终如一地遵循特定工作流的开发者</li>
+            <li>希望 Claude 遵循特定工作流的高级用户</li>
+            <li>希望在组织内标准化 Claude 工作方式的团队</li>
+          </ul>
+
+          <div class="tip">
+            <strong>阅读本指南的两条路径</strong>
+            <p><strong>构建独立 Skill？</strong>重点阅读“基础知识”“规划与设计”以及类别 1–2。<strong>增强 MCP 集成？</strong>“Skills + MCP”小节和类别 3 适合你。两条路径共享同一套技术要求，但你可以选择与自身用例相关的内容。</p>
+          </div>
+          <p><strong>读完本指南你将获得什么：</strong>到最后，你将能够在一次集中工作中构建出一个可用的 Skill。使用 <code>skill-creator</code> 构建并测试第一个可工作的 Skill，预计需要约 15–30 分钟。</p>
+          <p>现在开始吧。</p>
+          <p class="back-top"><a href="#top">返回顶部</a></p>
+        </section>
+
+        <section id="fundamentals" aria-labelledby="fundamentals-title">
+          <h2 id="fundamentals-title"><span class="chapter">Chapter 1 · Fundamentals</span>基础知识</h2>
+
+          <h3>什么是 Skill？</h3>
+          <p>一个 Skill 是包含以下内容的文件夹：</p>
+          <ul>
+            <li><code>SKILL.md</code>（必需）：采用 Markdown 编写、带 YAML <span lang="en">frontmatter</span>（文档头部元数据）的指令</li>
+            <li><code>scripts/</code>（可选）：可执行代码（Python、Bash 等）</li>
+            <li><code>references/</code>（可选）：按需加载的文档</li>
+            <li><code>assets/</code>（可选）：输出中使用的模板、字体、图标</li>
+          </ul>
+
+          <h3>核心设计原则</h3>
+          <p><strong>Progressive disclosure（渐进式披露）</strong></p>
+          <p>Skill 使用三级系统：</p>
+          <ol>
+            <li><strong>第一级（YAML frontmatter）：</strong>始终加载进 Claude 的系统提示词。它提供刚好足够的信息，让 Claude 知道每个 Skill 应在何时使用，而无需把全部内容都载入上下文。</li>
+            <li><strong>第二级（<code>SKILL.md</code> 正文）：</strong>当 Claude 认为该 Skill 与当前任务相关时加载。包含完整指令与指导。</li>
+            <li><strong>第三级（链接文件）：</strong>Skill 目录中捆绑的其他文件，Claude 可仅在需要时选择浏览和发现。</li>
+          </ol>
+          <p>这种渐进式披露在保留专业能力的同时，将 token 使用量降到最低。</p>
+
+          <div class="grid-2">
+            <div class="card">
+              <p class="label">可组合性（Composability）</p>
+              <p>Claude 可以同时加载多个 Skill。你的 Skill 应能与其他 Skill 良好协作，不要假定它是当前唯一可用的能力。</p>
+            </div>
+            <div class="card">
+              <p class="label">可移植性（Portability）</p>
+              <p>Skill 在 Claude.ai、Claude Code 和 API 中的工作方式相同。只需创建一次，即可无需修改地用于所有界面，前提是相应环境支持该 Skill 所需的依赖。</p>
+            </div>
+          </div>
+
+          <h3>面向 MCP 构建者：Skills + Connectors</h3>
+          <div class="note"><strong>提示：</strong>正在构建不使用 MCP 的独立 Skill？可直接跳到“规划与设计”——之后随时可以回来阅读。</div>
+          <p>如果你已经有一个可工作的 MCP 服务器，那么最难的部分已经完成。Skill 是叠加在它之上的知识层——捕获你已经掌握的工作流与最佳实践，让 Claude 能够一致地应用它们。</p>
+
+          <p><strong>厨房类比</strong></p>
+          <p>MCP 提供专业厨房：能够使用工具、食材和设备。</p>
+          <p>Skill 提供菜谱：说明如何一步步创造有价值成果的指令。</p>
+          <p>两者结合，用户就能完成复杂任务，而不必亲自弄清每一个步骤。</p>
+
+          <h3>两者如何协同工作</h3>
+          <div class="table-wrap" role="region" aria-label="MCP 与 Skills 对照表" tabindex="0">
+            <table>
+              <thead><tr><th>MCP（连接能力）</th><th>Skills（知识）</th></tr></thead>
+              <tbody>
+                <tr><td>将 Claude 连接到你的服务（Notion、Asana、Linear 等）</td><td>教 Claude 如何有效使用你的服务</td></tr>
+                <tr><td>提供实时数据访问和 <span lang="en">tool call</span>（工具调用）</td><td>捕获工作流与最佳实践</td></tr>
+                <tr><td>Claude 能做什么</td><td>Claude 应该怎样做</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>为什么这对 MCP 用户很重要</h3>
+          <div class="grid-2">
+            <div class="card compare-bad">
+              <p class="label">没有 Skill</p>
+              <ul>
+                <li>用户连接 MCP 后不知道下一步做什么</li>
+                <li>支持工单不断询问“如何用你们的集成做 X”</li>
+                <li>每次对话都从头开始</li>
+                <li>用户每次提示方式不同，导致结果不一致</li>
+                <li>实际问题是缺少工作流指导，用户却责怪连接器</li>
+              </ul>
+            </div>
+            <div class="card compare-good">
+              <p class="label">有 Skill</p>
+              <ul>
+                <li>预构建工作流在需要时自动激活</li>
+                <li>工具使用一致、可靠</li>
+                <li>每次交互都内置最佳实践</li>
+                <li>集成的学习门槛更低</li>
+              </ul>
+            </div>
+          </div>
+          <p class="back-top"><a href="#top">返回顶部</a></p>
+        </section>
+
+        <section id="planning-design" aria-labelledby="planning-design-title">
+          <h2 id="planning-design-title"><span class="chapter">Chapter 2 · Planning and design</span>规划与设计</h2>
+
+          <h3>从用例开始</h3>
+          <p>在编写任何代码之前，先确定你的 Skill 应支持的 2–3 个具体用例。</p>
+          <p><strong>良好的用例定义：</strong></p>
+          <pre><code>Use Case: Project Sprint Planning
+Trigger: User says "help me plan this sprint" or "create
+sprint tasks"
+Steps:
+1. Fetch current project status from Linear (via MCP)
+2. Analyze team velocity and capacity
+3. Suggest task prioritization
+4. Create tasks in Linear with proper labels and estimates
+Result: Fully planned sprint with tasks created</code></pre>
+          <p>问问自己：</p>
+          <ul>
+            <li>用户想完成什么？</li>
+            <li>这需要哪些多步骤工作流？</li>
+            <li>需要哪些工具（内置工具或 MCP）？</li>
+            <li>应嵌入哪些领域知识或最佳实践？</li>
+          </ul>
+
+          <h3>常见 Skill 用例类别</h3>
+          <p>在 Anthropic，我们观察到三种常见用例：</p>
+
+          <div class="card">
+            <p class="label">类别 1：文档与资产创建（Document &amp; Asset Creation）</p>
+            <p><strong>用于：</strong>创建一致、高质量的输出，包括文档、演示文稿、应用、设计、代码等。</p>
+            <p><strong>真实案例：</strong><a href="https://github.com/anthropics/skills/tree/main/skills/frontend-design"><code>frontend-design</code> Skill</a>（另请参阅用于 <a href="https://github.com/anthropics/skills/tree/main/skills/docx">DOCX</a>、<a href="https://github.com/anthropics/skills/tree/main/skills/pptx">PPTX</a>、<a href="https://github.com/anthropics/skills/tree/main/skills/xlsx">XLSX</a> 和 <a href="https://github.com/anthropics/skills/tree/main/skills/pdf">PDF</a> 的 Skill）</p>
+            <blockquote>“创建具有鲜明特色、达到生产级质量且设计水准很高的前端界面。用于构建 Web 组件、页面、产物、海报或应用程序时。”</blockquote>
+            <p><strong>关键技术：</strong></p>
+            <ul>
+              <li>嵌入式风格指南与品牌标准</li>
+              <li>用于保持输出一致的模板结构</li>
+              <li>最终定稿前的质量检查清单</li>
+              <li>无需外部工具——使用 Claude 的内置能力</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <p class="label">类别 2：工作流自动化（Workflow Automation）</p>
+            <p><strong>用于：</strong>从一致方法论中受益的多步骤流程，包括跨多个 MCP 服务器的协调。</p>
+            <p><strong>真实案例：</strong><a href="https://github.com/anthropics/skills/blob/main/skills/skill-creator/SKILL.md"><code>skill-creator</code> Skill</a></p>
+            <blockquote>“用于创建新 Skill 的交互式指南。引导用户完成用例定义、frontmatter 生成、指令编写和验证。”</blockquote>
+            <p><strong>关键技术：</strong></p>
+            <ul>
+              <li>带验证关卡的逐步工作流</li>
+              <li>适用于常见结构的模板</li>
+              <li>内置审查与改进建议</li>
+              <li>迭代优化循环</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <p class="label">类别 3：MCP 增强（MCP Enhancement）</p>
+            <p><strong>用于：</strong>提供工作流指导，以增强 MCP 服务器所提供的工具访问。</p>
+            <p><strong>真实案例：</strong><a href="https://github.com/getsentry/sentry-for-claude/tree/main/skills"><code>sentry-code-review</code> Skill</a>（来自 Sentry）</p>
+            <blockquote>“利用 Sentry MCP 服务器提供的错误监控数据，自动分析并修复 GitHub Pull Request 中检测到的缺陷。”</blockquote>
+            <p><strong>关键技术：</strong></p>
+            <ul>
+              <li>按顺序协调多次 MCP 调用</li>
+              <li>嵌入领域专长</li>
+              <li>提供原本需要用户自行说明的上下文</li>
+              <li>处理常见 MCP 问题的错误</li>
+            </ul>
+          </div>
+
+          <h3>定义成功标准</h3>
+          <p>你如何判断 Skill 是否有效？</p>
+          <p>以下是期望目标——属于粗略基准，而不是精确阈值。应追求严谨，但也要接受其中会包含一定程度的“凭感觉评估”。我们正在积极开发更稳健的衡量指导和工具。</p>
+          <p><strong>定量指标：</strong></p>
+          <ul>
+            <li><strong>Skill 能在 90% 的相关查询上触发</strong>
+              <ul><li><strong>衡量方法：</strong>运行 10–20 条本应触发 Skill 的测试查询。记录其中有多少次自动加载，多少次需要显式调用。</li></ul>
+            </li>
+            <li><strong>在 X 次 tool call 内完成工作流</strong>
+              <ul><li><strong>衡量方法：</strong>比较启用和不启用 Skill 时完成同一任务的情况。统计工具调用次数和消耗的 token 总量。</li></ul>
+            </li>
+            <li><strong>每个工作流 0 次 API 调用失败</strong>
+              <ul><li><strong>衡量方法：</strong>在测试运行期间监控 MCP 服务器日志。跟踪重试率与错误代码。</li></ul>
+            </li>
+          </ul>
+          <p><strong>定性指标：</strong></p>
+          <ul>
+            <li><strong>用户不需要提示 Claude 下一步怎么做</strong>
+              <ul><li><strong>评估方法：</strong>测试期间记录你需要重定向或澄清的频率。向 beta 用户收集反馈。</li></ul>
+            </li>
+            <li><strong>工作流无需用户纠正即可完成</strong>
+              <ul><li><strong>评估方法：</strong>对同一请求运行 3–5 次。比较输出在结构一致性和质量方面的表现。</li></ul>
+            </li>
+            <li><strong>跨会话结果一致</strong>
+              <ul><li><strong>评估方法：</strong>新用户是否能在最少指导下第一次就完成任务？</li></ul>
+            </li>
+          </ul>
+
+          <h3>技术要求：文件结构</h3>
+          <pre><code>your-skill-name/
+├── SKILL.md                  # 必需——主 Skill 文件
+├── scripts/                  # 可选——可执行代码
+│   ├── process_data.py       # 示例
+│   └── validate.sh           # 示例
+├── references/               # 可选——文档
+│   ├── api-guide.md          # 示例
+│   └── examples/             # 示例
+└── assets/                   # 可选——模板等
+    └── report-template.md    # 示例</code></pre>
+
+          <h3>关键规则</h3>
+          <div class="grid-2">
+            <div class="card">
+              <p class="label"><code>SKILL.md</code> 命名</p>
+              <ul>
+                <li>必须准确命名为 <code>SKILL.md</code>（区分大小写）</li>
+                <li>不接受任何变体（<code>SKILL.MD</code>、<code>skill.md</code> 等）</li>
+              </ul>
+            </div>
+            <div class="card">
+              <p class="label">Skill 文件夹命名</p>
+              <ul>
+                <li>使用 kebab-case：<code>notion-project-setup</code>（正确）</li>
+                <li>不能有空格：<code>Notion Project Setup</code>（错误）</li>
+                <li>不能有下划线：<code>notion_project_setup</code>（错误）</li>
+                <li>不能有大写字母：<code>NotionProjectSetup</code>（错误）</li>
+              </ul>
+            </div>
+          </div>
+          <div class="warning">
+            <strong>不要放置 <code>README.md</code></strong>
+            <ul>
+              <li>Skill 文件夹内不要包含 <code>README.md</code>。</li>
+              <li>所有文档都应放在 <code>SKILL.md</code> 或 <code>references/</code> 中。</li>
+              <li>注意：通过 GitHub 分发时，你仍需要一个面向人类用户的仓库级 README——参见“分发与分享”。</li>
+            </ul>
+          </div>
+
+          <h3>YAML frontmatter：最重要的部分</h3>
+          <p>Claude 正是通过 YAML frontmatter 判断是否加载你的 Skill。务必把它写对。</p>
+          <p><strong>最低必需格式：</strong></p>
+          <pre><code>---
+name: your-skill-name
+description: What it does. Use when user asks to [specific phrases].
+---</code></pre>
+          <p>起步只需要这些。</p>
+
+          <h3>字段要求</h3>
+          <p><strong><code>name</code>（必需）：</strong></p>
+          <ul>
+            <li>只能使用 kebab-case</li>
+            <li>不能有空格或大写字母</li>
+            <li>应与文件夹名称一致</li>
+          </ul>
+          <p><strong><code>description</code>（必需）：</strong></p>
+          <ul>
+            <li>必须同时包含：这个 Skill 做什么；何时使用它（触发条件）</li>
+            <li>少于 1024 个字符</li>
+            <li>不能包含 XML 标签（<code>&lt;</code> 或 <code>&gt;</code>）</li>
+            <li>包含用户可能会说出的具体任务</li>
+            <li>如相关，提及文件类型</li>
+          </ul>
+          <p><strong><code>license</code>（可选）：</strong></p>
+          <ul><li>Skill 开源时使用；常见值为 <code>MIT</code>、<code>Apache-2.0</code>。</li></ul>
+          <p><strong><code>compatibility</code>（可选）：</strong></p>
+          <ul>
+            <li>长度为 1–500 个字符</li>
+            <li>说明环境要求，例如预期使用的产品、所需系统软件包、网络访问需求等</li>
+          </ul>
+          <p><strong><code>metadata</code>（可选）：</strong></p>
+          <ul>
+            <li>任意自定义键值对</li>
+            <li>建议使用：<code>author</code>、<code>version</code>、<code>mcp-server</code></li>
+          </ul>
+          <pre><code>metadata:
+  author: ProjectHub
+  version: 1.0.0
+  mcp-server: projecthub</code></pre>
+
+          <h3>安全限制</h3>
+          <p><strong>frontmatter 中禁止：</strong></p>
+          <ul>
+            <li>XML 尖括号（<code>&lt;</code>、<code>&gt;</code>）</li>
+            <li>名称中含有 <code>claude</code> 或 <code>anthropic</code> 的 Skill（保留名称）</li>
+          </ul>
+          <p><strong>原因：</strong>frontmatter 会出现在 Claude 的系统提示词中。恶意内容可能注入指令。</p>
+
+          <h3>编写有效的 Skill：description 字段</h3>
+          <p>Anthropic 工程博客指出：“这些元数据……提供刚好足够的信息，让 Claude 知道每个 Skill 应在何时使用，而不必将它的全部内容加载进上下文。”这就是渐进式披露的第一级。</p>
+          <p><strong>结构：</strong></p>
+          <pre><code>[What it does] + [When to use it] + [Key capabilities]</code></pre>
+          <p><strong>优秀 description 示例：</strong></p>
+          <pre><code># 好——具体且可执行
+description: Analyzes Figma design files and generates developer handoff documentation. Use when user uploads .fig files, asks for "design specs", "component documentation", or "design-to-code handoff".
+
+# 好——包含触发短语
+description: Manages Linear project workflows including sprint planning, task creation, and status tracking. Use when user mentions "sprint", "Linear tasks", "project planning", or asks to "create tickets".
+
+# 好——价值主张清晰
+description: End-to-end customer onboarding workflow for PayFlow. Handles account creation, payment setup, and subscription management. Use when user says "onboard new customer", "set up subscription", or "create PayFlow account".</code></pre>
+          <p><strong>糟糕 description 示例：</strong></p>
+          <pre><code># 太模糊
+description: Helps with projects.
+
+# 缺少触发条件
+description: Creates sophisticated multi-page documentation systems.
+
+# 过于技术化，没有用户触发语句
+description: Implements the Project entity model with hierarchical relationships.</code></pre>
+
+          <h3>编写主要指令</h3>
+          <p>在 frontmatter 之后，用 Markdown 编写实际指令。以下是推荐结构；请根据你的 Skill 调整模板，将方括号中的内容替换成具体内容。</p>
+          <pre><code>---
+name: your-skill
+description: [...]
+---
+
+# Your Skill Name
+
+## Instructions
+
+### Step 1: [First Major Step]
+Clear explanation of what happens.
+
+Example:
+```bash
+python scripts/fetch_data.py --project-id PROJECT_ID
+```
+Expected output: [describe what success looks like]
+
+(Add more steps as needed)
+
+## Examples
+
+### Example 1: [common scenario]
+User says: "Set up a new marketing campaign"
+
+Actions:
+1. Fetch existing campaigns via MCP
+2. Create new campaign with provided parameters
+
+Result: Campaign created with confirmation link
+
+(Add more examples as needed)
+
+## Troubleshooting
+
+### Error: [Common error message]
+Cause: [Why it happens]
+Solution: [How to fix]
+
+(Add more error cases as needed)</code></pre>
+
+          <h3>指令最佳实践</h3>
+          <p><strong>具体且可执行</strong></p>
+          <div class="grid-2">
+            <div class="card compare-good">
+              <p class="label">好</p>
+              <pre><code>Run `python scripts/validate.py --input {filename}` to check data format.
+If validation fails, common issues include:
+- Missing required fields (add them to the CSV)
+- Invalid date formats (use YYYY-MM-DD)</code></pre>
+            </div>
+            <div class="card compare-bad">
+              <p class="label">差</p>
+              <pre><code>Validate the data before proceeding.</code></pre>
+            </div>
+          </div>
+
+          <p><strong>包含错误处理</strong></p>
+          <pre><code>## Common Issues
+
+### MCP Connection Failed
+If you see "Connection refused":
+1. Verify MCP server is running: Check Settings &gt; Extensions
+2. Confirm API key is valid
+3. Try reconnecting: Settings &gt; Extensions &gt; [Your Service] &gt; Reconnect</code></pre>
+
+          <p><strong>清晰引用捆绑资源</strong></p>
+          <pre><code>Before writing queries, consult `references/api-patterns.md` for:
+- Rate limiting guidance
+- Pagination patterns
+- Error codes and handling</code></pre>
+
+          <p><strong>使用渐进式披露</strong></p>
+          <p>让 <code>SKILL.md</code> 专注于核心指令。将详细文档移到 <code>references/</code> 并链接过去。（关于三级系统的工作方式，参见“核心设计原则”。）</p>
+          <p class="back-top"><a href="#top">返回顶部</a></p>
+        </section>
+
+        <section id="testing-iteration" aria-labelledby="testing-iteration-title">
+          <h2 id="testing-iteration-title"><span class="chapter">Chapter 3 · Testing and iteration</span>测试与迭代</h2>
+          <p>Skill 可以按不同严谨程度进行测试，具体取决于你的需求：</p>
+          <ul>
+            <li><strong>在 Claude.ai 中手动测试：</strong>直接运行查询并观察行为。迭代快，无需设置。</li>
+            <li><strong>在 Claude Code 中脚本化测试：</strong>将测试用例自动化，以便跨变更进行可重复验证。</li>
+            <li><strong>通过 Skills API 进行程序化测试：</strong>构建评估套件，针对已定义的测试集系统运行。</li>
+          </ul>
+          <p>应根据质量要求和 Skill 的可见范围选择合适方法。供小型团队内部使用的 Skill 与部署给数千名企业用户的 Skill，测试需求并不相同。</p>
+
+          <div class="tip">
+            <strong>专业提示：先迭代单一任务，再扩大范围</strong>
+            <p>我们发现，最有效的 Skill 创建者会先针对一个具有挑战性的任务反复迭代，直到 Claude 成功，再把成功的方法提取成 Skill。这样能利用 Claude 的上下文学习能力，并且比大范围测试更快获得有效信号。打好可用基础后，再扩展到多个测试用例以提高覆盖率。</p>
+          </div>
+
+          <h3>推荐测试方法</h3>
+          <p>根据早期经验，有效的 Skill 测试通常覆盖三个方面：</p>
+
+          <div class="pattern">
+            <h3>1. 触发测试</h3>
+            <p><strong>目标：</strong>确保 Skill 在正确的时机加载。</p>
+            <p><strong>测试用例：</strong></p>
+            <ul>
+              <li>应该在明显任务上触发</li>
+              <li>应该在改写后的请求上触发</li>
+              <li>不应在无关主题上触发</li>
+            </ul>
+            <p><strong>测试套件示例：</strong></p>
+            <pre><code>Should trigger:
+- "Help me set up a new ProjectHub workspace"
+- "I need to create a project in ProjectHub"
+- "Initialize a ProjectHub project for Q4 planning"
+
+Should NOT trigger:
+- "What's the weather in San Francisco?"
+- "Help me write Python code"
+- "Create a spreadsheet" (unless ProjectHub skill handles sheets)</code></pre>
+          </div>
+
+          <div class="pattern">
+            <h3>2. 功能测试</h3>
+            <p><strong>目标：</strong>验证 Skill 生成正确输出。</p>
+            <p><strong>测试用例：</strong></p>
+            <ul>
+              <li>生成有效输出</li>
+              <li>API 调用成功</li>
+              <li>错误处理有效</li>
+              <li>覆盖边界情况</li>
+            </ul>
+            <p><strong>示例：</strong></p>
+            <pre><code>Test: Create project with 5 tasks
+Given: Project name "Q4 Planning", 5 task descriptions
+When: Skill executes workflow
+Then:
+  - Project created in ProjectHub
+  - 5 tasks created with correct properties
+  - All tasks linked to project
+  - No API errors</code></pre>
+          </div>
+
+          <div class="pattern">
+            <h3>3. 性能对比</h3>
+            <p><strong>目标：</strong>证明 Skill 相比基线改善了结果。</p>
+            <p>使用“定义成功标准”中的指标。对比可能如下：</p>
+            <div class="grid-2">
+              <div class="card compare-bad">
+                <p class="label">没有 Skill</p>
+                <ul>
+                  <li>用户每次都提供指令</li>
+                  <li>15 次来回消息</li>
+                  <li>3 次 API 调用失败，需要重试</li>
+                  <li>消耗 12,000 tokens</li>
+                </ul>
+              </div>
+              <div class="card compare-good">
+                <p class="label">有 Skill</p>
+                <ul>
+                  <li>自动执行工作流</li>
+                  <li>只需 2 个澄清问题</li>
+                  <li>0 次 API 调用失败</li>
+                  <li>消耗 6,000 tokens</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <h3>使用 <code>skill-creator</code> Skill</h3>
+          <p><code>skill-creator</code> Skill 可通过 Claude.ai 插件目录获取，也可下载用于 Claude Code；它能帮助你构建和迭代 Skill。如果你有 MCP 服务器，并知道最重要的 2–3 个工作流，就能在一次集中工作中构建并测试一个可用的 Skill——通常只需 15–30 分钟。</p>
+          <p><strong>创建 Skill：</strong></p>
+          <ul>
+            <li>根据自然语言描述生成 Skill</li>
+            <li>生成带 frontmatter、格式正确的 <code>SKILL.md</code></li>
+            <li>建议触发短语和结构</li>
+          </ul>
+          <p><strong>审查 Skill：</strong></p>
+          <ul>
+            <li>标记常见问题（模糊的 description、缺少触发条件、结构问题）</li>
+            <li>识别潜在的触发不足或过度触发风险</li>
+            <li>根据 Skill 声明的用途建议测试用例</li>
+          </ul>
+          <p><strong>迭代改进：</strong></p>
+          <ul>
+            <li>使用 Skill 后遇到边界情况或失败时，把这些案例带回 <code>skill-creator</code>。</li>
+            <li>示例：“使用本次对话中发现的问题与解决方案，改进 Skill 对 [specific edge case] 的处理方式。”</li>
+          </ul>
+          <p><strong>使用方式：</strong></p>
+          <pre><code>"Use the skill-creator skill to help me build a skill for [your use case]"</code></pre>
+          <div class="note"><strong>注意：</strong><code>skill-creator</code> 可以帮助你设计和改进 Skill，但不会执行自动化测试套件，也不会生成定量评估结果。</div>
+
+          <h3>根据反馈迭代</h3>
+          <p>Skill 是持续演化的文档。应计划根据以下信号迭代：</p>
+          <div class="grid-2">
+            <div class="card">
+              <p class="label">触发不足信号</p>
+              <ul>
+                <li>Skill 在本应加载时没有加载</li>
+                <li>用户手动启用它</li>
+                <li>支持问题集中在“什么时候使用”</li>
+              </ul>
+              <p><strong>解决方案：</strong>为 description 增加更多细节和细微差别——这可能包括关键词，尤其是技术术语。</p>
+            </div>
+            <div class="card">
+              <p class="label">过度触发信号</p>
+              <ul>
+                <li>Skill 在无关查询上加载</li>
+                <li>用户禁用它</li>
+                <li>用户对用途感到困惑</li>
+              </ul>
+              <p><strong>解决方案：</strong>加入负向触发条件，表述得更具体。</p>
+            </div>
+          </div>
+          <div class="card">
+            <p class="label">执行问题</p>
+            <ul>
+              <li>结果不一致</li>
+              <li>API 调用失败</li>
+              <li>需要用户纠正</li>
+            </ul>
+            <p><strong>解决方案：</strong>改进指令并添加错误处理。</p>
+          </div>
+          <p class="back-top"><a href="#top">返回顶部</a></p>
+        </section>
+
+        <section id="distribution-sharing" aria-labelledby="distribution-sharing-title">
+          <h2 id="distribution-sharing-title"><span class="chapter">Chapter 4 · Distribution and sharing</span>分发与分享</h2>
+          <p>Skill 会让你的 MCP 集成更加完整。当用户比较连接器时，带有 Skill 的连接器能让用户更快获得价值，从而相较仅有 MCP 的替代方案形成优势。</p>
+
+          <h3>当前分发模式（2026 年 1 月）</h3>
+          <p><strong>个人用户如何获取 Skill：</strong></p>
+          <ol>
+            <li>下载 Skill 文件夹</li>
+            <li>压缩该文件夹（如需要）</li>
+            <li>通过 Claude.ai 的 Settings &gt; Capabilities &gt; Skills 上传</li>
+            <li>或者放进 Claude Code 的 Skills 目录</li>
+          </ol>
+          <p><strong>组织级 Skill：</strong></p>
+          <ul>
+            <li>管理员可在整个工作区部署 Skill（已于 2025 年 12 月 18 日发布）</li>
+            <li>自动更新</li>
+            <li>集中管理</li>
+          </ul>
+
+          <h3>开放标准</h3>
+          <p>我们已将 <a href="https://agentskills.io/home">Agent Skills</a> 发布为开放标准。与 MCP 一样，我们认为 Skill 应能跨工具和平台移植——无论你使用 Claude 还是其他 AI 平台，同一个 Skill 都应能够工作。尽管如此，有些 Skill 的设计会充分利用某一特定平台的能力；作者可以在 Skill 的 <code>compatibility</code> 字段中注明这一点。我们一直在与生态系统成员共同推进该标准，并对早期采用情况感到振奋。</p>
+
+          <h3>通过 API 使用 Skill</h3>
+          <p>对于以编程方式使用的场景——例如构建利用 Skill 的应用程序、智能体或自动化工作流——API 可让你直接控制 Skill 的管理和执行。</p>
+          <p><strong>关键能力：</strong></p>
+          <ul>
+            <li>用于列出和管理 Skill 的 <code>/v1/skills</code> 端点</li>
+            <li>通过 <code>container.skills</code> 参数将 Skill 添加到 Messages API 请求</li>
+            <li>通过 Claude Console 进行版本控制和管理</li>
+            <li>可与 Claude Agent SDK 配合构建自定义智能体</li>
+          </ul>
+          <p><strong>何时通过 API 使用 Skill，何时使用 Claude.ai：</strong></p>
+          <div class="table-wrap" role="region" aria-label="Skill 使用场景与最佳界面对照表" tabindex="0">
+            <table>
+              <thead><tr><th>用例</th><th>最佳界面</th></tr></thead>
+              <tbody>
+                <tr><td>终端用户直接与 Skill 交互</td><td>Claude.ai / Claude Code</td></tr>
+                <tr><td>开发期间的手动测试与迭代</td><td>Claude.ai / Claude Code</td></tr>
+                <tr><td>个人、临时工作流</td><td>Claude.ai / Claude Code</td></tr>
+                <tr><td>以编程方式使用 Skill 的应用</td><td>API</td></tr>
+                <tr><td>大规模生产部署</td><td>API</td></tr>
+                <tr><td>自动化流水线与智能体系统</td><td>API</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="note"><strong>注意：</strong>API 中的 Skill 需要 Code Execution Tool beta，它提供运行 Skill 所需的安全环境。</div>
+          <p><strong>实现细节请参阅：</strong></p>
+          <ul>
+            <li><a href="https://docs.claude.com/en/docs/agents-and-tools/agent-skills/quickstart">Skills API Quickstart</a></li>
+            <li><a href="https://docs.claude.com/en/api/skills/create-skill">Create Custom skills</a></li>
+            <li><a href="https://docs.claude.com/en/docs/agent-sdk/skills">Skills in the Agent SDK</a></li>
+          </ul>
+
+          <h3>当前推荐做法</h3>
+          <p>先在 GitHub 上托管你的 Skill：使用公开仓库，提供清晰的 README（面向人类访客——它与 Skill 文件夹分开，Skill 文件夹本身不应包含 <code>README.md</code>），并提供带截图的使用示例。然后在 MCP 文档中增加一个链接到 Skill 的小节，解释两者结合使用的价值，并提供快速入门指南。</p>
+          <ol>
+            <li><strong>托管到 GitHub</strong>
+              <ul>
+                <li>开源 Skill 使用公开仓库</li>
+                <li>提供含安装说明的清晰 README</li>
+                <li>提供用法示例和截图</li>
+              </ul>
+            </li>
+            <li><strong>在 MCP 仓库中编写文档</strong>
+              <ul>
+                <li>从 MCP 文档链接到 Skill</li>
+                <li>解释二者结合的价值</li>
+                <li>提供快速入门指南</li>
+              </ul>
+            </li>
+            <li><strong>创建安装指南</strong></li>
+          </ol>
+          <pre><code>## Installing the [Your Service] skill
+
+1. Download the skill:
+   - Clone repo: `git clone https://github.com/yourcompany/skills`
+   - Or download ZIP from Releases
+
+2. Install in Claude:
+   - Open Claude.ai &gt; Settings &gt; skills
+   - Click "Upload skill"
+   - Select the skill folder (zipped)
+
+3. Enable the skill:
+   - Toggle on the [Your Service] skill
+   - Ensure your MCP server is connected
+
+4. Test:
+   - Ask Claude: "Set up a new project in [Your Service]"</code></pre>
+
+          <h3>定位你的 Skill</h3>
+          <p>你如何描述 Skill，会决定用户能否理解它的价值以及是否真的愿意尝试。在 README、文档或营销材料中介绍 Skill 时，请遵循以下原则。</p>
+          <p><strong>聚焦结果，而不是功能：</strong></p>
+          <div class="grid-2">
+            <div class="card compare-good">
+              <p class="label">好</p>
+              <blockquote>“ProjectHub Skill 让团队能在几秒内建立完整的项目工作区——包括页面、数据库和模板——而不必花 30 分钟手动设置。”</blockquote>
+            </div>
+            <div class="card compare-bad">
+              <p class="label">差</p>
+              <blockquote>“ProjectHub Skill 是一个包含 YAML frontmatter 和 Markdown 指令的文件夹，它会调用我们的 MCP 服务器工具。”</blockquote>
+            </div>
+          </div>
+          <p><strong>突出 MCP + Skills 的组合叙事：</strong></p>
+          <blockquote>“我们的 MCP 服务器让 Claude 能够访问你的 Linear 项目。我们的 Skill 教 Claude 使用你团队的 Sprint 规划工作流。两者结合，就能实现 AI 驱动的项目管理。”</blockquote>
+          <p class="back-top"><a href="#top">返回顶部</a></p>
+        </section>
+
+        <section id="patterns-troubleshooting" aria-labelledby="patterns-troubleshooting-title">
+          <h2 id="patterns-troubleshooting-title"><span class="chapter">Chapter 5 · Patterns and troubleshooting</span>模式与故障排查</h2>
+          <p>以下模式来自早期采用者和内部团队创建的 Skill。它们代表我们观察到效果良好的常见做法，而不是必须遵循的模板。</p>
+
+          <h3>选择方法：问题优先还是工具优先</h3>
+          <p>可以把它想成逛 Home Depot。你可能带着一个问题进去——“我需要修好一个厨房橱柜”——然后员工会为你指出正确的工具。你也可能先挑中一把新电钻，再问如何把它用于自己的具体工作。</p>
+          <p>Skill 的工作方式也一样：</p>
+          <ul>
+            <li><strong>问题优先：</strong>“我需要建立一个项目工作区” → 你的 Skill 按正确顺序编排正确的 MCP 调用。用户描述结果，Skill 负责工具。</li>
+            <li><strong>工具优先：</strong>“我已经连接了 Notion MCP” → 你的 Skill 教 Claude 最优工作流与最佳实践。用户拥有访问能力，Skill 提供专业知识。</li>
+          </ul>
+          <p>大多数 Skill 都会偏向其中一种。了解哪种框架适合你的用例，有助于从下面选择正确模式。</p>
+
+          <div class="pattern">
+            <h3>模式 1：顺序工作流编排</h3>
+            <p><strong>适用场景：</strong>用户需要以特定顺序执行多步骤流程。</p>
+            <p><strong>结构示例：</strong></p>
+            <pre><code>## Workflow: Onboard New Customer
+
+### Step 1: Create Account
+Call MCP tool: `create_customer`
+Parameters: name, email, company
+
+### Step 2: Setup Payment
+Call MCP tool: `setup_payment_method`
+Wait for: payment method verification
+
+### Step 3: Create Subscription
+Call MCP tool: `create_subscription`
+Parameters: plan_id, customer_id (from Step 1)
+
+### Step 4: Send Welcome Email
+Call MCP tool: `send_email`
+Template: welcome_email_template</code></pre>
+            <div class="techniques">
+              <p><strong>关键技术：</strong></p>
+              <ul>
+                <li>明确步骤顺序</li>
+                <li>步骤之间的依赖关系</li>
+                <li>每个阶段都进行验证</li>
+                <li>失败时的回滚指令</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="pattern">
+            <h3>模式 2：多 MCP 协调</h3>
+            <p><strong>适用场景：</strong>工作流跨越多个服务。</p>
+            <p><strong>示例：从设计到开发的交接</strong></p>
+            <pre><code>### Phase 1: Design Export (Figma MCP)
+1. Export design assets from Figma
+2. Generate design specifications
+3. Create asset manifest
+
+### Phase 2: Asset Storage (Drive MCP)
+1. Create project folder in Drive
+2. Upload all assets
+3. Generate shareable links
+
+### Phase 3: Task Creation (Linear MCP)
+1. Create development tasks
+2. Attach asset links to tasks
+3. Assign to engineering team
+
+### Phase 4: Notification (Slack MCP)
+1. Post handoff summary to #engineering
+2. Include asset links and task references</code></pre>
+            <div class="techniques">
+              <p><strong>关键技术：</strong></p>
+              <ul>
+                <li>清晰划分阶段</li>
+                <li>在不同 MCP 之间传递数据</li>
+                <li>进入下一阶段前进行验证</li>
+                <li>集中化错误处理</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="pattern">
+            <h3>模式 3：迭代优化</h3>
+            <p><strong>适用场景：</strong>输出质量会随着迭代而提高。</p>
+            <p><strong>示例：生成报告</strong></p>
+            <pre><code>## Iterative Report Creation
+
+### Initial Draft
+1. Fetch data via MCP
+2. Generate first draft report
+3. Save to temporary file
+
+### Quality Check
+1. Run validation script: `scripts/check_report.py`
+2. Identify issues:
+   - Missing sections
+   - Inconsistent formatting
+   - Data validation errors
+
+### Refinement Loop
+1. Address each identified issue
+2. Regenerate affected sections
+3. Re-validate
+4. Repeat until quality threshold met
+
+### Finalization
+1. Apply final formatting
+2. Generate summary
+3. Save final version</code></pre>
+            <div class="techniques">
+              <p><strong>关键技术：</strong></p>
+              <ul>
+                <li>明确的质量标准</li>
+                <li>迭代改进</li>
+                <li>验证脚本</li>
+                <li>知道何时停止迭代</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="pattern">
+            <h3>模式 4：上下文感知的工具选择</h3>
+            <p><strong>适用场景：</strong>结果相同，但根据上下文使用不同工具。</p>
+            <p><strong>示例：文件存储</strong></p>
+            <pre><code>## Smart File Storage
+
+### Decision Tree
+1. Check file type and size
+2. Determine best storage location:
+   - Large files (&gt;10MB): Use cloud storage MCP
+   - Collaborative docs: Use Notion/Docs MCP
+   - Code files: Use GitHub MCP
+   - Temporary files: Use local storage
+
+### Execute Storage
+Based on decision:
+- Call appropriate MCP tool
+- Apply service-specific metadata
+- Generate access link
+
+### Provide Context to User
+Explain why that storage was chosen</code></pre>
+            <div class="techniques">
+              <p><strong>关键技术：</strong></p>
+              <ul>
+                <li>明确的决策标准</li>
+                <li>后备选项</li>
+                <li>对所做选择保持透明</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="pattern">
+            <h3>模式 5：领域专用智能</h3>
+            <p><strong>适用场景：</strong>Skill 提供超越工具访问的专业知识。</p>
+            <p><strong>示例：金融合规</strong></p>
+            <pre><code>## Payment Processing with Compliance
+
+### Before Processing (Compliance Check)
+1. Fetch transaction details via MCP
+2. Apply compliance rules:
+   - Check sanctions lists
+   - Verify jurisdiction allowances
+   - Assess risk level
+3. Document compliance decision
+
+### Processing
+IF compliance passed:
+  - Call payment processing MCP tool
+  - Apply appropriate fraud checks
+  - Process transaction
+ELSE:
+  - Flag for review
+  - Create compliance case
+
+### Audit Trail
+- Log all compliance checks
+- Record processing decisions
+- Generate audit report</code></pre>
+            <div class="techniques">
+              <p><strong>关键技术：</strong></p>
+              <ul>
+                <li>将领域专长嵌入逻辑</li>
+                <li>先合规，再行动</li>
+                <li>完整记录</li>
+                <li>清晰治理</li>
+              </ul>
+            </div>
+          </div>
+
+          <h3>故障排查：Skill 无法上传</h3>
+          <p><strong>错误：</strong><code>Could not find SKILL.md in uploaded folder</code></p>
+          <p><strong>原因：</strong>文件没有准确命名为 <code>SKILL.md</code>。</p>
+          <p><strong>解决方案：</strong></p>
+          <ul>
+            <li>重命名为 <code>SKILL.md</code>（区分大小写）</li>
+            <li>使用 <code>ls -la</code> 验证，输出应显示 <code>SKILL.md</code></li>
+          </ul>
+
+          <p><strong>错误：</strong><code>Invalid frontmatter</code></p>
+          <p><strong>原因：</strong>YAML 格式问题。</p>
+          <p><strong>常见错误：</strong></p>
+          <pre><code># 错误——缺少分隔符
+name: my-skill
+description: Does things
+
+# 错误——引号未闭合
+name: my-skill
+description: "Does things
+
+# 正确
+---
+name: my-skill
+description: Does things
+---</code></pre>
+
+          <p><strong>错误：</strong><code>Invalid skill name</code></p>
+          <p><strong>原因：</strong>名称中包含空格或大写字母。</p>
+          <pre><code># 错误
+name: My Cool Skill
+
+# 正确
+name: my-cool-skill</code></pre>
+
+          <h3>故障排查：Skill 不触发</h3>
+          <p><strong>症状：</strong>Skill 从不自动加载。</p>
+          <p><strong>修复：</strong>修改 description 字段。优秀与糟糕示例请参阅“description 字段”。</p>
+          <p><strong>快速检查清单：</strong></p>
+          <ul>
+            <li>它是否太笼统？（“帮助处理项目”不会奏效）</li>
+            <li>是否包含用户实际会说出的触发短语？</li>
+            <li>如果适用，是否提到相关文件类型？</li>
+          </ul>
+          <p><strong>调试方法：</strong>询问 Claude：“你会在什么时候使用 [skill name] Skill？”Claude 会引用 description。根据缺失内容进行调整。</p>
+
+          <h3>故障排查：Skill 触发过于频繁</h3>
+          <p><strong>症状：</strong>Skill 在无关查询上加载。</p>
+          <p><strong>解决方案 1：添加负向触发条件</strong></p>
+          <pre><code>description: Advanced data analysis for CSV files. Use for statistical modeling, regression, clustering. Do NOT use for simple data exploration (use data-viz skill instead).</code></pre>
+          <p><strong>解决方案 2：表述得更具体</strong></p>
+          <pre><code># 太宽泛
+description: Processes documents
+
+# 更具体
+description: Processes PDF legal documents for contract review</code></pre>
+          <p><strong>解决方案 3：明确范围</strong></p>
+          <pre><code>description: PayFlow payment processing for e-commerce. Use specifically for online payment workflows, not for general financial queries.</code></pre>
+
+          <h3>故障排查：MCP 连接问题</h3>
+          <p><strong>症状：</strong>Skill 已加载，但 MCP 调用失败。</p>
+          <p><strong>检查清单：</strong></p>
+          <ol>
+            <li><strong>确认 MCP 服务器已连接</strong>
+              <ul>
+                <li>Claude.ai：<a href="https://support.claude.com/en/articles/10949351-getting-started-with-local-mcp-servers-on-claude-desktop">Settings &gt; Extensions &gt; [Your Service]</a></li>
+                <li>应显示 <code>Connected</code> 状态</li>
+              </ul>
+            </li>
+            <li><strong>检查身份验证</strong>
+              <ul>
+                <li>API 密钥有效且未过期</li>
+                <li>已授予正确权限或 scope</li>
+                <li>OAuth token 已刷新</li>
+              </ul>
+            </li>
+            <li><strong>独立测试 MCP</strong>
+              <ul>
+                <li>让 Claude 直接调用 MCP（不使用 Skill）</li>
+                <li>“Use [Service] MCP to fetch my projects”</li>
+                <li>如果这里失败，问题在 MCP，而不是 Skill</li>
+              </ul>
+            </li>
+            <li><strong>确认工具名称</strong>
+              <ul>
+                <li>Skill 引用了正确的 MCP 工具名</li>
+                <li>检查 MCP 服务器文档</li>
+                <li>工具名称区分大小写</li>
+              </ul>
+            </li>
+          </ol>
+
+          <h3>故障排查：指令未被遵循</h3>
+          <p><strong>症状：</strong>Skill 已加载，但 Claude 没有遵循指令。</p>
+          <p><strong>常见原因：</strong></p>
+          <ol>
+            <li><strong>指令过于冗长</strong>
+              <ul>
+                <li>保持指令简洁</li>
+                <li>使用项目符号和编号列表</li>
+                <li>将详细参考资料移到单独文件</li>
+              </ul>
+            </li>
+            <li><strong>指令埋得太深</strong>
+              <ul>
+                <li>把关键指令放在顶部</li>
+                <li>使用 <code>## Important</code> 或 <code>## Critical</code> 标题</li>
+                <li>必要时重复关键点</li>
+              </ul>
+            </li>
+            <li><strong>语言含糊</strong></li>
+          </ol>
+          <div class="grid-2">
+            <div class="card compare-bad">
+              <p class="label">差</p>
+              <pre><code>Make sure to validate things properly</code></pre>
+            </div>
+            <div class="card compare-good">
+              <p class="label">好</p>
+              <pre><code>CRITICAL: Before calling create_project, verify:
+- Project name is non-empty
+- At least one team member assigned
+- Start date is not in the past</code></pre>
+            </div>
+          </div>
+          <p><strong>高级技巧：</strong>对于关键验证，可考虑捆绑一个以编程方式执行检查的脚本，而不是依赖自然语言指令。代码是确定性的，语言解释则不是。有关这种模式的示例，请参阅 Office Skills。</p>
+          <p><strong>4. 模型“偷懒”——添加明确鼓励：</strong></p>
+          <pre><code>## Performance Notes
+- Take your time to do this thoroughly
+- Quality is more important than speed
+- Do not skip validation steps</code></pre>
+          <div class="note"><strong>注意：</strong>把这些内容加入用户提示词，比放在 <code>SKILL.md</code> 中更有效。</div>
+
+          <h3>故障排查：大上下文问题</h3>
+          <p><strong>症状：</strong>Skill 看起来很慢，或者回答质量下降。</p>
+          <p><strong>原因：</strong></p>
+          <ul>
+            <li>Skill 内容过大</li>
+            <li>同时启用的 Skill 太多</li>
+            <li>所有内容都被加载，没有使用渐进式披露</li>
+          </ul>
+          <p><strong>解决方案：</strong></p>
+          <ol>
+            <li><strong>优化 <code>SKILL.md</code> 大小</strong>
+              <ul>
+                <li>将详细文档移到 <code>references/</code></li>
+                <li>链接参考资料，而不是内联全部内容</li>
+                <li>保持 <code>SKILL.md</code> 少于 5,000 词</li>
+              </ul>
+            </li>
+            <li><strong>减少启用的 Skill</strong>
+              <ul>
+                <li>如果同时启用了 20–50 个以上 Skill，评估是否确有必要</li>
+                <li>建议选择性启用</li>
+                <li>考虑将相关能力组织成 Skill “包”</li>
+              </ul>
+            </li>
+          </ol>
+          <p class="back-top"><a href="#top">返回顶部</a></p>
+        </section>
+
+        <section id="resources-references" aria-labelledby="resources-references-title">
+          <h2 id="resources-references-title"><span class="chapter">Chapter 6 · Resources and references</span>资源与参考</h2>
+          <p>如果你正在构建第一个 Skill，请从最佳实践指南开始，再按需查阅 API 文档。</p>
+
+          <h3>官方文档</h3>
+          <p><strong>Anthropic 资源：</strong></p>
+          <ul>
+            <li><a href="https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices">Best Practices Guide</a></li>
+            <li><a href="https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview">Skills Documentation</a></li>
+            <li><a href="https://platform.claude.com/docs/en/api/overview">API Reference</a></li>
+            <li><a href="https://modelcontextprotocol.io">MCP Documentation</a></li>
+          </ul>
+          <p><strong>博客文章：</strong></p>
+          <ul>
+            <li><a href="https://claude.com/blog/skills">Introducing Agent Skills</a></li>
+            <li><a href="https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills">Engineering Blog: Equipping Agents for the Real World</a></li>
+            <li><a href="https://www.claude.com/blog/skills-explained">Skills Explained</a></li>
+            <li><a href="https://www.claude.com/blog/how-to-create-skills-key-steps-limitations-and-examples">How to Create Skills for Claude</a></li>
+            <li><a href="https://www.claude.com/blog/building-skills-for-claude-code">Building Skills for Claude Code</a></li>
+            <li><a href="https://www.claude.com/blog/improving-frontend-design-through-skills">Improving Frontend Design through Skills</a></li>
+          </ul>
+
+          <h3>示例 Skill</h3>
+          <p><strong>公开 Skill 仓库：</strong></p>
+          <ul>
+            <li><a href="https://github.com/anthropics/skills">GitHub：<code>anthropics/skills</code></a></li>
+            <li>包含 Anthropic 创建、可供你定制的 Skill</li>
+          </ul>
+
+          <h3>工具与实用程序</h3>
+          <p><strong><code>skill-creator</code> Skill：</strong></p>
+          <ul>
+            <li>内置于 Claude.ai，也可用于 Claude Code</li>
+            <li>能根据描述生成 Skill</li>
+            <li>能够审查并提出建议</li>
+            <li>用法：“Help me build a skill using skill-creator”</li>
+          </ul>
+          <p><strong>验证：</strong></p>
+          <ul>
+            <li><code>skill-creator</code> 可以评估你的 Skill</li>
+            <li>可这样询问：“Review this skill and suggest improvements”</li>
+          </ul>
+
+          <h3>获取支持</h3>
+          <p><strong>技术问题：</strong></p>
+          <ul><li>一般问题：前往 <a href="https://discord.com/invite/6PPFFzqPDZ">Claude Developers Discord</a> 社区论坛</li></ul>
+          <p><strong>缺陷报告：</strong></p>
+          <ul>
+            <li>GitHub Issues：<a href="https://github.com/anthropics/skills/issues"><code>anthropics/skills/issues</code></a></li>
+            <li>请包含：Skill 名称、错误消息、复现步骤</li>
+          </ul>
+
+          <h3>参考 A：快速检查清单</h3>
+          <p>使用本清单在上传前后验证 Skill。如果希望更快开始，可以先用 <code>skill-creator</code> Skill 生成初稿，再逐项检查，确保没有遗漏。</p>
+          <div class="grid-2">
+            <div class="card">
+              <p class="label">开始之前</p>
+              <ul class="checklist">
+                <li>已确定 2–3 个具体用例</li>
+                <li>已确定所需工具（内置工具或 MCP）</li>
+                <li>已阅读本指南和示例 Skill</li>
+                <li>已规划文件夹结构</li>
+              </ul>
+            </div>
+            <div class="card">
+              <p class="label">开发期间</p>
+              <ul class="checklist">
+                <li>文件夹使用 kebab-case 命名</li>
+                <li><code>SKILL.md</code> 文件存在（拼写完全准确）</li>
+                <li>YAML frontmatter 使用 <code>---</code> 分隔符</li>
+                <li><code>name</code> 字段使用 kebab-case，无空格、无大写字母</li>
+                <li><code>description</code> 同时包含“做什么”和“何时使用”</li>
+                <li>任何位置都没有 XML 标签（<code>&lt;</code>、<code>&gt;</code>）</li>
+                <li>指令清晰且可执行</li>
+                <li>包含错误处理</li>
+                <li>提供了示例</li>
+                <li>清晰链接了参考资料</li>
+              </ul>
+            </div>
+            <div class="card">
+              <p class="label">上传之前</p>
+              <ul class="checklist">
+                <li>已测试在明显任务上的触发</li>
+                <li>已测试在改写请求上的触发</li>
+                <li>已验证不会在无关主题上触发</li>
+                <li>功能测试通过</li>
+                <li>工具集成有效（如适用）</li>
+                <li>已压缩为 <code>.zip</code> 文件</li>
+              </ul>
+            </div>
+            <div class="card">
+              <p class="label">上传之后</p>
+              <ul class="checklist">
+                <li>在真实对话中测试</li>
+                <li>监控触发不足或过度触发</li>
+                <li>收集用户反馈</li>
+                <li>迭代 description 和指令</li>
+                <li>更新 metadata 中的版本</li>
+              </ul>
+            </div>
+          </div>
+
+          <h3>参考 B：YAML frontmatter</h3>
+          <p><strong>必需字段：</strong></p>
+          <pre><code>---
+name: skill-name-in-kebab-case
+description: What it does and when to use it. Include specific trigger phrases.
+---</code></pre>
+          <p><strong>所有可选字段：</strong></p>
+          <pre><code>name: skill-name
+description: [required description]
+license: MIT # 可选：开源许可证
+allowed-tools: "Bash(python:*) Bash(npm:*) WebFetch" # 可选：限制工具访问
+metadata: # 可选：自定义字段
+  author: Company Name
+  version: 1.0.0
+  mcp-server: server-name
+  category: productivity
+  tags: [project-management, automation]
+  documentation: https://example.com/docs
+  support: support@example.com</code></pre>
+          <p><strong>安全说明</strong></p>
+          <div class="grid-2">
+            <div class="card compare-good">
+              <p class="label">允许</p>
+              <ul>
+                <li>任何标准 YAML 类型（字符串、数字、布尔值、列表、对象）</li>
+                <li>自定义 metadata 字段</li>
+                <li>最长 1024 个字符的长 description</li>
+              </ul>
+            </div>
+            <div class="card compare-bad">
+              <p class="label">禁止</p>
+              <ul>
+                <li>XML 尖括号（<code>&lt;</code>、<code>&gt;</code>）——安全限制</li>
+                <li>在 YAML 中执行代码（系统使用安全 YAML 解析）</li>
+                <li>以 <code>claude</code> 或 <code>anthropic</code> 为名称前缀的 Skill（保留）</li>
+              </ul>
+            </div>
+          </div>
+
+          <h3>参考 C：完整 Skill 示例</h3>
+          <p>如需查看完整、达到生产级质量且演示本指南模式的 Skill：</p>
+          <ul>
+            <li><strong>Document Skills：</strong><a href="https://github.com/anthropics/skills/tree/main/skills/pdf">PDF</a>、<a href="https://github.com/anthropics/skills/tree/main/skills/docx">DOCX</a>、<a href="https://github.com/anthropics/skills/tree/main/skills/pptx">PPTX</a>、<a href="https://github.com/anthropics/skills/tree/main/skills/xlsx">XLSX</a> 创建</li>
+            <li><a href="https://github.com/anthropics/skills/tree/main/skills">Example Skills</a>——多种工作流模式</li>
+            <li><a href="https://www.claude.com/connectors">Partner Skills Directory</a>——查看来自 Asana、Atlassian、Canva、Figma、Sentry、Zapier 等合作伙伴的 Skill</li>
+          </ul>
+          <p>这些仓库会持续保持最新，并包含本指南未覆盖的其他示例。你可以克隆它们，针对自己的用例进行修改，并将其作为模板。</p>
+          <p><a href="http://claude.ai">claude.ai</a></p>
+          <p class="back-top"><a href="#top">返回顶部</a></p>
+        </section>
+      </article>
+    </main>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <p><strong>原始材料与延伸阅读</strong></p>
+      <ul>
+        <li><a href="https://resources.anthropic.com/hubfs/The-Complete-Guide-to-Building-Skill-for-Claude.pdf?hsLang=en">官方 PDF：The Complete Guide to Building Skills for Claude</a></li>
+        <li><a href="../../raw/articles/A%20complete%20guide%20to%20building%20skills%20for%20Claude.md">本地介绍页：A complete guide to building skills for Claude</a></li>
+        <li><a href="https://claude.com/blog/complete-guide-to-building-skills-for-claude">官方介绍页</a></li>
+      </ul>
+      <p>本译文不展示本地介绍页中明显不一致的 <code>published: 2001-01-29</code>，且未修改原始材料。</p>
+    </div>
+  </footer>
+</body>
+</html>

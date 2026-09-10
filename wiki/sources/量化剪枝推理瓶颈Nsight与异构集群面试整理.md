@@ -43,6 +43,7 @@ updated: 2026-07-25
 - [[../concepts/PagedAttention]]
 - [[../concepts/Prefix Caching]]
 - [[../concepts/Speculative Decoding]]
+- [[../concepts/Sandbox]]
 
 ## 相关实体
 
@@ -53,7 +54,7 @@ updated: 2026-07-25
 
 ## 与现有 wiki 的关系
 
-- 会更新哪些概念页：本次先新增来源页和报告页；后续可拆出 `GPTQ`、`AWQ`、`剪枝`、`模型蒸馏`、`Marlin`、`A100`、`H20`、`数据预加载`、`Sandbox` 等独立概念/实体页。
+- 会更新哪些概念页：已从 Agent 沙箱章节拆出 [[../concepts/Sandbox]]；后续仍可拆出 `GPTQ`、`AWQ`、`剪枝`、`模型蒸馏`、`Marlin`、`A100`、`H20`、`数据预加载` 等独立概念/实体页。
 - 会更新哪些实体页：暂无。
 - 是否存在冲突：未发现与现有 wiki 直接冲突；H20 规格来自公开二手资料，应以实际集群和厂商资料核实。
 

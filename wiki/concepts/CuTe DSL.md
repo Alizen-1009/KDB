@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: GPU 编程
-sources: 1
+sources: 2
 updated: 2026-06-21
 ---
 
@@ -24,6 +24,7 @@ CuTe DSL 是 NVIDIA CUTLASS 4.x 中面向 GPU kernel authoring 的 Python-native
 - `Atom`：表示底层硬件操作，例如 MMA 或 copy。
 - `Tiled Operation`：描述 atom 如何跨 thread block、warp 或线程层级铺开，例如 `TiledMma`、`TiledCopy`。
 - Python 写出的 kernel 逻辑会被翻译成中间表示，再经 MLIR 和 `ptxas` 编译为 CUDA device code。
+- Blackwell dynamic persistent GEMM 示例通过 `ClcDynamicPersistentTileScheduler`、`PipelineClcFetchAsync`、shared-memory response 与 mbarrier 封装 [[Cluster Launch Control]]；每个 cluster 由一个 scheduler warp 发起 `try_cancel`，TMA/MMA/epilogue warps 消费解码后的 tile 坐标。
 
 ## 抽象层级
 
@@ -37,6 +38,7 @@ CuTe DSL 是 NVIDIA CUTLASS 4.x 中面向 GPU kernel authoring 的 Python-native
 - 与 [[Triton]]：二者都降低 GPU kernel 编写门槛；Triton 更偏 Pythonic block-level tensor program，CuTe DSL 更偏 CuTe/CUTLASS 风格的低级 tiling 与 hardware atom 组合。
 - 与 [[CODA]]：CODA 来源称其基于 CuTeDSL 实现，可理解为在 CuTe DSL / CUTLASS 能力之上构造面向 Transformer `GEMM + epilogue` 重写的 domain-specific 抽象。
 - 与 [[Torch Compile]]：`torch.compile` 偏通用图捕获、融合和代码生成；CuTe DSL 偏人工或 LLM 编写特定 CUDA kernel。
+- 与 [[Cluster Launch Control]]：CuTe DSL 提供可读性较高的 scheduler 与 pipeline 封装，但使用者仍需理解 cluster leader、transaction barrier、async proxy fence、pipeline stage 深度和取消失败后的退出语义。
 
 ## 关键权衡
 
@@ -53,10 +55,12 @@ CuTe DSL 是 NVIDIA CUTLASS 4.x 中面向 GPU kernel authoring 的 Python-native
 - [[CODA]]
 - [[Torch Compile]]
 - [[算子融合]]
+- [[Cluster Launch Control]]
 
 ## 相关来源
 
 - [[../sources/还在手写CUDA内核？CODA来了！LLM和新手也能让Transformer跑出光速]]
+- [[../sources/Dynamic persistent tile scheduling with Cluster Launch Control (CLC) on NVIDIA Blackwell GPUs]]
 
 ## 外部资料
 

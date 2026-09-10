@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>先进大模型架构知识图谱</title>
+<style>
+:root{
+  --paper:#f6f2e8;--sheet:#fffdf7;--ink:#152131;--muted:#596474;--line:#cfd2cc;
+  --repr:#176b87;--select:#a44a3f;--state:#5d6f2c;--reuse:#75549a;--depth:#a56a12;--capacity:#287557;
+  --fact:#185b45;--wiki:#465e86;--uncertain:#8b5322;--focus:#0a67a3;
+  --shadow:0 12px 32px rgba(33,43,55,.08);--radius:12px;
+  font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",Arial,sans-serif;
+}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--paper);color:var(--ink);line-height:1.68}
+a{color:#175d85;text-underline-offset:3px}a:hover{text-decoration-thickness:2px}
+a:focus-visible,button:focus-visible{outline:3px solid var(--focus);outline-offset:3px;border-radius:4px}
+code,.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;font-size:.92em}
+.skip{position:fixed;left:12px;top:-80px;z-index:100;background:#fff;padding:9px 13px;border:2px solid var(--focus)}.skip:focus{top:12px}
+.layout{display:grid;grid-template-columns:245px minmax(0,1fr);max-width:1540px;margin:auto}.side{position:sticky;top:0;height:100vh;padding:24px 18px;border-right:1px solid var(--line);background:rgba(246,242,232,.96);overflow:auto}.brand{font-weight:800;letter-spacing:.04em;margin-bottom:16px}.side .kicker{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.16em}.side nav a{display:block;padding:6px 9px;margin:2px 0;color:#344153;text-decoration:none;border-left:3px solid transparent;font-size:.88rem}.side nav a:hover{background:#ece8de;border-left-color:#667587}.axis-key{margin-top:20px;padding-top:14px;border-top:1px solid var(--line);font-size:.75rem;color:var(--muted)}.axis-key span{display:inline-block;margin:3px 4px 3px 0;padding:2px 6px;border:1px solid currentColor;border-radius:999px}
+main{min-width:0;padding:0 42px 70px}.hero{padding:76px 0 44px;border-bottom:1px solid var(--line)}.eyebrow{font-size:.78rem;font-weight:800;letter-spacing:.13em;color:var(--repr);text-transform:uppercase}.hero h1{font-size:clamp(2.45rem,5vw,5.2rem);line-height:1.03;letter-spacing:-.045em;margin:.16em 0}.subtitle{font-size:clamp(1.05rem,2vw,1.42rem);max-width:920px;color:#485567;margin:0}.hero-meta{margin-top:22px;font-size:.85rem;color:var(--muted)}
+section{scroll-margin-top:18px;padding:48px 0;border-bottom:1px solid var(--line)}h2{font-size:clamp(1.75rem,3vw,2.65rem);line-height:1.16;letter-spacing:-.025em;margin:0 0 10px}h3{font-size:1.28rem;line-height:1.3;margin:30px 0 10px}h4{font-size:1.04rem;margin:18px 0 6px}.lead{font-size:1.08rem;color:#435063;max-width:920px;margin-top:0}.section-no{font:700 .78rem ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--muted);letter-spacing:.12em}.callout{border-left:4px solid var(--repr);background:var(--sheet);padding:14px 18px;margin:18px 0;box-shadow:var(--shadow)}
+.theses{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:35px}.thesis{background:var(--sheet);padding:22px}.thesis b{display:block;font-size:1.08rem;margin-bottom:7px}.thesis .num{font:800 1.85rem ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--repr)}
+.badge{display:inline-block;font-size:.72rem;line-height:1.2;font-weight:750;padding:3px 7px;border-radius:999px;border:1px solid currentColor;vertical-align:middle;white-space:nowrap}.b-fact{color:var(--fact);background:#eff7f2}.b-wiki{color:var(--wiki);background:#f0f3f8}.b-warn{color:var(--uncertain);background:#fff6e8}.axis{display:inline-block;font-size:.72rem;font-weight:800;padding:3px 7px;border-radius:3px;color:#fff;white-space:nowrap}.repr{background:var(--repr)}.select{background:var(--select)}.state{background:var(--state)}.reuse{background:var(--reuse)}.depth{background:var(--depth)}.capacity{background:var(--capacity)}
+.diagram{background:var(--sheet);border:1px solid var(--line);padding:16px;box-shadow:var(--shadow);margin:22px 0}.diagram svg{display:block;width:100%;height:auto}.diagram-note,.scroll-hint{font-size:.78rem;color:var(--muted);margin:8px 0 0}.scroll-hint::before{content:"↔ ";font-weight:800}.flow-legend{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.axis-map{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.axis-panel{background:var(--sheet);border-top:5px solid var(--axis-color);padding:18px;border-radius:0 0 var(--radius) var(--radius);box-shadow:var(--shadow)}.axis-panel h3{margin:0 0 6px;font-size:1.1rem}.axis-panel p{margin:5px 0;color:#465266}.axis-panel .question{font-weight:750;color:var(--ink)}
+.table-wrap{overflow-x:auto;border:1px solid var(--line);background:var(--sheet);box-shadow:var(--shadow)}table{border-collapse:collapse;width:100%;font-size:.88rem}th,td{text-align:left;vertical-align:top;padding:11px 12px;border-bottom:1px solid #d9dcd6}th{position:sticky;top:0;background:#eae7de;color:#263447;font-size:.78rem;letter-spacing:.02em;z-index:1}tbody tr:hover{background:#faf4e9}tbody tr:last-child td{border-bottom:0}.matrix{min-width:1160px}.matrix th:nth-child(1){width:145px}.matrix th:nth-child(2){width:120px}.matrix th:nth-child(3){width:210px}.matrix th:nth-child(4),.matrix th:nth-child(5){width:220px}.matrix tr[hidden]{display:none}.filters{display:flex;gap:7px;flex-wrap:wrap;margin:18px 0 12px}.filters button,.top-button{font:inherit;font-size:.85rem;font-weight:750;border:1px solid #9aa2a8;background:var(--sheet);color:var(--ink);padding:7px 11px;border-radius:999px;cursor:pointer}.filters button[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:20px}.mode{background:var(--sheet);border-top:5px solid var(--repr);padding:20px;box-shadow:var(--shadow)}.mode h3{margin-top:0}.equation{display:block;background:#222b38;color:#f6f2e8;border-radius:7px;padding:13px 15px;overflow:auto;line-height:1.55}.compare-flow{display:grid;grid-template-columns:1fr 1fr;gap:16px}.compare-flow svg{width:100%;height:auto;background:#fffdf8;border:1px solid var(--line)}
+.tech-list{display:grid;gap:22px}.tech{display:grid;grid-template-columns:175px minmax(0,1fr);gap:22px;padding:24px 0;border-top:1px solid var(--line)}.tech:first-child{border-top:0}.tech-title h3{margin:0 0 6px;font-size:1.48rem}.tech-body>p:first-child{margin-top:0}.template-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.fact-box{background:var(--sheet);border:1px solid var(--line);padding:12px 14px}.fact-box b{display:block;font-size:.78rem;letter-spacing:.04em;color:#394657;margin-bottom:4px}.fact-box p{margin:0;color:#465266;font-size:.9rem}.steps{padding-left:1.25rem}.steps li{margin:5px 0}
+.recur-flow{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:18px 0}.recur-flow div{background:var(--sheet);border:1px solid var(--line);padding:13px;text-align:center}.recur-flow b{display:block;color:var(--state)}
+.choice-tree{list-style:none;padding:0;margin:22px 0}.choice-tree>li{border-left:4px solid var(--ink);padding:6px 0 18px 18px}.choice-tree ul{margin-top:8px}.misconceptions{counter-reset:myth;display:grid;grid-template-columns:1fr 1fr;gap:12px}.myth{counter-increment:myth;background:var(--sheet);border:1px solid var(--line);padding:16px}.myth::before{content:counter(myth,decimal-leading-zero);display:block;font:800 .76rem ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--select);margin-bottom:4px}.myth b{display:block}.myth p{margin:5px 0 0;color:#4b5665}
+.source-groups{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.source-group{background:var(--sheet);border:1px solid var(--line);padding:16px}.source-group h3{margin:0 0 8px;font-size:1.05rem}.source-group ul{margin:0;padding-left:1.15rem}.source-group li{margin:6px 0;overflow-wrap:anywhere}.evidence-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:18px 0}.evidence-grid div{border-top:4px solid #66717f;background:var(--sheet);padding:13px}.evidence-grid b{display:block}.evidence-grid p{margin:4px 0 0;font-size:.87rem;color:#4e5967}
+.footer{padding:28px 0;color:var(--muted);font-size:.82rem}.top-button{position:fixed;right:20px;bottom:20px;z-index:5;box-shadow:var(--shadow)}
+@media(max-width:980px){.layout{grid-template-columns:1fr}.side{position:sticky;top:0;height:auto;z-index:20;border-right:0;border-bottom:1px solid var(--line);padding:9px 14px}.brand,.axis-key{display:none}.side nav{display:flex;overflow-x:auto;white-space:nowrap;gap:2px}.side nav a{border-left:0;border-bottom:3px solid transparent;padding:7px 9px}.side nav a:hover{border-bottom-color:#667587}main{padding:0 24px}.hero{padding-top:52px}.axis-map,.source-groups{grid-template-columns:repeat(2,1fr)}.tech{grid-template-columns:140px minmax(0,1fr)}.template-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:620px){main{padding:0 15px}.hero h1{font-size:2.5rem}.theses,.axis-map,.split,.compare-flow,.misconceptions,.source-groups,.evidence-grid{grid-template-columns:1fr}.tech{grid-template-columns:1fr;gap:9px}.template-grid{grid-template-columns:1fr}.recur-flow{grid-template-columns:1fr 1fr}.diagram{padding:8px}.diagram svg text{font-size:12px}.top-button{right:10px;bottom:10px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important}}
+@media print{body{background:#fff;font-size:10.5pt}.layout{display:block;max-width:none}.side,.filters,.top-button,.scroll-hint,.skip{display:none!important}main{padding:0}.hero{padding:20px 0}.hero h1{font-size:30pt}section{padding:22px 0;break-before:auto}h2,h3{break-after:avoid}.thesis,.axis-panel,.mode,.fact-box,.myth,.source-group,.diagram,.tech{box-shadow:none;break-inside:avoid}.table-wrap{overflow:visible;box-shadow:none}.matrix{min-width:0;font-size:7pt}th{position:static}a[href^="http"]::after{content:" (" attr(href) ")";font-size:7pt;overflow-wrap:anywhere}.diagram svg{max-height:680px}.tech{grid-template-columns:130px 1fr}.source-groups{grid-template-columns:1fr 1fr 1fr}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">跳到正文</a>
+<div class="layout">
+<aside class="side" aria-label="章节导航">
+  <div class="kicker">Engineer’s field guide</div><div class="brand">先进架构知识图谱</div>
+  <nav>
+    <a href="#mental-model">核心结论</a><a href="#token-journey">Token 总图</a><a href="#six-axes">六轴地图</a>
+    <a href="#matrix">16 项矩阵</a><a href="#mla-modes">MLA 双模式</a><a href="#sparse-family">稀疏家族</a>
+    <a href="#recurrent-family">递归状态</a><a href="#depth-family">深度残差</a><a href="#capacity-family">容量家族</a>
+    <a href="#model-composition">模型组合</a><a href="#decision-tree">选择树</a><a href="#misconceptions">常见误区</a><a href="#sources">来源边界</a>
+  </nav>
+  <div class="axis-key"><b>轴配色</b><br><span style="color:var(--repr)">KV 表示</span><span style="color:var(--select)">历史选择</span><span style="color:var(--state)">递归状态</span><span style="color:var(--reuse)">Indexer 复用</span><span style="color:var(--depth)">层间残差</span><span style="color:var(--capacity)">静态/专家容量</span></div>
+</aside>
+<main id="main">
+<header class="hero">
+  <div class="eyebrow">从存储位置出发，而不是从缩写出发</div>
+  <h1>先进大模型架构<br>知识图谱</h1>
+  <p class="subtitle">从 MLA、稀疏注意力与递归状态，到残差拓扑、静态记忆和潜在专家</p>
+  <p class="hero-meta">面向工程师的机制手册 · 事实截止于所列仓库材料与官方文档 · 不把论文 kernel 数字外推为通用端到端性能</p>
+</header>
+
+<section id="mental-model" aria-labelledby="mental-model-title">
+  <div class="section-no">01 / MENTAL MODEL</div><h2 id="mental-model-title">先问六个问题，再看任何缩写</h2>
+  <p class="lead">每项技术都应回答：改了模型哪一轴？历史信息存在哪里？每个 token 读什么？节省什么？牺牲什么？代表模型如何组合？</p>
+  <div class="theses">
+    <article class="thesis"><span class="num">01</span><b>机制分属不同轴</b>MLA 改 KV 表示，DSA/QSA/MSA 改历史选择，GDN/KDA 改历史载体，mHC/AttnRes 改深度信息流，Engram/LatentMoE 改容量。它们通常不互斥。</article>
+    <article class="thesis"><span class="num">02</span><b>先进模型往往组合</b>同一模型可以同时使用压缩 KV、稀疏检索、固定递归状态、残差拓扑和 MoE；“A 还是 B”经常问错了层级。</article>
+    <article class="thesis"><span class="num">03</span><b>三个账本必须分开</b><code>FLOPs</code>、KV/state 容量与实际墙钟受不同因素支配。索引、Gather、内存访问、通信和 kernel 规则性会让理论节省不等于部署收益。</article>
+  </div>
+  <div class="callout"><span class="badge b-wiki">wiki 归纳</span> 一个实用总式：<b>表示决定“存成什么”，选择决定“读哪些”，状态决定“是否还保存逐 token 历史”，残差决定“沿深度如何读”，容量模块决定“参数知识放在哪里”。</b></div>
+</section>
+
+<section id="token-journey" aria-labelledby="token-journey-title">
+  <div class="section-no">02 / TOKEN JOURNEY</div><h2 id="token-journey-title">一个 token 穿过现代模型</h2>
+  <p class="lead">图中分支可并存：静态记忆在浅层补充局部模式，token mixer 处理序列历史，残差机制管理跨层流动，MoE 扩展 FFN 容量。</p>
+  <figure class="diagram">
+  <svg viewBox="0 0 1280 430" role="img" aria-labelledby="journey-svg-title journey-svg-desc" preserveAspectRatio="xMidYMid meet">
+    <title id="journey-svg-title">一个 token 穿过现代大模型的架构总图</title>
+    <desc id="journey-svg-desc">Token embedding 分出 Engram 或 n-gram 静态记忆支路，再进入 MLA、稀疏注意力、GDN 或 KDA token mixer，经 mHC 或 Attention Residuals 深度路径，再进入 LatentMoE，最终输出。</desc>
+    <defs><marker id="arrow-main" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#465567"/></marker><style>.box{fill:#fffdf7;stroke:#465567;stroke-width:2}.t{font:700 18px system-ui,sans-serif;fill:#152131}.s{font:14px system-ui,sans-serif;fill:#596474}.ln{stroke:#465567;stroke-width:3;fill:none;marker-end:url(#arrow-main)}.dash{stroke:#287557;stroke-width:3;stroke-dasharray:8 6;fill:none;marker-end:url(#arrow-main)}</style></defs>
+    <rect x="30" y="170" width="170" height="86" rx="10" class="box"/><text x="115" y="202" text-anchor="middle" class="t">Input / Token</text><text x="115" y="229" text-anchor="middle" class="s">token embedding</text>
+    <path d="M200 213H300" class="ln"/><rect x="300" y="145" width="260" height="136" rx="10" fill="#eef7fb" stroke="#176b87" stroke-width="3"/><text x="430" y="181" text-anchor="middle" class="t">Token Mixer</text><text x="430" y="212" text-anchor="middle" class="s">MLA + sparse softmax</text><text x="430" y="238" text-anchor="middle" class="s">或 GDN / KDA recurrent state</text><text x="430" y="263" text-anchor="middle" class="s">回答：当前 token 读哪段历史？</text>
+    <path d="M560 213H650" class="ln"/><rect x="650" y="145" width="230" height="136" rx="10" fill="#fff5e2" stroke="#a56a12" stroke-width="3"/><text x="765" y="181" text-anchor="middle" class="t">Residual / Depth</text><text x="765" y="212" text-anchor="middle" class="s">mHC：多路 stream 混合</text><text x="765" y="238" text-anchor="middle" class="s">AttnRes：选择历史层</text><text x="765" y="263" text-anchor="middle" class="s">回答：沿深度保留什么？</text>
+    <path d="M880 213H970" class="ln"/><rect x="970" y="145" width="210" height="136" rx="10" fill="#eff8f3" stroke="#287557" stroke-width="3"/><text x="1075" y="181" text-anchor="middle" class="t">FFN Capacity</text><text x="1075" y="212" text-anchor="middle" class="s">LatentMoE</text><text x="1075" y="238" text-anchor="middle" class="s">d → ℓ → experts → d</text><text x="1075" y="263" text-anchor="middle" class="s">更窄的专家访问路径</text>
+    <path d="M1180 213H1250" class="ln"/><text x="1240" y="194" text-anchor="end" class="t">Output</text>
+    <rect x="270" y="20" width="320" height="88" rx="10" fill="#eff8f3" stroke="#287557" stroke-width="3"/><text x="430" y="54" text-anchor="middle" class="t">静态记忆支路</text><text x="430" y="80" text-anchor="middle" class="s">Engram / Qwen n-gram embedding</text><path d="M115 170C140 66 205 64 270 64" class="dash"/><path d="M430 108V145" class="dash"/>
+    <rect x="298" y="330" width="830" height="70" rx="9" fill="#f2efe7" stroke="#aeb3b0"/><text x="713" y="359" text-anchor="middle" class="t">真正的部署账本</text><text x="713" y="384" text-anchor="middle" class="s">历史字节数 / 访存规则性 / Tensor Core 利用率 / 投影与路由 / 通信 / checkpoint 与回滚</text>
+  </svg>
+  <figcaption class="diagram-note">SVG 为页面内联，文本可选择；窄屏下按 viewBox 等比缩放，不依赖外部图片。</figcaption>
+  </figure>
+</section>
+
+<section id="six-axes" aria-labelledby="six-axes-title">
+  <div class="section-no">03 / SIX AXES</div><h2 id="six-axes-title">六轴知识地图</h2>
+  <p class="lead">把每项机制放回正确坐标，可避免把“压缩表示”“稀疏选取”和“固定状态”混成同一种长上下文技术。</p>
+  <div class="axis-map">
+    <article class="axis-panel" style="--axis-color:var(--repr)"><h3>KV 表示</h3><p class="question">历史 token 存成什么？</p><p>MLA 的 latent <code>c<sup>KV</sup></code>；MLA 的 MHA/MQA 是两种等价数据流形态。</p></article>
+    <article class="axis-panel" style="--axis-color:var(--select)"><h3>历史选择</h3><p class="question">当前 query 实际读哪些历史？</p><p>MSA、DSA、QSA、NSA、CSA/HCA；粒度可为 token、block 或 compressed entry。</p></article>
+    <article class="axis-panel" style="--axis-color:var(--state)"><h3>固定递归状态</h3><p class="question">是否仍保留逐 token KV？</p><p>GDN/KDA 把长期历史递推进固定矩阵，并另存 short-conv state。</p></article>
+    <article class="axis-panel" style="--axis-color:var(--reuse)"><h3>Indexer 复用</h3><p class="question">检索结果能否少算几次？</p><p>IndexShare 复用 top-k indices；跨层和跨 MTP iteration 是两个维度。</p></article>
+    <article class="axis-panel" style="--axis-color:var(--depth)"><h3>层间残差</h3><p class="question">历史层表示如何进入当前层？</p><p>mHC 维持多路 stream 并稳定混合；AttnRes 对历史层做 depth-wise softmax。</p></article>
+    <article class="axis-panel" style="--axis-color:var(--capacity)"><h3>静态 / 专家容量</h3><p class="question">参数知识在哪里被访问？</p><p>Engram/n-gram 走确定性查表；LatentMoE 让 routed experts 在低维潜空间工作。</p></article>
+  </div>
+</section>
+
+<section id="matrix" aria-labelledby="matrix-title">
+  <div class="section-no">04 / COMPARISON MATRIX</div><h2 id="matrix-title">16 项总对比矩阵</h2>
+  <p class="lead">默认完整显示；按钮只在本地隐藏非目标行。关闭 JavaScript 时，矩阵仍全部可读。</p>
+  <div class="filters" role="group" aria-label="按技术轴过滤矩阵">
+    <button type="button" data-filter="all" aria-pressed="true">全部</button><button type="button" data-filter="representation" aria-pressed="false">表示</button><button type="button" data-filter="sparse" aria-pressed="false">稀疏选择</button><button type="button" data-filter="recurrence" aria-pressed="false">递归状态</button><button type="button" data-filter="residual" aria-pressed="false">残差</button><button type="button" data-filter="capacity" aria-pressed="false">容量</button>
+  </div>
+  <p class="scroll-hint">宽表可横向滚动；列顺序固定，便于逐行比较。</p>
+  <div class="table-wrap" tabindex="0" aria-label="16 项技术对比表，可横向滚动">
+  <table class="matrix"><thead><tr><th>技术</th><th>作用轴</th><th>历史载体 / 选择粒度</th><th>每 token 读什么</th><th>主要节省</th><th>核心代价</th><th>代表模型</th></tr></thead><tbody id="matrix-body">
+    <tr data-category="representation"><td><b>MHA mode of MLA</b></td><td><span class="axis repr">KV 表示</span></td><td>latent cache 可恢复 per-head content K/V</td><td>逻辑上的各 head content K/V + decoupled RoPE key</td><td>保留 MLA 低秩 KV 表示；适合训练/prefill 数据流</td><td>显式恢复/使用多头张量时计算与中间量较大</td><td>DeepSeek-V3.1-Terminus 训练/prefill</td></tr>
+    <tr data-category="representation"><td><b>MQA mode of MLA</b></td><td><span class="axis repr">KV 表示</span></td><td>所有 query heads 共享同一 latent KV entry</td><td>吸收后的 query 与 latent cache；聚合后再走 output 侧映射</td><td>decode 访存与跨 head KV 复用</td><td>只在 MLA 的可吸收结构/变换成立；需要专用 kernel</td><td>DeepSeek-V3.1-Terminus decode；DeepSeek V3.2 DSA</td></tr>
+    <tr data-category="sparse"><td><b>MSA</b></td><td><span class="axis select">历史选择</span></td><td>标准 GQA KV；每 GQA group 选 top-k blocks</td><td>选中块内的原始 token K/V，做精确 softmax</td><td>core attention FLOPs/读流量；块规则性利于 GPU</td><td>轻量 indexer 仍含二次项；块粒度有召回边界</td><td>MiniMax M3</td></tr>
+    <tr data-category="sparse"><td><b>DSA</b></td><td><span class="axis select">历史选择</span></td><td>token-level MLA latent entries，top-2048（V3.2）</td><td>被 lightning indexer 选中的 latent KV entries</td><td>core 从 O(L²) 到 O(Lk)</td><td>indexer 仍 O(L²)；稀疏续训成本高</td><td>DeepSeek V3.2；GLM-5.x</td></tr>
+    <tr data-category="sparse"><td><b>QSA</b></td><td><span class="axis select">历史选择</span></td><td>仅 Indexer K 按 r=4 pooling；块选后展开原 token</td><td>最多 512 完整块展开成 K=2048 token budget + tail</td><td>indexer 到 O(L²/r)，core 稀疏</td><td>块池化可能模糊索引信号；仍需 top-k/sparse kernel</td><td>Qwen3.8-Flash-Next</td></tr>
+    <tr data-category="sparse"><td><b>NSA</b></td><td><span class="axis select">历史选择</span></td><td>compressed / selected blocks / sliding window 三套 K/V</td><td>三分支独立 attention 输出，经 learned gates 融合</td><td>全局粗读 + 精细块读 + 局部读的硬件对齐</td><td>多分支、独立 K/V、训练与 kernel 更复杂</td><td>NSA 论文实验模型</td></tr>
+    <tr data-category="sparse"><td><b>HCA</b></td><td><span class="axis select">压缩历史</span></td><td>m′=128 默认、non-overlapping compressed entries</td><td>所有可见重压缩 entries + local sliding K=V branch</td><td>无需 indexer；远程历史高度压缩</td><td>细节损失更大；compressed dense attention 仍随 entry 数增长</td><td>DeepSeek V4</td></tr>
+    <tr data-category="sparse"><td><b>CSA</b></td><td><span class="axis select">压缩+选择</span></td><td>m=4 默认、overlapping compressed entries；top-k</td><td>indexer 选中的 compressed blocks + local branch</td><td>低压缩保真与稀疏 core 兼顾</td><td>compressor、overlap state、indexer 与 gather 都要付费</td><td>DeepSeek V4</td></tr>
+    <tr data-category="recurrence"><td><b>KDA</b></td><td><span class="axis state">递归状态</span></td><td>固定 matrix state + short-conv；per-key-channel decay</td><td>query 从更新后的 key→value fast-weight matrix 读取</td><td>长期状态不随 L 线性增长</td><td>矩阵可大；任意回退、迁移、prefix cache 需 checkpoint/replay</td><td>Kimi K3；GLM-5.3-Flash</td></tr>
+    <tr data-category="recurrence"><td><b>GDN</b></td><td><span class="axis state">递归状态</span></td><td>固定 matrix state + short-conv；常见 per-head scalar decay</td><td>query 读取衰减并 delta-rule 更新后的矩阵</td><td>decode 固定状态；长上下文容量稳定</td><td>精确任意 token 检索弱于显式 KV</td><td>Qwen3.8-Flash-Next</td></tr>
+    <tr data-category="sparse"><td><b>IndexShare</b></td><td><span class="axis reuse">索引复用</span></td><td>共享 top-k token indices</td><td>各层仍用本层 Q/K/V 在共享 indices 上算 attention</td><td>减少重复 indexer FLOPs</td><td>牺牲逐层独立选择自由度；不减少本层 attention 本体</td><td>GLM-5.2</td></tr>
+    <tr data-category="residual"><td><b>mHC</b></td><td><span class="axis depth">层间残差</span></td><td>多路 residual streams；doubly stochastic mixing</td><td>层函数从多流读、再稳定地混回多流</td><td>扩展深度拓扑并约束信号放大/衰减</td><td>额外 stream 访存、Sinkhorn 与自定义 kernel</td><td>DeepSeek V4；GLM-5.3-Flash</td></tr>
+    <tr data-category="capacity"><td><b>Engram</b></td><td><span class="axis capacity">静态容量</span></td><td>compressed n-gram → hash → multihead table rows</td><td>固定次数数组索引结果，经 context gate/short conv</td><td>低 FLOPs 扩大静态参数容量</td><td>大表存储、碰撞、分片、预取与热行问题</td><td>Engram 论文/实现</td></tr>
+    <tr data-category="capacity"><td><b>n-gram embedding</b></td><td><span class="axis capacity">静态容量</span></td><td>确定性 n-gram lookup；51B 表在加速器外</td><td>Layer 2 单层取回向量，host prefetch 与 Layer 1 重叠</td><td>主干外扩展静态容量，额外 FLOPs 小</td><td>系统带宽/命中率未充分披露；实现细节未知</td><td>Qwen3.8-Flash-Next</td></tr>
+    <tr data-category="residual"><td><b>AttnRes</b></td><td><span class="axis depth">层间残差</span></td><td>历史层表示；depth-wise softmax</td><td>Full 读所有早层，Block 读 block 级历史表示</td><td>选择性跨层聚合，缓解固定累加稀释</td><td>保留历史表示、通信与 I/O；Full 更昂贵</td><td>Kimi K3</td></tr>
+    <tr data-category="capacity"><td><b>LatentMoE</b></td><td><span class="axis capacity">专家容量</span></td><td>主干 d；routed path 临时进入 latent ℓ</td><td>top-k experts 在 ℓ→m→ℓ 中工作，再投回 d</td><td>expert 权重带宽与 EP activation payload</td><td>新增 d↔ℓ 投影与信息瓶颈；小矩阵/同步开销</td><td>Kimi K3</td></tr>
+  </tbody></table></div>
+</section>
+
+<section id="mla-modes" aria-labelledby="mla-modes-title">
+  <div class="section-no">05 / MLA MODES</div><h2 id="mla-modes-title">MLA 双模式：同一低秩结构的两种执行形态</h2>
+  <p class="lead"><span class="badge b-fact">一手资料</span> MLA 先联合压缩 KV 为 <code>c<sup>KV</sup></code>，并用 decoupled RoPE 把 content 与位置路径分开。MHA/MQA mode 的关键不是“换 checkpoint”，而是矩阵吸收前后的数据流。</p>
+  <code class="equation">cₜᴷⱽ = Wᴰᴷⱽ hₜ
+kᶜₜ,ᵢ = Wᵁᴷᵢ cₜᴷⱽ        vᶜₜ,ᵢ = Wᵁⱽᵢ cₜᴷⱽ
+scoreᶜᵢ(t,s) = qᶜₜ,ᵢᵀ Wᵁᴷᵢ cₛᴷⱽ = (Wᵁᴷᵢᵀ qᶜₜ,ᵢ)ᵀ cₛᴷⱽ</code>
+  <div class="split">
+    <article class="mode"><h3>MHA mode of MLA</h3><p>逻辑上为每个 head 恢复或使用 content <code>Kᵢ/Vᵢ</code>，再与各 head query 做常规多头 core attention；位置项由独立的 RoPE key 提供。</p><ul><li><b>缓存本质：</b>底层仍可来自低秩 latent 与小 RoPE key。</li><li><b>适合：</b>训练与 prefill 中的大矩阵并行。</li><li><b>代价：</b>恢复/消费 per-head content K/V 会形成更宽中间数据流。</li></ul></article>
+    <article class="mode"><h3>MQA mode of MLA</h3><p>把 head-specific <code>Wᵁᴷᵢ</code> 吸收到 query 侧，把 <code>Wᵁⱽᵢ</code> 与 output 侧重排/融合；core attention 直接让所有 query heads 共享同一个 latent KV entry。</p><ul><li><b>缓存本质：</b><code>c<sup>KV</sup></code> + 小型 positional key。</li><li><b>适合：</b>decode 与 DSA kernel 的跨 query 复用。</li><li><b>边界：</b>不是把模型粗暴改成普通 MQA。</li></ul></article>
+  </div>
+  <figure class="diagram"><div class="compare-flow">
+    <svg viewBox="0 0 570 320" role="img" aria-labelledby="mha-flow-title"><title id="mha-flow-title">MLA MHA 模式数据流</title><defs><marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#176b87"/></marker></defs><g font-family="system-ui,sans-serif"><text x="25" y="32" font-weight="700" font-size="20">MHA mode</text><rect x="25" y="62" width="120" height="56" rx="7" fill="#eef7fb" stroke="#176b87"/><text x="85" y="88" text-anchor="middle">latent cache</text><text x="85" y="108" text-anchor="middle" font-size="13">cᴷⱽ + kᴿ</text><path d="M145 90H220" stroke="#176b87" stroke-width="3" marker-end="url(#a1)"/><rect x="220" y="48" width="150" height="84" rx="7" fill="#fffdf7" stroke="#176b87"/><text x="295" y="77" text-anchor="middle">Wᵁᴷᵢ / Wᵁⱽᵢ</text><text x="295" y="101" text-anchor="middle" font-size="13">恢复 per-head Kᶜᵢ/Vᶜᵢ</text><path d="M370 90H435" stroke="#176b87" stroke-width="3" marker-end="url(#a1)"/><rect x="435" y="58" width="110" height="64" rx="7" fill="#eef7fb" stroke="#176b87"/><text x="490" y="85" text-anchor="middle">MHA core</text><text x="490" y="106" text-anchor="middle" font-size="13">各 head K/V</text><rect x="220" y="183" width="150" height="60" rx="7" fill="#fff5e2" stroke="#a56a12"/><text x="295" y="208" text-anchor="middle">qᶜᵢ + RoPE(qᴿᵢ)</text><path d="M370 213C415 213 415 120 435 105" fill="none" stroke="#a56a12" stroke-width="3" marker-end="url(#a1)"/><text x="25" y="286" font-size="13" fill="#596474">宽 dataflow；训练/prefill 友好</text></g></svg>
+    <svg viewBox="0 0 570 320" role="img" aria-labelledby="mqa-flow-title"><title id="mqa-flow-title">MLA MQA 模式数据流</title><defs><marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#176b87"/></marker></defs><g font-family="system-ui,sans-serif"><text x="25" y="32" font-weight="700" font-size="20">MQA mode</text><rect x="25" y="62" width="145" height="62" rx="7" fill="#eef7fb" stroke="#176b87"/><text x="97" y="88" text-anchor="middle">shared latent entry</text><text x="97" y="110" text-anchor="middle" font-size="13">cᴷⱽ + kᴿ</text><path d="M170 93H280" stroke="#176b87" stroke-width="3" marker-end="url(#a2)"/><rect x="280" y="58" width="130" height="70" rx="7" fill="#eef7fb" stroke="#176b87"/><text x="345" y="85" text-anchor="middle">MQA core</text><text x="345" y="108" text-anchor="middle" font-size="13">all query heads</text><path d="M410 93H475" stroke="#176b87" stroke-width="3" marker-end="url(#a2)"/><rect x="475" y="62" width="72" height="62" rx="7" fill="#eff8f3" stroke="#287557"/><text x="511" y="98" text-anchor="middle">Wᵁⱽ/O</text><rect x="210" y="183" width="190" height="65" rx="7" fill="#fff5e2" stroke="#a56a12"/><text x="305" y="208" text-anchor="middle">absorbed query</text><text x="305" y="230" text-anchor="middle" font-size="13">Wᵁᴷᵢᵀ qᶜᵢ + RoPE(qᴿᵢ)</text><path d="M305 183V130" stroke="#a56a12" stroke-width="3" marker-end="url(#a2)"/><text x="25" y="286" font-size="13" fill="#596474">窄 cache 读取；decode / sparse kernel 友好</text></g></svg>
+  </div><figcaption class="diagram-note">两图比较 cache 与 dataflow；它们不是两个互不兼容的 checkpoint 架构。</figcaption></figure>
+  <div class="callout"><b>模式事实。</b> DeepSeek-V3.1-Terminus 训练/prefill 使用 MHA mode，decode 使用 MQA mode；DSA 因 kernel 要求同一 KV entry 在多个 query 间共享，建立在 MLA 的 MQA mode。该等价依赖 MLA 的低秩映射、decoupled RoPE 与可吸收变换，不能泛化成任意 MHA checkpoint 都可无条件变成 MQA。 <span class="badge b-fact">一手资料</span></div>
+</section>
+
+<section id="sparse-family" aria-labelledby="sparse-family-title">
+  <div class="section-no">06 / SPARSE &amp; COMPRESSED SOFTMAX</div><h2 id="sparse-family-title">稀疏 / 压缩 softmax 家族</h2>
+  <p class="lead">一致阅读模板：一句话 → 流程 → 历史保留 → 收益 → 代价 → 代表模型 → 边界。共同点是仍有 softmax；差异在“对谁打分、选什么、core 看原 token 还是 compressed entry”。</p>
+  <div class="tech-list">
+    <article class="tech" id="msa"><div class="tech-title"><h3>MSA</h3><span class="axis select">GQA 块选择</span><br><span class="badge b-fact">一手资料</span></div><div class="tech-body"><p><b>一句话：</b>在标准 GQA 上，用超轻 Index Branch 为每个 GQA group 独立选块，Main Branch 在块内做精确 softmax。</p><ol class="steps"><li>每个 GQA group 一个 index query；所有 groups 共享一个 index key。</li><li>先做 token score，再按块 max-pooling；每组 top-k blocks，强制包含当前 local block。</li><li>主分支 gather 选中块的可见原始 token K/V，执行标准缩放点积 softmax。</li><li>训练用 group-averaged 主分支分布做 KL teacher，并配合 detach、indexer warmup、forced local block。</li></ol><div class="template-grid"><div class="fact-box"><b>历史保留</b><p>完整标准 GQA KV；稀疏发生在读取。</p></div><div class="fact-box"><b>收益</b><p>core 预算固定为约 <code>k·B</code> tokens；block 规则化利于 GPU。</p></div><div class="fact-box"><b>代价 / 边界</b><p>Indexer 仍有轻量二次项；不是 MLA。代表 MiniMax M3 的 GQA+MSA。</p></div></div></div></article>
+
+    <article class="tech" id="dsa"><div class="tech-title"><h3>DSA</h3><span class="axis select">latent token top-k</span><br><span class="badge b-fact">一手资料</span></div><div class="tech-body"><p><b>一句话：</b>lightning indexer 对每个历史 token / MLA latent entry 做细粒度排序，只让 top-k 进入 MLA MQA core。</p><ol class="steps"><li>query 侧生成少量 index heads 与权重，历史生成共享 index key；ReLU 分数用于吞吐。</li><li>DeepSeek V3.2 每 query 选择 <code>k=2048</code> latent entries。</li><li>Core 从 <code>O(L²)</code> 变为 <code>O(Lk)</code>，但 indexer 仍为 <code>O(L²)</code>。</li></ol><div class="template-grid"><div class="fact-box"><b>历史保留</b><p>MLA latent KV cache，token 粒度。</p></div><div class="fact-box"><b>收益</b><p>减少 core attention 对长历史的计算和读取。</p></div><div class="fact-box"><b>代价 / 边界</b><p>选漏风险与高额迁移训练。约 2.1B warmup + 943.7B sparse CPT 是该论文模型事实，不可泛化。</p></div></div></div></article>
+
+    <article class="tech" id="qsa"><div class="tech-title"><h3>QSA</h3><span class="axis select">pool 后选块</span><br><span class="badge b-fact">一手资料</span></div><div class="tech-body"><p><b>一句话：</b>只把 Indexer K 序列按 <code>r=4</code> 压短，再按块选择；Core 仍读取展开后的原始 token K/V。</p><ol class="steps"><li>Indexer K 按不重叠 4-token micro-block average-pool；池化后赋 block position，再做 partial RoPE。</li><li>Query 不压缩，使用当前 token position。</li><li>最多选 512 个完整块，展开为 <code>K=2048</code> 原始 token budget，并总是加入未完成 tail。</li></ol><div class="template-grid"><div class="fact-box"><b>历史保留</b><p>Core Attention 的 token-level K/V 不压缩。</p></div><div class="fact-box"><b>收益</b><p>Indexer 论文口径降为 <code>O(L²/r)</code>；core 只看预算内 token。</p></div><div class="fact-box"><b>代价 / 边界</b><p>压缩仅发生在 Indexer K；不要写成 Core KV compression。代表 Qwen3.8-Flash-Next。</p></div></div></div></article>
+
+    <article class="tech" id="nsa"><div class="tech-title"><h3>NSA</h3><span class="axis select">原生三分支</span><br><span class="badge b-fact">一手资料</span></div><div class="tech-body"><p><b>一句话：</b>原生可训练的三分支 sparse attention，把全局粗读、重要块精读与局部窗口分开学习。</p><ol class="steps"><li><b>compressed：</b>learned compressor 产生 coarse-grained K/V。</li><li><b>selected：</b>选择 fine-grained contiguous blocks，保留原 token 细节。</li><li><b>sliding：</b>固定局部窗口；三分支各有独立 K/V，输出由 learned gates 融合。</li><li>GQA/MQA 场景下采用 group-consistent selection 与 group-centric kernel，组内 query heads 共享选块。</li></ol><div class="template-grid"><div class="fact-box"><b>历史保留</b><p>三类重映射历史，不是单个 DSA indexer。</p></div><div class="fact-box"><b>收益</b><p>层次化地覆盖全局、精细和局部模式，并面向 Tensor Core 规则块。</p></div><div class="fact-box"><b>代价 / 边界</b><p>独立分支与门控更复杂；NSA 不是 DeepSeek V3.2 的 DSA。</p></div></div></div></article>
+
+    <article class="tech" id="csa"><div class="tech-title"><h3>CSA</h3><span class="axis select">低压缩 + top-k</span><br><span class="badge b-fact">HF 官方文档</span></div><div class="tech-body"><p><b>一句话：</b>DeepSeek V4 的 Compressed Sparse Attention：对共享 K=V 的历史做低压缩率 overlapping compression，再由 lightning indexer 选 top-k compressed blocks。</p><ol class="steps"><li>官方 Transformers 默认压缩率 <code>m=4</code>，窗口重叠。</li><li>Indexer 对 compressed pool 排序并 gather top-<code>index_topk</code> entries。</li><li>Core 同时读取选中的 long-range compressed entries 与共享 local sliding-window K=V branch。</li></ol><div class="template-grid"><div class="fact-box"><b>历史保留</b><p>低压缩 overlapping entries + local exact K=V。</p></div><div class="fact-box"><b>收益</b><p>压缩后再稀疏，保留较细远程分辨率。</p></div><div class="fact-box"><b>代价 / 边界</b><p>需要 compressor overlap state、indexer 与 gather；与 HCA 不同。</p></div></div></div></article>
+
+    <article class="tech" id="hca"><div class="tech-title"><h3>HCA</h3><span class="axis select">重压缩 dense</span><br><span class="badge b-fact">HF 官方文档</span></div><div class="tech-body"><p><b>一句话：</b>DeepSeek V4 的 Heavily Compressed Attention：对共享 K=V 以高压缩率做 non-overlapping compression，不设 indexer，读取所有可见 compressed entries。</p><ol class="steps"><li>官方 Transformers 默认压缩率 <code>m′=128</code>，窗口不重叠。</li><li>远程 compressed entries 做 dense attention；另与 local sliding branch 拼接。</li><li>无 top-k indexer，cache 只需 compressor + local branch 状态。</li></ol><div class="template-grid"><div class="fact-box"><b>历史保留</b><p>重压缩 entries + local exact K=V。</p></div><div class="fact-box"><b>收益</b><p>去掉 indexer，远程序列长度大幅压短。</p></div><div class="fact-box"><b>代价 / 边界</b><p>压缩分辨率更粗；仍对全部 compressed entries dense 读取。CSA ≠ HCA。</p></div></div></div></article>
+
+    <article class="tech" id="indexshare"><div class="tech-title"><h3>IndexShare</h3><span class="axis reuse">复用 indices</span><br><span class="badge b-wiki">wiki 归纳</span></div><div class="tech-body"><p><b>一句话：</b>复用已经选出的 top-k token indices，避免重复运行 DSA indexer；它不是 attention。</p><ol class="steps"><li><b>跨 Transformer 层：</b>Full Indexer 层计算一次，后续 Shared 层复用 indices，但各自使用本层 Q/K/V。</li><li><b>跨 MTP iterations：</b>第一轮预测计算，后续迭代复用；与跨层共享正交。</li></ol><div class="template-grid"><div class="fact-box"><b>共享什么</b><p>只共享 top-k indices。</p></div><div class="fact-box"><b>不共享什么</b><p>不共享 QKV、KV cache、attention output。</p></div><div class="fact-box"><b>代价 / 边界</b><p>逐层选择灵活性下降；代表 GLM-5.2，GLM-5.3-Flash 无跨层共享。</p></div></div></div></article>
+  </div>
+  <div class="callout"><b>复杂度口径。</b> “Sparse”通常只把 core attention 变为 <code>O(Lk)</code> 或块等价形式；若 indexer 仍扫描全历史，它仍可能带有 <code>O(L²)</code> 或 <code>O(L²/r)</code> 项。总墙钟还取决于 top-k、Gather、block 规则性、batch/context、dtype、硬件与 backend。</div>
+</section>
+
+<section id="recurrent-family" aria-labelledby="recurrent-family-title">
+  <div class="section-no">07 / RECURRENT STATE</div><h2 id="recurrent-family-title">递归状态家族：GDN vs KDA</h2>
+  <p class="lead">两者都用 Delta Rule 把历史压进固定大小 key→value fast-weight matrix，并常带 short causal convolution state；主要分歧是旧状态衰减的粒度。</p>
+  <div class="recur-flow" aria-label="Delta Rule 四步流程"><div><b>1 衰减</b>旧矩阵状态</div><div><b>2 预测</b><code>kᵀ S̄</code> 预测 value</div><div><b>3 纠错写入</b>只写 <code>v-pred</code></div><div><b>4 Query 读取</b><code>o=Sᵀq</code></div></div>
+  <code class="equation">S̄ₜ = decay(Sₜ₋₁)
+prediction = kₜᵀ S̄ₜ
+delta_v = βₜ (vₜ − prediction)
+Sₜ = S̄ₜ + kₜ delta_vᵀ
+oₜ = Sₜᵀ qₜ</code>
+  <div class="table-wrap" tabindex="0" aria-label="GDN 与 KDA 对比表"><table><thead><tr><th>维度</th><th>GDN</th><th>KDA</th></tr></thead><tbody>
+    <tr><td><b>衰减</b></td><td>通常 per-head scalar <code>αₜ</code>：整张 head state 同一 retention</td><td>per-head、per-key-channel vector <code>αₜ[dₖ]</code>：<code>Diag(αₜ)S</code></td></tr>
+    <tr><td><b>历史载体</b></td><td colspan="2">固定 matrix state + short-conv state；都不是显式 token 列表</td></tr>
+    <tr><td><b>Kimi K3 特化</b></td><td>不适用</td><td><code>g_min=-5</code> 限制 log-decay，便于 chunk rescaling 数值稳定；full-rank output gate</td></tr>
+    <tr><td><b>代表模型</b></td><td>Qwen3.8-Flash-Next：每四层 3 GDN + 1 QSA</td><td>Kimi K3；GLM-5.3-Flash 的 34 KDA + 11 DSA</td></tr>
+  </tbody></table></div>
+  <h3>训练/prefill 与 decode 是两种调度</h3>
+  <div class="split"><div class="mode" style="border-top-color:var(--state)"><h3>Chunked training / prefill</h3><p>时间轴切块，块内把因果递推改写为矩阵乘/triangular 变换或 scan，块间只传播最终 state。这里的 chunk 是算子内部计算粒度，不等于 serving 的 chunked prefill 调度。</p></div><div class="mode" style="border-top-color:var(--state)"><h3>Recurrent decode</h3><p>每次一个 token：更新 Conv State 与 Matrix State，再原地推进。单步不需重读完整历史 KV，但状态读写与融合 kernel 仍决定墙钟。</p></div></div>
+  <div class="callout"><b>Fixed state 不等于免费。</b> 每请求、每层、每 head 的 <code>dₖ×dᵥ</code> 矩阵可能很大；prefix caching、请求迁移、投机回滚都需要 checkpoint、copy-on-write 或 replay。它也弱于显式 KV 的精确任意 token 检索，因此 Kimi K3、GLM-5.3-Flash 都与显式 attention 层混合使用。 <span class="badge b-wiki">wiki 归纳</span></div>
+</section>
+
+<section id="depth-family" aria-labelledby="depth-family-title">
+  <div class="section-no">08 / DEPTH &amp; RESIDUAL</div><h2 id="depth-family-title">深度 / 残差家族：mHC vs AttnRes</h2>
+  <p class="lead">它们都不改 token 维注意力与 KV cache；它们回答的是“当前层如何从深度历史中接收信息”。</p>
+  <div class="table-wrap" tabindex="0" aria-label="mHC 和 Attention Residuals 对比"><table><thead><tr><th>问题</th><th>mHC</th><th>Attention Residuals</th></tr></thead><tbody>
+    <tr><td><b>保存什么</b></td><td>始终维护多路 residual streams</td><td>保留历史层或历史 blocks 的表示供后层选择</td></tr>
+    <tr><td><b>当前层怎么读</b></td><td>学习 read/write/mixing；mixing 经 Sinkhorn 投到 doubly stochastic 空间</td><td>pseudo-query 对历史层表示做 depth-wise softmax attention</td></tr>
+    <tr><td><b>稳定性手段</b></td><td>行列和为 1 的 mixing 约束，恢复接近 identity / non-expansive 的传播</td><td>key 侧 RMSNorm；pseudo-query 零初始化使早期近似均匀</td></tr>
+    <tr><td><b>工程版本</b></td><td>kernel fusion、mixed precision、自定义 backward、重计算</td><td>Full 读所有历史层；Block 仅跨 block 聚合，降低显存/通信</td></tr>
+    <tr><td><b>核心代价</b></td><td>多流访存和 mixing 开销</td><td>历史表示存储、跨层/跨 stage 通信与 softmax I/O</td></tr>
+    <tr><td><b>代表模型</b></td><td>DeepSeek V4、GLM-5.3-Flash</td><td>Kimi K3</td></tr>
+  </tbody></table></div>
+  <div class="callout"><b>不要做普遍优劣结论。</b> mHC 是“保留多流并稳定混合”，AttnRes 是“在历史层中选择”；它们的状态形态、系统瓶颈与实验条件都不同。AttnRes 不是 token attention，也不是稀疏 KV 选择。</div>
+</section>
+
+<section id="capacity-family" aria-labelledby="capacity-family-title">
+  <div class="section-no">09 / CAPACITY</div><h2 id="capacity-family-title">容量家族：静态查表与潜在专家</h2>
+  <p class="lead">这组技术不主要改长历史读取，而是在控制每 token 计算/通信的前提下，把更多参数容量放进模型。</p>
+  <div class="tech-list">
+    <article class="tech"><div class="tech-title"><h3>Engram</h3><span class="axis capacity">Conditional Memory</span><br><span class="badge b-fact">一手资料</span></div><div class="tech-body"><p><b>流程：</b><code>local n-gram → tokenizer compression → multihead hash → table lookup → context gate → short conv → residual</code>。</p><p>每 token 只算固定数量的哈希地址并读取固定 rows，因此 lookup 是 <code>O(1)</code> 数组索引，不随表大小扫描。表项是可训练模型参数；它不是 ANN，不是外部文档检索，也不是 RAG。代价在大表存储、碰撞、分片、预取和热点。</p></div></article>
+    <article class="tech"><div class="tech-title"><h3>Qwen n-gram</h3><span class="axis capacity">加速器外静态表</span><br><span class="badge b-fact">论文事实</span></div><div class="tech-body"><p>Qwen3.8-Flash-Next 最终只在 <b>Layer 2</b> 放一层 n-gram embedding；额外 <b>51B</b> 参数在 125B 主干之外并存于加速器外，host prefetch 与 Layer 1 计算重叠。</p><p><span class="badge b-warn">实现未披露</span> 论文没有给出具体 n 阶、hash/slot、压缩方式或 hidden-state gate，不能把 Engram demo 的实现细节套过来。所谓“额外 latency 可忽略”也缺少带宽、命中率和端到端消融。</p></div></article>
+    <article class="tech"><div class="tech-title"><h3>LatentMoE</h3><span class="axis capacity">低维 routed path</span><br><span class="badge b-wiki">机制归纳</span></div><div class="tech-body"><code class="equation">主干 x: [T,d]
+→ down projection d→ℓ
+→ router / experts: ℓ→m→ℓ
+→ up projection ℓ→d
+→ 主干 y: [T,d]</code><p><b>三维必须分清：</b><code>d</code> 是主干 hidden/residual width；<code>ℓ</code> 只存在于 routed expert 路径；<code>m</code> 是 expert FFN intermediate width，通常不等于 <code>ℓ</code>。</p><p>expert 权重主导尺寸与 EP activation payload 可从 <code>d</code> 相关降到 <code>ℓ</code> 相关，但新增上下投影、可能的信息瓶颈、token permutation、collective latency 与小 GEMM 仍要记账。Kimi K3 的 Stable LatentMoE 是代表实例。</p></div></article>
+  </div>
+</section>
+
+<section id="model-composition" aria-labelledby="model-composition-title">
+  <div class="section-no">10 / COMPOSITION</div><h2 id="model-composition-title">代表模型如何组合</h2>
+  <p class="lead">只列已被指定材料支持的组合；“未列出”不等于模型没有其它模块。</p>
+  <div class="table-wrap" tabindex="0" aria-label="代表模型架构组合表"><table><thead><tr><th>模型</th><th>Token mixer / 历史</th><th>残差 / 深度</th><th>容量与其它</th><th>证据边界</th></tr></thead><tbody>
+    <tr><td><b>DeepSeek V3.2</b></td><td>MLA MQA mode + DSA，top-2048 latent entries</td><td>—</td><td>沿用主干 MoE</td><td><span class="badge b-fact">论文</span> DSA 为 continued training 引入</td></tr>
+    <tr><td><b>DeepSeek V4</b></td><td>共享 K=V MQA；CSA/HCA 与 local sliding branch</td><td>mHC</td><td>MoE</td><td><span class="badge b-fact">官方 HF/论文</span> 配置字段/版本可能演进</td></tr>
+    <tr><td><b>Qwen3.8-Flash-Next</b></td><td>每 4 层：3 GDN + 1 QSA</td><td>GR（四路 Gated Residual）</td><td>MoE + Layer 2 n-gram embedding</td><td><span class="badge b-fact">论文</span> 51B n-gram 在 125B 主干之外</td></tr>
+    <tr><td><b>GLM-5.2</b></td><td>MLA + DSA + 跨层 IndexShare；MTP iteration sharing</td><td>—</td><td>MoE</td><td><span class="badge b-wiki">配置归纳</span> GLM-5 已有 DSA，5.2 新增 IndexShare</td></tr>
+    <tr><td><b>GLM-5.3-Flash</b></td><td>34 KDA + 11 DSA；无跨层 IndexShare</td><td>mHC</td><td>MoE + Vision</td><td><span class="badge b-wiki">配置归纳</span> 不是 GLM-5.3 的量化/蒸馏版</td></tr>
+    <tr><td><b>Kimi K3</b></td><td>69 KDA + 24 Gated MLA 显式 attention</td><td>Block Attention Residuals</td><td>Stable LatentMoE + Vision</td><td><span class="badge b-fact">官方技术报告</span> 精确命名：Gated MLA、Stable LatentMoE、Block AttnRes</td></tr>
+    <tr><td><b>MiniMax M3</b></td><td>标准 GQA + MSA</td><td>—</td><td>MoE + 原生多模态</td><td><span class="badge b-fact">MSA 论文</span> 不混入 MLA</td></tr>
+  </tbody></table></div>
+  <p class="diagram-note">“—”表示本报告未在指定证据中归纳该轴，不表示模型没有标准 residual 或其它结构。</p>
+</section>
+
+<section id="decision-tree" aria-labelledby="decision-tree-title">
+  <div class="section-no">11 / DESIGN TREE</div><h2 id="decision-tree-title">设计选择树：先定位瓶颈，再选机制</h2>
+  <ul class="choice-tree">
+    <li><b>瓶颈是 decode 读取显式 KV 的字节数？</b><ul><li>希望保留多头表达且可接受专用 kernel：考虑 MLA 的 latent cache / absorbed MQA mode。</li><li>愿意把多数历史压进固定状态：考虑 GDN/KDA，但保留周期性显式 attention 以补精确检索。</li></ul></li>
+    <li><b>瓶颈是长序列 core attention FLOPs？</b><ul><li>标准 GQA、重视 GPU 规则块：MSA。</li><li>已有 MLA checkpoint、接受 token-level indexer 与 CPT：DSA。</li><li>希望先压短 indexer 且 core 仍读原 token：QSA。</li><li>希望原生三层次历史建模：NSA。</li><li>希望 compressed-entry 路线：CSA（低压缩+索引）或 HCA（重压缩+无索引）。</li></ul></li>
+    <li><b>瓶颈是 indexer 自身？</b><ul><li>压短候选：QSA 的 pooled Indexer K。</li><li>少算几次：IndexShare，但先验证跨层选择复用的质量边界。</li></ul></li>
+    <li><b>问题发生在深度信息流而非 token 历史？</b><ul><li>想保留多路 residual streams 并稳定 mixing：mHC。</li><li>想对历史层表示做选择：AttnRes；工程上先看 Block 版本。</li></ul></li>
+    <li><b>瓶颈是参数容量与访问成本？</b><ul><li>局部稳定模式可确定性寻址：Engram / n-gram embedding。</li><li>MoE 的专家权重带宽与 EP payload 过宽：LatentMoE，并测量投影是否成为新瓶颈。</li></ul></li>
+  </ul>
+  <div class="callout"><b>最终验收不是复杂度公式。</b> 至少分别报告：模型质量、训练条件、prefill/decode、上下文与 batch、KV/state 容量、kernel/module latency、端到端 serving、硬件与并行拓扑。</div>
+</section>
+
+<section id="misconceptions" aria-labelledby="misconceptions-title">
+  <div class="section-no">12 / TEN MYTHS</div><h2 id="misconceptions-title">10 条常见误区</h2>
+  <div class="misconceptions">
+    <article class="myth"><b>“QSA 压缩了 Core KV。”</b><p>错。QSA 只压缩 Indexer K 序列；选块展开后，Core Attention 读取原始 token-level K/V。</p></article>
+    <article class="myth"><b>“IndexShare 是一种 Attention。”</b><p>错。它只复用 top-k indices；每层仍用自己的 Q/K/V 和 attention 输出。</p></article>
+    <article class="myth"><b>“Sparse Attention 自动让总复杂度线性。”</b><p>错。Core 可为 O(Lk)，但 DSA/MSA indexer 仍可能含 O(L²) 轻量项，QSA 为 O(L²/r)。</p></article>
+    <article class="myth"><b>“Fixed state 可像 KV cache 一样任意回退。”</b><p>错。递归状态丢失逐 token 可逆性；回滚、迁移与 prefix reuse 需要 checkpoint/replay。</p></article>
+    <article class="myth"><b>“Engram 就是内置 RAG。”</b><p>错。它是模型参数表的确定性哈希索引，不搜索外部文档，也不做 ANN。</p></article>
+    <article class="myth"><b>“AttnRes 是另一种 token attention。”</b><p>错。它沿 depth 对历史层表示做 softmax，不选择上下文 token KV。</p></article>
+    <article class="myth"><b>“LatentMoE 的 ℓ 是新的 hidden size，m=ℓ。”</b><p>错。主干保持 d；ℓ 是 routed path width；m 是 expert intermediate width，三者独立。</p></article>
+    <article class="myth"><b>“CSA 与 HCA 是同义词。”</b><p>错。官方 HF 定义：CSA 默认 m=4 overlapping + indexer top-k；HCA 默认 m′=128 non-overlapping、无 indexer、dense 读 compressed entries。</p></article>
+    <article class="myth"><b>“MLA 的 MHA/MQA 是两个不同 checkpoint 的简单二选一。”</b><p>错。它们是可吸收结构下的两种执行形态；等价依赖具体矩阵与 RoPE 分解。</p></article>
+    <article class="myth"><b>“论文加速数字可以直接写进生产 SLO。”</b><p>错。必须保留硬件、dtype、batch、context、chunk、baseline 与 kernel/module/端到端边界。</p></article>
+  </div>
+</section>
+
+<section id="sources" aria-labelledby="sources-title">
+  <div class="section-no">13 / SOURCES &amp; EVIDENCE</div><h2 id="sources-title">来源与证据边界</h2>
+  <p class="lead">本页是学习型编译物，不是新的事实来源。机制定义优先一手论文/官方文档；仓库 wiki 用于交叉归纳与版本边界；二手文章只作为阅读线索。</p>
+  <div class="evidence-grid">
+    <div><b>已知事实</b><p>论文公式、官方配置、明确披露的模型组合。使用“一手资料”标签。</p></div>
+    <div><b>实现差异</b><p>mode、layout、kernel、cache/checkpoint 依模型与 backend 版本变化。</p></div>
+    <div><b>性能权衡</b><p>理论复杂度只说明子项；墙钟必须绑定实验条件，不做固定倍数承诺。</p></div>
+    <div><b>待核实</b><p>未公开 tensor shape、hash/gate、系统带宽或版本字段，显式保留未知。</p></div>
+  </div>
+  <div class="callout"><span class="badge b-warn">定义更新</span> 仓库旧页 <a href="../../wiki/concepts/CSA-HCA.md">CSA-HCA.md</a> 来自早期二手解析，曾把两者放在同一模糊结构下。本报告以当前 <a href="https://huggingface.co/docs/transformers/model_doc/deepseek_v4" target="_blank" rel="noopener">DeepSeek V4 Hugging Face 官方文档</a> 为正式定义：<b>CSA 与 HCA 不是同义词</b>。</div>
+  <div class="source-groups">
+    <div class="source-group"><h3>仓库 Wiki：机制</h3><ul>
+      <li><a href="../../wiki/concepts/MLA.md">MLA</a></li><li><a href="../../wiki/concepts/DeepSeek%20Sparse%20Attention.md">DeepSeek Sparse Attention</a></li><li><a href="../../wiki/concepts/Qwen%20Sparse%20Attention.md">Qwen Sparse Attention</a></li><li><a href="../../wiki/concepts/KDA.md">KDA</a></li><li><a href="../../wiki/concepts/线性注意力递归状态.md">线性注意力递归状态</a></li><li><a href="../../wiki/concepts/Chunked%20Gated%20Delta%20Rule.md">Chunked Gated Delta Rule</a></li><li><a href="../../wiki/concepts/IndexShare.md">IndexShare</a></li><li><a href="../../wiki/concepts/mHC.md">mHC</a></li><li><a href="../../wiki/concepts/Hyper-Connections.md">Hyper-Connections</a></li><li><a href="../../wiki/concepts/Attention%20Residuals.md">Attention Residuals</a></li><li><a href="../../wiki/concepts/Conditional%20Memory.md">Conditional Memory</a></li><li><a href="../../wiki/concepts/N-gram%20Embedding.md">N-gram Embedding</a></li><li><a href="../../wiki/concepts/LatentMoE.md">LatentMoE</a></li>
+    </ul></div>
+    <div class="source-group"><h3>仓库 Wiki：模型</h3><ul>
+      <li><a href="../../wiki/entities/Engram.md">Engram</a></li><li><a href="../../wiki/entities/DeepSeek-V3.2-Exp.md">DeepSeek-V3.2-Exp</a></li><li><a href="../../wiki/entities/Qwen3.8-Flash-Next.md">Qwen3.8-Flash-Next</a></li><li><a href="../../wiki/entities/GLM-5%20系列.md">GLM-5 系列</a></li><li><a href="../../wiki/entities/GLM-5.3-Flash.md">GLM-5.3-Flash</a></li><li><a href="../../wiki/entities/Kimi%20K3.md">Kimi K3</a></li>
+    </ul><h3 style="margin-top:18px">Raw</h3><ul><li><a href="../../raw/articles/MiniMax-M3：MSA%20技术报告速读.md">MiniMax-M3：MSA 技术报告速读</a> <span class="badge b-warn">二手</span></li><li><a href="../../raw/papers/DeepSeek_V3_2.pdf">DeepSeek_V3_2.pdf</a> <span class="badge b-fact">论文</span></li><li><a href="../../raw/papers/k3_tech_report.pdf">Kimi K3 Technical Report</a> <span class="badge b-fact">论文</span></li></ul></div>
+    <div class="source-group"><h3>官方外部资料</h3><ul>
+      <li><a href="https://arxiv.org/html/2502.11089" target="_blank" rel="noopener">NSA 论文</a></li><li><a href="https://arxiv.org/html/2606.13392" target="_blank" rel="noopener">MSA 论文</a></li><li><a href="https://github.com/MiniMax-AI/MSA" target="_blank" rel="noopener">MiniMax MSA repo</a></li><li><a href="https://huggingface.co/docs/transformers/model_doc/deepseek_v4" target="_blank" rel="noopener">DeepSeek V4 HF docs</a></li><li><a href="https://arxiv.org/html/2512.02556v1" target="_blank" rel="noopener">DeepSeek V3.2 / MLA modes</a></li>
+    </ul><h3 style="margin-top:18px">阅读规则</h3><ul><li>公式与正式命名优先官方。</li><li>Wiki 的“配置观察”不升级为普遍机制结论。</li><li>任何 benchmark 数字必须与条件一起引用。</li></ul></div>
+  </div>
+</section>
+<footer class="footer">先进大模型架构知识图谱 · 自包含单文件报告 · 无远程运行依赖 · 生成内容仅用于工程学习与证据导航</footer>
+</main>
+</div>
+<button class="top-button" id="back-to-top" type="button" aria-label="返回页面顶部">返回顶部</button>
+<script>
+(function(){
+  'use strict';
+  var buttons = Array.prototype.slice.call(document.querySelectorAll('[data-filter]'));
+  var rows = Array.prototype.slice.call(document.querySelectorAll('#matrix-body tr'));
+  buttons.forEach(function(button){
+    button.addEventListener('click', function(){
+      var filter = button.getAttribute('data-filter');
+      buttons.forEach(function(item){ item.setAttribute('aria-pressed', item === button ? 'true' : 'false'); });
+      rows.forEach(function(row){ row.hidden = filter !== 'all' && row.getAttribute('data-category') !== filter; });
+    });
+  });
+  document.getElementById('back-to-top').addEventListener('click', function(){
+    window.scrollTo({top:0, behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'});
+  });
+})();
+</script>
+</body>
+</html>

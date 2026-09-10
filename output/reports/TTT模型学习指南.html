@@ -1,0 +1,665 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="TTT Layer / TTT-LM 中文学习指南：机制、公式、mini-batch、dual form、理论边界、实验与推理系统含义。">
+  <title>TTT 模型学习指南｜从状态即学习器到推理系统挑战</title>
+  <style>
+    :root {
+      --paper: #f7f2e8;
+      --paper-2: #fffaf0;
+      --ink: #202925;
+      --muted: #667069;
+      --line: #d8d0c1;
+      --teal: #176b62;
+      --teal-soft: #dcece6;
+      --rust: #9b4634;
+      --rust-soft: #f3dfd7;
+      --gold: #8a6724;
+      --gold-soft: #f1e7c9;
+      --blue: #355f78;
+      --blue-soft: #dfebf1;
+      --shadow: 0 14px 36px rgba(48, 45, 36, .08);
+      --radius: 14px;
+      --reading: 76ch;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 1.2rem; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        linear-gradient(rgba(37, 87, 77, .025) 1px, transparent 1px),
+        var(--paper);
+      background-size: 100% 34px;
+      font-family: ui-serif, "Songti SC", "Noto Serif CJK SC", "Source Han Serif SC", Georgia, serif;
+      line-height: 1.75;
+      overflow-wrap: anywhere;
+    }
+    a { color: var(--teal); text-underline-offset: .18em; }
+    a:hover { color: var(--rust); }
+    :focus-visible { outline: 3px solid #c7772e; outline-offset: 3px; border-radius: 3px; }
+    .skip-link {
+      position: fixed; left: 1rem; top: -5rem; z-index: 100;
+      background: var(--ink); color: white; padding: .7rem 1rem; border-radius: 0 0 8px 8px;
+    }
+    .skip-link:focus { top: 0; }
+    .page { display: grid; grid-template-columns: minmax(220px, 282px) minmax(0, 1fr); max-width: 1480px; margin: 0 auto; }
+    .sidebar {
+      position: sticky; top: 0; align-self: start; height: 100vh; overflow: auto;
+      padding: 2rem 1.25rem 3rem 1.5rem; border-right: 1px solid var(--line);
+      background: rgba(247, 242, 232, .92); backdrop-filter: blur(8px);
+    }
+    .eyebrow { font: 700 .72rem/1.2 ui-sans-serif, system-ui, sans-serif; letter-spacing: .13em; text-transform: uppercase; color: var(--rust); }
+    .side-title { margin: .45rem 0 .25rem; font-size: 1.25rem; line-height: 1.28; }
+    .side-note { margin: 0 0 1.25rem; color: var(--muted); font-size: .86rem; }
+    .toc { list-style: none; margin: 0; padding: 0; font-family: ui-sans-serif, system-ui, sans-serif; font-size: .86rem; }
+    .toc li + li { margin-top: .16rem; }
+    .toc a { display: block; padding: .42rem .55rem; border-left: 2px solid transparent; color: #47534d; text-decoration: none; }
+    .toc a:hover { background: var(--teal-soft); border-left-color: var(--teal); color: var(--ink); }
+    .side-key { margin-top: 1.35rem; padding-top: 1rem; border-top: 1px solid var(--line); font: .78rem/1.55 ui-sans-serif, system-ui, sans-serif; color: var(--muted); }
+    main { min-width: 0; padding: 0 clamp(1.15rem, 4vw, 4.6rem) 5rem; }
+    .mobile-toc { display: none; }
+    .hero { max-width: 1020px; margin: 0 auto; padding: clamp(3.2rem, 8vw, 7rem) 0 2.4rem; border-bottom: 2px solid var(--ink); }
+    h1, h2, h3 { text-wrap: balance; }
+    h1 { max-width: 18ch; margin: .55rem 0 1rem; font-size: clamp(2.55rem, 6vw, 5.6rem); line-height: 1.02; letter-spacing: -.045em; }
+    .dek { max-width: 66ch; margin: 0; color: #47524d; font-size: clamp(1.05rem, 2vw, 1.35rem); }
+    .one-line { margin: 2rem 0 0; padding: 1.25rem 1.35rem; background: var(--ink); color: #fffaf0; border-radius: var(--radius); box-shadow: var(--shadow); font-size: 1.12rem; }
+    .one-line strong { color: #9bd6c8; }
+    .route { display: grid; grid-template-columns: 1fr 1.35fr; gap: 1rem; margin-top: 1.25rem; }
+    .route-card { padding: 1rem 1.1rem; border: 1px solid var(--line); border-radius: var(--radius); background: rgba(255, 250, 240, .78); }
+    .route-card h2 { margin: 0 0 .45rem; font-size: 1rem; font-family: ui-sans-serif, system-ui, sans-serif; letter-spacing: 0; }
+    .route-card ol { margin: .4rem 0 0; padding-left: 1.2rem; }
+    .legend { display: flex; flex-wrap: wrap; gap: .45rem; align-content: start; }
+    .content { max-width: 1020px; margin: 0 auto; }
+    section { padding: clamp(2.7rem, 6vw, 5.2rem) 0; border-bottom: 1px solid var(--line); }
+    h2 { margin: 0 0 1.1rem; font-size: clamp(1.75rem, 4vw, 2.75rem); line-height: 1.18; letter-spacing: -.025em; }
+    h3 { margin: 2rem 0 .65rem; font-size: clamp(1.15rem, 2.2vw, 1.42rem); line-height: 1.35; }
+    p { max-width: var(--reading); }
+    .kicker { display: block; margin-bottom: .55rem; font: 700 .76rem/1 ui-sans-serif, system-ui, sans-serif; letter-spacing: .1em; color: var(--teal); text-transform: uppercase; }
+    .lead { font-size: 1.14rem; color: #3d4842; }
+    .badge { display: inline-flex; align-items: center; width: fit-content; padding: .2rem .48rem; border-radius: 999px; font: 700 .72rem/1.4 ui-sans-serif, system-ui, sans-serif; white-space: nowrap; }
+    .fact { background: var(--teal-soft); color: #0f5a51; }
+    .obs { background: var(--blue-soft); color: #2f5870; }
+    .infer { background: var(--rust-soft); color: #843a2b; }
+    .verify { background: var(--gold-soft); color: #725514; }
+    .callout { margin: 1.35rem 0; padding: 1rem 1.2rem; border-left: 5px solid var(--teal); background: rgba(220, 236, 230, .62); border-radius: 0 var(--radius) var(--radius) 0; }
+    .callout.warn { border-left-color: var(--rust); background: rgba(243, 223, 215, .66); }
+    .callout.gold { border-left-color: var(--gold); background: rgba(241, 231, 201, .68); }
+    .callout p:first-child { margin-top: 0; }
+    .callout p:last-child { margin-bottom: 0; }
+    .table-wrap, .math-scroll, .code-scroll { overflow-x: auto; max-width: 100%; -webkit-overflow-scrolling: touch; }
+    table { width: 100%; min-width: 720px; border-collapse: collapse; margin: 1.25rem 0; background: rgba(255, 250, 240, .66); font-size: .94rem; }
+    caption { text-align: left; margin-bottom: .55rem; color: var(--muted); font: .82rem/1.5 ui-sans-serif, system-ui, sans-serif; }
+    th, td { padding: .78rem .75rem; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
+    th { background: #ebe5d9; font: 700 .8rem/1.4 ui-sans-serif, system-ui, sans-serif; letter-spacing: .02em; }
+    tbody tr:hover { background: rgba(220, 236, 230, .42); }
+    code, .formula { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    code { padding: .08rem .25rem; border-radius: 4px; background: #ebe5d9; font-size: .9em; }
+    .formula { min-width: max-content; margin: .75rem 0; padding: 1rem 1.15rem; border: 1px solid var(--line); border-left: 4px solid var(--rust); background: var(--paper-2); font-size: clamp(.98rem, 2vw, 1.16rem); line-height: 1.55; }
+    .formula-list { display: grid; gap: 1rem; }
+    .formula-card { padding: 1.2rem; border: 1px solid var(--line); border-radius: var(--radius); background: rgba(255, 250, 240, .72); }
+    .formula-card h3 { margin: 0 0 .5rem; }
+    .term-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: .8rem; margin: 1rem 0 0; }
+    .term { padding: .85rem; border-top: 3px solid var(--teal); background: #efe9de; }
+    .term strong { display: block; font-family: ui-sans-serif, system-ui, sans-serif; }
+    .diagram { margin: 1.4rem 0; padding: 1rem; border: 1px solid var(--line); border-radius: var(--radius); background: var(--paper-2); box-shadow: var(--shadow); overflow: hidden; }
+    .diagram svg { display: block; width: 100%; height: auto; min-width: 0; }
+    .diagram figcaption { margin-top: .65rem; color: var(--muted); font: .8rem/1.55 ui-sans-serif, system-ui, sans-serif; }
+    .step-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .85rem; margin-top: 1rem; }
+    .step-card { padding: 1rem; border: 1px solid var(--line); border-radius: 12px; background: rgba(255, 250, 240, .72); }
+    .step-card .n { display: inline-grid; place-items: center; width: 1.8rem; height: 1.8rem; border-radius: 50%; background: var(--teal); color: white; font: 700 .8rem/1 ui-sans-serif, system-ui, sans-serif; }
+    .step-card strong { display: block; margin: .55rem 0 .25rem; }
+    .toy { display: grid; grid-template-columns: .8fr 1.2fr; gap: 1rem; margin: 1.2rem 0; }
+    .toy > div { padding: 1.15rem; border: 1px solid var(--line); border-radius: var(--radius); background: rgba(255, 250, 240, .72); }
+    .toy h3 { margin-top: 0; }
+    .calc { margin: 0; padding: 0; list-style: none; counter-reset: calc; }
+    .calc li { counter-increment: calc; padding: .62rem 0 .62rem 2.45rem; position: relative; border-bottom: 1px dashed var(--line); }
+    .calc li::before { content: counter(calc); position: absolute; left: 0; top: .6rem; display: grid; place-items: center; width: 1.65rem; height: 1.65rem; border-radius: 50%; background: var(--rust-soft); color: var(--rust); font: 700 .75rem/1 ui-sans-serif, system-ui, sans-serif; }
+    .loop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1.15rem; }
+    .loop-card { padding: 1.2rem; border-radius: var(--radius); border: 1px solid var(--line); background: rgba(255, 250, 240, .72); }
+    .loop-card.inner { border-top: 5px solid var(--teal); }
+    .loop-card.outer { border-top: 5px solid var(--rust); }
+    .loop-card h3 { margin-top: 0; }
+    .loop-card ul { padding-left: 1.2rem; }
+    .choice-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .8rem; margin: 1rem 0; }
+    .choice { padding: 1rem; border: 1px solid var(--line); border-radius: 12px; background: rgba(255, 250, 240, .74); }
+    .choice h3 { margin: 0 0 .4rem; font-size: 1.05rem; }
+    .timeline { display: grid; grid-template-columns: repeat(16, minmax(28px, 1fr)); gap: 4px; margin: 1rem 0 .45rem; min-width: 620px; }
+    .token { display: grid; place-items: center; min-height: 38px; background: var(--teal-soft); border: 1px solid #aacfc5; font: 700 .72rem/1 ui-sans-serif, system-ui, sans-serif; }
+    .token:first-child { border-radius: 8px 0 0 8px; }
+    .token:last-child { border-radius: 0 8px 8px 0; }
+    .timeline-label { min-width: 620px; display: grid; grid-template-columns: 1fr; font: .8rem/1.4 ui-sans-serif, system-ui, sans-serif; color: var(--muted); }
+    .batch-brace { display: grid; grid-template-columns: 1fr; gap: 4px; min-width: 620px; }
+    .batch-brace span { padding: .35rem; text-align: center; border-top: 3px solid var(--rust); color: var(--rust); font: 700 .75rem/1.35 ui-sans-serif, system-ui, sans-serif; }
+    .dual-grid { display: grid; grid-template-columns: 1fr auto 1fr; align-items: stretch; gap: 1rem; margin-top: 1.2rem; }
+    .dual-box { padding: 1rem; border: 1px solid var(--line); border-radius: 12px; background: rgba(255, 250, 240, .78); }
+    .dual-box h3 { margin-top: 0; }
+    .dual-arrow { align-self: center; color: var(--rust); font: 700 1.5rem/1 ui-sans-serif, system-ui, sans-serif; }
+    .theorem { margin: 1.2rem 0; padding: 1.2rem; border: 1px solid var(--ink); background: rgba(255, 250, 240, .78); box-shadow: 7px 7px 0 #d8d0c1; }
+    .theorem h3 { margin-top: 0; }
+    .conditions { display: flex; flex-wrap: wrap; gap: .5rem; margin: .8rem 0; }
+    .conditions code { padding: .35rem .55rem; border: 1px solid var(--line); background: white; }
+    .evidence-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem; }
+    .evidence-card { padding: 1rem 1.1rem; border: 1px solid var(--line); border-radius: var(--radius); background: rgba(255, 250, 240, .72); }
+    .evidence-card h3 { margin-top: 0; }
+    .evidence-card.support { border-top: 5px solid var(--teal); }
+    .evidence-card.limit { border-top: 5px solid var(--rust); }
+    .systems { display: grid; grid-template-columns: repeat(2, 1fr); gap: .75rem; margin-top: 1rem; }
+    .system-item { position: relative; padding: 1rem 1rem 1rem 3.25rem; border: 1px solid var(--line); border-radius: 12px; background: rgba(255, 250, 240, .72); }
+    .system-item::before { content: attr(data-n); position: absolute; left: 1rem; top: 1rem; color: var(--rust); font: 800 1rem/1.5 ui-sans-serif, system-ui, sans-serif; }
+    .system-item strong { display: block; }
+    .myths { counter-reset: myth; display: grid; gap: .75rem; margin-top: 1rem; }
+    .myth { counter-increment: myth; display: grid; grid-template-columns: 2.3rem 1fr; gap: .8rem; padding: .9rem 1rem; border-bottom: 1px solid var(--line); background: rgba(255, 250, 240, .52); }
+    .myth::before { content: counter(myth, decimal-leading-zero); color: var(--rust); font: 800 .9rem/1.8 ui-sans-serif, system-ui, sans-serif; }
+    .myth strong { display: block; }
+    .quiz { display: grid; gap: .7rem; margin-top: 1.2rem; }
+    details { border: 1px solid var(--line); border-radius: 10px; background: rgba(255, 250, 240, .74); }
+    summary { cursor: pointer; padding: .9rem 1rem; font-weight: 700; }
+    details[open] summary { border-bottom: 1px solid var(--line); background: #eee8dc; }
+    .answer { padding: .9rem 1rem; }
+    .answer p:first-child { margin-top: 0; }
+    .checklist { display: grid; grid-template-columns: 1fr 1fr; gap: .55rem 1rem; margin: 1rem 0 0; padding: 0; list-style: none; }
+    .checklist li { position: relative; padding: .65rem .75rem .65rem 2.25rem; border: 1px solid var(--line); background: rgba(255, 250, 240, .6); }
+    .checklist li::before { content: "□"; position: absolute; left: .75rem; color: var(--teal); font-weight: 800; }
+    .sources { columns: 2 320px; column-gap: 2rem; padding-left: 1.2rem; }
+    .sources li { break-inside: avoid; margin-bottom: .65rem; }
+    footer { max-width: 1020px; margin: 0 auto; padding: 2rem 0 3rem; color: var(--muted); font: .82rem/1.65 ui-sans-serif, system-ui, sans-serif; }
+    .version { display: inline-block; margin-top: .5rem; padding: .35rem .55rem; border: 1px solid var(--line); background: var(--paper-2); color: var(--ink); }
+    @media (max-width: 980px) {
+      .page { display: block; }
+      .sidebar { display: none; }
+      main { padding-inline: clamp(1rem, 4vw, 2rem); }
+      .mobile-toc { display: block; position: sticky; top: 0; z-index: 20; margin: 0 calc(-1 * clamp(1rem, 4vw, 2rem)); padding: .5rem clamp(1rem, 4vw, 2rem); background: rgba(247, 242, 232, .96); border-bottom: 1px solid var(--line); backdrop-filter: blur(8px); }
+      .mobile-toc summary { padding: .45rem 0; font: 700 .9rem/1.4 ui-sans-serif, system-ui, sans-serif; }
+      .mobile-toc .toc { max-height: 55vh; overflow: auto; padding: .4rem 0 .8rem; }
+      .route, .toy, .loop-grid, .evidence-grid { grid-template-columns: 1fr; }
+      .term-list, .choice-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 640px) {
+      .hero { padding-top: 2.6rem; }
+      h1 { font-size: 2.75rem; }
+      .term-list, .step-grid, .choice-grid, .systems, .checklist { grid-template-columns: 1fr; }
+      .dual-grid { grid-template-columns: 1fr; }
+      .dual-arrow { transform: rotate(90deg); justify-self: center; }
+      .diagram { padding: .55rem; }
+      .diagram .small-svg-text { font-size: 12px; }
+      section { padding-block: 2.6rem; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    }
+    @media print {
+      @page { margin: 15mm; }
+      body { background: white; color: black; font-size: 10.5pt; }
+      .page { display: block; max-width: none; }
+      .sidebar, .mobile-toc, .skip-link { display: none !important; }
+      main { padding: 0; }
+      .hero { padding-top: 0; }
+      section { break-inside: auto; padding: 1.3rem 0; }
+      h2, h3, table, figure, details, .callout, .theorem { break-inside: avoid; }
+      details { display: block; }
+      details > * { display: block !important; }
+      summary { border-bottom: 1px solid #aaa; }
+      a { color: black; text-decoration: underline; }
+      .diagram, .theorem { box-shadow: none; }
+      footer { padding-bottom: 0; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">跳到正文</a>
+  <div class="page">
+    <aside class="sidebar" aria-label="桌面目录">
+      <div class="eyebrow">Research notebook</div>
+      <div class="side-title">TTT 模型学习指南</div>
+      <p class="side-note">读完目标：能讲机制、边界、证据与系统代价。</p>
+      <nav aria-label="章节目录">
+        <ol class="toc">
+          <li><a href="#answer">一句话与路线</a></li>
+          <li><a href="#memory">01 历史存在哪里</a></li>
+          <li><a href="#token-flow">02 单 token 流程</a></li>
+          <li><a href="#equations">03 三个核心公式</a></li>
+          <li><a href="#toy-example">04 标量玩具例子</a></li>
+          <li><a href="#loops">05 内循环 vs 外循环</a></li>
+          <li><a href="#variants">06 Linear vs MLP</a></li>
+          <li><a href="#minibatch-dual">07 Mini-batch 与 Dual</a></li>
+          <li><a href="#equivalence">08 理论等价边界</a></li>
+          <li><a href="#benchmarks">09 实验支持什么</a></li>
+          <li><a href="#systems">10 推理工程含义</a></li>
+          <li><a href="#misconceptions">11 常见误区</a></li>
+          <li><a href="#quiz">12 学习自测</a></li>
+          <li><a href="#checklist">13 讲明白检查表</a></li>
+          <li><a href="#sources">来源与追溯</a></li>
+        </ol>
+      </nav>
+      <div class="side-key">本文中的 TTT 专指 <strong>Test-Time Training Layer / TTT-LM</strong>，不泛指所有 test-time adaptation。</div>
+    </aside>
+
+    <main id="main-content">
+      <details class="mobile-toc">
+        <summary>目录与阅读进度</summary>
+        <nav aria-label="移动端章节目录">
+          <ol class="toc">
+            <li><a href="#answer">一句话与路线</a></li><li><a href="#memory">历史存在哪里</a></li>
+            <li><a href="#token-flow">单 token 流程</a></li><li><a href="#equations">三个核心公式</a></li>
+            <li><a href="#toy-example">标量玩具例子</a></li><li><a href="#loops">内外循环</a></li>
+            <li><a href="#variants">Linear vs MLP</a></li><li><a href="#minibatch-dual">Mini-batch / Dual</a></li>
+            <li><a href="#equivalence">理论边界</a></li><li><a href="#benchmarks">实验</a></li>
+            <li><a href="#systems">推理工程</a></li><li><a href="#misconceptions">误区</a></li>
+            <li><a href="#quiz">自测</a></li><li><a href="#checklist">检查表</a></li><li><a href="#sources">来源</a></li>
+          </ol>
+        </nav>
+      </details>
+
+      <header class="hero" id="answer">
+        <div class="eyebrow">从模型公式到 serving 状态</div>
+        <h1>TTT：把隐藏状态变成一个会在线学习的小模型</h1>
+        <p class="dek">本指南围绕一个问题组织：历史不再作为 token 列表保存，而被写进 learner 的权重后，模型、并行算法与推理系统分别付出什么代价？</p>
+        <p class="one-line"><strong>一句话答案：</strong>TTT Layer 是一种 RNN-like 层——每个 token 先通过局部自监督损失更新内部 learner 权重 <code>W_t</code>（写状态），再用查询视图从更新后的 learner 读取输出（读状态）；外循环则训练这套“如何写、如何读”的规则，使其服务于语言模型 next-token prediction。</p>
+        <div class="route">
+          <div class="route-card">
+            <h2>5 分钟学习路线</h2>
+            <ol>
+              <li><strong>1 分钟：</strong>看四类“历史状态”对比。</li>
+              <li><strong>2 分钟：</strong>沿单 token 流程读三个公式。</li>
+              <li><strong>1 分钟：</strong>分清内外循环与 strict equivalence。</li>
+              <li><strong>1 分钟：</strong>看 benchmark 边界和 serving 清单。</li>
+            </ol>
+          </div>
+          <div class="route-card" aria-label="证据标签图例">
+            <h2>证据标签</h2>
+            <div class="legend">
+              <span class="badge fact">【论文/来源事实】</span>
+              <span class="badge obs">【实验观察】</span>
+              <span class="badge infer">【工程推导】</span>
+              <span class="badge verify">【待核实】</span>
+            </div>
+            <p class="side-note">标签同时用文字与颜色编码；工程推导不冒充论文已实现，版本相关能力不冒充当前 runtime 事实。</p>
+          </div>
+        </div>
+      </header>
+
+      <div class="content">
+        <section id="memory" aria-labelledby="memory-title">
+          <span class="kicker">01 · Mental model</span>
+          <h2 id="memory-title">先问：历史到底存在哪里？</h2>
+          <p class="lead"><span class="badge fact">【论文/来源事实】</span> TTT 的新意不只是“测试时算梯度”，而是把序列层的隐藏状态从向量或聚合矩阵，升级为一个可学习函数的参数。以下统一以“每请求、每层”为观察单位，维度符号只用于建立数量级直觉。</p>
+          <div class="table-wrap">
+            <table>
+              <caption>统一维度账本：<code>T</code> 为已处理 token 数，<code>d</code> 为状态/模型宽度，<code>d_k,d_v</code> 为 key/value 维度。</caption>
+              <thead><tr><th>序列机制</th><th>历史载体</th><th>典型形状</th><th>随 T 增长？</th><th>读写方式</th><th>回退/复用直觉</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Transformer</strong></td><td>显式 KV Cache</td><td><code>K:[T,d_k]</code><br><code>V:[T,d_v]</code></td><td>是，线性增长</td><td>追加当前 K/V；Q 读取历史行</td><td>token/page 边界清晰，较自然做 prefix 复用</td></tr>
+                <tr><td><strong>普通 RNN</strong></td><td>隐藏向量</td><td><code>h_t:[d]</code></td><td>否</td><td>递推覆盖向量</td><td>需保存边界状态；无法恢复任意历史 token</td></tr>
+                <tr><td><strong>线性注意力</strong></td><td>fast-weight 矩阵状态</td><td><code>S_t:[d_k,d_v]</code></td><td>否</td><td>外积/结构化递推写入；Q 乘矩阵读取</td><td>需 checkpoint 聚合状态；不能自然逐 token 删除</td></tr>
+                <tr><td><strong>TTT-Linear</strong></td><td>learner 权重</td><td><code>W_t:[d,d]</code></td><td>否</td><td>对自监督损失做梯度更新；用 Q-view 查询</td><td>需 checkpoint learner；更新、复制、回滚更复杂</td></tr>
+                <tr><td><strong>TTT-MLP</strong></td><td>多层 learner 权重</td><td>多组矩阵；隐藏层通常扩到输入的 <code>4×</code></td><td>否</td><td>更新 MLP 参数；执行 MLP 查询</td><td>状态更强也更重；I/O 与 checkpoint 压力更大</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="callout warn">
+            <p><strong>固定大小 ≠ 状态小。</strong> <span class="badge fact">【论文/来源事实】</span></p>
+            <p>不随 <code>T</code> 增长只说明渐近形态稳定。每请求、每层一个 <code>d×d</code> 方阵，或一个带多组参数的 MLP learner，仍可能比普通 RNN 的 <code>d</code> 维向量大很多；TP 分片、dtype、层数与并发请求数都会进入显存账本。</p>
+          </div>
+          <p>可以把四类机制压缩成一句对比：<strong>Transformer 保存“原始索引卡片”，普通 RNN 保存“摘要向量”，线性注意力保存“聚合关联表”，TTT 保存“读写历史后改变了参数的 learner”。</strong></p>
+        </section>
+
+        <section id="token-flow" aria-labelledby="token-flow-title">
+          <span class="kicker">02 · Read after write</span>
+          <h2 id="token-flow-title">一个 token 如何先写状态、再读状态</h2>
+          <p><span class="badge fact">【论文/来源事实】</span> 当前 token <code>x_t</code> 被投影成 training / label / test 三个视图。training 与 label 视图定义“学什么”，test 视图定义“怎么问”。</p>
+          <figure class="diagram">
+            <svg viewBox="0 0 1100 330" role="img" aria-labelledby="flow-svg-title flow-svg-desc">
+              <title id="flow-svg-title">TTT 单 token 更新与查询流程</title>
+              <desc id="flow-svg-desc">x_t 经过 theta K 和 theta V 形成训练与标签视图，计算多视图重建损失并更新 W_t，再由 theta Q 查询更新后的 learner 产生 z_t。</desc>
+              <defs>
+                <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#667069"/></marker>
+              </defs>
+              <g font-family="ui-sans-serif, system-ui, sans-serif" fill="#202925">
+                <rect x="28" y="126" width="100" height="70" rx="14" fill="#202925"/>
+                <text x="78" y="168" text-anchor="middle" fill="#fffaf0" font-size="24" font-weight="700">x<tspan baseline-shift="sub" font-size="15">t</tspan></text>
+                <line x1="128" y1="146" x2="195" y2="76" stroke="#667069" stroke-width="3" marker-end="url(#arrow)"/>
+                <line x1="128" y1="161" x2="195" y2="161" stroke="#667069" stroke-width="3" marker-end="url(#arrow)"/>
+                <line x1="128" y1="177" x2="195" y2="249" stroke="#667069" stroke-width="3" marker-end="url(#arrow)"/>
+                <rect x="205" y="32" width="170" height="76" rx="12" fill="#dcece6" stroke="#176b62" stroke-width="2"/>
+                <text x="290" y="63" text-anchor="middle" font-size="19" font-weight="700">θ<tspan baseline-shift="sub" font-size="12">K</tspan> x<tspan baseline-shift="sub" font-size="12">t</tspan></text>
+                <text x="290" y="89" text-anchor="middle" font-size="15">training view / 输入</text>
+                <rect x="205" y="123" width="170" height="76" rx="12" fill="#f3dfd7" stroke="#9b4634" stroke-width="2"/>
+                <text x="290" y="154" text-anchor="middle" font-size="19" font-weight="700">θ<tspan baseline-shift="sub" font-size="12">V</tspan> x<tspan baseline-shift="sub" font-size="12">t</tspan></text>
+                <text x="290" y="180" text-anchor="middle" font-size="15">label view / 目标</text>
+                <rect x="205" y="214" width="170" height="76" rx="12" fill="#dfebf1" stroke="#355f78" stroke-width="2"/>
+                <text x="290" y="245" text-anchor="middle" font-size="19" font-weight="700">θ<tspan baseline-shift="sub" font-size="12">Q</tspan> x<tspan baseline-shift="sub" font-size="12">t</tspan></text>
+                <text x="290" y="271" text-anchor="middle" font-size="15">test view / 查询</text>
+                <line x1="375" y1="70" x2="447" y2="120" stroke="#667069" stroke-width="3" marker-end="url(#arrow)"/>
+                <line x1="375" y1="161" x2="447" y2="153" stroke="#667069" stroke-width="3" marker-end="url(#arrow)"/>
+                <rect x="458" y="96" width="200" height="100" rx="14" fill="#fffaf0" stroke="#9b4634" stroke-width="2.5"/>
+                <text x="558" y="130" text-anchor="middle" font-size="18" font-weight="700">多视图重建损失</text>
+                <text x="558" y="159" text-anchor="middle" font-size="16">l(W; x<tspan baseline-shift="sub" font-size="11">t</tspan>)</text>
+                <text x="558" y="183" text-anchor="middle" font-size="14" fill="#667069">比较 learner 输出与 V-view</text>
+                <line x1="658" y1="146" x2="717" y2="146" stroke="#667069" stroke-width="3" marker-end="url(#arrow)"/>
+                <rect x="728" y="96" width="170" height="100" rx="14" fill="#dcece6" stroke="#176b62" stroke-width="2.5"/>
+                <text x="813" y="130" text-anchor="middle" font-size="17" font-weight="700">梯度步骤</text>
+                <text x="813" y="159" text-anchor="middle" font-size="18">W<tspan baseline-shift="sub" font-size="12">t-1</tspan> → W<tspan baseline-shift="sub" font-size="12">t</tspan></text>
+                <text x="813" y="183" text-anchor="middle" font-size="14" fill="#667069">写入当前 token</text>
+                <path d="M375 252 C580 300, 760 270, 812 205" fill="none" stroke="#355f78" stroke-width="3" marker-end="url(#arrow)"/>
+                <line x1="898" y1="146" x2="957" y2="146" stroke="#667069" stroke-width="3" marker-end="url(#arrow)"/>
+                <rect x="968" y="108" width="105" height="76" rx="14" fill="#202925"/>
+                <text x="1020" y="140" text-anchor="middle" fill="#fffaf0" font-size="17" font-weight="700">查询 W<tspan baseline-shift="sub" font-size="11">t</tspan></text>
+                <text x="1020" y="166" text-anchor="middle" fill="#9bd6c8" font-size="20">z<tspan baseline-shift="sub" font-size="13">t</tspan></text>
+                <text x="558" y="30" text-anchor="middle" font-size="14" fill="#9b4634">写状态</text>
+                <text x="914" y="260" text-anchor="middle" font-size="14" fill="#355f78">读更新后的状态（read-after-write）</text>
+              </g>
+            </svg>
+            <figcaption>流程中的 SVG 文字可选择。关键时序是 <code>W_{t-1} → W_t → z_t</code>，不是先用旧状态输出、再异步更新。</figcaption>
+          </figure>
+          <div class="step-grid">
+            <div class="step-card"><span class="n">1</span><strong>构造局部训练样本</strong><code>θ_K x_t</code> 是输入，<code>θ_V x_t</code> 是重建目标。</div>
+            <div class="step-card"><span class="n">2</span><strong>推进 learner 状态</strong>在 <code>W_{t-1}</code> 处求梯度，得到序列私有的 <code>W_t</code>。</div>
+            <div class="step-card"><span class="n">3</span><strong>查询更新后 learner</strong><code>θ_Q x_t</code> 进入 <code>f(·;W_t)</code>，产生层输出 <code>z_t</code>。</div>
+          </div>
+        </section>
+
+        <section id="equations" aria-labelledby="equations-title">
+          <span class="kicker">03 · Core equations</span>
+          <h2 id="equations-title">三个公式：写什么、怎么写、怎么读</h2>
+          <div class="formula-list">
+            <article class="formula-card">
+              <h3>① 多视图重建损失：定义“写入信号”</h3>
+              <div class="math-scroll"><div class="formula">l(W; x<sub>t</sub>) = || f(θ<sub>K</sub>x<sub>t</sub>; W) − θ<sub>V</sub>x<sub>t</sub> ||²</div></div>
+              <p><span class="badge fact">【论文/来源事实】</span> learner 用 training view 作为输入，尝试重建 label view。平方误差衡量“当前 learner 对该 token 的局部任务做得多差”。这不是 next-token prediction。</p>
+            </article>
+            <article class="formula-card">
+              <h3>② 梯度更新：把当前 token 写进隐藏状态</h3>
+              <div class="math-scroll"><div class="formula">W<sub>t</sub> = W<sub>t−1</sub> − η ∇<sub>W</sub> l(W<sub>t−1</sub>; x<sub>t</sub>)</div></div>
+              <p><code>W_{t-1}</code> 是过去所有 token 作用后的 learner 权重；梯度方向来自当前 token 的重建误差；<code>η</code> 控制写入步长。论文实现中还涉及 token-dependent learning rate 等由外循环学习的设计。</p>
+            </article>
+            <article class="formula-card">
+              <h3>③ 查询输出：从新状态读取</h3>
+              <div class="math-scroll"><div class="formula">z<sub>t</sub> = f(θ<sub>Q</sub>x<sub>t</sub>; W<sub>t</sub>)</div></div>
+              <p>查询使用的是刚更新出的 <code>W_t</code>。因此同一个 <code>x_t</code> 同时参与“写状态”和“读状态”，但三个投影视图的职责不同。</p>
+            </article>
+          </div>
+          <div class="term-list" aria-label="三个视图的职责">
+            <div class="term"><strong>θ<sub>K</sub>：training view</strong>learner 接收什么输入。</div>
+            <div class="term"><strong>θ<sub>V</sub>：label view</strong>learner 被要求重建什么。</div>
+            <div class="term"><strong>θ<sub>Q</sub>：test view</strong>当前输出如何查询已写入的状态。</div>
+          </div>
+        </section>
+
+        <section id="toy-example" aria-labelledby="toy-title">
+          <span class="kicker">04 · Hand calculation</span>
+          <h2 id="toy-title">教学用标量玩具例子，不是论文真实维度</h2>
+          <div class="callout gold"><p><strong>目的只有一个：</strong>展示“先写状态、再读状态”。它不展示多维投影、mini-batch、LayerNorm、残差、token-dependent learning rate，也不能代表真实数值稳定性或性能。</p></div>
+          <div class="toy">
+            <div>
+              <h3>设定</h3>
+              <div class="math-scroll"><div class="formula">f(q; w)=wq<br>w<sub>0</sub>=0, k=2, v=1, q=3, η=0.1</div></div>
+              <p>这里把 <code>θ_Kx_t</code> 简写为 <code>k</code>，把 <code>θ_Vx_t</code> 简写为 <code>v</code>，把 <code>θ_Qx_t</code> 简写为 <code>q</code>。</p>
+            </div>
+            <div>
+              <h3>逐步手算</h3>
+              <ol class="calc">
+                <li>损失：<code>l(w)=(wk-v)²=(2w-1)²</code>。</li>
+                <li>梯度：<code>dl/dw=2(wk-v)k</code>，在 <code>w₀=0</code> 处为 <code>2(0×2-1)×2=-4</code>。</li>
+                <li>写状态：<code>w₁=w₀-η(-4)=0-0.1×(-4)=0.4</code>。</li>
+                <li>读状态：<code>z=f(q;w₁)=w₁q=0.4×3=1.2</code>。</li>
+              </ol>
+            </div>
+          </div>
+          <p><strong>你应该带走的唯一机制：</strong>重建误差让 learner 权重从 <code>0</code> 变成 <code>0.4</code>，随后查询看到的是新权重，因此输出为 <code>1.2</code>。这就是最小化的 read-after-write。</p>
+        </section>
+
+        <section id="loops" aria-labelledby="loops-title">
+          <span class="kicker">05 · Meta-learning view</span>
+          <h2 id="loops-title">内循环 vs 外循环：两个目标、两种时间尺度</h2>
+          <div class="loop-grid">
+            <article class="loop-card inner">
+              <h3>内循环：每条序列内部推进状态</h3>
+              <span class="badge fact">【论文/来源事实】</span>
+              <ul>
+                <li>输入当前 token 的 K/V 视图。</li>
+                <li>优化多视图重建损失。</li>
+                <li>推进 <code>W₀ → W₁ → … → W_T</code>。</li>
+                <li><code>W_t</code> 对外循环而言是 activation / hidden state。</li>
+                <li>测试序列也会推动该序列私有 learner 状态。</li>
+              </ul>
+            </article>
+            <article class="loop-card outer">
+              <h3>外循环：训练“如何学习”</h3>
+              <span class="badge fact">【论文/来源事实】</span>
+              <ul>
+                <li>目标是语言模型 next-token prediction。</li>
+                <li>学习 <code>θ_K / θ_V / θ_Q</code>。</li>
+                <li>学习初始化 <code>θ_init = W₀</code>。</li>
+                <li>学习 token-dependent learning rate。</li>
+                <li>共同训练 backbone 与网络其他参数。</li>
+              </ul>
+            </article>
+          </div>
+          <div class="callout warn">
+            <p><strong>两个必须纠正的说法：</strong></p>
+            <p>① 内循环<strong>不是</strong> next-token prediction；next-token prediction 属于外循环语言模型目标。② serving 时推进 TTT learner 状态<strong>不是</strong>拿标签微调整个 LLM；被更新的是 TTT 层内部、每序列私有的 hidden-state learner。</p>
+          </div>
+          <p>外循环可被理解为：寻找一种视图投影、初始 learner 和写入速度，使得“在序列内做局部自监督学习”最终有利于语言建模。这个视角接近 meta-learning，但本文不把 TTT 泛化为所有 test-time adaptation。</p>
+        </section>
+
+        <section id="variants" aria-labelledby="variants-title">
+          <span class="kicker">06 · Learner choice</span>
+          <h2 id="variants-title">TTT-Linear vs TTT-MLP：表达力不是免费的</h2>
+          <div class="table-wrap">
+            <table>
+              <caption>以下比较来自当前 wiki 对原论文和两篇解读的整理；真实速度依赖后端、shape 与 kernel。</caption>
+              <thead><tr><th>维度</th><th>TTT-Linear</th><th>TTT-MLP</th></tr></thead>
+              <tbody>
+                <tr><td><strong>learner</strong></td><td><code>f(x)=Wx</code>，状态是方阵</td><td>带 LayerNorm、残差与 GELU 的两层 MLP；隐藏维度通常为输入的 <code>4×</code></td></tr>
+                <tr><td><strong>状态表达力</strong></td><td>线性 key-to-value / fast-weight 映射，结构较规整</td><td>非线性 learner 更强，但“更强”不自动等于端到端更优</td></tr>
+                <tr><td><strong>计算与 I/O</strong></td><td>相对规整，矩阵状态读写仍非小成本</td><td>参数组更多，逐 token 更新、内存 I/O 与 wall-clock 压力更高</td></tr>
+                <tr><td><strong>dual form 适配</strong></td><td>最自然，可把外积/累计重写为 matmul</td><td>可做系统优化，但计算图和状态更新更复杂</td></tr>
+                <tr><td><strong>理论联系</strong></td><td>仅在严格特例下等价最简无 softmax linear attention</td><td>无该线性等价口径</td></tr>
+                <tr><td><strong>已知实验观察</strong></td><td>Pile 2k 与 Mamba、Transformer 大致接近；长上下文相对 Mamba 的优势扩大</td><td>来源报告质量潜力更强，但额外 FLOPs、内存 I/O 与 wall-clock 会抵消部分优势</td></tr>
+                <tr><td><strong>证据限制</strong></td><td colspan="2">覆盖到约 1.3B、32k，主要指标 perplexity；不能外推生产 serving 或更大规模。</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="callout">
+            <p><span class="badge fact">【论文/来源事实】</span> <strong>比较不是“纯 TTT 层真空对决”。</strong>论文中的 TTT 变体默认使用 Mamba-inspired backbone，并带时间卷积与门控。因此观察到的结果同时受 learner 选择、backbone、归一化、残差、初始化、学习率和实现影响。</p>
+          </div>
+        </section>
+
+        <section id="minibatch-dual" aria-labelledby="minibatch-title">
+          <span class="kicker">07 · Parallelization</span>
+          <h2 id="minibatch-title">Mini-batch TTT 与 dual form：把串行学习变成硬件可执行的块</h2>
+          <h3>为什么严格 online GD 难并行</h3>
+          <p><span class="badge fact">【论文/来源事实】</span> online GD 的第 <code>t</code> 个梯度在 <code>W_{t-1}</code> 处计算，而 <code>W_{t-1}</code> 又依赖前一个 token，时间轴形成长串行链。batch GD 则让整个批次的梯度都在同一个批前状态计算，容易并行，但状态适应粒度最粗。</p>
+          <div class="table-wrap" aria-label="mini-batch b 等于 16 的 token 示意">
+            <div class="timeline">
+              <span class="token">1</span><span class="token">2</span><span class="token">3</span><span class="token">4</span>
+              <span class="token">5</span><span class="token">6</span><span class="token">7</span><span class="token">8</span>
+              <span class="token">9</span><span class="token">10</span><span class="token">11</span><span class="token">12</span>
+              <span class="token">13</span><span class="token">14</span><span class="token">15</span><span class="token">16</span>
+            </div>
+            <div class="batch-brace"><span>一个 mini-batch：b=16；16 个梯度共享批前状态，可批内矩阵化</span></div>
+            <div class="timeline-label">批末统一推进 learner state；第 17 个 token 所在的下一批再从这个新状态开始。论文主要实验使用 <code>b=16</code>，但这不是通用最优值。</div>
+          </div>
+          <div class="choice-grid">
+            <article class="choice"><h3>Online GD · b=1</h3><p>最细粒度适应；每步依赖前态，时间并行度最低。</p></article>
+            <article class="choice"><h3>Mini-batch · b=16</h3><p>论文主要实验折中：批内并行、批间推进。<strong>不是通用最优值。</strong></p></article>
+            <article class="choice"><h3>Batch GD · b=T</h3><p>整段共享初始状态计算梯度，最易矩阵化，偏离 online adaptation 最大。</p></article>
+          </div>
+          <h3>Dual form 在解决什么</h3>
+          <div class="dual-grid">
+            <article class="dual-box">
+              <h3>Primal：显式参数空间</h3>
+              <p>若逐 token 物化梯度/更新，中间对象可呈现多个 <code>d×d</code> 矩阵。瓶颈不仅是算术，还包括这些矩阵的生成、读写与存储。</p>
+            </article>
+            <div class="dual-arrow" aria-hidden="true">→</div>
+            <article class="dual-box">
+              <h3>Dual：样本/小批空间重写</h3>
+              <p>直接推导小批输出和批末状态，把外积与累计组织成加速器擅长的 matmul，避免物化全部 <code>d×d</code> 中间矩阵。</p>
+            </article>
+          </div>
+          <div class="callout warn">
+            <p><strong>不要说“dual form 减少 FLOPs”。</strong> <span class="badge fact">【论文/来源事实】</span></p>
+            <p>更准确的系统口径是：dual form 保持数学输出不变，通过重写数据流、避免不利的中间矩阵物化，并可能用<strong>额外算术</strong>换取更高 matmul / 加速器利用率。因此单看 FLOPs 无法预测 wall-clock。</p>
+          </div>
+        </section>
+
+        <section id="equivalence" aria-labelledby="equivalence-title">
+          <span class="kicker">08 · Theorem boundaries</span>
+          <h2 id="equivalence-title">理论等价只在边界内成立</h2>
+          <article class="theorem">
+            <h3>定理 1：TTT-Linear ↔ 最简无 softmax linear attention</h3>
+            <span class="badge fact">【论文/来源事实】</span>
+            <p>等价需要以下条件<strong>同时成立</strong>：</p>
+            <div class="conditions">
+              <code>f(x)=Wx</code><code>batch GD</code><code>η=1/2</code><code>W₀=0</code><code>特定 θ_K/θ_V/θ_Q views</code>
+            </div>
+            <div class="math-scroll"><div class="formula">W<sub>t</sub> = Σ<sub>s≤t</sub> (θ<sub>V</sub>x<sub>s</sub>)(θ<sub>K</sub>x<sub>s</sub>)ᵀ<br>z<sub>t</sub> = W<sub>t</sub>(θ<sub>Q</sub>x<sub>t</sub>)</div></div>
+            <p>这与最简 linear attention 的 fast-weight 累积一致。但实际 TTT-Linear 还包含 mini-batch、LayerNorm、残差、可学习初始化和学习率，因此<strong>实际 TTT-Linear 不等同于 linear attention</strong>。</p>
+          </article>
+          <article class="theorem">
+            <h3>定理 2：Nadaraya–Watson learner ↔ softmax self-attention</h3>
+            <span class="badge fact">【论文/来源事实】</span>
+            <p>使用保存历史样本列表的 Nadaraya–Watson 非参数 learner 与指数核，可以得到与 softmax self-attention 相同的输出。这里的 learner 状态会随序列增长；它不是固定大小 <code>W_t</code>。</p>
+            <p><strong>意义：</strong>提供“attention 也可看成 test-time learner”的统一解释。<strong>不意味着：</strong>自动得到新的高效 softmax-attention kernel，或消除 KV 历史增长。</p>
+          </article>
+          <div class="callout gold">
+            <p><strong>判断等价的三问：</strong>learner 是否相同？更新规则与初始化是否相同？状态是否同样随上下文增长？任一答案不同，就不能只凭“都像 fast weights”宣称同一算法。</p>
+          </div>
+        </section>
+
+        <section id="benchmarks" aria-labelledby="benchmarks-title">
+          <span class="kicker">09 · Evidence ledger</span>
+          <h2 id="benchmarks-title">来源 benchmark：实验支持什么，不支持什么</h2>
+          <p><span class="badge fact">【论文/来源事实】</span> 当前资料覆盖 Pile <code>2k / 8k</code> 与 Books3 <code>1k–32k</code> 上下文。TTT / Transformer 规模为 <code>125M / 350M / 760M / 1.3B</code>；Mamba 对应 <code>130M / 370M / 790M / 1.4B</code>。</p>
+          <div class="callout warn"><p><strong>口径纠正：</strong>第一篇二手文章中的 <code>250M</code> 是误记；本报告只采用原论文口径 <code>350M</code>。</p></div>
+          <div class="evidence-grid">
+            <article class="evidence-card support">
+              <h3>观察到了什么</h3>
+              <span class="badge obs">【实验观察】</span>
+              <ul>
+                <li><strong>Pile 2k：</strong>来源整理称 TTT-Linear、Mamba、Transformer 大致接近；TTT-MLP 的额外 FLOPs 会抵消部分 perplexity 优势。</li>
+                <li><strong>Pile 8k：</strong>来源报告 TTT-Linear / TTT-MLP 相对 Mamba 的优势扩大。</li>
+                <li><strong>Books3 1k–32k：</strong>上下文拉长时，来源报告 TTT 相对 Mamba 的优势更明显，32k 是当前资料上界。</li>
+                <li>Transformer 原始 perplexity 仍可保持竞争力，但长上下文计算成本更高。</li>
+                <li>TTT-MLP 的内存 I/O 与实际 wall-clock 仍是主要限制。</li>
+              </ul>
+            </article>
+            <article class="evidence-card limit">
+              <h3>不能推出什么</h3>
+              <span class="badge verify">【待核实】</span>
+              <ul>
+                <li>不能推出在更大模型或百万上下文上仍保持同样趋势。</li>
+                <li>不能从 perplexity 排名推出生产吞吐、P99、TTFT 或 TPOT。</li>
+                <li>不能推出主流 serving runtime 已完整支持 learner state 生命周期。</li>
+                <li>不能把特定 JAX/TPU 训练收益、GPU inference kernel 结果泛化到任意后端。</li>
+                <li>不能隔离证明收益全部来自 TTT learner；Mamba-inspired backbone 也参与比较。</li>
+              </ul>
+            </article>
+          </div>
+          <p><strong>证据结论：</strong>现有实验支持“在所测约 1.3B、最长 32k、以 perplexity 为主的研究设置中，表达性固定状态值得继续研究”，但不支持“TTT 已是生产 Transformer/Mamba 替代品”。本文不添加任何未提供的 perplexity、吞吐或硬件数字。</p>
+        </section>
+
+        <section id="systems" aria-labelledby="systems-title">
+          <span class="kicker">10 · Serving implications</span>
+          <h2 id="systems-title">推理工程含义：learner state 不是普通 KV page</h2>
+          <div class="callout warn">
+            <p><span class="badge infer">【工程推导】</span> <strong>本节是从状态语义推导出的系统问题清单，不代表论文或当前 repo 已完整实现。</strong>具体 API、checkpoint 格式、runtime 支持与 kernel 性能均需绑定版本核实。</p>
+          </div>
+          <div class="systems">
+            <article class="system-item" data-n="01"><strong>每请求、每层 learner state</strong>调度器不仅管理 token KV 块，还要为每个活跃请求、每个 TTT 层持有 <code>W_t</code>；TTT-MLP 可能是多组参数状态。</article>
+            <article class="system-item" data-n="02"><strong>Checkpoint 与迁移</strong>抢占、PD 交接或跨 worker 迁移时，需要冻结某个 token 边界的 learner state，并保证 dtype、layout、版本和层顺序一致。</article>
+            <article class="system-item" data-n="03"><strong>Prefix 复用</strong>共享前缀不能只记录“命中多少 token”；需要有该边界对应的 learner checkpoint。状态已压缩历史，无法像 KV 行一样自然截取任意更短边界。</article>
+            <article class="system-item" data-n="04"><strong>Speculative decoding 回滚</strong>被拒绝的 draft token 已推进 learner 时，runtime 必须恢复接受边界状态，或保留旧状态、做 copy-on-write / replay；直接原地覆盖会破坏语义。</article>
+            <article class="system-item" data-n="05"><strong>Continuous batching</strong>每个请求处于不同序列位置与 learner 状态。batch slot 重排、请求完成、暂停与恢复都要与状态槽生命周期一致。</article>
+            <article class="system-item" data-n="06"><strong>TP / Sharding</strong>若 <code>W_t</code> 被分片，每步更新和读取必须遵守与权重布局匹配的 collective / 本地 shard 语义；请求迁移还可能涉及重分片。</article>
+            <article class="system-item" data-n="07"><strong>HBM 写流量</strong>KV decode 以读历史和追加小块为主；TTT 则反复更新较大 learner 权重。即使状态固定，写流量、读改写与中间量也可能成为瓶颈。</article>
+            <article class="system-item" data-n="08"><strong>Kernel 支持</strong>需要把投影、损失、梯度、状态更新和查询映射成高利用率 kernel；dual form 只是数学/数据流基础，不等于任意 runtime 已有高性能实现。</article>
+          </div>
+          <h3>一个实用的状态事务模型</h3>
+          <div class="math-scroll"><div class="formula">begin(token boundary) → read W<sub>t−1</sub> → propose updates → commit W<sub>t</sub> / rollback → expose z<sub>t</sub></div></div>
+          <p><span class="badge infer">【工程推导】</span> 把每次状态推进看成“有提交边界的事务”，能统一理解 prefix checkpoint、speculative rejection、请求迁移和 batch slot 生命周期。它是设计思路，不是论文声称的现成 runtime API。</p>
+        </section>
+
+        <section id="misconceptions" aria-labelledby="misconceptions-title">
+          <span class="kicker">11 · Corrections</span>
+          <h2 id="misconceptions-title">常见误区</h2>
+          <div class="myths">
+            <div class="myth"><div><strong>“TTT 就是 serving 时微调整个 LLM。”</strong>错。更新的是 TTT 层内部、每序列私有的 learner hidden state，不是用标签改全模型共享参数。</div></div>
+            <div class="myth"><div><strong>“内循环目标是 next-token prediction。”</strong>错。内循环是 <code>θ_K/θ_V</code> 多视图重建；next-token prediction 是外循环目标。</div></div>
+            <div class="myth"><div><strong>“TTT-Linear 就是线性注意力。”</strong>错。仅在 linear learner、batch GD、<code>η=1/2</code>、<code>W₀=0</code> 与特定视图同时成立时等价。</div></div>
+            <div class="myth"><div><strong>“固定大小状态一定省显存。”</strong>错。固定只是不随上下文增长；每请求、每层的方阵或 MLP 权重仍可能很大。</div></div>
+            <div class="myth"><div><strong>“Dual form 的核心是减少 FLOPs。”</strong>错。它主要重写数据流、避免物化不利的 <code>d×d</code> 中间矩阵，并可能用更多算术换硬件利用率。</div></div>
+            <div class="myth"><div><strong>“b=16 是理论最优 mini-batch。”</strong>错。它是论文主要实验中的折中，不是跨模型、硬件和上下文的通用最优。</div></div>
+            <div class="myth"><div><strong>“定理 2 给出了更快的 softmax attention kernel。”</strong>错。Nadaraya–Watson learner 的状态随历史增长；定理提供统一解释，不自动带来高效 kernel。</div></div>
+            <div class="myth"><div><strong>“研究 perplexity 优势等于生产 serving 优势。”</strong>错。现有证据最大约 1.3B、32k，主要看 perplexity；状态管理、延迟、吞吐和硬件适配需要独立验证。</div></div>
+          </div>
+        </section>
+
+        <section id="quiz" aria-labelledby="quiz-title">
+          <span class="kicker">12 · Self test</span>
+          <h2 id="quiz-title">学习自测：8 题</h2>
+          <p>先口头回答，再展开答案。<code>&lt;details&gt;</code> 可用键盘聚焦并切换。</p>
+          <div class="quiz">
+            <details id="quiz-1"><summary>1. 用两句话解释 TTT 是什么，以及一个 token 的读写顺序。</summary><div class="answer"><p>TTT Layer 把 RNN-like 隐藏状态定义为内部 learner 的权重。当前 token 先用 K/V 多视图重建损失把 <code>W_{t-1}</code> 更新为 <code>W_t</code>，再用 Q 视图查询 <code>W_t</code> 得到 <code>z_t</code>。</p></div></details>
+            <details id="quiz-2"><summary>2. 为什么“固定大小状态”不等于“状态很小”？</summary><div class="answer"><p>固定只表示大小不随上下文长度 <code>T</code> 线性增长。TTT-Linear 每请求、每层可能保存 <code>d×d</code> 矩阵，TTT-MLP 还包含多组权重；层数、并发、dtype 与分片都会放大实际显存。</p></div></details>
+            <details id="quiz-3"><summary>3. 内循环和外循环分别优化什么？</summary><div class="answer"><p>内循环对当前序列的多视图重建损失更新 learner 状态 <code>W_t</code>。外循环用语言模型 next-token prediction 训练 K/V/Q 视图、初始权重、token-dependent learning rate、backbone 和网络其他参数。</p></div></details>
+            <details id="quiz-4"><summary>4. Mini-batch TTT 在什么两者之间折中？为什么 b=16 不是定律？</summary><div class="answer"><p>它在 online learning 的细粒度适应与批内并行度之间折中：小批更接近逐 token 更新，大批更易矩阵化但适应更粗。<code>b=16</code> 是论文主要实验设置，最优点会受模型、序列、硬件和实现影响。</p></div></details>
+            <details id="quiz-5"><summary>5. Dual form 的正确性能表述是什么？</summary><div class="answer"><p>它把参数空间中的外积/累计重写到小批矩阵运算，避免物化大量 <code>d×d</code> 中间矩阵，并提升 matmul / 加速器利用率。它不应被简化成“减少 FLOPs”，因为可能用额外算术换更好的硬件执行。</p></div></details>
+            <details id="quiz-6"><summary>6. TTT-Linear 在哪些条件下才等价最简 linear attention？</summary><div class="answer"><p><code>f(x)=Wx</code>、batch GD、<code>η=1/2</code>、<code>W₀=0</code>，并使用特定 <code>θ_K/θ_V/θ_Q</code> 视图。实际 TTT-Linear 含 mini-batch、LayerNorm、残差、可学习初始化和学习率，因此不等同。</p></div></details>
+            <details id="quiz-7"><summary>7. 当前实验能支持哪一级结论？不能支持哪一级？</summary><div class="answer"><p>可支持：在约 1.3B、最长 32k、以 perplexity 为主的研究设置中，TTT 相对 Mamba 的长上下文趋势值得关注。不可支持：百万上下文、更大模型、生产吞吐/延迟、主流 runtime 已成熟支持，或 TTT 已全面替代 Transformer/Mamba。</p></div></details>
+            <details id="quiz-8"><summary>8. Speculative decoding 为什么会让 TTT 状态管理更难？</summary><div class="answer"><p>draft token 若已推进 learner state，而验证后部分 token 被拒绝，runtime 必须恢复到最后接受边界。需要旧状态、checkpoint、copy-on-write 或可重放更新；原地覆盖且无回滚会让后续状态错误。</p></div></details>
+          </div>
+        </section>
+
+        <section id="checklist" aria-labelledby="checklist-title">
+          <span class="kicker">13 · Explainability check</span>
+          <h2 id="checklist-title">“我能否讲明白 TTT？”检查清单</h2>
+          <ul class="checklist">
+            <li>能先讲“状态是什么”，而不是从公式名词开始。</li>
+            <li>能画出 <code>x_t → K/V loss → W_t → Q → z_t</code>。</li>
+            <li>能解释三个视图各自负责输入、目标与查询。</li>
+            <li>能准确区分内循环重建与外循环 next-token prediction。</li>
+            <li>能用标量例子算出梯度 <code>-4</code>、<code>w₁=0.4</code>、<code>z=1.2</code>。</li>
+            <li>能说明 online、mini-batch 与 batch GD 的并行/适应折中。</li>
+            <li>不会把 dual form 说成单纯减少 FLOPs。</li>
+            <li>能完整说出定理 1 的五个条件。</li>
+            <li>知道定理 2 的 learner 状态会增长，且不产生高效 kernel。</li>
+            <li>能说出 TTT-MLP 的表达力、I/O 与 wall-clock 权衡。</li>
+            <li>能把实验结论限制在约 1.3B、32k、perplexity。</li>
+            <li>能从 checkpoint、prefix、rollback、batching、TP、HBM、kernel 七个维度讨论 serving。</li>
+          </ul>
+        </section>
+
+        <section id="sources" aria-labelledby="sources-title">
+          <span class="kicker">Traceability</span>
+          <h2 id="sources-title">来源与追溯</h2>
+          <p>本页是当前 wiki 的派生学习指南，不是新的事实来源。外部链接指向论文与项目；库内链接均从本 HTML 使用普通相对路径。</p>
+          <ol class="sources">
+            <li><a href="https://arxiv.org/abs/2407.04620" rel="noopener noreferrer">原论文：Learning to (Learn at Test Time): RNNs with Expressive Hidden States（arXiv:2407.04620）</a></li>
+            <li><a href="https://github.com/test-time-training/ttt-lm-pytorch" rel="noopener noreferrer">GitHub：test-time-training/ttt-lm-pytorch</a></li>
+            <li><a href="../../wiki/concepts/TTT Layer.md">Wiki concept：TTT Layer</a></li>
+            <li><a href="../../wiki/entities/TTT-LM.md">Wiki entity：TTT-LM</a></li>
+            <li><a href="../../wiki/sources/【LLM2】Standford TTT模型(Learn at Test Time).md">Wiki source：【LLM2】Standford TTT模型(Learn at Test Time)</a></li>
+            <li><a href="../../wiki/sources/一文通透TTT：Learning to “Learn at Test Time”，让RNN的隐藏层变成可学习的函数，把T.md">Wiki source：一文通透 TTT 长篇解读</a></li>
+            <li><a href="../../wiki/concepts/线性注意力递归状态.md">Wiki concept：线性注意力递归状态（《与 TTT Layer 的关系》）</a></li>
+            <li><a href="../../wiki/concepts/KV Cache.md">Wiki concept：KV Cache（《与递归线性状态的区别》）</a></li>
+          </ol>
+          <div class="callout gold">
+            <p><span class="badge verify">【待核实】</span> 最新 repo/checkpoint、训练 kernel、GPU inference kernel、主流 serving 框架支持、状态 checkpoint/迁移与 speculative rollback 的实际版本化实现。本指南不声称这些能力已经完备。</p>
+          </div>
+        </section>
+      </div>
+
+      <footer>
+        <strong>版本说明</strong><br>
+        基于当前 wiki 与 arXiv:2407.04620 整理，不代表最新 repo/runtime 状态。外部项目状态、API、checkpoint 与 kernel 支持应以目标 commit 和部署环境重新核实。
+        <div class="version">v1.0 · 整理日期：2026-08-26 · 单文件自包含 HTML5</div>
+      </footer>
+    </main>
+  </div>
+</body>
+</html>

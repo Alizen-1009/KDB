@@ -28,6 +28,7 @@ updated: 2026-06-12
 - 官方文档语境里，SGLang 对 DeepSeek/MLA serving 还强调 [[DP Attention]]：通过 attention 侧数据并行减少 TP 下 latent KV cache 重复，提升可承载 batch size 和吞吐。
 - 新来源 `RTP-LLM` 将 `SGLang` 作为模型加载、TTFT、推测解码和多模态吞吐的对比基线；这些结果应视为特定 benchmark/生产流量下的来源声称。
 - `Look Ma, No Bubbles!` 将 SGLang 作为 Llama-3.2-1B、batch size 1、BF16 低延迟 decode baseline，指出 megakernel 在该特定场景中能进一步减少 kernel 边界带来的 pipeline bubble。
+- 截至官方 `main` commit `04374ba`，SGLang 的独立全模型 `--enable-torch-compile` 仍是默认关闭的实验功能，但支持配置中的 Piecewise CUDA Graph 使用 `torch.compile(..., backend=SGLangBackend)` 捕获和分割模型图，再把 split ops 留在 eager 路径、其余区段 capture/replay。这里 [[../concepts/Torch Compile|Torch Compile]] 的主要作用可以是图捕获与分区，而不一定是让 Inductor 重写所有专用 kernel。
 - 新来源从混合 MLA/KDA serving 补充状态管理视角：Token KV Pool 保存按 token 组织的 MLA KV，MambaPool 保存按请求、按层组织的 Conv State 与递归矩阵状态；UnifiedRadixCache 在同一逻辑树上协调两类 component 的前缀匹配和生命周期。
 - 对递归状态做 Prefix Cache 时，SGLang 需要保存边界 checkpoint；如果 KV 命中位置没有对应状态快照，就回退到最近共同边界并重新 prefill。来源还描述了 speculative verification 的状态暂存/提交路径。
 
@@ -47,6 +48,8 @@ updated: 2026-06-12
 - [[线性注意力递归状态]]
 - [[递归状态 Prefix Caching]]
 - [[混合注意力]]
+- [[Torch Compile]]
+- [[CUDA Graph 执行模式]]
 
 ## 相关来源
 

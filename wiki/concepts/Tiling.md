@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: GPU 编程
-sources: 6
+sources: 9
 updated: 2026-05-06
 ---
 
@@ -27,6 +27,20 @@ updated: 2026-05-06
 - 当 `TILE=32` 时，一个被搬入 shared memory 的元素可被同一 block 中多条线程复用，访存量可近似降到原来的 `1/32` 量级；这也是 GEMM、attention 和归约高度依赖 tiling 的原因
 - 它的本质是用 shared memory 的低延迟去承接重复访问，把“多次回 HBM”改成“搬一次，多次复用”
 
+## Work tile 调度
+
+Tiling 不只决定 tile 内如何复用数据，也决定 tile 间如何映射到 CTA 或 thread block cluster。[[Cluster Launch Control]] 来源把常见策略分为：每个 cluster 固定处理一个 tile 的 single-tile scheduling、一波常驻 cluster 按静态步长遍历 tile 的 static persistent scheduling，以及由活跃 cluster 取消未启动 cluster 并接手其 tile 坐标的 CLC dynamic persistent scheduling。后者主要用于 tile 成本不一致时改善负载均衡，但动态顺序也可能改变 L2 局部性。
+
+## Head dimension 与 pipeline tile
+
+PAI-FA 来源表明，tile shape 与 pipeline stage 不能分开选择。`head_dim=256` 时，`128×128` attention tile 的 `O/dQ/dK/dV` accumulator footprint 相比 `head_dim=128` 翻倍；若继续保留原双缓冲 stage，会超出 [[Tensor Memory|TMEM]]。该实现保留较大的计算 tile 以维持 arithmetic intensity，但将 Forward Q stage 降为 1；Backward 则让 `dQ` 使用 `128×128`、`dKdV` 使用 `128×64`，以不同 loop ownership 适配各自累加目标。
+
+## KDA chunk 16 与 chunk 32
+
+FlashKDA 现有资料使用 16-token chunk，把 lower-bounded cumulative decay 控制在 BF16 范围并直接适配 `m16n8k16` 小矩阵路径。[[../entities/CAKE KDA]] 通过固定 exponent anchor 把 chunk 扩到 32：anchor 在 `Mqk` 中抵消，使每个 BF16 Q/K operand 的指数半径接近未居中 chunk 16；更大 chunk 减少 recurrence 次数，但需要 `32×32` triangular/inverse 处理、五级 SMEM look-ahead 和更高单 CTA 资源占用。
+
+CAKE 同时提供 M64/M128 physical schedules：M128 增加单 CTA 工作量和 Tensor Core 复用，M64 保留更多 grid parallelism。选择不能只看单 CTA 峰值，还要结合 batch×heads 是否足以覆盖 SM。
+
 ## 关键权衡
 
 - 正确的 tile 设计能同时改善复用和 coalescing
@@ -36,6 +50,7 @@ updated: 2026-05-06
 ## 相关实体
 
 - [[../entities/Stanford CS336]]
+- [[../entities/NVIDIA Blackwell]]
 
 ## 相关来源
 
@@ -45,12 +60,18 @@ updated: 2026-05-06
 - [[../sources/你一定要知道：CUDA优化六要]]
 - [[../sources/CUDA优化维度框架]]
 - [[../sources/秋招CUDA手撕题复盘（附代码）]]
+- [[../sources/Dynamic persistent tile scheduling with Cluster Launch Control (CLC) on NVIDIA Blackwell GPUs]]
+- [[../sources/PAI-FA｜突破 TMEM 瓶颈：FlashAttention-4 大 Head Dimension (256) 高性能算子实现与优化]]
+- [[../sources/REMINDER FF-KDA & CAKE KDA Highlights]]
 
 ## 相关概念
 
 - [[GPU执行模型]]
 - [[内存合并访问]]
 - [[FlashAttention]]
+- [[Cluster Launch Control]]
+- [[Tensor Memory]]
+- [[KDA]]
 
 ## 研究备注
 

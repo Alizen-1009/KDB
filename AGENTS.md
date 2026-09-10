@@ -82,13 +82,14 @@ updated: 2026-07-12 # 派生字段，勿手填
 
 - 这个仓库是 Obsidian Vault，不是应用；`scripts/` 只包含 Python 标准库脚本，无需虚拟环境或额外依赖。
 - `wiki/index.md` 是生成物；`wiki/maps/*.md` 中 `BEGIN AUTO` 标记后的区域也是生成物，不要手改。主题地图标记前的《导读》是手写区。
+- `output/reports/` 中篇幅较长、主要供人阅读的报告默认使用自包含 HTML；短线性备忘或明确要求 Obsidian-native 时使用 Markdown。同名报告不同时维护 HTML 与 Markdown 两份源。
 - `wiki/log.md` 只通过 `scripts/kb_log.py` 追加，不要手编。
 - 每次修改 `wiki/` 后依次运行 `python3 scripts/kb_meta.py sync`、`python3 scripts/update_index.py`、`python3 scripts/lint.py`。
 - 来源页必须包含 `原始文件：` 字段；知识库正文默认使用中文。
 
 ## 核心操作
 
-三个核心动作的**执行流程**写在 `.pi/skills/` 下（`kb-ingest` / `kb-query` / `kb-export`），本文件只定义**规则约束**。两者分工：skill 说“按什么顺序做”，schema 说“什么算写对了”。改规则改这里，改流程改 skill。
+核心动作的**执行流程**写在 `.pi/skills/` 下（`kb-ingest` / `kb-query` / `kb-export` / `kb-cards` / `kb-interview`），本文件只定义**规则约束**。两者分工：skill 说“按什么顺序做”，schema 说“什么算写对了”。改规则改这里，改流程改 skill。
 
 ### Ingest
 
@@ -114,11 +115,28 @@ updated: 2026-07-12 # 派生字段，勿手填
 
 1. 先读 `wiki/index.md`
 2. 按需读取相关概念页、来源页、实体页
-3. 输出为 Markdown 报告、对比表、Marp 幻灯片或可视化
+3. 面向人阅读的长篇报告、对比和机制讲解默认输出为自包含 HTML；短线性/Obsidian-native 内容可用 Markdown，幻灯片使用 Marp
 4. 对高价值结论进行回填
 5. 记录到 `wiki/log.md`
 
 ### Export
+
+输入：一个要供人阅读、分享或评审的已有知识主题。
+
+流程：
+
+1. 从 wiki 页面和既有 output 中选料，冻结读者任务与事实边界
+2. 按 `html-artifacts` 的 format gate 编译为 `output/exports/<标题>.html`
+3. 在真实浏览器验证桌面/窄屏、交互、console、可访问性、链接与打印
+4. 更新索引并记录到 `wiki/log.md`
+
+约束：
+
+- HTML 是 wiki/output 的派生物，不是新事实来源
+- 默认自包含、无远程依赖，不把 Markdown 文本简单包进 `<pre>`
+- 同一导出不维护 HTML/Markdown 双份可编辑源
+
+### Cards
 
 输入：一个需要反复记忆的主题。
 
@@ -134,6 +152,18 @@ updated: 2026-07-12 # 派生字段，勿手填
 - 标了“待核实”的结论、没有一手来源的 benchmark 数字不出卡
 - 一张卡一个知识点，且必须独立成立（Anki 会打乱顺序）
 - 卡片是 wiki 的派生物，不是新的事实来源；发现卡片写错，回去改 wiki 页面再重新导出
+
+### Interview
+
+收录单道面试题、批量题单，或补充已有题目答案与追问时，读取 `.pi/skills/kb-interview/SKILL.md`。
+
+约束：
+
+- 题库位于 `output/interview/秋招问题汇总/`，使用 Markdown：`questions/` 一题一页，`sets/` 只维护系列导读与题目链接，`README.md` 为总入口。
+- 面试聊天中的普通提问只回答；明确要求收录或更新题库后才落盘。只有题目时可标记“待整理”，不强制补答案。
+- 同义题复用同一问题页；答案整理状态不等于事实核实状态，也不等于用户掌握程度。
+- 题库保存面试表达，通用原理优先回链 wiki；题库及对话不是新的一手事实来源，不为收题伪造 raw 或来源页。
+- 通用技术题放 KDB；个人项目与经历题建议放 `my_resume`，跨仓库写入或迁移须另行授权。
 
 ### Lint
 

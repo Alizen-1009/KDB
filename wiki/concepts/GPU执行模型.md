@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: GPU 编程
-sources: 7
+sources: 11
 updated: 2026-06-12
 ---
 
@@ -27,6 +27,32 @@ updated: 2026-06-12
 - CUDA kernel 之间通常存在严格顺序边界：后一个 kernel 的 block 不会在前一个 kernel 的所有 block 完成前开始执行。这个语义简化了数据依赖管理，但在许多短 kernel 串联时会放大 launch overhead、tail effect 和 load bubble。
 - [[Megakernel]] 通过在单个 kernel 内部自行调度 SM instruction 和同步依赖，绕开部分 kernel 间全局边界，但也把依赖正确性责任交给实现者。
 
+## Ampere→Hopper→Blackwell 的流水线演进
+
+翻译来源提供了一条从 latency hiding 到显式异步流水的代际主线：
+
+- [[../entities/NVIDIA Ampere]]：`cp.async` 让单 CTA 在当前 tile MMA 时预取下一 tile，把 global→shared load 与 compute 重叠。
+- [[../entities/NVIDIA Hopper]]：TMA 负责 tensor tile 搬运，异步 WGMMA 负责 warpgroup MMA；producer/consumer warp specialization 与 [[Persistent Kernel]] 让一个驻留 CTA 连续处理多个 work tiles。
+- [[../entities/NVIDIA Blackwell]]：`tcgen05` 将大型 accumulator 放入 [[Tensor Memory|TMEM]]，降低普通 RF 压力，使 load、MMA 与 output consumption/epilogue 更容易形成跨 tile 三阶段流水。
+
+这不是“每代只运行一个 CTA”。普通 grid 仍可有多个 CTA/cluster；persistent 描述的是 worker 连续领取逻辑 tiles。来源图中的“Only ONE block launched”应理解为一个长期驻留 worker 的示意，而不是全 GPU 只有一个 block。
+
+## Thread block cluster 与 CLC
+
+[[../entities/NVIDIA Hopper]] 首次在 CUDA 编程层级中加入可选的 thread block cluster：cluster 内 blocks 保证并发调度在同一 GPC 的多个 SM 上，可用 cluster barrier 同步，并通过 Distributed Shared Memory 对彼此 SMEM 执行 load/store/atomic。Portable cluster size 上限为 8；H100 可显式 opt-in 到 nonportable 16，但更大 cluster 可能减少全 GPU active blocks。
+
+[[../entities/NVIDIA Blackwell]] 的 [[Cluster Launch Control]] 进一步把动态调度粒度扩展到 thread block cluster：一个活跃 cluster 可以原子取消尚未启动的 cluster，并取得后者首个 CTA 的 grid 坐标来接手其 work tile。该机制不是让 CTA 在任意时刻迁移 SM，而是围绕“尚未启动的 cluster launch”做取消与任务继承；同一 cluster 内仍需由 leader scheduler warp、shared-memory 响应、mbarrier 和消费者 warp 协同保证坐标一致。
+
+## Blackwell 异构异步流水
+
+PAI-FA 来源展示了比统一 SIMT 叙事更细的职责分工：Load warps 驱动 TMA/SMEM staging，MMA 侧由单线程发起 `tcgen05.mma`，Softmax/Correction warps 使用 CUDA Core 处理从 [[Tensor Memory|TMEM]] 读出的中间量，Epilogue warps 完成写回。这里的 warp specialization 不是增加数学并行度，而是让搬运、Tensor Core、CUDA Core 和输出阶段拥有更规则的指令流并通过显式 producer-consumer barrier 重叠。
+
+2-CTA/CTA Pair 进一步把执行范围扩展到两个相邻 CTA：leader CTA 发起 MMA，两个 CTA 通过 DSMEM 共享或交换部分操作数，并分别承担分块。它能扩大 tile、分摊 SMEM，但要求 cluster 内 layout 与同步严格匹配。
+
+### CAKE KDA 的双依赖域流水
+
+来源称 [[../entities/CAKE KDA]] 在单 CTA 内使用 32 warps，并将其组织为五组 preparation producers 与有序 recurrence consumer；该线程配置仍需按 PR 生成 kernel 核实。五组 producer 可同时构造未来 chunks 的 gate/Q/K/`Mqk`/inverse，并写入五级 SMEM ring；consumer 必须按 chunk 顺序更新唯一 FP32 TMEM state。mbarrier 同时承担 ready notification 和 backpressure，使 slot 只有在前一 chunk 被消费后才能复用。该设计增加 CTA 内 look-ahead，但没有增加 grid 维度，因此小 batch×heads 仍可能无法覆盖全部 SM。
+
 ## Rubin 架构与跨 kernel 调度
 
 [[../entities/NVIDIA Rubin]] 来源转述 Rubin 将部分 I/O 功能移到独立 I/O Die，并把双计算 Die 的 SM 总数提高到 224。对执行模型更重要的不是 SM 数本身，而是 producer-consumer kernel 能否按更细粒度数据 ready 关系推进，从而减少前序 kernel 尾部与后序 kernel 启动之间的 bubble。
@@ -42,6 +68,10 @@ updated: 2026-06-12
 
 - [[../entities/Stanford CS336]]
 - [[../entities/NVIDIA Rubin]]
+- [[../entities/NVIDIA Blackwell]]
+- [[../entities/CAKE KDA]]
+- [[../entities/NVIDIA Ampere]]
+- [[../entities/NVIDIA Hopper]]
 
 ## 相关来源
 
@@ -52,6 +82,10 @@ updated: 2026-06-12
 - [[../sources/多卡GPU监控与SM执行模型面试整理]]
 - [[../sources/Look Ma, No Bubbles! Designing a Low-Latency Megakernel for Llama-1B]]
 - [[../sources/Nvidia Rubin架构分析预览]]
+- [[../sources/Dynamic persistent tile scheduling with Cluster Launch Control (CLC) on NVIDIA Blackwell GPUs]]
+- [[../sources/PAI-FA｜突破 TMEM 瓶颈：FlashAttention-4 大 Head Dimension (256) 高性能算子实现与优化]]
+- [[../sources/REMINDER FF-KDA & CAKE KDA Highlights]]
+- [[../sources/译 NVIDIA’s GPUs - 从 Ampere, Hopper 到 Blackwell]]
 
 ## 相关概念
 
@@ -66,6 +100,10 @@ updated: 2026-06-12
 - [[FlashAttention]]
 - [[Megakernel]]
 - [[Programmatic Dependent Launch]]
+- [[Cluster Launch Control]]
+- [[Tensor Memory]]
+- [[KDA]]
+- [[Persistent Kernel]]
 
 ## 研究备注
 

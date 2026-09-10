@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: 注意力机制
-sources: 5
+sources: 7
 updated: 2026-06-12
 ---
 
@@ -40,6 +40,18 @@ updated: 2026-06-12
 9. z = p @ kv_cache
 10. output 侧应用 W_UV / W_O
 ```
+
+## DSA 下的 MQA Mode
+
+[[../entities/DeepSeek-V3.2-Exp]] 在 MLA 上实例化 [[DeepSeek Sparse Attention|DSA]]。为让同一被选 latent KV entry 在 kernel 中跨 query 复用，核心 attention 使用 MLA 的 MQA mode：每个 `c_s^KV` 与 RoPE key 由当前 token 的所有 query heads 共享；lightning indexer 先对历史 latent entries 排序，再只把 top-`2048` entries 交给核心 attention。
+
+论文附录同时说明，DeepSeek-V3.1-Terminus 在训练/prefill 使用 MLA MHA mode、decode 使用 MQA mode；V3.2-Exp 的 DSA 则为 continued-training 兼容性直接建立在 MQA mode 上。这里的 MQA 是 MLA 的等价执行模式，不表示放弃 latent KV 压缩。
+
+## GLM 系列配置案例
+
+[[../entities/GLM-5 系列|GLM-5 / 5.2]] 的 MLA 配置为 `q_lora_rank=2048`、`kv_lora_rank=512`、`qk_nope_head_dim=192`、`qk_rope_head_dim=64`、`v_head_dim=256`。DSA 先选择历史 token，MLA 再对被选 latent KV 执行本层 attention；MoE 则位于 FFN，三者分别解决 token 选择、KV 压缩与模型容量。
+
+[[../entities/GLM-5.3-Flash]] 的周期性 DSA 层仍沿用 MLA 投影语境，但设置 `qk_nope_head_dim=256`、`qk_rope_head_dim=0`、`mla_use_nope=true`，整个 Q/K head 都是 NoPE。Flash 的 KDA 层使用固定 recurrent state，不应与 DSA 层的 MLA latent KV 路径混为一类 cache。
 
 ## Kernel/backend 视角
 
@@ -82,7 +94,10 @@ MLA 压缩历史 KV 后，纯 TP 沿 KV-head 维的切分空间更有限，因�
 ## 相关实体
 
 - [[../entities/DeepSeek-AI]]
+- [[../entities/DeepSeek-V3.2-Exp]]
 - [[../entities/SGLang]]
+- [[../entities/GLM-5 系列]]
+- [[../entities/GLM-5.3-Flash]]
 
 ## 相关来源
 
@@ -91,6 +106,8 @@ MLA 压缩历史 KV 后，纯 TP 沿 KV-head 维的切分空间更有限，因�
 - [[../sources/陈巍：DeepSeek 开源Day（1）-FlashMLA 深入分析（收录于：DeepSeek技术详解系列）]]
 - [[../sources/vllm并行策略之DCP(Decode Context Parallel)]]
 - [[../sources/vllm PCP 与 DCP 深度解析]]
+- [[../sources/DeepSeek-V3.2-Exp：Boosting Long-Context Efficiency with DeepSeek Sparse Attention]]
+- [[../sources/glm-5-architecture-evolution]]
 
 ## 相关概念
 
@@ -103,6 +120,9 @@ MLA 压缩历史 KV 后，纯 TP 沿 KV-head 维的切分空间更有限，因�
 - [[FlashMLA]]
 - [[Decode Context Parallel]]
 - [[Prefill Context Parallel]]
+- [[DeepSeek Sparse Attention]]
+- [[IndexShare]]
+- [[KDA]]
 
 ## 研究备注
 

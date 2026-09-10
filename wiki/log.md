@@ -1477,8 +1477,341 @@
 - 更新概念：`wiki/concepts/KDA.md`
 - 结论：技术报告明确的是Decode Recurrent Core Fusion；Merged Input Projection是开源vLLM实现层优化。官方Preview的概括性“projections and convolution”需按commit校准。
 
+<<<<<<< HEAD
 ## [2026-09-10] query | CUDA内存层次、GPGPU与Cache Line入门
 
 - 创建入门报告，解释 GPU/GPGPU/CUDA 关系及 CUDA 存储空间与缓存层次。
 - 更新 CUDA内存层次、内存合并访问：据 NVIDIA 官方文档区分 128B cache line、32B sector 和实际 DRAM 流量，修正旧有 line/transaction 混用。
 - 示例为地址覆盖推导，不是 benchmark；具体容量与延迟依赖设备。
+=======
+## [2026-08-06] query | 算子融合与 Torch Compile、CUDA Graph 的关系
+
+- 读取概念页：`算子融合`、`Torch Compile`、`CUDA Graph 执行模式`、`CUDA Kernel`、`Occupancy`、`Roofline 模型`
+- 创建报告：`output/reports/算子融合与Torch Compile、CUDA Graph的分层关系.md`
+- 更新概念页：`wiki/concepts/算子融合.md`、`wiki/concepts/Torch Compile.md`，补充分层关系、组合顺序与动态形状/capture 约束
+- 本次 query 澄清：算子融合优化 kernel 内数据流与中间 HBM 往返；`torch.compile` 是可能自动产生融合的图编译入口；CUDA Graph 优化编译后 kernel 序列的提交与重放，本身不融合 kernel。三者可叠加，但应先用 profiling 区分 memory-bound、compute-bound 与 launch-bound。
+
+## [2026-08-06] query | 现代推理框架中的 Torch Compile 作用
+
+- 读取概念/实体页：`Torch Compile`、`算子融合`、`CUDA Graph 执行模式`、`vLLM`、`SGLang`、`TensorRT-LLM`
+- 核对官方实现：vLLM `2dfb8ba`、SGLang `04374ba`、TensorRT-LLM `aafc4eb` 的 `main` 源码与文档
+- 创建报告：`output/reports/现代推理框架中的Torch Compile作用.md`
+- 更新概念/实体页：`wiki/concepts/Torch Compile.md`、`wiki/entities/vLLM.md`、`wiki/entities/SGLang.md`、`wiki/entities/TensorRT-LLM.md`
+- 本次 query 澄清：成熟框架的 Attention/GEMM/MoE 热点主要依赖专用 kernel，使 stock Inductor 自动生成 kernel 的边际收益缩小；但 `torch.compile` 正被用于图捕获、custom passes、轻量融合、shape specialization、编译缓存和 Piecewise CUDA Graph。vLLM V1 默认启用，SGLang/TRT-LLM 也在特定图路径中集成，因此不能概括为“很少使用、基本没作用”。
+- 待核实：官方 `main` 不等同于所有 release；具体收益和默认路径需按生产 commit、本地模型与流量消融。
+
+## [2026-08-14] ingest | Recursive Language Models: the paradigm of 2026
+
+- 读取原始资料：`raw/articles/Recursive Language Models the paradigm of 2026.md`
+- 创建来源页：`wiki/sources/Recursive Language Models the paradigm of 2026.md`
+- 创建概念页：`wiki/concepts/Recursive Language Model.md`、`wiki/concepts/Context Folding.md`
+- 创建实体页：`wiki/entities/Prime Intellect.md`、`wiki/entities/verifiers.md`
+- 更新概念页：`wiki/concepts/LLM Programs.md`，补充 RLM 的程序化控制与上下文隔离
+- 更新主题地图：`wiki/maps/推理服务.md`，补充 Context Folding → RLM 阅读路径
+- 未发现与现有 wiki 的直接冲突；标题中的“2026 paradigm”、训练收益与长期 Agent 能力保留为作者判断或待验证假设
+
+## [2026-08-14] query | Recursive Language Models 中文导读
+
+- 读取来源页：`wiki/sources/Recursive Language Models the paradigm of 2026.md`
+- 读取概念页：`wiki/concepts/Recursive Language Model.md`、`wiki/concepts/Context Folding.md`、`wiki/concepts/LLM Programs.md`
+- 创建中文导读：`output/reports/Recursive Language Models 中文导读.md`
+- 区分实现事实、实验观察与作者关于 RL 训练和长期 Agent 的待验证假设
+
+## [2026-08-14] query | 高并发对单请求 E2E 延迟的影响
+
+- 读取概念页：`wiki/concepts/Continuous Batching.md`、`wiki/concepts/Chunked Prefill.md`、`wiki/concepts/PD分离.md`、`wiki/concepts/Benchmarking.md`
+- 复用既有结论：低负载区增大 batch 可能提高 GPU 利用率，单请求延迟未必立刻上升；接近或超过系统饱和点后，排队时间、每轮 batch 执行时间和 prefill/decode 干扰会使 E2E 增长，且 P99 通常先恶化
+
+## [2026-08-17] query | Sandbox 概念、用途与使用场景
+
+- 读取概念页：`wiki/concepts/Recursive Language Model.md`、`wiki/concepts/LLM Programs.md`
+- 读取来源页：`wiki/sources/Recursive Language Models the paradigm of 2026.md`、`wiki/sources/量化剪枝推理瓶颈Nsight与异构集群面试整理.md`
+- 创建概念页：`wiki/concepts/Sandbox.md`，补充隔离维度、实现层级、Agent 场景和安全边界
+- 更新 RLM、LLM Programs、两份来源页与推理服务主题地图的交叉引用
+- 本次 query 澄清：Sandbox 不是固定产品，也不等同于 Docker；它是按威胁模型约束文件、进程、网络、凭证、资源和生命周期的隔离执行环境
+
+## [2026-08-17] query | MCP 服务是什么及主要用途
+
+- 读取现有概念页：`wiki/concepts/LLM Programs.md`、`wiki/concepts/Sandbox.md`、`wiki/concepts/Recursive Language Model.md`
+- 核对官方资料：MCP Introduction、Architecture、Server Primitives、Transports 与 Authorization 规范
+- 创建概念页：`wiki/concepts/Model Context Protocol.md`，补充全名、Host/Client/Server 架构、Tools/Resources/Prompts、传输、安全边界和使用场景
+- 更新 LLM Programs、Sandbox、RLM 与推理服务主题地图的交叉引用
+- 本次 query 澄清：MCP Server 是按 Model Context Protocol 暴露能力的程序，可本地或远程运行；MCP 标准化能力连接，但不替代 API、权限系统或 Sandbox
+
+## [2026-08-17] ingest | 并行投机解码(DFlash/DSpark)的快速理解与vLLM实测
+
+- 读取原始资料：`raw/articles/并行投机解码(DFlashDSpark)的快速理解与vLLM实测.md`
+- 创建来源页：`wiki/sources/并行投机解码(DFlashDSpark)的快速理解与vLLM实测.md`
+- 创建概念页：`wiki/concepts/并行投机解码.md`、`wiki/concepts/DFlash.md`、`wiki/concepts/DSpark.md`
+- 更新概念页：`Speculative Decoding`、`MTP Drafter`、`Benchmarking`、`确定性推理`
+- 更新实体页：`wiki/entities/vLLM.md`、`wiki/entities/kaiyuan.md`
+- 更新主题地图：`wiki/maps/投机解码.md`，补充顺序/模型内 drafter 与并行 drafter 两条阅读路线
+- 未发现与现有 wiki 的直接冲突；来源 benchmark 数字绑定 Qwen3-4B/A800/文章所称 vLLM 0.26.0，实际 GPU 数、TP 配置、image digest 与完整 workload 标为待核实
+
+## [2026-08-21] ingest | Dynamic persistent tile scheduling with Cluster Launch Control (CLC) on NVIDIA Blackwell GPUs
+
+- 读取原始资料：`raw/articles/Dynamic persistent tile scheduling with Cluster Launch Control (CLC) on NVIDIA Blackwell GPUs.md`
+- 创建来源页：`wiki/sources/Dynamic persistent tile scheduling with Cluster Launch Control (CLC) on NVIDIA Blackwell GPUs.md`
+- 创建概念页：`wiki/concepts/Cluster Launch Control.md`
+- 创建实体页：`wiki/entities/NVIDIA Blackwell.md`、`wiki/entities/Colfax Research.md`
+- 更新概念页：`wiki/concepts/Tiling.md`、`wiki/concepts/Tail Effect.md`、`wiki/concepts/GPU执行模型.md`、`wiki/concepts/CuTe DSL.md`
+- 未发现与现有 wiki 的直接冲突；记录 CLC 在均衡 workload 上不保证优于静态 persistent scheduler，且 L2 hit rate 差异根因待核实
+
+## [2026-08-21] ingest | PAI-FA｜突破 TMEM 瓶颈：FlashAttention-4 大 Head Dimension (256) 高性能算子实现与优化
+
+- 读取原始资料：`raw/articles/PAI-FA｜突破 TMEM 瓶颈：FlashAttention-4 大 Head Dimension (256) 高性能算子实现与优化.md`
+- 创建来源页：`wiki/sources/PAI-FA｜突破 TMEM 瓶颈：FlashAttention-4 大 Head Dimension (256) 高性能算子实现与优化.md`
+- 创建概念页：`wiki/concepts/Tensor Memory.md`
+- 创建实体页：`wiki/entities/阿里云 PAI 团队.md`
+- 更新概念页：`wiki/concepts/FlashAttention.md`、`wiki/concepts/CUDA内存层次.md`、`wiki/concepts/GPU执行模型.md`、`wiki/concepts/Tiling.md`、`wiki/concepts/重计算.md`
+- 更新实体页：`wiki/entities/NVIDIA Blackwell.md`、`wiki/entities/阿里巴巴.md`
+- 未发现与现有 wiki 的直接冲突；原文 L20A/L20C、FA3 baseline 与多组峰值吞吐口径不一致，并含 dKdV 变量名笔误，均已显式标记待核实
+
+## [2026-08-21] ingest | REMINDER FF-KDA & CAKE KDA Highlights
+
+- 读取原始资料：`raw/articles/REMINDER FF-KDA & CAKE KDA Highlights.md`，并读取 FF-KDA highlights 配图
+- 创建来源页：`wiki/sources/REMINDER FF-KDA & CAKE KDA Highlights.md`
+- 创建实体页：`wiki/entities/CAKE KDA.md`
+- 更新概念页：`wiki/concepts/KDA.md`、`wiki/concepts/Tensor Memory.md`、`wiki/concepts/CUDA内存层次.md`、`wiki/concepts/Tiling.md`、`wiki/concepts/GPU执行模型.md`
+- 更新实体页：`wiki/entities/FlashKDA.md`、`wiki/entities/FlashInfer.md`、`wiki/entities/NVIDIA Blackwell.md`
+- 未发现与现有 wiki 的直接冲突；FF-KDA 身份与对应 PR、缺失 exponent-anchor 公式、32 warps/CTA 和 2.0512× benchmark 均已标记待核实
+
+## [2026-08-21] distill | LPT 在 Causal Attention 中的调度优化
+
+- 整理当前对话为：`output/reports/LPT在Causal Attention中的调度优化.md`
+- 依据知识页与报告：`wiki/concepts/FlashAttention.md`、`wiki/concepts/Tail Effect.md`、`wiki/concepts/Cluster Launch Control.md`、`output/reports/Prefill Attention 的 CUDA 并行映射.md`
+- 更新概念页：`wiki/concepts/FlashAttention.md`、`wiki/concepts/Tail Effect.md`
+- 机制归纳：用可见 KV tiles 数估算 causal Q tile 成本，descending Q tile 近似固定长度 LPT，并可与 persistent/CLC scheduler 组合
+- 待核实：Atrex FA4 当前 scheduler、2-CTA work-item 编码、已有动态调度能力，以及 LPT 在目标生产 shape 上的收益与 L2 locality 成本
+
+## [2026-08-21] ingest | 译 NVIDIA’s GPUs - 从 Ampere, Hopper 到 Blackwell
+
+- 读取原始资料：`raw/articles/译 NVIDIA’s GPUs - 从 Ampere, Hopper 到 Blackwell.md`，并检查 Pre-Ampere、A100、H100、B200 流水线示意图
+- 创建来源页：`wiki/sources/译 NVIDIA’s GPUs - 从 Ampere, Hopper 到 Blackwell.md`
+- 创建实体页：`wiki/entities/NVIDIA Ampere.md`、`wiki/entities/NVIDIA Hopper.md`
+- 创建概念页：`wiki/concepts/Persistent Kernel.md`
+- 更新实体页：`wiki/entities/NVIDIA Blackwell.md`
+- 更新概念页：`wiki/concepts/GPU执行模型.md`、`wiki/concepts/CUDA内存层次.md`、`wiki/concepts/Tensor Memory.md`、`wiki/concepts/Megakernel.md`、`wiki/concepts/Tail Effect.md`、`wiki/concepts/Cluster Launch Control.md`
+- 更新 GPU 编程主题地图导读，加入 Ampere→Hopper→Blackwell 与 Persistent Kernel→CLC 阅读路径
+- 未发现与现有 wiki 的直接冲突；架构与 SKU 混用、double buffering、launch overhead、Hopper→Blackwell 兼容性和 TMEM write-back 简化均已显式标记待核实
+
+## [2026-08-21] query | Hopper 架构变化与 Persistent Kernel
+
+- 读取概念与实体页：`NVIDIA Hopper`、`Persistent Kernel`、`GPU执行模型`、`CUDA内存层次`
+- 核对一手资料：NVIDIA Hopper Tuning Guide、NVIDIA Hopper Architecture In-Depth
+- 创建报告：`output/reports/Hopper架构变化与Persistent Kernel.md`
+- 更新实体页：`wiki/entities/NVIDIA Hopper.md`，补充 FP8 Transformer Engine、thread block cluster、DSMEM、transaction barrier、SMEM/L1、DPX、HBM/L2 与互联变化
+- 更新概念页：`wiki/concepts/Persistent Kernel.md`、`wiki/concepts/GPU执行模型.md`，明确 persistent 不是 Hopper 专属，并补充 cluster-aware 资源权衡
+- 待核实：具体 WGMMA shape/register 约束与 CUTLASS/FlashAttention 是否采用 persistent scheduler 必须绑定对应版本和 commit
+
+## [2026-08-21] query | Blackwell 相对 Hopper 的新特性
+
+- 读取实体与概念页：`NVIDIA Blackwell`、`Tensor Memory`、`Cluster Launch Control`、`Persistent Kernel`
+- 核对 KernelWiki：`tcgen05-mma`、`tmem`、`2sm-cooperative`、`clc`、`nvfp4`，并参考 NVIDIA Blackwell Architecture 与 Tuning Guide
+- 创建报告：`output/reports/Blackwell相对Hopper的新特性.md`
+- 更新实体页：`wiki/entities/NVIDIA Blackwell.md`，补充 tcgen05/TMEM、FP4/FP6 block scaling、2-SM MMA、CLC、第二代 Transformer Engine 与系统级能力
+- 明确边界：TMA、cluster、DSMEM、mbarrier、persistent kernel 在 Hopper 已存在；SM100 能力不能笼统推广到所有 Blackwell SKU
+- 待核实：具体指令与资源限制需绑定 SM target、PTX/CUDA/CUTLASS 版本；所有性能数字需绑定 GPU、dtype、shape、metric、value 和 source
+
+## [2026-08-21] query | Fused MoE NVFP4 v1-v5 优化复盘
+
+- 分析用户提供的 Moe-Qwen3_5-Plus_prefill 优化记录，按 routing、top-k、metadata、NVFP4 epilogue、2CTA/TMA multicast 与 specialization 分类
+- 交叉核对 KernelWiki：`fused-moe`、`tma`、`tmem`、`2sm-cooperative`、`nvfp4`，以及 SM103/vLLM/SGLang 上游 PR 线索
+- 创建报告：`output/reports/Fused MoE NVFP4 v1-v5优化复盘.md`
+- 关键修正：runtime top_k 的 warp-uniform 条件不是 lane divergence；165→161 若仍在同一寄存器分配档位不会提高 occupancy；TMEM 不保证 epilogue 对 MMA 零影响；TMA multicast 填充各 CTA 的本地 SMEM
+- 未回填 wiki：实现细节和性能数字来自用户提供的内部文档，尚缺 shape、commit、测量方法与可复现证据
+- 待核实：SM103 exact-target 兼容性、v0-v5 ablation、2CTA M128/M256 heuristic、determinism 与 preshuffle/layout 契约
+
+## [2026-08-21] query | MoE 计算流程与 TP-EP 实现
+
+- 读取概念页：`MoE`、`Tensor Parallelism`、`Expert Parallelism`、`Wide Expert Parallelism`、`MegaMoE`
+- 参考 KernelWiki：`wiki/kernels/fused-moe.md`，结合前序 SM103 NVFP4 v1-v5 文档解释实现术语
+- 创建报告：`output/reports/MoE计算流程与TP-EP实现.md`
+- 更新概念页：`wiki/concepts/MoE.md`，补充 populate、preshuffle、epilogue 的稳定定义与报告回链
+- 区分 TP：全 experts 的权重 shard + C2 partial all-reduce；EP：部分完整 experts + dispatch/combine All-to-All；并补充 EP+TP 混合路径
+- 待核实：具体框架可能调整 combine 与 TP collective 顺序、物化或融合 token permutation，以及 preshuffle physical layout
+
+## [2026-08-21] query | MoE 计算流程与 TP-EP HTML 导出
+
+- 基于 `output/reports/MoE计算流程与TP-EP实现.md` 创建独立 HTML：`output/reports/MoE计算流程与TP-EP实现.html`
+- 加入 MoE 全链路、Populate route map、Preshuffle layout、C1/C2 Epilogue、TP/EP/混合并行交互标签与对比表
+- 页面无外部依赖，支持响应式布局、键盘可操作 tabs、reduced-motion 与打印样式
+- 使用 Chrome headless 验证桌面/移动截图和 rendered DOM；通过 HTML anchor、ARIA contract、JavaScript 语法、wiki lint 与 git diff 检查
+- 环境未配置 Chrome DevTools MCP，因此以本地 Chrome headless 与静态可访问性审计替代
+
+## [2026-08-21] maintenance | 人读报告默认 HTML
+
+- 读取全局 skill：`~/.pi/agent/skills/html-artifacts/SKILL.md`，采用其 format gate、单文件、自包含与浏览器验证约定
+- 更新 skills：`kb-query` 与 `kb-distill` 的长篇人读报告默认输出 HTML；`kb-export` 保留 Markdown→Anki TSV 的机器输入契约
+- 更新 schema/docs：`AGENTS.md`、`output/README.md`、`scripts/README.md`
+- 更新索引脚本：识别 HTML 报告，同 stem 时优先 HTML，并新增 `scripts/test_update_index.py`
+- 更新回链：`wiki/concepts/MoE.md` 改为指向 HTML 报告
+
+## [2026-08-21] maintenance | 拆分 HTML Export 与 Anki Cards
+
+- 按用户选择重新定义 `kb-export`：从 wiki/既有 output 生成 `output/exports/<标题>.html` 自包含人读 artifact
+- 新增 `kb-cards`：承接原 `kb-export` 的 Markdown 卡片与 Anki TSV 工作流
+- 更正上一条日志边界：Anki Markdown 契约属于 `kb-cards`，不再属于 `kb-export`
+- 更新 schema/docs：`AGENTS.md`、`output/README.md`、`scripts/README.md`、`scripts/export_cards.py`
+- 更新索引：增加 `output/exports/*.html` 的资源统计与《HTML 导出》区
+
+## [2026-08-26] query | DFlash 与 DSpark 投机解码机制
+
+- 读取概念页：`DFlash`、`DSpark`、`并行投机解码`、`Speculative Decoding`
+- 读取来源页：`并行投机解码(DFlashDSpark)的快速理解与vLLM实测`
+- 参考原论文：DFlash arXiv:2602.06036、DSpark arXiv:2607.05147
+- 更新概念页：`wiki/concepts/DFlash.md`、`wiki/concepts/DSpark.md`，补充 single-step block diffusion、半自回归修正、STS 与 hardware-aware scheduler
+- 待核实：vLLM 正式支持版本及是否完整实现 DSpark 论文 scheduler / STS 流程
+
+## [2026-08-26] query | DFlash 与 DSpark 投机解码详解
+
+- 读取概念页：`DFlash`、`DSpark`、`并行投机解码`、`Speculative Decoding`
+- 参考原论文：DFlash arXiv:2602.06036、DSpark arXiv:2607.05147，以及 DeepSpec 官方仓库
+- 创建报告：`output/reports/DFlash与DSpark投机解码详解.html`
+- 更新概念页：`wiki/concepts/DFlash.md`、`wiki/concepts/DSpark.md`，增加报告回链
+- 浏览器验证：Chrome Headless 桌面 1440px、窄屏 500px、交互 tab、DOM/heading、页面脚本错误与打印 PDF
+- 待核实：vLLM 正式支持版本及是否完整实现 DSpark 论文 scheduler / STS 流程
+
+## [2026-08-26] ingest | DSpark：结合半自回归生成与置信度调度的投机解码技术
+
+- 读取原始资料：`raw/articles/DSpark：结合半自回归生成与置信度调度的投机解码技术.md`
+- 创建来源页：`wiki/sources/DSpark：结合半自回归生成与置信度调度的投机解码技术.md`
+- 更新概念页：`wiki/concepts/DSpark.md`、`wiki/concepts/DFlash.md`、`wiki/concepts/Speculative Decoding.md`
+- 更新实体页：`wiki/entities/DeepSeek V4.md`、`wiki/entities/DeepSeek-AI.md`
+- 澄清：DFlash block 内并非计算上完全独立，但不会根据本轮实际采样前缀重新条件化
+- 待核实：离线 benchmark 细项、V4 生产流量配置，以及 DeepSpec 是否完整开源 STS 与硬件感知 scheduler
+
+## [2026-08-26] query | Code w Claude London 2026 中文翻译
+
+- 读取原始资料：`raw/articles/Code w Claude London 2026 Rethinking how we build.md`
+- 创建中文阅读版：`output/reports/Code w Claude London 2026：重新思考我们的构建方式.html`
+- 保留原文链接、产品状态与图片说明；未修改 raw 中疑似错误的 published 日期
+- 浏览器验证：Chrome Headless 桌面 1360px、窄屏 500px、HTML 结构、关键译文章节与打印 PDF
+
+## [2026-08-26] query | Claude Skills 完整构建指南中文翻译
+
+- 读取介绍页：`raw/articles/A complete guide to building skills for Claude.md`
+- 下载并完整读取官方 33 页 PDF：`The Complete Guide to Building Skills for Claude`
+- 创建中文全文阅读版：`output/reports/Claude Skills 完整构建指南（中文翻译）.html`
+- 保留全部章节、代码、YAML、表格、故障排查与资源链接；未修改 raw 中疑似错误的 published 日期
+- 验证：25 个内容覆盖标记、31 个代码块、HTML 锚点/标题/本地链接、无远程依赖、桌面 1440px、窄屏 500px 与 42 页打印输出
+
+## [2026-08-26] query | Claude Code 动态工作流 Harness 中文翻译
+
+- 完整读取原文：`raw/articles/A harness for every task dynamic workflows in Claude Code.md`
+- 创建中文全文阅读版：`output/reports/Claude Code 动态工作流：为每项任务定制 Harness（中文翻译）.html`
+- 保留 8 个示例提示词、6 种工作流模式、10 类用例、限制、技巧、链接和作者署名
+- 将 9 张远程图片替换为对应小节的自包含说明卡；未修改 raw 中疑似错误的 published 日期
+- 验证：28 个内容覆盖标记、8 个提示词卡、9 个配图说明、HTML 锚点/标题/本地链接、无远程依赖、桌面 1440px、窄屏 500px 与 11 页打印输出
+
+## [2026-08-26] ingest | TTT：Learning to Learn at Test Time 两篇解读
+
+- 读取原始资料：`raw/articles/【LLM2】Standford TTT模型(Learn at Test Time).md`、`raw/articles/一文通透TTT：Learning to “Learn at Test Time”，让RNN的隐藏层变成可学习的函数，把T.md`
+- 核对原论文：`Learning to (Learn at Test Time): RNNs with Expressive Hidden States`（arXiv:2407.04620）
+- 创建来源页：`wiki/sources/【LLM2】Standford TTT模型(Learn at Test Time).md`、`wiki/sources/一文通透TTT：Learning to “Learn at Test Time”，让RNN的隐藏层变成可学习的函数，把T.md`
+- 创建概念页：`wiki/concepts/TTT Layer.md`
+- 创建实体页：`wiki/entities/TTT-LM.md`
+- 更新概念页：`wiki/concepts/线性注意力递归状态.md`、`wiki/concepts/KV Cache.md`；更新 `wiki/maps/模型架构.md` 导读
+- 冲突澄清：内循环是多视图重建而非 next-token prediction；模型规模为 350M 而非 250M；TTT-Linear 只在严格特例下等价 linear attention
+- 待核实：最新 repo/checkpoint、训练与推理 kernel、serving 状态管理及更大规模 benchmark
+
+## [2026-08-26] query | TTT 模型学习指南
+
+- 读取概念页：`wiki/concepts/TTT Layer.md`、`wiki/concepts/线性注意力递归状态.md`、`wiki/concepts/KV Cache.md`
+- 读取实体与来源页：`wiki/entities/TTT-LM.md` 及两篇 TTT 解读来源页
+- 创建报告：`output/reports/TTT模型学习指南.html`
+- 内容覆盖：状态心智模型、单 token 流程、核心公式、标量手算、内外循环、TTT-Linear/MLP、mini-batch/dual form、理论边界、benchmark、推理工程、误区与 8 道自测
+- 未新增需回填的稳定结论；工程章节已显式标注为推导
+- 待核实：最新 repo/checkpoint、训练与推理 kernel、runtime 状态管理和更大规模 benchmark
+- 验证：静态结构与链接、无远程依赖、桌面 1440px、窄屏 500px、15 页打印输出，浏览器无脚本错误
+
+## [2026-08-27] ingest | On the Design of Qwen3.8-Next Architecture
+
+- 完整读取原始论文：`raw/papers/qwen3.8-Next.pdf`（28 页）
+- 创建来源页：`wiki/sources/On the Design of Qwen3.8-Next Architecture：Evaluation, Efficiency, and Training Stability.md`
+- 创建模型实体：`wiki/entities/Qwen3.8-Flash-Next.md`
+- 创建概念页：`Qwen Sparse Attention`、`Gated Residual`、`N-gram Embedding`、`Muon Optimizer`
+- 更新注意力概念：`混合注意力`、`线性注意力递归状态`、`RoPE`
+- 更新模型架构概念：`Conditional Memory`、`Hyper-Connections`、`mHC`、`Attention Residuals`
+- 更新训练概念：`Critical Batch Size`、`Scaling Laws`；更新实体 `阿里巴巴` 和三个主题地图导读
+- 命名澄清：文件名 qwen3.8-Next、论文标题 Qwen3.8-Next Architecture、正文模型 Qwen3.8-Flash-Next；397B/17B 基线为 Qwen3.7-Plus-Base
+- 未发现与现有 wiki 的直接事实冲突；保留 loss/downstream、pretraining/post-training 与 kernel/end-to-end 口径差异
+- 待核实：最终绝对训练 token/FLOPs、n-gram 寻址与 host-memory 指标、Canzona 开源状态及生产 runtime 支持
+
+## [2026-08-27] ingest | DeepSeek-V3.2-Exp: Boosting Long-Context Efficiency with DeepSeek Sparse Attention
+
+- 完整读取原始论文：`raw/papers/DeepSeek_V3_2.pdf`（6 页）
+- 创建来源页：`wiki/sources/DeepSeek-V3.2-Exp：Boosting Long-Context Efficiency with DeepSeek Sparse Attention.md`
+- 创建概念页：`wiki/concepts/DeepSeek Sparse Attention.md`
+- 创建模型实体：`wiki/entities/DeepSeek-V3.2-Exp.md`
+- 更新概念页：`Qwen Sparse Attention`、`MLA`、`KV Cache`、`RoPE`、`Benchmarking`
+- 更新实体：`DeepSeek-AI`；更新注意力机制、模型架构、性能分析主题地图导读
+- 未发现直接事实冲突；明确 DSA token-level O(L²) indexer 与 QSA micro-block O(L²/r) indexer 的边界
+- 评测边界：能力差异受 reasoning output length 影响；H800 服务成本图按 $2/GPU-hour 换算且短 prefill 使用 masked MHA，不估读曲线数字
+- 待核实：indexer shape/FP8 细节、精确服务指标、真实流量 failure cases 与大规模生产验证
+
+## [2026-08-27] ingest | GLM-5 系列模型架构演进：DSA、IndexShare、KDA 与 mHC
+
+- 原样复制外部资料到 `raw/articles/glm-5-architecture-evolution.md`，SHA-256 `20872c20213a035bfa4d59c123e607cf8adac730954a9d396ae54ec30f480b4f`
+- 创建来源页：`wiki/sources/glm-5-architecture-evolution.md`
+- 创建概念页：`wiki/concepts/IndexShare.md`
+- 创建实体页：`GLM-5 系列`、`GLM-5.3-Flash`、`Z.ai`
+- 更新注意力与架构概念：`DeepSeek Sparse Attention`、`KDA`、`MLA`、`混合注意力`、`mHC`、`RoPE`、`Qwen Sparse Attention`
+- 更新投机解码概念：`Multi-Token Prediction`；区分跨层 IndexShare 与 MTP iteration sharing
+- 更新 `vLLM`：支持矩阵绑定 commit `94d96e2446d6`，未把通用 KDA 路径误写成 GLM-5.3-Flash 原生支持
+- 更新注意力机制、模型架构、投机解码主题地图导读
+- 未发现与现有 wiki 的直接事实冲突；显式记录 GLM-5.1/5.3 后训练边界、Flash 独立 Base、K-pool 与 QSA 公式边界
+- 待核实：GLM-5.3 独立 config、Flash K-pool 完整公式、IndexShare 2.9× 本地复测及未来 vLLM 支持
+
+## [2026-08-27] query | 先进大模型架构知识图谱
+
+- 创建自包含 HTML 报告 output/reports/先进大模型架构知识图谱.html，统一比较 MLA 双模式、MSA/DSA/QSA/NSA/CSA/HCA、GDN/KDA、IndexShare、mHC、Engram、N-gram Embedding、AttnRes 与 LatentMoE。
+- 按当前 DeepSeek V4 官方 Transformers 文档修正 CSA/HCA 边界：CSA 为低倍率重叠压缩后稀疏选择，HCA 为高倍率非重叠压缩后 dense 读取；旧 C128A/RoPE 解析保留为版本相关二手线索。
+- 更新 CSA-HCA、DeepSeek V4、注意力机制与模型架构导航；完成桌面、500px 窄屏、17 页打印、矩阵交互、锚点、本地链接、JS 与无远程依赖验证。
+
+## [2026-08-28] query | KCP 与 KDA Context Parallelism
+
+- 基于 Kimi K3 Technical Report §5.1.2 解释 KCP：每个序列分段被压缩为累计 transition 与从零生成的 local state，再通过仿射 prefix scan 恢复各 rank 的精确 incoming state。
+- 更新 KDA 概念页，补充一次 AllGather 的固定大小 fragments、与加法型线性注意力/softmax CP/DCP/单卡 SM-level CP 的边界。
+
+## [2026-08-28] ingest | RLTraining Inference Mismatch
+
+- 读取原始资料：`raw/articles/RLTraining Inference Mismatch.md`（675 行）
+- 创建来源页：`wiki/sources/RLTraining Inference Mismatch.md`
+- 创建概念页：`wiki/concepts/RL 训推不一致.md`
+- 更新概念页：`跨 Mesh 权重重分片`、`混合精度训练与推理`、`确定性推理`
+- 更新训练与 Scaling 主题地图导读；明确原文 shift/mask 示例错误、KL 配方与固定阈值均未提升为通用结论
+
+## [2026-08-28] query | RL 训推不一致入门解释
+
+- 基于 `RL 训推不一致` 概念页解释 Rollout 与 Trainer 对同一条件 logprob 的对齐目标，以及 importance ratio 被系统偏差扭曲的机制。
+- 按根因修复、数值执行对齐、TIS/拒绝采样缓解和 MoE Router Replay 四层整理解决方法；强调无条件统一阈值不存在。
+
+## [2026-08-28] query | RL 训推不一致入门指南
+
+- 读取概念页：`RL 训推不一致`、`跨 Mesh 权重重分片`、`混合精度训练与推理`、`确定性推理`
+- 创建自包含 HTML：`output/reports/RL训推不一致入门指南.html`，包含 RL 闭环、条件 logprob 对齐、Ratio 计算器、六类根因、TIS/R3 边界与 22 项调试清单
+- 更新概念页与训练与 Scaling 主题地图，补充 HTML 回链
+- 完成 1440px、500px、14 页打印、Ratio/错误输入/重置、清单进度与重置、锚点、本地链接、JS 和无远程依赖验证
+- 待核实：框架配置名、rollout correction 模式和 Router Replay 支持组合需绑定 VeRL/NeMo RL 版本
+
+## [2026-09-04] query | Qwen3.8-Next Gated Residual 中 gate 的含义
+
+- 读取概念页：`wiki/concepts/Gated Residual.md`、实体页 `wiki/entities/Qwen3.8-Flash-Next.md` 与论文来源页
+- 核对官方技术报告第 2.2 节公式（29）–（36）
+- 本次 query 澄清：GR 的 gate 是由当前四路 residual state 动态生成的软乘法权重；read gate 按分支、按 channel 控制子层读取，write gate 按分支控制子层输出写回；它不是 MoE router、硬开关，也不是 GDN 内部的状态门
+
+## [2026-09-04] query | Qwen3.8-Next 的 GR、Engram 与 N-gram 区别
+
+- 读取概念页：`Gated Residual`、`N-gram Embedding`、`Conditional Memory`
+- 读取实体页：`Qwen3.8-Flash-Next`、`Engram`
+- 本次 query 澄清：GR 是四分支残差流的动态读写机制；N-gram 是连续 n 个 token 的局部模式，N-gram Embedding 是以其为键的参数查表；Engram 是 DeepSeek 提出的、以 N-gram 查表为核心并加入压缩、哈希、门控与卷积融合的具体 Conditional Memory 模块。Qwen 的 N-gram Embedding 与 Engram 属于同类方向，但论文未披露足够实现细节，不能直接等同。
+
+## [2026-09-05] interview | 整理历史面试资料为秋招逐题题库
+
+- 完整盘点 output/interview 下 11 份原稿，从 175 个候选问题归并为 146 道通用题和 12 个个人项目/行为提示；保留原稿原路径与全部正文。
+- 创建 output/interview/README.md 与 output/interview/秋招问题汇总/README.md；新增 6 个技术专题、个人题单、原稿题目对照及 146 个问题页，更新 output/README.md 入口。
+- 123 道题提炼历史短答并标为整理中，23 道题保持待整理；逐题保留原稿章节回链、同义问法和核实边界，没有新建事实来源页或补造个人经历。
+- 风险标注：旧框架命名、CUDA Graph/Fluid API、未证实加速倍率、教学代码边界；纠正前向激活峰值账本和通信重叠必然节省显存的误读。未恢复已删除的两份代码，未读写 my_resume。
+- 校验：11 份原稿 SHA-256 不变；候选问题映射无遗漏；新导航/问题页内部链接及章节锚点可解析。未逐题独立核验技术事实、运行代码或复测 benchmark。
+>>>>>>> origin/main

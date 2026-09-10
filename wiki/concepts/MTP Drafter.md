@@ -67,6 +67,9 @@ updated: 2026-06-12
 - [[KV Cache]]
 - [[Shared KV Cache]]
 - [[Per-Layer Embeddings]]
+- [[并行投机解码]]
+- [[DFlash]]
+- [[DSpark]]
 
 ## 研究备注
 

@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -sL \"https://raw.githubusercontent.com/vllm-project/vllm/main/vllm/v1/kv_cache_interface.py\" -o /tmp/kv_cache_interface.py && wc -l /tmp/kv_cache_interface.py)"
+    ]
+  }
+}

@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: 投机解码
-sources: 3
+sources: 4
 updated: 2026-07-08
 ---
 
@@ -82,6 +82,12 @@ MTP 不是 [[Speculative Decoding]] 本身，而是 speculative decoding 里“�
 4. 从前往后接受连续通过验证的 token。
 5. 遇到第一个未通过的 token 后，丢弃后续 draft，并由 target model 给出替代 token。
 
+## GLM 的 MTP index sharing
+
+[[../entities/GLM-5 系列|GLM-5.2]] 与 [[../entities/GLM-5.3-Flash]] 均设置 `index_share_for_mtp_iteration=true`：第一个 MTP iteration 计算 DSA top-k indices，后续 iterations 可以复用，避免每个 speculative step 都重跑 Indexer。
+
+这与 GLM-5.2 的跨 Transformer 层 [[IndexShare]] 是两个维度：前者跨 MTP decoding iterations，后者由 `index_topk_freq=4` 控制跨层复用。Flash 的 DSA Indexer 全为 `full`，所以只有 MTP iteration sharing，没有 5.2 式跨层 IndexShare。
+
 ## 关键权衡
 
 - 接受率决定收益上限：MTP 猜得越准，一次 target forward 能接受的 token 越多。
@@ -93,14 +99,22 @@ MTP 不是 [[Speculative Decoding]] 本身，而是 speculative decoding 里“�
 
 > MTP 可以理解成“让模型顺手多预测几个未来 token”。如果这些预测头只用于训练，它是一个辅助训练目标；如果推理时拿这些预测结果当草稿，再让大模型并行验证，它就成了 speculative decoding 的 drafter。也就是说，speculative decoding 是“猜测-验证”的解码框架，MTP 是其中一种高耦合的猜测器。
 
+## 相关实体
+
+- [[../entities/GLM-5 系列]]
+- [[../entities/GLM-5.3-Flash]]
+
 ## 相关来源
 
 - [[../sources/LLM提速利器：投机推理的原理与常见方案]]
 - [[../sources/Gemma 4：Drafter 详解]]
 - [[../sources/RTP-LLM]]
+- [[../sources/glm-5-architecture-evolution]]
 
 ## 相关概念
 
 - [[Speculative Decoding]]
 - [[MTP Drafter]]
 - [[KV Cache]]
+- [[IndexShare]]
+- [[DeepSeek Sparse Attention]]

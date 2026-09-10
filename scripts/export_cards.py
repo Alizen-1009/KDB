@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """把 `output/cards/*.md` 里的问答卡片转换成 Anki 可导入的 TSV。
 
-卡片源文件由 `kb-export` skill 编写，是 vault 内可直接阅读、可回链的 Markdown；
+卡片源文件由 `kb-cards` skill 编写，是 vault 内可直接阅读、可回链的 Markdown；
 本脚本只做机械转换，不生成内容。
 
 源文件格式：

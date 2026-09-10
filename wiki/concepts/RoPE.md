@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: 位置编码
-sources: 3
+sources: 6
 updated: 2026-05-17
 ---
 
@@ -33,6 +33,22 @@ updated: 2026-05-17
 - `cos/sin` 通常按最大位置和旋转维度预计算或缓存，前向时按 `position_ids` lookup/broadcast 到 `Q/K`
 - 具体维度配对方式会影响代码张量布局，但只要配对和 `cos/sin` 拼接一致，数学上仍对应一组二维平面旋转
 
+## Qwen3.8-Flash-Next 的位置编码边界
+
+- Qwen3.8 的 GDN hybrid 在周期性 full-attention 层保留 RoPE。NoPE 变体在预训练阶段与 RoPE 近似，但 post-training 后 endless generation 比例明显更高，因此论文没有采用 NoPE；这是一项晚阶段生成质量观察，不代表 RoPE 单独决定终止行为。
+- [[Qwen Sparse Attention|QSA]] 的 indexer head dimension 为 `128`，其中 `64` 维使用 partial RoPE。key 先按 `r=4` 平均池化，再把压缩块赋为 block starting position；query 保留 token position。先 pool 后旋转可避免平均不同 rotary phases。
+
+## DeepSeek Sparse Attention 的 Partial RoPE
+
+[[../entities/DeepSeek-V3.2-Exp]] 的 [[DeepSeek Sparse Attention|lightning indexer]] 对 indexer query/key 部分维度应用 partial RoPE；核心 MLA attention 继续使用 decoupled RoPE 路径。原始技术报告没有披露 indexer head 数、维度或 rotary dimension，不能套用 QSA 的 `4 heads / 128 dim / 64 rotary dim` 配置。
+
+## GLM-5 系列的位置配置演进
+
+- [[../entities/GLM-5 系列|GLM-5 / 5.1]] 的公开 Base 配置上限约 `200K`（GLM-5 为 `max_position_embeddings=202752`），MLA Q/K head 拆为 `192` 维 NoPE 与 `64` 维 RoPE。
+- GLM-5.2 将 `max_position_embeddings` 提升到 `1,048,576`，并设置 `rope_theta=8,000,000`；[[IndexShare]] 降低 DSA Indexer 在超长上下文下的重复成本，但它不是位置编码机制。
+- GLM-5.3 官方说明沿用 GLM-5.2 Base；由于没有独立公开文本 checkpoint config，不能写成直接核对了 5.3 的 RoPE 字段。
+- [[../entities/GLM-5.3-Flash]] 同样配置 `1M` context，但其 DSA/MLA 设置 `qk_nope_head_dim=256`、`qk_rope_head_dim=0`、`mla_use_nope=true`，即该路径不保留 RoPE 子空间。不能仅由“1M context”反推其采用与 5.2 相同的 RoPE 方案。
+
 ## 关键权衡
 
 - 相比加性绝对位置编码，RoPE 更直接服务于相对位置建模，也更适合很多 decoder-only 模型
@@ -47,12 +63,19 @@ updated: 2026-05-17
 - [[../entities/DeepSeek V4]]
 - [[../entities/Gemma 4]]
 - [[../entities/Qwen VL]]
+- [[../entities/Qwen3.8-Flash-Next]]
+- [[../entities/DeepSeek-V3.2-Exp]]
+- [[../entities/GLM-5 系列]]
+- [[../entities/GLM-5.3-Flash]]
 
 ## 相关来源
 
 - [[../sources/十分钟读懂旋转编码（RoPE）]]
 - [[../sources/彻底搞懂RoPE计算原理：从1D到3D]]
 - [[../sources/DeepSeekV4中RoPE设计解析]]
+- [[../sources/On the Design of Qwen3.8-Next Architecture：Evaluation, Efficiency, and Training Stability]]
+- [[../sources/DeepSeek-V3.2-Exp：Boosting Long-Context Efficiency with DeepSeek Sparse Attention]]
+- [[../sources/glm-5-architecture-evolution]]
 
 ## 相关概念
 
@@ -60,6 +83,9 @@ updated: 2026-05-17
 - [[Dual RoPE]]
 - [[M-RoPE]]
 - [[混合注意力]]
+- [[Qwen Sparse Attention]]
+- [[DeepSeek Sparse Attention]]
+- [[IndexShare]]
 
 ## 研究备注
 

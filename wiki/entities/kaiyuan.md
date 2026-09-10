@@ -2,7 +2,7 @@
 type: entity
 entity_type: 人物
 topic: 推理服务
-sources: 2
+sources: 3
 updated: 2026-05-17
 ---
 
@@ -21,6 +21,7 @@ updated: 2026-05-17
 - 在当前知识库中以《彻底搞懂RoPE计算原理：从1D到3D》作者出现。
 - 写作重点偏向 AI Infra 基础机制、RoPE 数学直觉、代码实现与视觉多模态扩展。
 - 新增《DeepSeekV4中RoPE设计解析》补入压缩 attention、`MQA/KV 共享` 与 RoPE 兼容问题。
+- 新增《并行投机解码(DFlash/DSpark)的快速理解与vLLM实测》，说明其内容还覆盖 speculative decoding、vLLM 部署与 inference benchmark。
 - 后续如果继续 ingest 该作者的文章，可逐步补全其长期关注主题。
 
 ## 相关概念
@@ -28,11 +29,15 @@ updated: 2026-05-17
 - [[../concepts/RoPE]]
 - [[../concepts/M-RoPE]]
 - [[../concepts/CSA-HCA|CSA/HCA]]
+- [[../concepts/并行投机解码]]
+- [[../concepts/DFlash]]
+- [[../concepts/DSpark]]
 
 ## 相关来源
 
 - [[../sources/彻底搞懂RoPE计算原理：从1D到3D]]
 - [[../sources/DeepSeekV4中RoPE设计解析]]
+- [[../sources/并行投机解码(DFlashDSpark)的快速理解与vLLM实测]]
 
 ## 冲突与备注
 

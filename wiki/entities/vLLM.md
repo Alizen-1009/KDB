@@ -2,7 +2,7 @@
 type: entity
 entity_type: 框架
 topic: 推理服务
-sources: 19
+sources: 21
 updated: 2026-06-12
 ---
 
@@ -26,6 +26,7 @@ updated: 2026-06-12
 - 新来源 `MRV2` 进一步说明，`vLLM` 的优化重点不只在 `PagedAttention`，还在于执行核心本身：包括 `persistent batching`、GPU-native input preparation、async-first scheduling 和更模块化的 `ModelState` 抽象。
 - 新增来源还补入了 `vLLM` 在可复现性上的一条工程主线：除了给采样设置 `seed`，还可以通过关闭 `V1 multiprocessing`、开启 `Batch Invariance` 等方式减少调度与 kernel 路径带来的非确定性；但这通常会带来性能回退，且支持范围有限。
 - 新来源补充了 `vLLM` 在 speculative decoding 上的使用面：它不仅支持小 draft model，也支持 `ngram / suffix / MTP / EAGLE` 等多类 speculative 配置，但不同版本和并行策略存在能力边界。
+- DFlash/DSpark 来源进一步称其测试环境中的 vLLM `0.26.0` 可通过 `--speculative-config` 的 `method=dflash/dspark` 部署 [[../concepts/并行投机解码|并行 drafter]]；其中 DSpark 还按 confidence 与硬件 `SPS(B)` 动态选择各请求 verify length。该支持矩阵、CLI 和并行限制尚未按官方源码 commit 复核。
 - 新增截图整理补足了 `vLLM v0 -> vLLM v1` 的调度架构变化：v1 以 `{request_id: num_tokens}` 形式统一 prompt/output token 的每步调度决策，更自然地支持 chunked prefill、prefix caching 和 speculative decoding；但 `token quota`、chunked prefill 默认行为和优先级调度能力都需要按具体版本核实。
 - 新来源 `SGLang：LLM推理引擎发展新方向` 把 `vLLM` 放在推理框架演化史中讨论：它因 `PagedAttention`、PyTorch 生态易用性、开源社区和多硬件支持成为现象级系统，但也可能像早期 `Caffe` 一样在新使用范式和硬件压力下继续被重构。
 - 新增截图整理校正了一个常见误解：`vLLM` 的抽象重心偏 serving engine，但这不等于它只能做单轮简单问答；它也在支持 prefix caching、structured output、speculative decoding、多模态等能力。
@@ -34,6 +35,7 @@ updated: 2026-06-12
 - 新来源 `RTP-LLM` 将 `vLLM` 作为模型加载、TTFT、推测解码和多模态吞吐的对比基线；这些对比应限定在原文给出的模型、硬件、并行配置和框架版本下。
 - 新来源 `vllm并行策略之DCP` 补充了 `vLLM` 的 decode context parallel 口径：DCP 复用 TP group，通过 `--decode-context-parallel-size` 在 decode 阶段沿 `seq_len` 维分片 KV cache，适合 `MLA/MQA/GQA` 这类 `num_kv_heads` 较小、纯 TP 容易复制 KV cache 的场景。
 - `vLLM` 的 `--enforce-eager` 与 `cudagraph_mode=NONE` 不完全等价：前者是运行在 eager mode 的总开关，会关闭 `torch.compile` 集成和 CUDA Graphs；后者只关闭 CUDA Graphs，仍可能保留 `torch.compile` / vLLM compile 的其他路径。
+- 截至官方 `main` commit `2dfb8ba`，V1 默认使用 `VLLM_COMPILE` 模式；[[../concepts/Torch Compile|Torch Compile]] 在这里不只是通用 Inductor fusion，还承担自定义 backend、编译缓存、piecewise compilation、shape specialization、custom passes 与 CUDA Graph 分区等职责。Attention 等重型路径通常作为 custom op 保留专用 kernel，因此“热点由手写 kernel 承担”不等于整个框架很少使用 compile。
 - vLLM V1 的 [[../concepts/CUDA Graph 执行模式|CUDA Graph 执行模式]] 区分 workload 与 capture 粒度：`PIECEWISE` 对各类 batch 只 capture graph-safe partitions；`FULL_DECODE_ONLY` 对 uniform decode 使用 full graph，而 prefill 与 mixed batch 不使用 CUDA Graph。
 - `Look Ma, No Bubbles!` 将 vLLM 作为 Llama-3.2-1B、batch size 1、BF16 低延迟 decode baseline，指出在该极窄场景中许多短 kernel 边界会限制可用 HBM 带宽；该结论不能直接外推到高并发 serving。
 - 新来源 `vLLM AFD Plugin` 展示了 vLLM 的外部插件扩展面：在保留调度器、KV Cache、请求生命周期和 OpenAI 兼容接口的同时，可通过 connector 把每个 MoE 切分层的 FFN 执行移到独立服务，让 Attention 与专家容量采用不同 rank 拓扑。
@@ -42,6 +44,9 @@ updated: 2026-06-12
 - vLLM x TileRT 来源展示了 V1 Connector 的另一条扩展路线：stock vLLM 保留 API、调度、Prefix Cache 和 Prefill，通过 `KVConnectorBase_V1` 与 `MultiConnector` 把部分延迟敏感流量交给 TileRT Decode，同时 native Decode pool 继续服务普通流量。
 - 新增 PCP/DCP 解读补充 Context Parallel 路线：DCP 面向 Decode KV context 分片；PCP 面向单个超长 Prefill 的 sequence 并行。官方 `main` commit `1ad5182` 中 PCP 是与 TP 正交、会扩张 world size 的维度：`world_size = PP × PCP × TP`，rank 顺序为 `DP × PP × PCP × TP`；当前 MRV2 实现只支持 MLA，源码采用 partial-Q/full-KV 的 PCP-group AllGather 路径。官方文档另列 partial-Q/partial-KV Ring Attention 方向，但两条策略仍标为 active development；官方仓库当前未实现/提及 Ulysses。
 - Kimi K3 Preview记录了vLLM对混合KDA–MLA Cache的核心扩展：将Physical State Block、Scheduler Alignment与Prefix-match Unit解耦；MLA KV、KDA Matrix State与ShortConv State必须对同一个`num_computed_tokens`有效，命中后通过Copy-on-Write恢复为请求私有Running State。该能力属于可复用于其他Hybrid Attention模型的核心基础设施，而不是K3特例补丁。
+
+- GLM 架构整理核对 commit `94d96e2446d6`：[[GLM-5 系列|GLM-5 / 5.1 / 5.2]] 注册为 `GlmMoeDsaForCausalLM`，CUDA 路径复用 `vllm/models/deepseek_v32/` 的 DSA 实现；通用兼容类位于 `vllm/model_executor/models/deepseek_v2.py`，其中 GLM 类是 `DeepseekV2ForCausalLM` 子类。`index_topk_freq`、`index_topk_pattern`、`index_skip_topk_offset` 的读取位置见该来源列出的 `deepseek_v32/attention.py` 与 `deepseek_v2.py`。
+- 同一 commit 已有面向 Kimi K3 的 NVIDIA / AMD 通用 KDA 路径及 `third_party/flash_linear_attention` 实现，但没有找到 [[GLM-5.3-Flash]] 的 `Glm5NextForConditionalGeneration` / `glm5_next` 原生注册。因此这只能证明“已有通用 KDA”，不能证明该 commit 支持 GLM-5.3-Flash；未来版本需重新核实。
 
 ## 相关概念
 
@@ -71,6 +76,12 @@ updated: 2026-06-12
 - [[DeepSpeed Ulysses]]
 - [[递归状态 Prefix Caching]]
 - [[KDA]]
+- [[并行投机解码]]
+- [[DFlash]]
+- [[DSpark]]
+- [[../concepts/DeepSeek Sparse Attention]]
+- [[../concepts/IndexShare]]
+- [[../concepts/MLA]]
 
 ## 相关来源
 
@@ -93,6 +104,8 @@ updated: 2026-06-12
 - [[../sources/vLLM x TileRT Specialized Decode for Latency-Critical Serving]]
 - [[../sources/vllm PCP 与 DCP 深度解析]]
 - [[../sources/A Preview of Production-Scale Kimi K3 Support on vLLM]]
+- [[../sources/并行投机解码(DFlashDSpark)的快速理解与vLLM实测]]
+- [[../sources/glm-5-architecture-evolution]]
 
 ## 冲突与备注
 
@@ -115,3 +128,5 @@ updated: 2026-06-12
 - TileRT 集成依赖 vLLM V1 公共 Connector；跨引擎 KV/sparse index/MTP 状态格式与升级兼容需绑定版本验证。
 - PCP/DCP 二手来源对 world size、`ag_rs` 数据流、PCP 上线版本和参数名存在冲突。官方 `main` commit `1ad5182` 已明确 PCP 扩张 world size、DCP 默认不扩张；但发布版本与 backend 数据流仍需绑定实际 commit。
 - K3官方博客是权重发布前Preview：Non-disaggregated Serving已工作，但FlashKDA Backend Selection、PD/Offload Prefix Cache、EP与Vendor Validation仍在进行；不能把“已集成”自动写成“所有部署路径已完成生产验证”。
+- DFlash/DSpark benchmark 启动命令使用 `vllm/vllm-openai:latest` 且未显式设置 `--tensor-parallel-size`；虽然正文称 vLLM `0.26.0` 和 8×A800 环境，实际 image digest、计算 GPU 数与 TP 拓扑仍待核实，吞吐结果不能视为框架通用基线。
+- GLM 支持矩阵只对应 commit `94d96e2446d6`：该 commit 支持 `GlmMoeDsaForCausalLM` 路线，但未找到 `Glm5NextForConditionalGeneration` / `glm5_next` 注册；不能把后续 release、外部分支或通用 KDA kernel 的存在倒推为该 commit 原生支持 GLM-5.3-Flash。

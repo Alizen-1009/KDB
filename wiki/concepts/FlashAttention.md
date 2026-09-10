@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: 注意力机制
-sources: 4
+sources: 5
 updated: 2026-07-18
 ---
 
@@ -37,11 +37,30 @@ updated: 2026-07-18
 - block 由 GPU 动态调度到某个 [[GPU执行模型|SM]]；它一旦驻留就不跨 SM 迁移，但一个 SM 可以同时驻留多个 block。实际数量受线程数、寄存器和 shared memory 用量限制，并不是“每个 SM 固定只跑一个 block”。
 - 当 `B × Hq × ceil(Nq/Br)` 太小、难以喂饱所有 SM 时，某些 backend 会再沿 `KV/context` 维做 split-KV，由多个 block 产生局部结果，再用 log-sum-exp / online-softmax 规则合并；这是增加并行度的特化路径，不是上述常规映射的必选步骤。
 
+## Causal Q tile 负载与 LPT 候选调度
+
+> [!note] 机制归纳
+> 本节是基于上述 Q-tile/KV-loop 映射的调度推导，不是现有来源宣称的通用 FlashAttention 实现特性。
+
+高效 causal kernel 会直接缩短每个 Q tile 的 KV loop：序列前部 Q tile 只扫描少量 KV tiles，后部 Q tile 扫描更多历史，因此 CTA 虽然可以并行，耗时却不相同。`LPT（Longest Processing Time First）` 可把“可见 KV tiles 较多”的 Q work tiles 优先交给 persistent worker/cluster，再用短任务填补尾部，以减少 [[Tail Effect]]。
+
+LPT 只改变独立 Q output tiles 的调度顺序；causal mask、online-softmax KV loop 和输出写回仍使用原始 `(batch, head, q_tile)` 坐标。固定等长 causal self-attention 可用 descending Q tile 近似 LPT；varlen、chunked prefill、local window、GQA/head packing 和 boundary tile 则需要按真实 mask iterator 估算成本。默认 CUDA block 调度不保证严格按 block index 启动，稳定实现通常需要显式 scheduler 映射或 persistent work queue。
+
+该优化最可能适合长序列、少 wave、低 `batch×heads` 或 varlen prefill；non-causal、普通 `q_len=1` decode、大量独立 work tiles，或已有充分动态 stealing 的路径可能收益很小。完整实现与验证清单见 [[../../output/reports/LPT在Causal Attention中的调度优化|LPT 在 Causal Attention 中的调度优化]]。
+
 ## FA1 与 FA2 的差异
 
 - `FlashAttention-1` 更接近“外 KV 内 Q”：同一个 `KV` block 会反复驱动多个 `Q` block 更新，因此输出状态更容易频繁回写 HBM
 - `FlashAttention-2` 更接近“外 Q 内 KV”：固定一个 `Q` block，让所有 `KV` block 流过本地状态，等这块输出完全算完后再一次性写回
 - 两者数学上等价，但 `FA2` 的 work partition 更符合输出归属，也更容易把 `O / m / d` 留在本地缓存里
+
+## FA4 HeadDim=256 的 Blackwell 专用流水
+
+PAI-FA 来源给出一个 shape 改变后必须重做 pipeline 账本的案例：`head_dim` 从 128 增至 256 后，`S` tile 形状不变，但 `O/dQ/dK/dV` 等 [[Tensor Memory|TMEM]] accumulator footprint 翻倍，原有多 stage 方案会超出片上容量。
+
+- Forward 维持 `128×128×256` 大 tile，但因单次 MMA 工作量翻倍、Softmax 工作量基本不变，将掩盖关系从约“2 MMA 对 1 Softmax”改为约“1 MMA 对 1 Softmax”。Q stage 从 2 降到 1，只保留一个 O tile，并让同一 Q 下的不同 K tile ping-pong。
+- Backward 拆为 `dQ kernel` 与 `dKdV kernel`：前者使用 `128×128`、Outer-Q/Inner-K，后者使用 `128×64`、Outer-K/Inner-Q。拆分把 MMA 数从约 5 增至约 7，但避免 `dQ/dK/dV` 同时占用 TMEM。
+- 2-CTA/DSMEM 用于分摊 SMEM、共享操作数和扩大协作 tile。该收益依赖 Blackwell 数据路径、具体 dtype、mask、GQA、序列长度和实现版本，不是所有 FlashAttention backend 的通用配置。
 
 ## 为什么它通常更快
 
@@ -72,6 +91,8 @@ updated: 2026-07-18
 - [[../entities/Stanford CS336]]
 - [[../entities/vLLM]]
 - [[../entities/TensorRT-LLM]]
+- [[../entities/NVIDIA Blackwell]]
+- [[../entities/阿里云 PAI 团队]]
 
 ## 相关来源
 
@@ -79,6 +100,7 @@ updated: 2026-07-18
 - [[../sources/Flash Attention 详细解释推演与Pytorch代码实现]]
 - [[../sources/vLLM皇冠上的明珠：深入浅出理解PagedAttention CUDA实现]]
 - [[../sources/陈巍：DeepSeek 开源Day（1）-FlashMLA 深入分析（收录于：DeepSeek技术详解系列）]]
+- [[../sources/PAI-FA｜突破 TMEM 瓶颈：FlashAttention-4 大 Head Dimension (256) 高性能算子实现与优化]]
 
 ## 相关概念
 
@@ -90,6 +112,9 @@ updated: 2026-07-18
 - [[PagedAttention]]
 - [[Flash Decoding]]
 - [[FlashMLA]]
+- [[Tensor Memory]]
+- [[Tail Effect]]
+- [[Cluster Launch Control]]
 
 ## 研究备注
 

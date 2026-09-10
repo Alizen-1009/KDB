@@ -7,6 +7,8 @@
 重建 `wiki/index.md` 和 `wiki/maps/<主题>.md`。分组依据是页面 frontmatter 的 `topic` / `entity_type` / `source_kind`，所以页面必须先有 frontmatter。
 
 - `wiki/index.md` 整页是生成物，不要手工编辑。
+- 报告索引同时识别 `output/reports/*.html` 与 `*.md`；同 stem 同时存在时只列 HTML，避免双份报告。
+- `output/exports/*.html` 单独列在《HTML 导出》区，不与研究报告或 Anki 卡片混在一起。
 - `wiki/maps/<主题>.md` 只有 `BEGIN AUTO` 标记之后的部分是生成物；**标记之前的《导读》是手写区，重新生成时保留**。想写“这个主题按什么顺序读”，写在那里。
 
 ```bash
@@ -36,7 +38,7 @@ python3 scripts/kb_log.py ingest "Attention Residuals" \
 
 ## `export_cards.py`
 
-把 `output/cards/*.md` 的问答卡片转换成 Anki 可导入的 TSV，输出到 `output/cards/anki/`。卡片内容由 `kb-export` skill 编写，这个脚本只做机械转换。
+把 `output/cards/*.md` 的问答卡片转换成 Anki 可导入的 TSV，输出到 `output/cards/anki/`。卡片内容由 `kb-cards` skill 编写，这个脚本只做机械转换。
 
 ```bash
 python3 scripts/export_cards.py                      # 全部
