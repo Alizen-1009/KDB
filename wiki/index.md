@@ -25,7 +25,7 @@
 
 ## 资源统计
 
-- 原始文章：59
+- 原始文章：60
 - 原始论文：4
 - 原始仓库：0
 - 原始数据集：0
@@ -34,7 +34,7 @@
 - 来源文件：49
 - 实体文件：33
 - 概念文件：98
-- 报告文件：23
+- 报告文件：24
 - 面试文件：11
 - 卡片文件：0
 - 幻灯片文件：0
@@ -313,6 +313,7 @@
 
 ## 报告
 
+- [[../output/reports/CUDA内存层次、GPGPU与Cache Line入门|CUDA内存层次、GPGPU与Cache Line入门]]
 - [[../output/reports/DCP是什么|DCP是什么]]
 - [[../output/reports/DeepSpeed Ulysses适用场景与DeepSeek关系|DeepSpeed Ulysses适用场景与DeepSeek关系]]
 - [[../output/reports/FlashKDA为什么能并行|FlashKDA为什么能并行]]

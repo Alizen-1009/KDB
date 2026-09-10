@@ -71,3 +71,12 @@ updated: 2026-06-12
 
 - 后续可补不同 NVIDIA 架构中 L1/shared memory 配置、register file 大小、L2 容量和 cache policy 的差异
 - Megakernel 来源中的 shared memory paging 是特定实现策略，不等同于 CUDA 提供的通用 shared memory 分页机制；引用时应说明这是作者在 kernel 内部的资源管理抽象。
+
+## 地址空间与物理层次
+
+- Global/local/shared 描述程序可见的存储空间；L1/L2 描述硬件缓存层。它们不能排成每次访问都必经的一条链。
+- 普通 global load 可经过 L1、L2；缓存命中时无需继续访问显存，部分指令或策略可绕过 L1。Shared memory 是显式管理的片上存储，不是 L1 miss 后的下一级 cache。
+- Local 的含义是线程私有，不保证片上驻留；它与寄存器不是同义词。
+- Cache line 是缓存按对齐地址组织数据的块；Nsight Compute 所描述的 L1/L2 line 为 128B，含 4 个 32B sector。实际请求与传输应区分 line、sector 和 DRAM 流量，见 [[内存合并访问]]。
+- 入门报告：[[../../output/reports/CUDA内存层次、GPGPU与Cache Line入门]]。
+- 官方核对：[CUDA Programming Model](https://docs.nvidia.com/cuda/cuda-programming-guide/01-introduction/programming-model.html)、[Nsight Compute Profiling Guide](https://docs.nvidia.com/nsight-compute/ProfilingGuide/index.html)。

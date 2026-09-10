@@ -1476,3 +1476,9 @@
 - 更新报告：`output/reports/KDA投影融合优化.md`
 - 更新概念：`wiki/concepts/KDA.md`
 - 结论：技术报告明确的是Decode Recurrent Core Fusion；Merged Input Projection是开源vLLM实现层优化。官方Preview的概括性“projections and convolution”需按commit校准。
+
+## [2026-09-10] query | CUDA内存层次、GPGPU与Cache Line入门
+
+- 创建入门报告，解释 GPU/GPGPU/CUDA 关系及 CUDA 存储空间与缓存层次。
+- 更新 CUDA内存层次、内存合并访问：据 NVIDIA 官方文档区分 128B cache line、32B sector 和实际 DRAM 流量，修正旧有 line/transaction 混用。
+- 示例为地址覆盖推导，不是 benchmark；具体容量与延迟依赖设备。
