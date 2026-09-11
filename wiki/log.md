@@ -1477,13 +1477,6 @@
 - 更新概念：`wiki/concepts/KDA.md`
 - 结论：技术报告明确的是Decode Recurrent Core Fusion；Merged Input Projection是开源vLLM实现层优化。官方Preview的概括性“projections and convolution”需按commit校准。
 
-<<<<<<< HEAD
-## [2026-09-10] query | CUDA内存层次、GPGPU与Cache Line入门
-
-- 创建入门报告，解释 GPU/GPGPU/CUDA 关系及 CUDA 存储空间与缓存层次。
-- 更新 CUDA内存层次、内存合并访问：据 NVIDIA 官方文档区分 128B cache line、32B sector 和实际 DRAM 流量，修正旧有 line/transaction 混用。
-- 示例为地址覆盖推导，不是 benchmark；具体容量与延迟依赖设备。
-=======
 ## [2026-08-06] query | 算子融合与 Torch Compile、CUDA Graph 的关系
 
 - 读取概念页：`算子融合`、`Torch Compile`、`CUDA Graph 执行模式`、`CUDA Kernel`、`Occupancy`、`Roofline 模型`
@@ -1814,4 +1807,25 @@
 - 123 道题提炼历史短答并标为整理中，23 道题保持待整理；逐题保留原稿章节回链、同义问法和核实边界，没有新建事实来源页或补造个人经历。
 - 风险标注：旧框架命名、CUDA Graph/Fluid API、未证实加速倍率、教学代码边界；纠正前向激活峰值账本和通信重叠必然节省显存的误读。未恢复已删除的两份代码，未读写 my_resume。
 - 校验：11 份原稿 SHA-256 不变；候选问题映射无遗漏；新导航/问题页内部链接及章节锚点可解析。未逐题独立核验技术事实、运行代码或复测 benchmark。
->>>>>>> origin/main
+
+## [2026-09-07] query | CUDA、ROCm、HIP 与 PTX 的层级关系
+
+- 读取概念页：`CUDA Kernel`、`Triton`，并参考既有报告 `Triton跨芯片支持.md`
+- 本次 query 澄清：CUDA 与 ROCm 更接近平台级对应，CUDA C++/Runtime 与 HIP 更接近编程接口级对应；PTX 是 NVIDIA 虚拟 ISA，AMD 工具链没有严格一一对应层，AMDGPU/GCN ISA 更接近最终 SASS，LLVM IR/AMDGPU backend 也不能简单等同 PTX。HIP API 与 CUDA API 有大量迁移映射，但不是功能、语义或性能上的一一对应。
+
+## [2026-09-07] query | RMSNorm 计算公式
+
+- 读取概念页：`wiki/concepts/RMSNorm.md`
+- 本次 query 复用既有结论：对每个 hidden vector 沿最后一维计算 `inv_rms = rsqrt(mean(x^2) + eps)`，再执行 `y = gamma * x * inv_rms`；与 LayerNorm 不同，RMSNorm 不减均值。
+
+## [2026-09-10] query | CUDA内存层次、GPGPU与Cache Line入门
+
+- 创建入门报告，解释 GPU/GPGPU/CUDA 关系及 CUDA 存储空间与缓存层次。
+- 更新 CUDA内存层次、内存合并访问：据 NVIDIA 官方文档区分 128B cache line、32B sector 和实际 DRAM 流量，修正旧有 line/transaction 混用。
+- 示例为地址覆盖推导，不是 benchmark；具体容量与延迟依赖设备。
+
+## [2026-09-11] maintenance | 修复 git pull 与已提交冲突标记
+
+- 根因：本地 `wiki/index.md`、`wiki/log.md` 未提交修改会被远端覆盖；远端 merge commit `abcd54b` 还误提交了两文件中的冲突标记。
+- 先以 stash 和 `.git/pi-pull-repair-20260911-093428.patch` 双重备份本地改动，再 fast-forward；保留 2026-09-07 两条本地日志和 2026-09-10 远端日志。
+- 重新生成 `wiki/index.md` 与 10 个主题地图；校验无冲突标记，`scripts/lint.py` 通过，`git pull --ff-only` 返回 Already up to date。

@@ -25,31 +25,18 @@
 
 ## 资源统计
 
-<<<<<<< HEAD
-- 原始文章：60
-- 原始论文：4
-=======
-- 原始文章：77
-- 原始论文：8
->>>>>>> origin/main
+- 原始文章：80
+- 原始论文：9
 - 原始仓库：0
 - 原始数据集：0
 - 原始图片：19
 - 原始代码：1
-<<<<<<< HEAD
-- 来源文件：49
-- 实体文件：33
-- 概念文件：98
-- 报告文件：24
-- 面试文件：11
-=======
 - 来源文件：62
 - 实体文件：47
 - 概念文件：116
-- 报告文件：37
+- 报告文件：38
 - HTML 导出：0
 - 面试文件：12
->>>>>>> origin/main
 - 卡片文件：0
 - 幻灯片文件：0
 
@@ -372,13 +359,10 @@
 
 ## 报告
 
-<<<<<<< HEAD
-- [[../output/reports/CUDA内存层次、GPGPU与Cache Line入门|CUDA内存层次、GPGPU与Cache Line入门]]
-=======
 - [[../output/reports/Blackwell相对Hopper的新特性|Blackwell相对Hopper的新特性]]
+- [[../output/reports/CUDA内存层次、GPGPU与Cache Line入门|CUDA内存层次、GPGPU与Cache Line入门]]
 - [Claude Code 动态工作流：为每项任务定制 Harness（中文翻译）](../output/reports/Claude%20Code%20动态工作流：为每项任务定制%20Harness（中文翻译）.html)
 - [Claude Skills 完整构建指南（中文翻译）](../output/reports/Claude%20Skills%20完整构建指南（中文翻译）.html)
->>>>>>> origin/main
 - [[../output/reports/DCP是什么|DCP是什么]]
 - [DFlash与DSpark投机解码详解](../output/reports/DFlash与DSpark投机解码详解.html)
 - [[../output/reports/DeepSpeed Ulysses适用场景与DeepSeek关系|DeepSpeed Ulysses适用场景与DeepSeek关系]]
