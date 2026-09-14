@@ -26,6 +26,13 @@ updated: 2026-05-17
 - Lightning Indexer 对 query 与压缩条目打分，每个 query 只 gather top-`index_topk` 条目进入长程核心 attention。
 - 其状态除 local sliding-window KV 外，还包括 compressor overlap state、compressed pool 与 Indexer state。
 
+## CSA 的两套压缩路径与 CSA2 的区别
+
+- [DeepSeek V4 原始报告](../../raw/papers/DeepSeekV4%20tech%20report.pdf) §2.3.1、图 3 与公式 (9)–(17)：主全局 KV 与 Indexer K 从 hidden states 分别经过各自的 compressor，压缩后的条目按块位置对应；“使用相同的压缩操作”不意味着共享参数或从主 KV 继续投影。
+- [官方 V4 参考实现](https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro/blob/main/inference/model.py) 的 `Indexer` 独立创建 `Compressor(..., index_head_dim, ...)` 并在 forward 中输入 hidden `x`。此实现于 2026-09-14 核对。
+- [V4.1 原始报告](../../raw/papers/DeepSeek_V41_Tech_Report.pdf) §2.3 把该分支简化为从主全局 latent 投影 Indexer K；生成 Indexer K 使用的是主 latent 的 pre-RoPE、pre-cache-quantization 版本，不是读取已打包主缓存后再变换。
+- 两者核心 attention 都可直接读取压缩后的主 KV 条目；这与 [[Qwen Sparse Attention]] 将选中的 index micro-block 展开后读取原始逐 token K/V 不同。HCA 不使用 Indexer，不存在 Indexer K 的来源问题。
+
 ## HCA：重压缩后的 Dense Attention
 
 - 官方 Transformers 默认压缩率为 `m'=128`，使用 non-overlapping windows 形成更粗粒度的 compressed entries。

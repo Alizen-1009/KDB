@@ -26,6 +26,12 @@ updated: 2026-08-27
 - Stage 1 只训练 indexer：`1000` 步、LR `1e-3`、每步 `8×256K`，约 `2B` tokens。Stage 2 联合训练 backbone 与 indexer：`8000` 步、LR `2.5e-5`、每步 `96×256K`，约 `200B` tokens。
 - 多步 MTP 可跨 prediction steps 复用 top-k indices；论文的四步实验中平均接受长度为 `4.06→4.07`。
 
+## Indexer K 与主 KV 的来源区别
+
+- [本地技术报告](../../raw/papers/qwen3.8-Next.pdf) §2.1.2、公式 (12)–(19) 明确：Indexer 使用独立投影 `k_i = W_K x_i`，再对每 4 个 index keys 做平均池化、RMSNorm 和 block-position partial RoPE。它不是从主 attention KV latent 派生。
+- QSA 压缩的是索引用的 key 序列；选中的 micro-block 会展开为原始 token 位置，主 attention 读取这些位置的逐 token K/V，而不是读取池化后的 index key 作为主 KV。不能由 `r=4` 推出主 KV cache 减为 1/4。
+- 对照 [DeepSeek-V4.1 报告](../../raw/papers/DeepSeek_V41_Tech_Report.pdf) §2.3：CSA2 从主全局 latent（尚未进行 RoPE 与主缓存量化）投影生成 Indexer K；V4 的 [[CSA-HCA|CSA]] 则从 hidden 使用独立的 Indexer compressor；HCA 没有 Indexer。
+
 ## 评测与效率边界
 
 - 短上下文八项任务中 QSA 在 `7/8` 项不降，均分 `75.9→76.8`。

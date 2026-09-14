@@ -1829,3 +1829,15 @@
 - 根因：本地 `wiki/index.md`、`wiki/log.md` 未提交修改会被远端覆盖；远端 merge commit `abcd54b` 还误提交了两文件中的冲突标记。
 - 先以 stash 和 `.git/pi-pull-repair-20260911-093428.patch` 双重备份本地改动，再 fast-forward；保留 2026-09-07 两条本地日志和 2026-09-10 远端日志。
 - 重新生成 `wiki/index.md` 与 10 个主题地图；校验无冲突标记，`scripts/lint.py` 通过，`git pull --ff-only` 返回 Already up to date。
+
+## [2026-09-14] query | DeepSeek-V4.1-Flash 配置与技术报告深读
+
+- 基于用户提供的 config、51 页原始技术报告和固定 revision dba1be0a40aa45a94ad051997016db3960a90277 的官方参考实现，创建 output/reports/DeepSeek-V4.1-Flash配置与技术报告深读.html。
+- 覆盖 43 层配置映射、CED/CSA2、890 B/token、SWA Bounded Replay、MoE、Engram、Single-Pass mHC、DSpark、视觉与训练系统；含逐层交互、缓存计算器和自测。
+- 更新 KV Cache 概念页的字节账本；区分物理 FP4 打包与参考实现 quant-dequant、候选内打分与全量打分后 mask、生产 CED/DSpark 与 minimal forward。未新建来源页或修改 raw。
+- 验证桌面与 500px 窄屏、43 层交互、偶数/奇数/批量/非法输入计算、23 个链接及锚点、打印输出；浏览器无脚本错误。未部署模型或复测吞吐。
+
+## [2026-09-14] query | QSA、CSA、HCA 与 CSA2 的 Indexer K 来源
+
+- 核对 Qwen3.8-Next 报告第 6–7 页、DeepSeek V4 第 9–12 页及 V4 官方 Indexer 实现。
+- 补充 Qwen Sparse Attention 与 CSA-HCA 概念页：QSA 独立投影并池化 index keys 后展开为 token 读取；CSA 主 KV/index K 独立压缩；HCA 无 indexer；CSA2 从 pre-RoPE 主 latent 派生 index K。

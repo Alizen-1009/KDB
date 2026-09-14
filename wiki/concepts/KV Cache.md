@@ -70,6 +70,18 @@ KV Cache 按 token/page 保存显式历史，已保存的每行 K/V 可以作为
 - 一个常见的粗略公式是：`KV Cache bytes ≈ 2 * B * S * L * H_kv * D_head * bytes_per_elem`
 - 前面的 `2` 对应同时保存 `K` 和 `V`
 
+## DeepSeek-V4.1-Flash 的全局缓存账本
+
+根据本地 [DeepSeek-V4.1-Flash 技术报告](../../raw/papers/DeepSeek_V41_Tech_Report.pdf) §2.3、§2.4.4 与官方参考实现（revision `dba1be0a40aa45a94ad051997016db3960a90277`），其全局缓存包含主 KV 与 Indexer K：
+
+- 主 KV 为共享 `K=V` 的 512 维 latent，FP4 数据 256 B，加每 16 通道一个 E4M3 scale 共 32 B，合计 288 B/entry；64 维 RoPE 是 512 维内部的一部分，不额外追加。
+- Indexer K 为共享的 128 维向量，FP4 数据 64 B，加每 32 通道一个 E8M0 scale 共 4 B，合计 68 B/entry；32 个 Indexer query heads 不应乘入缓存份数。
+- 独立全局 KV source 为零基层号 `2/8/14/20`：encoder 三组各存 `floor(T/2)` 条，decoder 一组存 `T` 条。因此有效载荷为 `B × [3 floor(T/2) + T] × (288 + 68)` bytes；偶数 `T` 时为 `890 B/token/sequence`，不再乘 40 层。
+- 这不是总显存：SWA、未完成压缩组状态、DSpark、权重、对齐和临时空间另计；TP 是否复制共享缓存也需核实。Top-K=512 限制当前 query 的读取数，不限制全局缓存总长度。
+- 官方 minimal inference 的缓存路径使用 inplace quant+dequant，低精度数值模拟不等于物理 FP4 打包；不能把参考程序的实际 tensor 占用与论文生产缓存口径直接等同。
+
+完整推导、配置映射与实现边界见[DeepSeek-V4.1-Flash 配置与技术报告深读](../../output/reports/DeepSeek-V4.1-Flash配置与技术报告深读.html)。实现依据：[model.py](https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/dba1be0a40aa45a94ad051997016db3960a90277/inference/model.py)、[kernel.py](https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/dba1be0a40aa45a94ad051997016db3960a90277/inference/kernel.py)。以上为布局推导，未运行模型复测。
+
 ## 关键权衡
 
 - 计算复杂度下降，但显存占用显著上升

@@ -34,7 +34,7 @@
 - 来源文件：62
 - 实体文件：47
 - 概念文件：116
-- 报告文件：38
+- 报告文件：39
 - HTML 导出：0
 - 面试文件：12
 - 卡片文件：0
@@ -365,6 +365,7 @@
 - [Claude Skills 完整构建指南（中文翻译）](../output/reports/Claude%20Skills%20完整构建指南（中文翻译）.html)
 - [[../output/reports/DCP是什么|DCP是什么]]
 - [DFlash与DSpark投机解码详解](../output/reports/DFlash与DSpark投机解码详解.html)
+- [DeepSeek-V4.1-Flash配置与技术报告深读](../output/reports/DeepSeek-V4.1-Flash配置与技术报告深读.html)
 - [[../output/reports/DeepSpeed Ulysses适用场景与DeepSeek关系|DeepSpeed Ulysses适用场景与DeepSeek关系]]
 - [[../output/reports/FlashKDA为什么能并行|FlashKDA为什么能并行]]
 - [[../output/reports/FlashKDA优化方法与GDN迁移指南|FlashKDA优化方法与GDN迁移指南]]
