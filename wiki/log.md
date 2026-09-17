@@ -1841,3 +1841,19 @@
 
 - 核对 Qwen3.8-Next 报告第 6–7 页、DeepSeek V4 第 9–12 页及 V4 官方 Indexer 实现。
 - 补充 Qwen Sparse Attention 与 CSA-HCA 概念页：QSA 独立投影并池化 index keys 后展开为 token 读取；CSA 主 KV/index K 独立压缩；HCA 无 indexer；CSA2 从 pre-RoPE 主 latent 派生 index K。
+
+## [2026-09-17] interview | SGLang 与 CUDA 系统一面问题收录
+
+- 新建：7 道重点问题页与 sets/SGLang与CUDA系统一面.md；更新题库入口及相关既有问题页
+- 复用：SGLang 框架比较、PagedAttention、推理显存、PD 分离、量化、Roofline；个人项目深挖待用户决定是否写入 my_resume
+- 待核实：面试官所说 cache 半双工/全双工的具体硬件对象；SGLang backend metadata 需绑定部署版本
+
+## [2026-09-17] interview | SGLang 与 CUDA 系统一面收录数量更正
+
+- 更正上一条日志：实际新建 8 道重点问题页和 1 个系列页，不是 7 道；其余复用与待核实说明不变
+
+## [2026-09-17] interview | 近期对话与 PyTorch 图编译一面问题补录
+
+- 新增 8 道通用问题页：PyTorch 显存分配器、torch.compile、GEMM、SGLang KV Cache、FlashAttention 1/2/3、FlashDecoding++、复读与 Lost in the Middle、推理理论上限与 SLA。
+- 新增 PyTorch图编译与推理系统一面、近期对话面试问题回顾两份题单，并更新总入口与四个分类题单。
+- 复用并补链既有图编译器、MHA/MLA、SGLang/vLLM、Decoder-only 页面；简历项目与大规模分布式部署经历按个人题边界仅记录，不编造答案。

@@ -13,6 +13,9 @@
 
 ## 专题入口
 
+- [[sets/近期对话面试问题回顾|近期对话面试问题回顾]]
+- [[sets/PyTorch图编译与推理系统一面|PyTorch 图编译与推理系统一面]]
+- [[sets/SGLang与CUDA系统一面|SGLang 与 CUDA 系统一面]]
 - [[sets/GPU与算子|GPU与算子]]
 - [[sets/推理服务|推理服务]]
 - [[sets/模型架构|模型架构]]
@@ -26,6 +29,12 @@
 
 ### GPU与算子
 
+- [[questions/torch.compile 的 Dynamo、AOTAutograd 与 Inductor 如何协作|torch.compile 的 Dynamo、AOTAutograd 与 Inductor 如何协作？]]
+- [[questions/GEMM 常用的 GPU 优化手段有哪些|GEMM 常用的 GPU 优化手段有哪些？]]
+- [[questions/FlashAttention-1、2、3 分别优化了什么|FlashAttention-1、2、3 分别优化了什么？]]
+- [[questions/FlashDecoding 与 FlashDecoding++ 如何优化小 Batch 长上下文|FlashDecoding 与 FlashDecoding++ 如何优化小 Batch 长上下文？]]
+- [[questions/CUDA 语境中的全双工、半双工与 cache line 分别是什么|CUDA 语境中的全双工、半双工与 cache line 分别是什么？]]
+- [[questions/CUDA Thrust、CUB 与 CUTLASS 各自解决什么问题|CUDA Thrust、CUB 与 CUTLASS 各自解决什么问题？]]
 - [[questions/FlashAttention-2 与 FlashDecoding 为什么更快，分别优化什么|FlashAttention-2 与 FlashDecoding 为什么更快，分别优化什么？]]
 - [[questions/如何理解 CUDA 编程与显存管理，避免 OOM 并优化 kernel|如何理解 CUDA 编程与显存管理，避免 OOM 并优化 kernel？]]
 - [[questions/XLA 与 TVM 等 AI 编译栈如何优化计算图，有何侧重|XLA 与 TVM 等 AI 编译栈如何优化计算图，有何侧重？]]
@@ -44,6 +53,13 @@
 
 ### 推理服务
 
+- [[questions/SGLang 的 KV Cache 由哪些数据结构协同管理|SGLang 的 KV Cache 由哪些数据结构协同管理？]]
+- [[questions/SGLang RadixCache 如何组织前缀复用、引用与淘汰|SGLang RadixCache 如何组织前缀复用、引用与淘汰？]]
+- [[questions/SGLang 显存不足时如何回收 KV Cache，哪些显存不能被 RadixCache 淘汰|SGLang 显存不足时如何回收 KV Cache，哪些显存不能被 RadixCache 淘汰？]]
+- [[questions/SGLang 的 varlen metadata 如何映射到物理 KV slot|SGLang 的 varlen metadata 如何映射到物理 KV slot？]]
+- [[questions/一个 KV page 内的多个 slot 在显存中是否连续|一个 KV page 内的多个 slot 在显存中是否连续？]]
+- [[questions/PD 分离中的 Prefill 与 Decode 实例配比如何确定|PD 分离中的 Prefill 与 Decode 实例配比如何确定？]]
+- [[questions/MTP 与 DSpark 的基本思路和区别是什么|MTP 与 DSpark 的基本思路和区别是什么？]]
 - [[questions/PagedAttention 的原理是什么，解决了什么痛点|PagedAttention 的原理是什么，解决了什么痛点？]]
 - [[questions/连续批处理与传统批处理有什么区别，吞吐提升取决于什么|连续批处理与传统批处理有什么区别，吞吐提升取决于什么？]]
 - [[questions/如何手写一个支持分页和 LRU 淘汰的 KV Cache 管理器|如何手写一个支持分页和 LRU 淘汰的 KV Cache 管理器？]]
@@ -81,6 +97,7 @@
 
 ### 模型架构
 
+- [[questions/如何区分并排查模型复读与 Lost in the Middle|如何区分并排查模型复读与 Lost in the Middle？]]
 - [[questions/MoE 的稀疏激活原理是什么，总参数与激活参数为何不同|MoE 的稀疏激活原理是什么，总参数与激活参数为何不同？]]
 - [[questions/MoE 路由器如何给 token 选择专家，为什么会负载不均|MoE 路由器如何给 token 选择专家，为什么会负载不均？]]
 - [[questions/MoE 中部分专家利用率低，如何改进路由与训练机制|MoE 中部分专家利用率低，如何改进路由与训练机制？]]
@@ -133,6 +150,8 @@
 
 ### 量化与性能
 
+- [[questions/PyTorch CUDA caching allocator 如何管理显存与缓解碎片|PyTorch CUDA caching allocator 如何管理显存与缓解碎片？]]
+- [[questions/如何估算推理系统理论上限，并定义 SLA 下的最大吞吐|如何估算推理系统理论上限，并定义 SLA 下的最大吞吐？]]
 - [[questions/如何用 Roofline 模型区分计算、访存和其他瓶颈|如何用 Roofline 模型区分计算、访存和其他瓶颈？]]
 - [[questions/FP8、INT8、AWQ、GPTQ、SmoothQuant 有何区别，各适用于什么场景|FP8、INT8、AWQ、GPTQ、SmoothQuant 有何区别，各适用于什么场景？]]
 - [[questions/如何估算 Transformer 前向的参数、KV Cache 与激活显存|如何估算 Transformer 前向的参数、KV Cache 与激活显存？]]

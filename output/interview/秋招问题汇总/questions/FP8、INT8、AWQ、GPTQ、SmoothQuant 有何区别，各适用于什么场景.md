@@ -8,6 +8,7 @@
 
 ## 其他问法
 
+- SmoothQuant 的核心原理是什么？为什么说它把 activation outlier 的量化难度迁移到权重侧？
 - FP8、INT8、AWQ、GPTQ、SmoothQuant 的区别和适用场景
 - LLM 主流量化方案可以按哪些维度分类？
 - 主流量化方案怎么分类？
@@ -36,5 +37,6 @@
 
 ## 所属题单
 
+- [[../sets/SGLang与CUDA系统一面|SGLang 与 CUDA 系统一面]]
 - [[../sets/量化与性能|量化与性能]]
 - [[../README|秋招问题汇总]]

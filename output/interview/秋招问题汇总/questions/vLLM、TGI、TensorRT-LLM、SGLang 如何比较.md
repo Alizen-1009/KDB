@@ -8,9 +8,11 @@
 
 ## 其他问法
 
+- 如何介绍 SGLang，它的 runtime、RadixAttention 和结构化输出侧重点是什么？
 - vLLM、TGI、TensorRT-LLM、SGLang 与题单中的 ImDeploy 有何核心区别？
 - vLLM、TGI、TensorRT-LLM、ImDeploy、SGLang 在推理加速上的核心区别
 - vLLM vs TGI vs TensorRT-LLM vs SGLang
+- SGLang 与 vLLM 在调度、前缀缓存、结构化生成和生态定位上有什么设计差异？
 
 ## 30 秒回答
 
@@ -36,5 +38,7 @@
 
 ## 所属题单
 
+- [[../sets/PyTorch图编译与推理系统一面|PyTorch 图编译与推理系统一面]]
+- [[../sets/SGLang与CUDA系统一面|SGLang 与 CUDA 系统一面]]
 - [[../sets/推理服务|推理服务]]
 - [[../README|秋招问题汇总]]

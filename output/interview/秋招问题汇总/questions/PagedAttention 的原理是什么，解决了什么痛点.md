@@ -8,6 +8,7 @@
 
 ## 其他问法
 
+- SGLang 中分页 KV 显存管理如何工作，逻辑 token 如何映射到物理 page/slot？
 - PagedAttention 的原理是什么？解决了什么痛点？
 - PagedAttention 为什么能缓解大 batch 和长上下文的显存碎片？
 
@@ -35,5 +36,6 @@ PagedAttention 把 KV Cache 从按请求连续大块分配改为固定大小的 
 
 ## 所属题单
 
+- [[../sets/SGLang与CUDA系统一面|SGLang 与 CUDA 系统一面]]
 - [[../sets/推理服务|推理服务]]
 - [[../README|秋招问题汇总]]
