@@ -13,6 +13,7 @@
 - 解释 FLOPS、TFLOPS、内存带宽、屋顶线模型
 - 如何判断一个问题是算力瓶颈还是带宽瓶颈
 - FLOPS vs TFLOPS vs 实际吞吐
+- 调优 kernel 时，如何根据 Roofline 的位置选择优化方向并验证是否移动？
 
 ## 30 秒回答
 
@@ -38,6 +39,7 @@ FLOPS 是每秒浮点运算次数，TFLOPS 是 10¹² FLOPS。Roofline 用峰值
 
 ## 所属题单
 
+- [[../sets/千问C端AI Infra一面|千问 C 端 AI Infra 一面]]
 - [[../sets/SGLang与CUDA系统一面|SGLang 与 CUDA 系统一面]]
 - [[../sets/量化与性能|量化与性能]]
 - [[../README|秋招问题汇总]]

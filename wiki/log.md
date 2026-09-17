@@ -1857,3 +1857,9 @@
 - 新增 8 道通用问题页：PyTorch 显存分配器、torch.compile、GEMM、SGLang KV Cache、FlashAttention 1/2/3、FlashDecoding++、复读与 Lost in the Middle、推理理论上限与 SLA。
 - 新增 PyTorch图编译与推理系统一面、近期对话面试问题回顾两份题单，并更新总入口与四个分类题单。
 - 复用并补链既有图编译器、MHA/MLA、SGLang/vLLM、Decoder-only 页面；简历项目与大规模分布式部署经历按个人题边界仅记录，不编造答案。
+
+## [2026-09-17] interview | 千问 C 端 AI Infra 一面问题收录
+
+- 新增 7 道待整理问题页：SGLang HiCache、PD Router、国产 AI 加速卡对比、计算/访存密集型算子、PyTorch Dispatcher、CUDA RMSNorm、Triton Softmax；新增 sets/千问C端AI Infra一面.md。
+- 复用并补链：PD 分离与配比、RadixCache、KV Cache、CUTLASS、FlashAttention-3、Roofline、Online Softmax、线性注意力、图优化。
+- 个人题边界：过简历、SGLang 源码阅读与改进、CUDA 新算法算子经历只记录原问法，未编造个人答案。

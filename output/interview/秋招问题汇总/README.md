@@ -13,6 +13,7 @@
 
 ## 专题入口
 
+- [[sets/千问C端AI Infra一面|千问 C 端 AI Infra 一面]]
 - [[sets/近期对话面试问题回顾|近期对话面试问题回顾]]
 - [[sets/PyTorch图编译与推理系统一面|PyTorch 图编译与推理系统一面]]
 - [[sets/SGLang与CUDA系统一面|SGLang 与 CUDA 系统一面]]
@@ -29,6 +30,9 @@
 
 ### GPU与算子
 
+- [[questions/PyTorch 算子如何注册 CPU 与 CUDA 实现并由 Dispatcher 分发|PyTorch 算子如何注册 CPU 与 CUDA 实现并由 Dispatcher 分发？]]
+- [[questions/如何完整实现带 Reduce 的 CUDA RMSNorm|如何完整实现带 Reduce 的 CUDA RMSNorm？]]
+- [[questions/如何用 Triton 实现并优化 Softmax|如何用 Triton 实现并优化 Softmax？]]
 - [[questions/torch.compile 的 Dynamo、AOTAutograd 与 Inductor 如何协作|torch.compile 的 Dynamo、AOTAutograd 与 Inductor 如何协作？]]
 - [[questions/GEMM 常用的 GPU 优化手段有哪些|GEMM 常用的 GPU 优化手段有哪些？]]
 - [[questions/FlashAttention-1、2、3 分别优化了什么|FlashAttention-1、2、3 分别优化了什么？]]
@@ -53,6 +57,8 @@
 
 ### 推理服务
 
+- [[questions/SGLang HiCache 如何实现分层 KV Cache|SGLang HiCache 如何实现分层 KV Cache？]]
+- [[questions/PD 分离中的 Router 如何进行负载与缓存感知路由|PD 分离中的 Router 如何进行负载与缓存感知路由？]]
 - [[questions/SGLang 的 KV Cache 由哪些数据结构协同管理|SGLang 的 KV Cache 由哪些数据结构协同管理？]]
 - [[questions/SGLang RadixCache 如何组织前缀复用、引用与淘汰|SGLang RadixCache 如何组织前缀复用、引用与淘汰？]]
 - [[questions/SGLang 显存不足时如何回收 KV Cache，哪些显存不能被 RadixCache 淘汰|SGLang 显存不足时如何回收 KV Cache，哪些显存不能被 RadixCache 淘汰？]]
@@ -150,6 +156,7 @@
 
 ### 量化与性能
 
+- [[questions/如何区分计算密集型与访存密集型算子|如何区分计算密集型与访存密集型算子？]]
 - [[questions/PyTorch CUDA caching allocator 如何管理显存与缓解碎片|PyTorch CUDA caching allocator 如何管理显存与缓解碎片？]]
 - [[questions/如何估算推理系统理论上限，并定义 SLA 下的最大吞吐|如何估算推理系统理论上限，并定义 SLA 下的最大吞吐？]]
 - [[questions/如何用 Roofline 模型区分计算、访存和其他瓶颈|如何用 Roofline 模型区分计算、访存和其他瓶颈？]]
@@ -177,6 +184,7 @@
 
 ### 平台与工程
 
+- [[questions/国产 AI 加速卡与 NVIDIA GPU 的软件栈和优化差异是什么|国产 AI 加速卡与 NVIDIA GPU 的软件栈和优化差异是什么？]]
 - [[questions/H100 集群网络拓扑与机内跨机八卡如何比较|H100 集群网络拓扑与机内跨机八卡如何比较？]]
 - [[questions/如何设计支持万卡规模的大模型训练集群|如何设计支持万卡规模的大模型训练集群？]]
 - [[questions/未来 AI Infra 的主要瓶颈和技术突破口是什么，网络、内存与电力如何权衡|未来 AI Infra 的主要瓶颈和技术突破口是什么，网络、内存与电力如何权衡？]]

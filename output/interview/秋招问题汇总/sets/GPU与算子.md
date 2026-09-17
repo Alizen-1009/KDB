@@ -6,6 +6,9 @@
 
 ## 题目
 
+1. [[../questions/PyTorch 算子如何注册 CPU 与 CUDA 实现并由 Dispatcher 分发|PyTorch 算子如何注册 CPU 与 CUDA 实现并由 Dispatcher 分发？]]
+1. [[../questions/如何完整实现带 Reduce 的 CUDA RMSNorm|如何完整实现带 Reduce 的 CUDA RMSNorm？]]
+1. [[../questions/如何用 Triton 实现并优化 Softmax|如何用 Triton 实现并优化 Softmax？]]
 1. [[../questions/torch.compile 的 Dynamo、AOTAutograd 与 Inductor 如何协作|torch.compile 的 Dynamo、AOTAutograd 与 Inductor 如何协作？]]
 1. [[../questions/GEMM 常用的 GPU 优化手段有哪些|GEMM 常用的 GPU 优化手段有哪些？]]
 1. [[../questions/FlashAttention-1、2、3 分别优化了什么|FlashAttention-1、2、3 分别优化了什么？]]

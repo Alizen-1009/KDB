@@ -36,6 +36,7 @@ Radix tree 的边不是单个字符，而可以是一段 token；插入时若新
 
 ## 所属题单
 
+- [[../sets/千问C端AI Infra一面|千问 C 端 AI Infra 一面]]
 - [[../sets/SGLang与CUDA系统一面|SGLang 与 CUDA 系统一面]]
 - [[../sets/推理服务|推理服务]]
 - [[../README|秋招问题汇总]]

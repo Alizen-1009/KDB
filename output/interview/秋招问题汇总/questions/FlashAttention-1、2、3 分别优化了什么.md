@@ -6,6 +6,7 @@
 ## 其他问法
 
 - FlashAttention-1/2/3 如何利用 SRAM 分块和 Online Softmax 减少 HBM 读写？
+- FlashAttention-3 相比前两代具体改进了哪些执行流水与硬件映射？
 
 ## 30 秒回答
 
@@ -25,6 +26,7 @@
 
 ## 所属题单
 
+- [[../sets/千问C端AI Infra一面|千问 C 端 AI Infra 一面]]
 - [[../sets/近期对话面试问题回顾|近期对话面试问题回顾]]
 - [[../sets/GPU与算子|GPU与算子]]
 - [[../README|秋招问题汇总]]

@@ -37,5 +37,6 @@ Prefill 为整段提示计算并缓存各层 K/V；decode 只计算新 token 的
 
 ## 所属题单
 
+- [[../sets/千问C端AI Infra一面|千问 C 端 AI Infra 一面]]
 - [[../sets/推理服务|推理服务]]
 - [[../README|秋招问题汇总]]

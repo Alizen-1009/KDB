@@ -28,6 +28,7 @@ AI 编译栈把高层计算图降低为更适合硬件执行的表示，通过�
 
 ## 所属题单
 
+- [[../sets/千问C端AI Infra一面|千问 C 端 AI Infra 一面]]
 - [[../sets/PyTorch图编译与推理系统一面|PyTorch 图编译与推理系统一面]]
 - [[../sets/GPU与算子|GPU与算子]]
 - [[../README|秋招问题汇总]]

@@ -46,6 +46,7 @@ Thrust 适合快速写数据预处理和通用并行算法，但复杂算子链�
 
 ## 所属题单
 
+- [[../sets/千问C端AI Infra一面|千问 C 端 AI Infra 一面]]
 - [[../sets/SGLang与CUDA系统一面|SGLang 与 CUDA 系统一面]]
 - [[../sets/GPU与算子|GPU与算子]]
 - [[../README|秋招问题汇总]]
