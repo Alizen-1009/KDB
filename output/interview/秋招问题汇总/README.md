@@ -13,6 +13,7 @@
 
 ## 专题入口
 
+- [[sets/百度Infra面试|百度 Infra 面试]]
 - [[sets/Kimi AI Infra一面|Kimi AI Infra 一面]]
 - [[sets/千问C端AI Infra一面|千问 C 端 AI Infra 一面]]
 - [[sets/近期对话面试问题回顾|近期对话面试问题回顾]]
@@ -31,6 +32,11 @@
 
 ### GPU与算子
 
+- [[questions/为什么异步 H2D 通常需要 pinned memory|为什么异步 H2D 通常需要 pinned memory？]]
+- [[questions/Memory-bound kernel 如何判断优化空间与端到端收益|Memory-bound kernel 如何判断优化空间与端到端收益？]]
+- [[questions/为什么 Hopper Blackwell 上普通 LDG 可能难以打满带宽|为什么 Hopper、Blackwell 上普通 LDG 可能难以打满带宽？]]
+- [[questions/如何实现高性能行主序 GEMV|如何实现高性能行主序 GEMV？]]
+- [[questions/什么数据适合放进 CUDA shared memory|什么数据适合放进 CUDA shared memory？]]
 - [[questions/Ampere Hopper Blackwell 的异步计算流水如何演进|Ampere、Hopper、Blackwell 的异步计算流水如何演进？]]
 - [[questions/Tensor Memory 流水如何组织，num_stages 怎么选|Tensor Memory 流水如何组织，num_stages 怎么选？]]
 - [[questions/寄存器与共享内存如何影响 occupancy，Persistent Kernel 如何隐藏延迟|寄存器与共享内存如何影响 occupancy，Persistent Kernel 如何隐藏延迟？]]

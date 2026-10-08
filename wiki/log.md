@@ -1869,3 +1869,9 @@
 - 新增 9 道问题页和 sets/Kimi AI Infra一面.md；补全既有 Online Softmax 问题页的合并公式。
 - 更新题库总入口；按用户顺序收录 10 道题，答案区分通用机制和 DeepEP/DeepGEMM/vLLM 具体实现。
 - 待核实：面试官所指 DeepEP 版本及 rank-major 去重的具体代码路径；性能取舍需按目标硬件和 shape 实测。
+
+## [2026-10-08] interview | 百度 Infra 面试问题与答案收录
+
+- 新增 5 道独立问题页与 sets/百度Infra面试.md；按用户给出的题目顺序收录。
+- 更新题库总入口和 GPU与算子分类入口；短答补充 pinned memory、LDG/TMA、GEMV 与 shared memory 的适用边界。
+- 待核实：具体 GPU 与 shape 下的带宽余量、TMA 收益和 GEMV 参数需实测；本轮未运行 GPU benchmark。
