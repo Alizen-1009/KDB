@@ -25,6 +25,7 @@
 
 ## 所属题单
 
+- [[../sets/昆仑芯AI Infra一面|昆仑芯 AI Infra 一面]]
 - [[../sets/千问C端AI Infra一面|千问 C 端 AI Infra 一面]]
 - [[../sets/平台与工程|平台与工程]]
 - [[../README|秋招问题汇总]]

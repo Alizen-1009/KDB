@@ -13,15 +13,16 @@
 
 ## 30 秒回答
 
-HiCache 将可复用 KV 的驻留范围从 GPU 扩展到较慢层级：热前缀留 GPU，较冷但仍有复用价值的块可迁到主机内存或外部后端；请求命中时按层级恢复，再交给 GPU attention。要把前缀索引、存储层位置和异步搬运调度区分开。
+HiCache 把 KV 分为 L1 GPU、L2 本机 CPU、L3 外部存储。HiRadixTree 记录前缀及本地 KV 的存储位置；请求先匹配 L1/L2，未命中的连续前缀可从 L3 预取，计算前把需要的 KV 恢复到 GPU。写回策略控制何时把数据下沉。
 
 ## 深入解释
 
-具体层级、淘汰策略、pinning 与 backend 支持随 SGLang 版本变化；此页先保留机制级短答，待绑定源码版本验证。
+L1/L2 通常是实例私有，跨实例复用依赖配置成共享的 L3 backend；不能说多机 CPU 内存自动组成一个共享 L2。预取是否等待、写回时机和后台传输要按部署配置权衡 TTFT、命中率与带宽。具体策略和代码细节随版本变化。
 
 ## 参考来源与待核实
 
 - [[../../../../wiki/concepts/分层 KV Cache|分层 KV Cache]]
+- [SGLang HiCache 设计文档](https://docs.sglang.io/docs/advanced_features/hicache_design)
 
 ## 所属题单
 

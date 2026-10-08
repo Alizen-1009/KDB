@@ -46,11 +46,11 @@ Resident CTA   : 下一轮继续处理新 tile，而不是退出
 
 ## 与普通 Kernel 和 Megakernel 的区别
 
-| 方式 | 典型边界 | 主要目标 |
-| --- | --- | --- |
-| 普通 tile kernel | 一个 CTA 通常负责一个逻辑 tile | 简单、由硬件补充 waves |
+| 方式                | 典型边界                          | 主要目标                        |
+| ----------------- | ----------------------------- | --------------------------- |
+| 普通 tile kernel    | 一个 CTA 通常负责一个逻辑 tile          | 简单、由硬件补充 waves              |
 | Persistent kernel | 一个 CTA/cluster 连续处理多个同类 tiles | 摊销初始化、跨 tile overlap、动态负载均衡 |
-| [[Megakernel]] | 跨多个算子、层甚至整模型的指令序列 | 减少更大范围 kernel 边界和中间状态往返 |
+| [[Megakernel]]    | 跨多个算子、层甚至整模型的指令序列             | 减少更大范围 kernel 边界和中间状态往返     |
 
 Persistent 描述的是 worker 生命周期与 work acquisition；megakernel 描述的是融合范围。一个 megakernel 往往是 persistent 的，但 persistent GEMM/attention kernel 不一定跨算子，因此不应把两者等同。
 

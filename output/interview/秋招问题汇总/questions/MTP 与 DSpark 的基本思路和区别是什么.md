@@ -28,6 +28,7 @@ MTP 是让额外预测模块一次提出多个未来 token，再由 target model
 
 ## 所属题单
 
+- [[../sets/昆仑芯AI Infra一面|昆仑芯 AI Infra 一面]]
 - [[../sets/SGLang与CUDA系统一面|SGLang 与 CUDA 系统一面]]
 - [[../sets/推理服务|推理服务]]
 - [[../README|秋招问题汇总]]

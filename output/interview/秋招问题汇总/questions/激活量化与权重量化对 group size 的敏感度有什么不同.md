@@ -17,10 +17,9 @@ group 越大，共享一个 scale 的值越多，metadata 越少，但离群值�
 
 ## 参考来源与待核实
 
-- [[../../../../wiki/concepts/量化|量化]]
+- [[Per-group 量化的 group size 如何选择，为什么不是越小越好|Per-group 量化 group size]]
 - [[../../面试经验#6. per-group quantization group size 怎么选|面试经验]]
 
-- 待核实 / 原稿边界：原稿只列该比较追问，没有分别解释激活与权重量化；保留整体比较题，短答留空。
 
 ## 所属题单
 

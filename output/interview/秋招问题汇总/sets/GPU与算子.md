@@ -11,6 +11,7 @@
 1. [[../questions/为什么 Hopper Blackwell 上普通 LDG 可能难以打满带宽|为什么 Hopper、Blackwell 上普通 LDG 可能难以打满带宽？]]
 1. [[../questions/如何实现高性能行主序 GEMV|如何实现高性能行主序 GEMV？]]
 1. [[../questions/什么数据适合放进 CUDA shared memory|什么数据适合放进 CUDA shared memory？]]
+1. [[../questions/Hopper 为什么设计 WGMMA，传统 MMA 有什么局限|Hopper 为什么设计 WGMMA，传统 MMA 有什么局限？]]
 1. [[../questions/PyTorch 算子如何注册 CPU 与 CUDA 实现并由 Dispatcher 分发|PyTorch 算子如何注册 CPU 与 CUDA 实现并由 Dispatcher 分发？]]
 1. [[../questions/如何完整实现带 Reduce 的 CUDA RMSNorm|如何完整实现带 Reduce 的 CUDA RMSNorm？]]
 1. [[../questions/如何用 Triton 实现并优化 Softmax|如何用 Triton 实现并优化 Softmax？]]

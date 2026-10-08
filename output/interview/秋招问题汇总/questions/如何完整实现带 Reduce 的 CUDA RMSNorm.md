@@ -15,6 +15,50 @@
 
 要处理 H 非 2 的幂、行 stride、weight 广播和输入/输出 dtype；低精度输入建议 FP32 累加。大 H 或小行数时再考虑多 block/行，避免额外全局归约成本。
 
+下面是面试可写的**连续 FP32、每个 block 一行**版本。`B > 0`、`H > 0`，输入/输出为 `[B,H]`，`weight` 为 `[H]`；代码未在 GPU 上编译或运行。
+
+```cuda
+#include <cuda_runtime.h>
+
+__global__ void rmsnorm_f32(const float* x, const float* weight,
+                            float* y, int H, float eps) {
+    int row = blockIdx.x;
+    int tid = threadIdx.x;
+    int lane = tid & 31;
+    int warp = tid >> 5;
+    __shared__ float warp_sum[8];  // launch 使用 256 threads
+
+    float sum = 0.f;
+    for (int j = tid; j < H; j += blockDim.x) {
+        float v = x[row * H + j];
+        sum += v * v;
+    }
+    for (int offset = 16; offset > 0; offset >>= 1)
+        sum += __shfl_down_sync(0xffffffff, sum, offset);
+    if (lane == 0) warp_sum[warp] = sum;
+    __syncthreads();
+
+    if (warp == 0) {
+        sum = lane < 8 ? warp_sum[lane] : 0.f;
+        for (int offset = 16; offset > 0; offset >>= 1)
+            sum += __shfl_down_sync(0xffffffff, sum, offset);
+        if (lane == 0) warp_sum[0] = rsqrtf(sum / H + eps);
+    }
+    __syncthreads();
+    float inv = warp_sum[0];
+    for (int j = tid; j < H; j += blockDim.x)
+        y[row * H + j] = x[row * H + j] * inv * weight[j];
+}
+
+void launch_rmsnorm_f32(const float* x, const float* weight, float* y,
+                        int B, int H, float eps, cudaStream_t stream) {
+    rmsnorm_f32<<<B, 256, 0, stream>>>(x, weight, y, H, eps);
+    // 调用方检查 cudaGetLastError()，并在需要时同步 stream。
+}
+```
+
+验证时与 FP32 reference 对比随机输入、非整除 `H`、不同 `eps`，再测长行和低精度版本；上面只覆盖连续 FP32 基线。
+
 ## 参考来源与待核实
 
 - [[../../../../wiki/concepts/RMSNorm|RMSNorm]]

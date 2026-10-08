@@ -43,6 +43,7 @@ KV tensor pool：实际 K/V 数据与 layout
 
 ## 所属题单
 
+- [[../sets/昆仑芯AI Infra一面|昆仑芯 AI Infra 一面]]
 - [[../sets/PyTorch图编译与推理系统一面|PyTorch 图编译与推理系统一面]]
 - [[../sets/推理服务|推理服务]]
 - [[../README|秋招问题汇总]]

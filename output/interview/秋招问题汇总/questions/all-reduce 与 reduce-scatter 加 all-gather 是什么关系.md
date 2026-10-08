@@ -20,7 +20,6 @@
 - [NCCL collectives 文档](https://docs.nvidia.com/deeplearning/nccl/user-guide/docs/usage/collectives.html)
 - [[../../多卡与推理系统面试梳理#9. 最后给一个高频追问清单|多卡与推理系统面试梳理]]
 
-- 待核实 / 原稿边界：原稿只给出该追问；前文分别解释通信原语，但未回答此组合关系，故不补答案。
 
 ## 所属题单
 

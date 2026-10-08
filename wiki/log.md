@@ -1875,3 +1875,20 @@
 - 新增 5 道独立问题页与 sets/百度Infra面试.md；按用户给出的题目顺序收录。
 - 更新题库总入口和 GPU与算子分类入口；短答补充 pinned memory、LDG/TMA、GEMV 与 shared memory 的适用边界。
 - 待核实：具体 GPU 与 shape 下的带宽余量、TMA 收益和 GEMV 参数需实测；本轮未运行 GPU benchmark。
+
+## [2026-10-08] interview | 秋招题库空答案与旧稿去重
+
+- 补齐原先 28 道待整理题的短答与边界；CUDA RMSNorm 和 Triton Softmax 增加基线代码；HiCache 与国产卡仍为整理中
+- 将推理系统专题面试稿第 3 至 5 题的重复答案收束到 PagedAttention 题页，保留原章节标题和链接
+- 尚未逐题核实其余 125 道历史整理中题目，代码未在 GPU 上编译运行
+
+## [2026-10-08] interview | Hopper WGMMA 与传统 MMA
+
+- 新建：output/interview/秋招问题汇总/questions/Hopper 为什么设计 WGMMA，传统 MMA 有什么局限.md；更新 GPU与算子题单及秋招问题汇总入口。
+- 待核实：具体性能收益依赖目标 GPU、dtype、shape 和实现，未运行 GPU benchmark。
+
+## [2026-10-08] interview | 昆仑芯 AI Infra 一面题单
+
+- 新建 sets/昆仑芯AI Infra一面.md；新增 7 道待整理通用题页：PP chunk 调度、多请求 chunk、模型特定 KV 布局、KV dtype、MTP 参数、达芬奇架构、前缀树
+- 复用并补链 11 道已有问题页，更新题库 README 与推理服务、平台与工程分类入口；个人项目题与反问反馈只保留在题单
+- 待确认：PP 的具体实现、3k chunk 的预算含义、DS V4、V3/V4 top-k 所指对象、KV Cache 写/读 bound 的原话；不为本批题目补造答案

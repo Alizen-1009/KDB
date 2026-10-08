@@ -1,6 +1,6 @@
 # 秋招问题汇总
 
-把历史资料中的独立面试问题归并成可逐题维护的题库。短答只作复习草稿，完整答案、代码和上下文回链原稿；通用知识回链 wiki。
+把历史资料中的独立面试问题归并成可逐题维护的题库。题页维护面试短答、关键边界和必要的代码骨架；长篇推导及历史上下文回链原稿，通用原理回链 wiki。
 
 ## 使用方式
 
@@ -9,10 +9,11 @@
 3. 同义题更新原页，独立追问另建页；新增系列只维护导读与链接。
 4. 事实核实与用户熟练度分开：有短答不等于已核实，更不等于已掌握。
 
-本轮从 11 份原稿整理。已有短答的页标为“整理中”，仅有题目的页标为“待整理”；逐题核对后再更新状态。没有重新跑 benchmark，也没有验证历史代码。
+题页的“已整理”表示已有可口述短答；“整理中”表示仍有关键细节待补。事实是否核实、代码是否实测，以各题页的来源和边界说明为准。历史原稿保留原章节入口，重复内容逐步收束到题页。
 
 ## 专题入口
 
+- [[sets/昆仑芯AI Infra一面|昆仑芯 AI Infra 一面]]
 - [[sets/百度Infra面试|百度 Infra 面试]]
 - [[sets/Kimi AI Infra一面|Kimi AI Infra 一面]]
 - [[sets/千问C端AI Infra一面|千问 C 端 AI Infra 一面]]
@@ -37,6 +38,7 @@
 - [[questions/为什么 Hopper Blackwell 上普通 LDG 可能难以打满带宽|为什么 Hopper、Blackwell 上普通 LDG 可能难以打满带宽？]]
 - [[questions/如何实现高性能行主序 GEMV|如何实现高性能行主序 GEMV？]]
 - [[questions/什么数据适合放进 CUDA shared memory|什么数据适合放进 CUDA shared memory？]]
+- [[questions/Hopper 为什么设计 WGMMA，传统 MMA 有什么局限|Hopper 为什么设计 WGMMA，传统 MMA 有什么局限？]]
 - [[questions/Ampere Hopper Blackwell 的异步计算流水如何演进|Ampere、Hopper、Blackwell 的异步计算流水如何演进？]]
 - [[questions/Tensor Memory 流水如何组织，num_stages 怎么选|Tensor Memory 流水如何组织，num_stages 怎么选？]]
 - [[questions/寄存器与共享内存如何影响 occupancy，Persistent Kernel 如何隐藏延迟|寄存器与共享内存如何影响 occupancy，Persistent Kernel 如何隐藏延迟？]]
@@ -68,6 +70,16 @@
 - [[questions/A100 与 H20 的硬件差异如何影响任务放置|A100 与 H20 的硬件差异如何影响任务放置？]]
 
 ### 推理服务
+
+- [[questions/MTP 的 draft 长度、top-k、树形候选与 batch 如何影响收益|MTP 的 draft 长度、top-k、树形候选与 batch 如何影响收益？]]
+
+- [[questions/推理框架中的 KV Cache dtype 由什么决定|推理框架中的 KV Cache dtype 由什么决定？]]
+
+- [[questions/模型特定 KV Cache 布局如何影响框架适配与压缩|模型特定 KV Cache 布局如何影响框架适配与压缩？]]
+
+- [[questions/多请求 Chunked Prefill 如何组批并处理固定 shape 与变长|多请求 Chunked Prefill 如何组批并处理固定 shape 与变长？]]
+
+- [[questions/PP 调度中的 Chunk 如何切分，按计算量均衡为何不等于等时|PP 调度中的 Chunk 如何切分，按计算量均衡为何不等于等时？]]
 
 - [[questions/DeepEP normal 与 low-latency 模式有什么区别|DeepEP normal 与 low-latency 模式有什么区别？]]
 - [[questions/Decode Context Parallel 如何切分 KV 并合并 attention|Decode Context Parallel 如何切分 KV 并合并 attention？]]
@@ -199,6 +211,10 @@
 - [[questions/如何从端到端账本判断 LLM 推理的真正瓶颈|如何从端到端账本判断 LLM 推理的真正瓶颈？]]
 
 ### 平台与工程
+
+- [[questions/如何手写前缀树|如何手写前缀树？]]
+
+- [[questions/达芬奇架构的计算与存储层级如何理解|达芬奇架构的计算与存储层级如何理解？]]
 
 - [[questions/国产 AI 加速卡与 NVIDIA GPU 的软件栈和优化差异是什么|国产 AI 加速卡与 NVIDIA GPU 的软件栈和优化差异是什么？]]
 - [[questions/H100 集群网络拓扑与机内跨机八卡如何比较|H100 集群网络拓扑与机内跨机八卡如何比较？]]
