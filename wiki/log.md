@@ -1863,3 +1863,9 @@
 - 新增 7 道待整理问题页：SGLang HiCache、PD Router、国产 AI 加速卡对比、计算/访存密集型算子、PyTorch Dispatcher、CUDA RMSNorm、Triton Softmax；新增 sets/千问C端AI Infra一面.md。
 - 复用并补链：PD 分离与配比、RadixCache、KV Cache、CUTLASS、FlashAttention-3、Roofline、Online Softmax、线性注意力、图优化。
 - 个人题边界：过简历、SGLang 源码阅读与改进、CUDA 新算法算子经历只记录原问法，未编造个人答案。
+
+## [2026-10-08] interview | Kimi AI Infra 一面问题与答案整理
+
+- 新增 9 道问题页和 sets/Kimi AI Infra一面.md；补全既有 Online Softmax 问题页的合并公式。
+- 更新题库总入口；按用户顺序收录 10 道题，答案区分通用机制和 DeepEP/DeepGEMM/vLLM 具体实现。
+- 待核实：面试官所指 DeepEP 版本及 rank-major 去重的具体代码路径；性能取舍需按目标硬件和 shape 实测。

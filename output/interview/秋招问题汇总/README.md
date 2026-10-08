@@ -13,6 +13,7 @@
 
 ## 专题入口
 
+- [[sets/Kimi AI Infra一面|Kimi AI Infra 一面]]
 - [[sets/千问C端AI Infra一面|千问 C 端 AI Infra 一面]]
 - [[sets/近期对话面试问题回顾|近期对话面试问题回顾]]
 - [[sets/PyTorch图编译与推理系统一面|PyTorch 图编译与推理系统一面]]
@@ -30,6 +31,11 @@
 
 ### GPU与算子
 
+- [[questions/Ampere Hopper Blackwell 的异步计算流水如何演进|Ampere、Hopper、Blackwell 的异步计算流水如何演进？]]
+- [[questions/Tensor Memory 流水如何组织，num_stages 怎么选|Tensor Memory 流水如何组织，num_stages 怎么选？]]
+- [[questions/寄存器与共享内存如何影响 occupancy，Persistent Kernel 如何隐藏延迟|寄存器与共享内存如何影响 occupancy，Persistent Kernel 如何隐藏延迟？]]
+- [[questions/Grouped GEMM 的 contiguous 与 masked 布局及 tile 调度有什么区别|Grouped GEMM 的 contiguous 与 masked 布局及 tile 调度有什么区别？]]
+- [[questions/TMA 与 cp.async 如何选择|TMA 与 cp.async 如何选择？]]
 - [[questions/PyTorch 算子如何注册 CPU 与 CUDA 实现并由 Dispatcher 分发|PyTorch 算子如何注册 CPU 与 CUDA 实现并由 Dispatcher 分发？]]
 - [[questions/如何完整实现带 Reduce 的 CUDA RMSNorm|如何完整实现带 Reduce 的 CUDA RMSNorm？]]
 - [[questions/如何用 Triton 实现并优化 Softmax|如何用 Triton 实现并优化 Softmax？]]
@@ -57,6 +63,8 @@
 
 ### 推理服务
 
+- [[questions/DeepEP normal 与 low-latency 模式有什么区别|DeepEP normal 与 low-latency 模式有什么区别？]]
+- [[questions/Decode Context Parallel 如何切分 KV 并合并 attention|Decode Context Parallel 如何切分 KV 并合并 attention？]]
 - [[questions/SGLang HiCache 如何实现分层 KV Cache|SGLang HiCache 如何实现分层 KV Cache？]]
 - [[questions/PD 分离中的 Router 如何进行负载与缓存感知路由|PD 分离中的 Router 如何进行负载与缓存感知路由？]]
 - [[questions/SGLang 的 KV Cache 由哪些数据结构协同管理|SGLang 的 KV Cache 由哪些数据结构协同管理？]]
@@ -131,6 +139,7 @@
 
 ### 分布式训练
 
+- [[questions/Ulysses Sequence Parallelism 与 Ring Attention 有什么区别|Ulysses Sequence Parallelism 与 Ring Attention 有什么区别？]]
 - [[questions/DP、TP、PP 分别切什么，如何组合|DP、TP、PP 分别切什么，如何组合？]]
 - [[questions/ZeRO 各阶段与 Offload 如何节省显存|ZeRO 各阶段与 Offload 如何节省显存？]]
 - [[questions/torchrun 如何启动 PyTorch DDP，为什么 master_port 会冲突|torchrun 如何启动 PyTorch DDP，为什么 master_port 会冲突？]]
@@ -156,6 +165,7 @@
 
 ### 量化与性能
 
+- [[questions/MXFP8 与 block-wise FP8 有什么区别|MXFP8 与 block-wise FP8 有什么区别？]]
 - [[questions/如何区分计算密集型与访存密集型算子|如何区分计算密集型与访存密集型算子？]]
 - [[questions/PyTorch CUDA caching allocator 如何管理显存与缓解碎片|PyTorch CUDA caching allocator 如何管理显存与缓解碎片？]]
 - [[questions/如何估算推理系统理论上限，并定义 SLA 下的最大吞吐|如何估算推理系统理论上限，并定义 SLA 下的最大吞吐？]]
