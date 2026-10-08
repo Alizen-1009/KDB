@@ -1,14 +1,15 @@
 # 什么是 Sequence Parallelism？
 
-- 整理状态：待整理
+- 整理状态：已整理
 - 题目出处：既有面试原稿（见文末具体章节）
 
-> [!note] 整理边界
-> 本页从历史原稿提炼；本轮未逐题重新核验技术事实或运行代码，不表示答案已通过事实复核。
+## 30 秒回答
 
-## 待补充
+在常见 Megatron 式 TP+SP 中，把部分 activation 沿序列维分到 TP ranks，让 LayerNorm、dropout、残差等逐 token 操作只保存本地 token shard；进入需要完整序列的子层时 all-gather，输出可 reduce-scatter 回序列 shard。目标主要是降低 activation 显存。
 
-已收录题目；本次未从原稿提取出足够独立的答案，后续再补短答、边界与依据。
+## 深入解释
+
+它不能让标准 causal attention 只看本地 KV；这与 Ulysses/Ring 等 context parallel 协议不同。
 
 ## 关联知识
 
@@ -19,7 +20,6 @@
 
 - [[../../大模型系统面试题地图#A. 已经有较好锚点，可以直接展开|大模型系统面试题地图]]
 
-- 原稿是派生备考资料，不是一手技术证据；涉及具体版本、硬件、性能数字的结论，复习时应沿原稿和 wiki 继续核对一手来源。
 
 ## 所属题单
 
