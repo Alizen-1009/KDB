@@ -13,6 +13,7 @@
 
 ## 专题入口
 
+- [[sets/小鹏汽车端侧AI Infra三面|小鹏汽车端侧 AI Infra 三面]]
 - [[sets/昆仑芯AI Infra一面|昆仑芯 AI Infra 一面]]
 - [[sets/百度Infra面试|百度 Infra 面试]]
 - [[sets/Kimi AI Infra一面|Kimi AI Infra 一面]]
@@ -33,6 +34,7 @@
 
 ### GPU与算子
 
+- [[questions/如何用 CUDA 直方图和前缀和查找第 K 大元素|如何用 CUDA 直方图和前缀和查找第 K 大元素？]]
 - [[questions/为什么异步 H2D 通常需要 pinned memory|为什么异步 H2D 通常需要 pinned memory？]]
 - [[questions/Memory-bound kernel 如何判断优化空间与端到端收益|Memory-bound kernel 如何判断优化空间与端到端收益？]]
 - [[questions/为什么 Hopper Blackwell 上普通 LDG 可能难以打满带宽|为什么 Hopper、Blackwell 上普通 LDG 可能难以打满带宽？]]
@@ -71,6 +73,7 @@
 
 ### 推理服务
 
+- [[questions/PD 分离多副本仿真如何建模与校验延迟数据|PD 分离多副本仿真如何建模与校验延迟数据？]]
 - [[questions/MTP 的 draft 长度、top-k、树形候选与 batch 如何影响收益|MTP 的 draft 长度、top-k、树形候选与 batch 如何影响收益？]]
 
 - [[questions/推理框架中的 KV Cache dtype 由什么决定|推理框架中的 KV Cache dtype 由什么决定？]]
@@ -183,6 +186,7 @@
 
 ### 量化与性能
 
+- [[questions/稀疏量化如何降低索引开销并验证端侧收益|稀疏量化如何降低索引开销并验证端侧收益？]]
 - [[questions/MXFP8 与 block-wise FP8 有什么区别|MXFP8 与 block-wise FP8 有什么区别？]]
 - [[questions/如何区分计算密集型与访存密集型算子|如何区分计算密集型与访存密集型算子？]]
 - [[questions/PyTorch CUDA caching allocator 如何管理显存与缓解碎片|PyTorch CUDA caching allocator 如何管理显存与缓解碎片？]]
@@ -212,6 +216,8 @@
 
 ### 平台与工程
 
+- [[questions/端侧 CPU GPU NPU DLA 如何统一调度|端侧 CPU、GPU、NPU、DLA 如何统一调度？]]
+- [[questions/跨帧流水线为何产生读写竞争，三种缓冲方案如何取舍|跨帧流水线为何产生读写竞争，三种缓冲方案如何取舍？]]
 - [[questions/如何手写前缀树|如何手写前缀树？]]
 
 - [[questions/达芬奇架构的计算与存储层级如何理解|达芬奇架构的计算与存储层级如何理解？]]

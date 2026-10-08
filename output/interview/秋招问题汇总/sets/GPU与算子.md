@@ -6,6 +6,7 @@
 
 ## 题目
 
+1. [[../questions/如何用 CUDA 直方图和前缀和查找第 K 大元素|如何用 CUDA 直方图和前缀和查找第 K 大元素？]]
 1. [[../questions/为什么异步 H2D 通常需要 pinned memory|为什么异步 H2D 通常需要 pinned memory？]]
 1. [[../questions/Memory-bound kernel 如何判断优化空间与端到端收益|Memory-bound kernel 如何判断优化空间与端到端收益？]]
 1. [[../questions/为什么 Hopper Blackwell 上普通 LDG 可能难以打满带宽|为什么 Hopper、Blackwell 上普通 LDG 可能难以打满带宽？]]
