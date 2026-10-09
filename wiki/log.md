@@ -1892,3 +1892,9 @@
 - 新建 sets/昆仑芯AI Infra一面.md；新增 7 道待整理通用题页：PP chunk 调度、多请求 chunk、模型特定 KV 布局、KV dtype、MTP 参数、达芬奇架构、前缀树
 - 复用并补链 11 道已有问题页，更新题库 README 与推理服务、平台与工程分类入口；个人项目题与反问反馈只保留在题单
 - 待确认：PP 的具体实现、3k chunk 的预算含义、DS V4、V3/V4 top-k 所指对象、KV Cache 写/读 bound 的原话；不为本批题目补造答案
+
+## [2026-10-08] interview | 小鹏汽车端侧 AI Infra 三面问题与答案
+
+- 新建 5 道通用技术题页与 sets/小鹏汽车端侧AI Infra三面.md，按面经顺序覆盖 PD 多副本仿真、稀疏量化、端侧异构调度、跨帧缓冲和 CUDA 第 K 大。
+- 更新既有缓存感知 Router 问题页与题库、分类导航；个人项目结果与团队口述指标均保留待核实边界。
+- 未运行 Orin/Thor 或 CUDA benchmark；第 K 大答案限定有限整数值域，L2 收益需实际复用与 profiling 验证。
