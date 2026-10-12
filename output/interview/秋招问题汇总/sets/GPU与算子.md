@@ -6,6 +6,8 @@
 
 ## 题目
 
+1. [[../questions/矩阵乘法的计算量、读取量与 tile 大小是什么关系|矩阵乘法的计算量、读取量与 tile 大小是什么关系？]]
+
 1. [[../questions/如何用 CUDA 直方图和前缀和查找第 K 大元素|如何用 CUDA 直方图和前缀和查找第 K 大元素？]]
 1. [[../questions/为什么异步 H2D 通常需要 pinned memory|为什么异步 H2D 通常需要 pinned memory？]]
 1. [[../questions/Memory-bound kernel 如何判断优化空间与端到端收益|Memory-bound kernel 如何判断优化空间与端到端收益？]]

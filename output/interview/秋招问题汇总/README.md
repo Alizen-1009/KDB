@@ -13,6 +13,8 @@
 
 ## 专题入口
 
+- [[sets/10月10号面试遇到的问题|10月10号面试遇到的问题]]
+
 - [[sets/小鹏汽车端侧AI Infra三面|小鹏汽车端侧 AI Infra 三面]]
 - [[sets/昆仑芯AI Infra一面|昆仑芯 AI Infra 一面]]
 - [[sets/百度Infra面试|百度 Infra 面试]]
@@ -33,6 +35,8 @@
 ## 全部通用问题
 
 ### GPU与算子
+
+- [[questions/矩阵乘法的计算量、读取量与 tile 大小是什么关系|矩阵乘法的计算量、读取量与 tile 大小是什么关系？]]
 
 - [[questions/如何用 CUDA 直方图和前缀和查找第 K 大元素|如何用 CUDA 直方图和前缀和查找第 K 大元素？]]
 - [[questions/为什么异步 H2D 通常需要 pinned memory|为什么异步 H2D 通常需要 pinned memory？]]
@@ -72,6 +76,9 @@
 - [[questions/A100 与 H20 的硬件差异如何影响任务放置|A100 与 H20 的硬件差异如何影响任务放置？]]
 
 ### 推理服务
+
+- [[questions/为什么 MoE 部署要开大 EP，吞吐收益取决于什么|为什么 MoE 部署要开大 EP，吞吐收益取决于什么？]]
+- [[questions/两张 GPU 部署模型时如何选择 TP 与 PP|两张 GPU 部署模型时如何选择 TP 与 PP？]]
 
 - [[questions/PD 分离多副本仿真如何建模与校验延迟数据|PD 分离多副本仿真如何建模与校验延迟数据？]]
 - [[questions/MTP 的 draft 长度、top-k、树形候选与 batch 如何影响收益|MTP 的 draft 长度、top-k、树形候选与 batch 如何影响收益？]]

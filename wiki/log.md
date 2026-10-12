@@ -1898,3 +1898,9 @@
 - 新建 5 道通用技术题页与 sets/小鹏汽车端侧AI Infra三面.md，按面经顺序覆盖 PD 多副本仿真、稀疏量化、端侧异构调度、跨帧缓冲和 CUDA 第 K 大。
 - 更新既有缓存感知 Router 问题页与题库、分类导航；个人项目结果与团队口述指标均保留待核实边界。
 - 未运行 Orin/Thor 或 CUDA benchmark；第 K 大答案限定有限整数值域，L2 收益需实际复用与 profiling 验证。
+
+## [2026-10-10] interview | 10月10号面试遇到的问题
+
+- 收录 2026-10-10 面试回忆，共 5 个问题；新建 3 道问题页与 sets/10月10号面试遇到的问题.md，补充既有 Memory-bound 与 GEMM 优化两页。
+- 更新秋招题库 README、GPU与算子和推理服务入口；保留 EP/TP/PP 收益条件、SIMT 优化边界及 M/N/K/block size 公式假设。
+- 待核实：具体模型、GPU、框架版本、互联与 shape 下的性能收益需实测；本轮未运行 GPU benchmark。
