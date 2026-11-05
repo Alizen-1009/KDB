@@ -32,8 +32,15 @@ SLA 是对外服务等级协议；SLI 是实际测量指标，SLO 是内部目�
 
 - 理论峰值必须与 dtype、稀疏/dense 口径和实际指令路径一致；kernel 上限不能直接代替端到端系统上限。
 
+## 面试追问：TTFT、TPOT 之外还看什么？
+
+优先看 P95/P99 ITL、端到端延迟和 SLO goodput。TPOT 是请求内平均出 token 间隔，ITL 保留相邻 token 的间隔分布，能发现偶发停顿。Goodput 统计单位时间内达标的请求。还应记录输入与输出吞吐、请求吞吐、错误率、峰值显存和 KV Cache 占用。固定到达率、并发、长度分布、前缀命中和采样配置后再做 A/B。
+
+- [vLLM benchmark 指标和 goodput 配置](https://docs.vllm.ai/en/stable/cli/bench/serve/)
+
 ## 所属题单
 
+- [[../sets/推理并行、昇腾调优与 MLIR 面试追问|推理并行、昇腾调优与 MLIR 面试追问]]
 - [[../sets/近期对话面试问题回顾|近期对话面试问题回顾]]
 - [[../sets/量化与性能|量化与性能]]
 - [[../README|秋招问题汇总]]

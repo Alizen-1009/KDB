@@ -30,7 +30,19 @@
 - 待核实 / 原稿边界：原稿强调比较对象必须区分 PyTorch eager、torch.compile 与高度特化的官方 kernel；硬件、驱动、CUDA、shape、warmup 和计时口径必须一致。没有具体实验数字或超越官方库的个人经历证据。步骤与方向小标题均不另建题。
 - 原稿是派生备考资料，不是一手技术证据；涉及具体版本、硬件、性能数字的结论，复习时应沿原稿和 wiki 继续核对一手来源。
 
+## 面试追问：怎么证明优化有效，测过核利用率吗？
+
+1. 和参考实现对比正确性，覆盖常用 shape、dtype、layout、尾块和边界值。
+2. 固定输入和运行环境，预热后重复测 kernel latency，覆盖常见 shape 的回归。报告加速比，按瓶颈看有效带宽或吞吐。
+3. 用模型 timeline 检查新路径命中、调用次数、总耗时和是否落在关键路径。最后测端到端收益。
+4. NVIDIA 用 Nsight Compute 看 SM、DRAM/L2 吞吐和 achieved occupancy。昇腾用 msprof op 或 msopprof 看 Cube、Vector、MTE 流水与各核耗时。Occupancy 表示 warp 驻留情况，计算吞吐还需独立测量。
+5. Double buffer 的验证可以在相同 shape 做开关 A/B，看总耗时和搬运与计算的重叠变化。个人实测数值待提供。
+
+- [NVIDIA Nsight Compute](https://docs.nvidia.com/nsight-compute/ComputeTriage/)
+- [CANN 通算流水图](https://www.hiascend.com/document/detail/zh/canncommercial/83RC1/devaids/opdev/atlasopdev_16_0139.html)
+
 ## 所属题单
 
+- [[../sets/推理并行、昇腾调优与 MLIR 面试追问|推理并行、昇腾调优与 MLIR 面试追问]]
 - [[../sets/GPU与算子|GPU与算子]]
 - [[../README|秋招问题汇总]]

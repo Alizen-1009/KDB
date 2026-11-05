@@ -29,7 +29,15 @@ NCCL 侧重 GPU collective 性能，适合多 GPU 训练，但更依赖 CUDA 和
 - 待核实 / 原稿边界：保留整体对比。原稿另列 TensorFlow 的 NCCL/XLA/grpc/collective ops 生态，层级并不完全相同；具体后端支持与性能未绑定版本。
 - 原稿是派生备考资料，不是一手技术证据；涉及具体版本、硬件、性能数字的结论，复习时应沿原稿和 wiki 继续核对一手来源。
 
+## 面试追问：SFT 用了什么并行，多机传什么？
+
+报实际节点数、每节点卡数、并行策略与 group 划分。DDP 典型地 all-reduce 梯度，FSDP 按需 all-gather 参数，并 reduce-scatter 梯度。若使用 TP、PP 或 EP，再说清各组跨哪些 ranks 以及交换的张量。区分通信后端、节点内互联和节点间实际链路，按训练配置和日志填写。
+
+- [PyTorch DDP](https://docs.pytorch.org/docs/main/notes/ddp.html)
+- [PyTorch FSDP](https://docs.pytorch.org/tutorials/intermediate/FSDP1_tutorial.html)
+
 ## 所属题单
 
+- [[../sets/推理并行、昇腾调优与 MLIR 面试追问|推理并行、昇腾调优与 MLIR 面试追问]]
 - [[../sets/分布式训练|分布式训练]]
 - [[../README|秋招问题汇总]]

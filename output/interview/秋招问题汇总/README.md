@@ -13,6 +13,8 @@
 
 ## 专题入口
 
+- [[sets/推理并行、昇腾调优与 MLIR 面试追问|推理并行、昇腾调优与 MLIR 面试追问]]
+
 - [[sets/英伟达高性能计算工程师26题|英伟达高性能计算工程师26题]]
 - [[sets/SDE与强化学习岗位面经|SDE与强化学习岗位面经]]
 - [[sets/英伟达AI Infra五面面经|英伟达 AI Infra 五面面经]]
@@ -41,6 +43,8 @@
 
 ### GPU与算子
 
+- [[questions/W8A8 Triton、Marlin FP8 与 Persistent Matmul 是什么关系|W8A8 Triton、Marlin FP8 与 Persistent Matmul 是什么关系？]]
+- [[questions/Kernel 内同步、Kernel 间数据交接和跨卡通信有何区别|Kernel 内同步、Kernel 间数据交接和跨卡通信有何区别？]]
 - [[questions/CUDA warp divergence 如何影响吞吐，怎样用重排优化|CUDA warp divergence 如何影响吞吐，怎样用重排优化]]
 - [[questions/CUDA shared memory 和 L1 如何共享片上容量|CUDA shared memory 和 L1 如何共享片上容量]]
 - [[questions/CUDA Unified Memory 如何迁移，瓶颈在哪里|CUDA Unified Memory 如何迁移，瓶颈在哪里]]
@@ -99,6 +103,11 @@
 
 ### 推理服务
 
+- [[questions/PCP 与 DCP 各解决什么瓶颈，什么时候开|PCP 与 DCP 各解决什么瓶颈，什么时候开？]]
+- [[questions/PD 分离中为什么用国产卡做 Prefill、NVIDIA 做 Decode|PD 分离中为什么用国产卡做 Prefill、NVIDIA 做 Decode？]]
+- [[questions/稀疏 Attention 的 Decode TopK 后端如何选择|稀疏 Attention 的 Decode TopK 后端如何选择？]]
+- [[questions/DCP 稀疏索引如何选全局 TopK，两个 pack 有何区别|DCP 稀疏索引如何选全局 TopK，两个 pack 有何区别？]]
+- [[questions/DCP Attention 的 AG 加 RS 与 A2A 合并有何区别|DCP Attention 的 AG 加 RS 与 A2A 合并有何区别？]]
 - [[questions/训练调用的分布式推理服务如何支持动态批处理与流水线|训练调用的分布式推理服务如何支持动态批处理与流水线]]
 - [[questions/MLA Chunked Prefill 如何避免历史 KV 展开导致激活显存过大|MLA Chunked Prefill 如何避免历史 KV 展开导致激活显存过大？]]
 - [[questions/Agent 场景 KV Cache 空间不足时如何优化|Agent 场景 KV Cache 空间不足时如何优化？]]
@@ -197,6 +206,8 @@
 
 ### 分布式训练
 
+- [[questions/SFT 如何构建数据并验证调参效果|SFT 如何构建数据并验证调参效果？]]
+- [[questions/SFT 如何说明训练框架和 Base Model，怎样判断原生多模态|SFT 如何说明训练框架和 Base Model，怎样判断原生多模态？]]
 - [[questions/NVLink 多 GPU 如何做 P2P 并安排通信|NVLink 多 GPU 如何做 P2P 并安排通信]]
 - [[questions/NVSwitch 和 InfiniBand 上如何设计分层集合通信|NVSwitch 和 InfiniBand 上如何设计分层集合通信]]
 - [[questions/千卡训练如何设计梯度同步并比较压缩与异步 SGD|千卡训练如何设计梯度同步并比较压缩与异步 SGD]]
@@ -232,6 +243,7 @@
 
 ### 量化与性能
 
+- [[questions/昇腾 A5 相比 A3 升级在哪里，FP16 和 FP8 峰值是多少|昇腾 A5 相比 A3 升级在哪里，FP16 和 FP8 峰值是多少？]]
 - [[questions/稀疏量化如何降低索引开销并验证端侧收益|稀疏量化如何降低索引开销并验证端侧收益？]]
 - [[questions/MXFP8 与 block-wise FP8 有什么区别|MXFP8 与 block-wise FP8 有什么区别？]]
 - [[questions/如何区分计算密集型与访存密集型算子|如何区分计算密集型与访存密集型算子？]]
@@ -262,6 +274,10 @@
 
 ### 平台与工程
 
+- [[questions/CMake、Ninja 与 g++ 如何分工|CMake、Ninja 与 g++ 如何分工？]]
+- [[questions/MLIR Op 如何从 TableGen 生成 C++ 并注册到 Dialect|MLIR Op 如何从 TableGen 生成 C++ 并注册到 Dialect？]]
+- [[questions/MLIR ODS 合同、类型推导和 Verifier 如何分工|MLIR ODS 合同、类型推导和 Verifier 如何分工？]]
+- [[questions/grep -E 如何搜索构建文件中的多种模式|grep -E 如何搜索构建文件中的多种模式？]]
 - [[questions/端侧 CPU GPU NPU DLA 如何统一调度|端侧 CPU、GPU、NPU、DLA 如何统一调度？]]
 - [[questions/跨帧流水线为何产生读写竞争，三种缓冲方案如何取舍|跨帧流水线为何产生读写竞争，三种缓冲方案如何取舍？]]
 - [[questions/如何手写前缀树|如何手写前缀树？]]

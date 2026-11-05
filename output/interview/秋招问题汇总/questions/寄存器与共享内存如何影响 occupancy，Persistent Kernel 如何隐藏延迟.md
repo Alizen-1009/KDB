@@ -16,7 +16,14 @@
 
 - [CUDA Occupancy 说明](https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#occupancy)；[CUTLASS Grouped Kernel Scheduler](https://github.com/NVIDIA/cutlass/blob/main/media/docs/cpp/grouped_scheduler.md)。
 
+## 面试追问：Persistent Matmul 中一个 program 算哪些 tile？
+
+Triton 教程示例按固定步长遍历 tile。假设有 4 个 program 和 12 个 tile，program 0 处理 0、4、8。program 在一次 launch 内连续处理多个 tile，每个 tile 的累加器重新初始化。固定步长分配无需共享任务队列。跨 launch 保存状态属于不同机制。
+
+- [Triton Persistent Matmul](https://github.com/triton-lang/triton/blob/main/python/tutorials/09-persistent-matmul.py)
+
 ## 所属题单
 
+- [[../sets/推理并行、昇腾调优与 MLIR 面试追问|推理并行、昇腾调优与 MLIR 面试追问]]
 - [[../sets/Kimi AI Infra一面|Kimi AI Infra 一面]]
 - [[../README|秋招问题汇总]]
