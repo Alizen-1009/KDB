@@ -13,6 +13,9 @@
 
 ## 专题入口
 
+- [[sets/英伟达AI Infra五面面经|英伟达 AI Infra 五面面经]]
+- [[sets/编程、数学与算法|编程、数学与算法]]
+
 - [[sets/10月10号面试遇到的问题|10月10号面试遇到的问题]]
 
 - [[sets/小鹏汽车端侧AI Infra三面|小鹏汽车端侧 AI Infra 三面]]
@@ -35,6 +38,15 @@
 ## 全部通用问题
 
 ### GPU与算子
+
+- [[questions/如何用 Roofline 推导 GEMM 与 MoE 的临界 token 数|如何用 Roofline 推导 GEMM 与 MoE 的临界 token 数？]]
+- [[questions/GPU 算子有哪些优化方法，如何按瓶颈选择|GPU 算子有哪些优化方法，如何按瓶颈选择？]]
+- [[questions/如何根据 GPU 硬件特性制定 Infra 优化方案|如何根据 GPU 硬件特性制定 Infra 优化方案？]]
+- [[questions/相同输入的算子为何可能不确定，atomicAdd 会带来什么问题|相同输入的算子为何可能不确定，atomicAdd 会带来什么问题？]]
+- [[questions/FP32 大数减极小数为何不变，如何区分舍入与溢出|FP32 大数减极小数为何不变，如何区分舍入与溢出？]]
+- [[questions/GPU 有哪些内存与缓存，地址空间和物理层次如何区分|GPU 有哪些内存与缓存，地址空间和物理层次如何区分？]]
+- [[questions/两个进程如何共享 GPU 显存，GPU 是否有虚拟地址|两个进程如何共享 GPU 显存，GPU 是否有虚拟地址？]]
+- [[questions/CUDA 算子的常量参数放在哪种内存中|CUDA 算子的常量参数放在哪种内存中？]]
 
 - [[questions/矩阵乘法的计算量、读取量与 tile 大小是什么关系|矩阵乘法的计算量、读取量与 tile 大小是什么关系？]]
 
@@ -76,6 +88,12 @@
 - [[questions/A100 与 H20 的硬件差异如何影响任务放置|A100 与 H20 的硬件差异如何影响任务放置？]]
 
 ### 推理服务
+
+- [[questions/MLA Chunked Prefill 如何避免历史 KV 展开导致激活显存过大|MLA Chunked Prefill 如何避免历史 KV 展开导致激活显存过大？]]
+- [[questions/Agent 场景 KV Cache 空间不足时如何优化|Agent 场景 KV Cache 空间不足时如何优化？]]
+- [[questions/PD 分离在长前缀 Agent 场景下一定更好吗|PD 分离在长前缀 Agent 场景下一定更好吗？]]
+- [[questions/Context Parallel 中 AllGather KV 与 AllGather Q 如何选择|Context Parallel 中 AllGather KV 与 AllGather Q 如何选择？]]
+- [[questions/Decode 长输出请求如何做负载均衡与优化|Decode 长输出请求如何做负载均衡与优化？]]
 
 - [[questions/为什么 MoE 部署要开大 EP，吞吐收益取决于什么|为什么 MoE 部署要开大 EP，吞吐收益取决于什么？]]
 - [[questions/两张 GPU 部署模型时如何选择 TP 与 PP|两张 GPU 部署模型时如何选择 TP 与 PP？]]
@@ -166,6 +184,8 @@
 - [[questions/MHA 与 MLA 的核心区别是什么，为什么 MLA 的收益特别关注推理|MHA 与 MLA 的核心区别是什么，为什么 MLA 的收益特别关注推理？]]
 
 ### 分布式训练
+
+- [[questions/四台服务器如何在内存受限时并行计算矩阵乘法|四台服务器如何在内存受限时并行计算矩阵乘法？]]
 
 - [[questions/Ulysses Sequence Parallelism 与 Ring Attention 有什么区别|Ulysses Sequence Parallelism 与 Ring Attention 有什么区别？]]
 - [[questions/DP、TP、PP 分别切什么，如何组合|DP、TP、PP 分别切什么，如何组合？]]
@@ -271,3 +291,23 @@
 
 - [[../README|面试备考总入口]]
 - [[../../../wiki/index|知识库索引]]
+
+### 编程、数学与算法
+
+- [[questions/单核上两个线程何时可能比一个线程更快|单核上两个线程何时可能比一个线程更快？]]
+- [[questions/const int 指针的两种写法与常量指针有什么区别|const int 指针的两种写法与常量指针有什么区别？]]
+- [[questions/两个指针指向常量时如何交换它们的指向|两个指针指向常量时如何交换它们的指向？]]
+- [[questions/C++ 拷贝构造函数是什么，与拷贝赋值有何区别|C++ 拷贝构造函数是什么，与拷贝赋值有何区别？]]
+- [[questions/C++ 浅拷贝与深拷贝如何区分，如何实现资源独立复制|C++ 浅拷贝与深拷贝如何区分，如何实现资源独立复制？]]
+- [[questions/虚函数与继承如何影响 C++ 对象的 sizeof|虚函数与继承如何影响 C++ 对象的 sizeof？]]
+- [[questions/不用临时变量交换两个 int 时加减法与异或法有什么边界|不用临时变量交换两个 int 时加减法与异或法有什么边界？]]
+- [[questions/如何求点到直线或线段的投影点|如何求点到直线或线段的投影点？]]
+- [[questions/Sigmoid 函数如何求导并稳定计算|Sigmoid 函数如何求导并稳定计算？]]
+- [[questions/Softmax 为什么减去最大值，数值稳定性边界是什么|Softmax 为什么减去最大值，数值稳定性边界是什么？]]
+- [[questions/排序二叉树中替换分数相同节点的题意如何澄清|排序二叉树中替换分数相同节点的题意如何澄清？]]
+- [[questions/如何深拷贝带 random 指针的链表|如何深拷贝带 random 指针的链表？]]
+- [[questions/两个空瓶换一瓶汽水时 N 元最多喝多少瓶|两个空瓶换一瓶汽水时 N 元最多喝多少瓶？]]
+- [[questions/耗时为一到 N 的独立任务如何最小化完工时间与核数|耗时为一到 N 的独立任务如何最小化完工时间与核数？]]
+- [[questions/LeetCode 2712 如何通过相邻边界推导最小翻转成本|LeetCode 2712 如何通过相邻边界推导最小翻转成本？]]
+- [[questions/最多选择 k 台机器如何最大化速度和乘最小可靠性|最多选择 k 台机器如何最大化速度和乘最小可靠性？]]
+- [[questions/数字字符串插入任意加号后的所有表达式之和如何计算|数字字符串插入任意加号后的所有表达式之和如何计算？]]

@@ -5,6 +5,8 @@
 
 ## 其他问法
 
+- 为什么要大 EP、大 DP？大 EP 开多大合适？固定单卡的 batch size 为 16，以 DeepSeek 为例，计算 EP 大小？
+
 - 为什么模型部署要开 EP？它有什么好处，为什么能提高吞吐？
 
 ## 30 秒回答
@@ -12,6 +14,30 @@
 EP 把不同专家权重分布到不同 GPU，token 经 router 选择专家后分发激活，计算后返回并合并。它分摊专家权重显存，并让不同专家并行计算；释放的显存可用于 KV Cache 和更大并发。更大有效 batch 让专家收到更多 token，提高权重复用和 GEMM 效率。但吞吐收益需要足够流量、合理负载均衡和高效通信，不能只把 EP size 调大。
 
 ## 深入解释
+
+### 英伟达五面补充
+
+- 本次题目出处：用户提供的《英伟达 AI Infra 五面面经》截图，AI Infra 与推理系统第 9 题；2026-11-05 收录，实际面试日期与具体轮次未提供。
+- 本次原题：为什么要大 EP、大 DP？大 EP 开多大合适？固定单卡的 batch size 为 16，以 DeepSeek 为例，计算 EP 大小？
+
+本补充显式选用 DeepSeek-V3，不把“DeepSeek”泛化为所有版本。官方配置有 256 个 routed experts，每 token 激活 8 个 routed experts；shared expert 不放入该路由均值分母。
+
+假设 EP 组 P 个 ranks，每个 rank 每步贡献 16 个 tokens，均匀路由：
+
+$$T=16P,\qquad M_e=\frac{Tk}{E}=\frac{16P\times8}{256}=\frac P2$$
+
+| P | 每 expert 平均 tokens |
+|---|---:|
+| 8 | 4 |
+| 32 | 16 |
+| 64 | 32 |
+| 128 | 64 |
+
+若只是示例地要求 M_e=64，可推得 P=128；目标 64 必须来自 GEMM 性能/延迟分析，不能当作模型固有常量。这里的 batch=16 指每 rank 实际贡献 token 数；若是 TP 复制视图，不能重复计数。
+
+固定单卡 batch 时，扩 P 同时扩大全局 batch；固定全局 T 时，M_e=Tk/E 不随 P 自动增大。目标部署还要满足权重容量、路由波动、网络拓扑、A2A、小消息和延迟约束。因此题设不足以唯一确定最优 EP。
+
+与 [[如何用 Roofline 推导 GEMM 与 MoE 的临界 token 数|Roofline 临界 token 推导]] 联合使用时，先估目标 M_e，再推并行规模，最后压测。
 
 ### 从容量到吞吐的因果链
 
@@ -56,7 +82,14 @@ $$M_{expert}\approx\frac{Bk}{E}$$
 - [vLLM：Large Scale Serving with Wide-EP](https://vllm-project.github.io/2025/12/17/large-scale-serving.html)：Wide-EP、MLA KV 容量与配套优化。
 - 专家平均 token 数为均匀路由条件下的机制推导；实际路由有偏斜。最优 EP size 和实际吞吐需绑定模型、GPU、互联、流量及 backend 实测；本次未运行 benchmark。
 
+### 本次补充依据与边界
+
+- [DeepSeek-V3 官方配置](https://huggingface.co/deepseek-ai/DeepSeek-V3/blob/main/config.json)。
+- P/2 为均匀路由条件下的平均值，不是每个 expert 的实际 token 数；未运行 benchmark。
+
 ## 所属题单
+
+- [[../sets/英伟达AI Infra五面面经|英伟达 AI Infra 五面面经]]
 
 - [[../sets/10月10号面试遇到的问题|10月10号面试遇到的问题]]
 - [[../sets/推理服务|推理服务]]

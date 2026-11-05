@@ -226,6 +226,11 @@ for e in experts:
 
 所以高性能单卡 MoE 通常更倾向使用 `grouped matmul / grouped GEMM` 来算 expert FFN；`batched matmul` 主要出现在 padding 到固定 capacity 的简单实现、训练参考实现，或 expert token 数较均匀且 padding 浪费可接受的场景。
 
+### 权重 tile 的 L2 复用
+
+- 固定 expert 与输出列 tile `n` 时，不同 token 行 tile `m` 会读取相同的权重 tile `B_e[k, n]`。让这些 CTA 在相近时间运行，可以缩短跨 CTA 的复用距离。分组大小还要兼顾 activation 复用与 SM 负载均衡。[PyTorch 的 cache-aware grouped GEMM 实现](https://pytorch.org/blog/accelerating-moes-with-a-triton-persistent-cache-aware-grouped-gemm-kernel/)
+- 当某个 expert 只有一个 M tile，常规输出分块下没有沿 M 的跨 CTA 权重复用。对有近期重读的权重 tile，可再尝试 [[CUDA内存层次|L2 驱逐优先级提示]]。用相同输入对比 tile 排序与缓存策略各自对 DRAM 读取字节数、L2 读取命中率和 kernel 耗时的影响。
+
 ## Rubin 的 MoE 执行链优化
 
 [[../entities/NVIDIA Rubin]] 的相关机制可以串成一条动态 expert 执行链：

@@ -6,6 +6,15 @@
 
 ## 题目
 
+1. [[../questions/如何用 Roofline 推导 GEMM 与 MoE 的临界 token 数|如何用 Roofline 推导 GEMM 与 MoE 的临界 token 数？]]
+1. [[../questions/GPU 算子有哪些优化方法，如何按瓶颈选择|GPU 算子有哪些优化方法，如何按瓶颈选择？]]
+1. [[../questions/如何根据 GPU 硬件特性制定 Infra 优化方案|如何根据 GPU 硬件特性制定 Infra 优化方案？]]
+1. [[../questions/相同输入的算子为何可能不确定，atomicAdd 会带来什么问题|相同输入的算子为何可能不确定，atomicAdd 会带来什么问题？]]
+1. [[../questions/FP32 大数减极小数为何不变，如何区分舍入与溢出|FP32 大数减极小数为何不变，如何区分舍入与溢出？]]
+1. [[../questions/GPU 有哪些内存与缓存，地址空间和物理层次如何区分|GPU 有哪些内存与缓存，地址空间和物理层次如何区分？]]
+1. [[../questions/两个进程如何共享 GPU 显存，GPU 是否有虚拟地址|两个进程如何共享 GPU 显存，GPU 是否有虚拟地址？]]
+1. [[../questions/CUDA 算子的常量参数放在哪种内存中|CUDA 算子的常量参数放在哪种内存中？]]
+
 1. [[../questions/矩阵乘法的计算量、读取量与 tile 大小是什么关系|矩阵乘法的计算量、读取量与 tile 大小是什么关系？]]
 
 1. [[../questions/如何用 CUDA 直方图和前缀和查找第 K 大元素|如何用 CUDA 直方图和前缀和查找第 K 大元素？]]

@@ -1904,3 +1904,14 @@
 - 收录 2026-10-10 面试回忆，共 5 个问题；新建 3 道问题页与 sets/10月10号面试遇到的问题.md，补充既有 Memory-bound 与 GEMM 优化两页。
 - 更新秋招题库 README、GPU与算子和推理服务入口；保留 EP/TP/PP 收益条件、SIMT 优化边界及 M/N/K/block size 公式假设。
 - 待核实：具体模型、GPU、框架版本、互联与 shape 下的性能收益需实测；本轮未运行 GPU benchmark。
+
+## [2026-11-05] interview | 英伟达 AI Infra 五面面经
+
+- 按三张截图原顺序收录 37 题：新建 31 道问题页，复用并补充 6 道已有题页；新增 sets/英伟达AI Infra五面面经.md 与编程、数学与算法分类入口。
+- 补充 FlashAttention/Flash Decoding、Prefix Cache、Wide-EP 定量计算、PD 配比、MoE A2A 与 MHA/GQA/MLA 算术强度；更新题库总入口及 GPU与算子、推理服务、分布式训练导航。
+- 题意待确认：排序二叉树替换规则、任务调度截图裁切和空间定义、MLA 激活大所指语义、数字字符串求和约束。公式保留假设，代码未编译且未运行 GPU benchmark；FP32 数值在前序对话以 Python struct 核对。
+
+## [2026-11-05] query | MoE Grouped GEMM 的权重 L2 复用
+
+- 在 MoE 概念页补充跨 M tile 权重复用、调度权衡与验证指标。
+- 核对 PyTorch grouped GEMM 实现与 NVIDIA PTX 缓存提示语义。未运行 GPU benchmark。
