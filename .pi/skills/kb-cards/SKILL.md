@@ -8,6 +8,10 @@ description: 从 wiki/ 的概念页、实体页和 output/interview/ 的面试�
 > [!note] 格式边界
 > 本 skill 的 Markdown 是 `scripts/export_cards.py` 的机器输入和 Anki 卡片事实源，不适用人读报告的 HTML 默认规则；产物仍是 `output/cards/<主题>.md` 与 `output/cards/anki/<主题>.txt`。
 
+## 路径约定
+
+仓库根目录为本文件所在目录的 `../../..`（符号链接路径或真实路径均适用）；先解析为绝对路径。`AGENTS.md`、`wiki/`、`raw/`、`output/`、`scripts/` 均相对仓库根目录，命令在根目录执行；其他 skill 的链接相对本文件。
+
 ## 一次只导一个主题
 
 问清主题（或从用户给的页面推断），一个主题一个文件：`output/cards/<主题>.md`。主题粒度参考 `attention`、`kv-cache`、`并行策略`、`cuda-优化`、`moe`，不要一次导出整个 wiki——卡片质量比数量重要得多。

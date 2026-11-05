@@ -89,7 +89,9 @@ updated: 2026-07-12 # 派生字段，勿手填
 
 ## 核心操作
 
-核心动作的**执行流程**写在 `.pi/skills/` 下（`kb-ingest` / `kb-query` / `kb-export` / `kb-cards` / `kb-interview`），本文件只定义**规则约束**。两者分工：skill 说“按什么顺序做”，schema 说“什么算写对了”。改规则改这里，改流程改 skill。
+核心动作的**执行流程**写在 `.pi/skills/` 下（`kb-ingest` / `kb-query` / `kb-distill` / `kb-export` / `kb-cards` / `kb-interview`），本文件只定义**规则约束**。两者分工：skill 说“按什么顺序做”，schema 说“什么算写对了”。改规则改这里，改流程改 skill。
+
+Codex 的项目级发现入口位于 `.agents/skills/`；其中每个 skill 目录通过相对符号链接指向 `.pi/skills/` 下的同名目录，内容只维护一份。HTML 工作流共用 `.pi/skills/html-artifacts/SKILL.md`。新增 skill 时，同时在 `.agents/skills/` 建立同名链接。可用 `$kb-query` 等名称显式调用，也可按 description 自动匹配；若新增项未出现，重启 Codex 后检查。
 
 ### Ingest
 

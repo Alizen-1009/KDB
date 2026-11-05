@@ -5,6 +5,10 @@ description: 把当前多轮对话中已经澄清的技术知识整理成结构�
 
 # Distill：把技术对话沉淀进知识库
 
+## 路径约定
+
+仓库根目录为本文件所在目录的 `../../..`（符号链接路径或真实路径均适用）；先解析为绝对路径。`AGENTS.md`、`wiki/`、`raw/`、`output/`、`scripts/` 均相对仓库根目录，命令在根目录执行；其他 skill 的链接相对本文件。
+
 ## 目标
 
 把当前对话编译为长期可查询的知识，而不是保存聊天流水账。提取定义、机制、数据流、对比、权衡、边界和待核实点，写入最合适的 wiki 或 output 页面。
@@ -49,9 +53,9 @@ description: 把当前多轮对话中已经澄清的技术知识整理成结构�
 - 单一稳定机制：新建或局部更新 `wiki/concepts/<概念>.md`。
 - 项目、框架、模型或组织能力：更新 `wiki/entities/<实体>.md`。
 - 对一份真实 raw 资料的摘要：按 `kb-ingest` 创建 `wiki/sources/<标题>.md`，必须包含 `原始文件：`。
-- 跨多个概念的长篇教学文档或架构分析：默认创建 `output/reports/<标题>.html`，并把稳定结论局部回填 wiki；创建前读取全局 `html-artifacts` skill。
+- 跨多个概念的长篇教学文档或架构分析：默认创建 `output/reports/<标题>.html`，并把稳定结论局部回填 wiki；创建前读取项目内 [html-artifacts](../html-artifacts/SKILL.md)。
 - 面试导向的完整问答：创建 `output/interview/<标题>.md`，并回填稳定概念。
-- 仅为下一 session 延续工作：不要使用本 skill，应使用 `handoff`。
+- 仅为下一 session 延续工作：不要使用本 skill；有可用的 `handoff` skill 时使用它，否则按用户要求在对话中给出续接摘要。
 
 不要为了“保存对话”创建虚假的 source 页面，也不要把聊天 transcript 写入 `raw/`。优先局部更新已有页面；只有形成独立、可复用概念时才新建页面。
 

@@ -5,6 +5,10 @@ description: 把 wiki 页面、研究结论或既有 output 内容导出为可�
 
 # Export：把知识导出成自包含 HTML
 
+## 路径约定
+
+仓库根目录为本文件所在目录的 `../../..`（符号链接路径或真实路径均适用）；先解析为绝对路径。`AGENTS.md`、`wiki/`、`raw/`、`output/`、`scripts/` 均相对仓库根目录，命令在根目录执行；其他 skill 的链接相对本文件。
+
 ## 目标
 
 把知识库中的已有知识编译成一个面向人的浏览器 artifact，而不是复制 Markdown 文本。默认产物是：
@@ -25,7 +29,7 @@ output/exports/<描述性中文标题>.html
 
 ## 第 2 步：应用 HTML format gate
 
-读取并遵循全局 `html-artifacts` skill。它是信息架构、自包含实现、可访问性、交互闭环、信任边界和浏览器验证的单一来源，本 skill 不复制其规则。
+读取并遵循项目内 [html-artifacts](../html-artifacts/SKILL.md)。它是信息架构、自包含实现、可访问性、交互闭环、信任边界和浏览器验证的单一来源，本 skill 不复制其规则。
 
 本仓库补充约束：
 
