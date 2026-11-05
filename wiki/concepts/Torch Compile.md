@@ -23,6 +23,24 @@ PyTorch 2.x 提供的图捕获与编译入口，用于把 Python 层模型或函
 - 将高层实现降到更适合当前硬件和算子模式的执行路径
 - 在 CODA 来源中，`cuBLAS + torch.compile` 被作为基线之一；这体现了通用图编译融合与专门的 `GEMM + epilogue` 重写之间的分工差异。
 
+### 捕获、编译与缓存
+
+- **TorchDynamo** 在 Python frame 层解释字节码，将可捕获的 Tensor 运算提取为 FX 图，并生成 guards 与剩余 Python 字节码。
+- **AOTAutograd** 在训练路径提前构造反向计算，划分前向和反向图，并处理需要保存或重算的中间值。
+- **TorchInductor** 对图做降低、融合与调度，生成设备代码，也可调用现有算子。以 `(x + bias) * scale` 为例，融合有机会省掉一次 kernel launch 和中间张量的全局内存往返。
+
+**Graph break** 发生在追踪时。默认模式下可编译已捕获的区域，运行断点处的 Python，再尝试继续追踪。**Recompile** 通常发生在后续调用时。若已有版本的 guards 都无法匹配当前 shape、stride、dtype 或 Python 参数，可能编译新版本。即使整段可捕获，也可能发生重编译。
+
+### 如何选择编译边界
+
+1. 先 profile eager 的真实负载。连续小 kernel、临时张量和 CPU dispatch 空隙是优先验证的信号。若耗时集中在已有的 FlashAttention、GEMM 或 GDN recurrent kernel，先量化其周围仍可融合的工作占比。
+2. 从稳定的较高层 Tensor 入口试起，例如模块 forward 或单个 train step。热路径断图、guard 频繁失败或编译时间过长时，再缩到 block、MLP 或连续的 norm/gate 子图。
+3. 用 `TORCH_LOGS="graph_breaks,recompiles"` 查断点和 guard 失败，用 `output_code` 查生成的 kernel。大模型可用 `TORCH_TRACE` 与 `tlparse` 看全局。局部用 `backend="eager", fullgraph=True` 暴露断点。排查编译报错时依次试 `eager`、`aot_eager`、`inductor`，缩小问题所在层。
+4. 用实际 shape 分布测首次编译和稳态延迟。对比 eager 与 compiled 的 kernel 数、GPU 时间和 launch 间隙。Serving 分开测 prefill/decode 的 TTFT/TPOT，并保持 CUDA Graph 设置一致以隔离 compile 收益。动态 shape 或分桶应以真实 guard 失败原因和 A/B 结果为依据。
+
+- [PyTorch 编译模型与边界选择](https://docs.pytorch.org/docs/stable/user_guide/torch_compiler/compile/programming_model.html)
+- [PyTorch 编译 profiling](https://docs.pytorch.org/docs/stable/user_guide/torch_compiler/torch.compiler_profiling_torch_compile.html)
+
 ## 与算子融合、CUDA Graph 的关系
 
 - `torch.compile` 可能通过图优化与代码生成实现 [[算子融合]]，但二者不等价：手写 Triton/CUDA、CUTLASS epilogue 和库内 fused kernel 也能完成融合，且编译器未必能自动发现所有数学重写与硬件特化机会。
@@ -83,5 +101,4 @@ PyTorch 2.x 提供的图捕获与编译入口，用于把 Python 层模型或函
 
 ## 研究备注
 
-- 后续可补 Dynamo / AOTAutograd / Inductor 在 `torch.compile` 栈中的分工
 - 可继续补充 `torch.compile` 与 CODA 这类 domain-specific kernel abstraction 的边界：前者偏通用图优化，后者偏固定模式的数学重写和内核特化。

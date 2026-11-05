@@ -24,6 +24,10 @@ Python/PyTorch
 
 CUDA Graph 位于更靠后的执行提交层：它重放稳定的 kernel 序列以减少 launch overhead，但不负责把 ATen 图变成 fused kernel。成熟推理框架还会把 Attention、MoE 等重型热点保留为 custom op，让 compile 负责图分区、轻量融合、shape specialization 和 piecewise CUDA Graph 组织。
 
+## 面试官可能追问
+
+**怎么判断哪里适合编译？** 先 profile eager，找耗时占比高且由连续 Tensor 运算组成的区域。从模块 forward 或 train step 试起，必要时缩到稳定的 block。看 `graph_breaks,recompiles` 区分捕获中断与 guard 失效，再用实际输入分布比较冷启动和稳态。详细步骤见 [[../../../../wiki/concepts/Torch Compile#如何选择编译边界|如何选择编译边界]]。
+
 ## 常见误区
 
 - `torch.compile` 不保证全图无 graph break。

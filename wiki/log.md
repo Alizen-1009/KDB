@@ -1932,3 +1932,9 @@
 
 - 在 output/interview/秋招问题汇总/ 新增 14 道问题页、更新 5 道已有问题页，新增 sets/推理并行、昇腾调优与 MLIR 面试追问.md 并更新总入口。
 - 待核实：950PR/950DT 官方 FP16 峰值、Decode TopK 分段和同分细节、四个 mini.* Op 的实际定义。SFT 个人配置及实测结果保留待补。
+
+## [2026-11-05] distill | ZeRO/FSDP 通信账本与 torch.compile 编译边界
+
+- 回填 ZeRO、FSDP、Torch Compile 三个概念页，分别补充分片通信量、前反向时序和编译边界定位。
+- 复用并更新秋招题库中 ZeRO 与 FSDP、ZeRO 各阶段与 Offload、torch.compile 三道题。
+- 通信量按 ring 与每卡单向发送推导；框架实际 collective 随版本和配置变化，未运行性能实测。依据为 ZeRO 论文、PyTorch、DeepSpeed 与 NVIDIA NCCL 文档。

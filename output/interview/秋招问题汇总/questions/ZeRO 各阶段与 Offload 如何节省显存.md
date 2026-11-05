@@ -19,6 +19,17 @@
 
 沿文末原稿章节阅读完整机制、推导或代码；本页保留短答，不复制长篇正文。
 
+## 面试官可能追问
+
+**每步通信量怎么算？** 设 $f=(D-1)/D$，参数和梯度的传输字节数分别为 $P$ 和 $G$。按 ring、每卡发送量、每次前反向对应一次更新估算：
+
+- DDP 梯度 AllReduce 为 $2fG$。
+- ZeRO-1 在梯度 AllReduce 后分发更新参数，按 ring AllGather 估算为 $f(2G+P)$。若梯度只归约到 owner，则为 $f(G+P)$。
+- ZeRO-2 归约并分片梯度，更新后 AllGather 参数，为 $f(G+P)$。
+- ZeRO-3 前向与反向各 AllGather 一次参数，反向后 ReduceScatter 梯度，为 $f(2P+G)$。参数与梯度同精度时约为 DDP 的 1.5 倍。
+
+具体实现可能选用其他 collective。公式假设与来源见 [[../../../../wiki/concepts/ZeRO#每步通信与单卡状态显存|ZeRO 通信账本]]。
+
 ## 关联知识
 
 - [[../../../../wiki/concepts/KV Cache|KV Cache]]
