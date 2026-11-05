@@ -1915,3 +1915,10 @@
 
 - 在 MoE 概念页补充跨 M tile 权重复用、调度权衡与验证指标。
 - 核对 PyTorch grouped GEMM 实现与 NVIDIA PTX 缓存提示语义。未运行 GPU benchmark。
+
+## [2026-11-05] ingest | Hopper与Blackwell GPU算力带宽规格及Roofline估算
+
+- 新增 GPU算力与带宽速查概念页及 NVIDIA Hopper与Blackwell GPU规格核对来源页，收录用户原表全部精度、显存、MIG与互联指标；外部一手文档直接链接，未修改 raw。
+- 局部更新 Hopper、Blackwell 实体、Roofline 与混合精度概念，以及性能分析主题地图导读；补齐双向引用。
+- 澄清稠密/稀疏、SXM/HGX与NVL、单卡/整机、HBM/互联和双向聚合口径；B300 FP4以整机108 PFLOPS除8为13.5 PFLOPS，单卡PDF显示14 PFLOPS舍入值。
+- H800 SXM完整原厂PDF读取失败，保留用户表并显式标记待逐项核实；未运行GPU benchmark。

@@ -31,9 +31,9 @@
 - 原始数据集：0
 - 原始图片：19
 - 原始代码：1
-- 来源文件：62
+- 来源文件：63
 - 实体文件：47
-- 概念文件：116
+- 概念文件：117
 - 报告文件：39
 - HTML 导出：0
 - 面试文件：12
@@ -139,9 +139,10 @@
 - [[../wiki/concepts/动态共享内存|动态共享内存]]
 - [[../wiki/concepts/算子融合|算子融合]]
 
-### 性能分析（3）
+### 性能分析（4）
 
 - [[../wiki/concepts/Benchmarking|Benchmarking]]
+- [[../wiki/concepts/GPU算力与带宽速查|GPU算力与带宽速查]]
 - [[../wiki/concepts/Profiling|Profiling]]
 - [[../wiki/concepts/Roofline 模型|Roofline 模型]]
 
@@ -265,7 +266,7 @@
 
 ## 来源摘要（按类型）
 
-### 文章（41）
+### 文章（42）
 
 - [[../wiki/sources/2026 年MoE 架构正在发生一次关键变化|2026 年MoE 架构正在发生一次关键变化]]
 - [[../wiki/sources/A Preview of Production-Scale Kimi K3 Support on vLLM|A Preview of Production-Scale Kimi K3 Support on vLLM]]
@@ -281,6 +282,7 @@
 - [[../wiki/sources/LLM提速利器：投机推理的原理与常见方案|LLM提速利器：投机推理的原理与常见方案]]
 - [[../wiki/sources/MegaMoE — 让 all-to-all 消失|MegaMoE — 让 all-to-all 消失]]
 - [[../wiki/sources/Model Runner V2 A Modular and Faster Core for vLLM|Model Runner V2 A Modular and Faster Core for vLLM]]
+- [[../wiki/sources/NVIDIA Hopper与Blackwell GPU规格核对|NVIDIA Hopper与Blackwell GPU规格核对]]
 - [[../wiki/sources/NVIDIA 开源 NCCL Extensions：把 MoE 专家路由与跨 Mesh 权重重分片推进到 GPU 设备侧|NVIDIA 开源 NCCL Extensions：把 MoE 专家路由与跨 Mesh 权重重分片推进到 GPU 设备侧]]
 - [[../wiki/sources/Nvidia Rubin架构分析预览|Nvidia Rubin架构分析预览]]
 - [[../wiki/sources/PAI-FA｜突破 TMEM 瓶颈：FlashAttention-4 大 Head Dimension (256) 高性能算子实现与优化|PAI-FA｜突破 TMEM 瓶颈：FlashAttention-4 大 Head Dimension (256) 高性能算子实现与优化]]

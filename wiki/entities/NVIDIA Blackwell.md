@@ -2,7 +2,7 @@
 type: entity
 entity_type: 硬件
 topic: GPU 编程
-sources: 4
+sources: 5
 updated: 2026-08-21
 ---
 
@@ -45,6 +45,10 @@ updated: 2026-08-21
 
 系统层面，官方资料还强调双 reticle die 通过高带宽 chip-to-chip interconnect 组成统一 GPU、第五代 NVLink/NVLink Switch、固定功能 Decompression Engine、独立 RAS Engine 与 TEE-I/O。它们影响机内扩展、数据管线和可靠性，但不等同于单 kernel 指令能力。完整整理见 [[../../output/reports/Blackwell相对Hopper的新特性|Blackwell 相对 Hopper 的新特性]]。
 
+## 型号规格与估算入口
+
+按 HGX 单 GPU 口径，B200 / B300（Blackwell Ultra）的显存分别为 180 / 270 GB，HBM 带宽均为 7.7 TB/s，稠密 FP16/BF16 峰值均为 2,250 TFLOPS。B300 的稠密 FP4 相比 B200 约提高 50%，但 FP64 与 INT8 标称规格更低；不能推断所有计算路径都有相同增益。完整精度、MIG、互联和原厂舍入差异见 [[../concepts/GPU算力与带宽速查]]，GB200/GB300 NVL72 的配置另行区分。
+
 ## 相关概念
 
 - [[Cluster Launch Control]]
@@ -64,6 +68,8 @@ updated: 2026-08-21
 - [[NVIDIA Hopper]]
 
 ## 相关来源
+
+- [[../sources/NVIDIA Hopper与Blackwell GPU规格核对]]
 
 - [[../sources/Dynamic persistent tile scheduling with Cluster Launch Control (CLC) on NVIDIA Blackwell GPUs]]
 - [[../sources/PAI-FA｜突破 TMEM 瓶颈：FlashAttention-4 大 Head Dimension (256) 高性能算子实现与优化]]

@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: 性能分析
-sources: 3
+sources: 4
 updated: 2026-06-12
 ---
 
@@ -23,6 +23,25 @@ updated: 2026-06-12
 - 高 intensity 区域更接近计算上限，表现为 compute bound
 - 对 batch size 1 的小模型 decode，整个 forward 也可以做粗粒度 roofline 账本：如果权重读取主导时延，理论上限近似由 `GPU memory bandwidth / model weight bytes` 决定；实际性能再被 kernel launch、tail effect、activation load/store 和同步开销拉低。
 
+## 峰值算力 F、带宽 W 与分界点
+
+令 $F$ 为匹配计算路径的峰值算力（FLOP/s），$W$ 为 HBM 带宽（Byte/s），$C$ 为运算量（FLOP），$D$ 为实际 HBM 流量（Byte）：
+
+$$
+I=\frac{C}{D},\qquad
+P_{\max}=\min(F,WI),\qquad
+T\gtrsim\max\left(\frac{C}{F},\frac{D}{W}\right),\qquad
+I_{\mathrm{ridge}}=\frac{F}{W}.
+$$
+
+- $I<F/W$ 时带宽屋顶更低，$I>F/W$ 时计算屋顶更低；这只是理想上界，不能代替实际瓶颈测量。
+- 普通稠密 BF16 Tensor Core 口径：H100 SXM 约 989–990 TFLOPS / 3.35 TB/s，对应约 295 FLOP/Byte；H200 约 206；HGX B200/B300 单 GPU 约 292。
+- $F$ 不能混用 FP32 CUDA Core、BF16 Tensor Core 和稀疏峰值。低精度 Tensor Core 常见的稀疏减半规则也有例外，例如 B300 FP4，需逐行读规格脚注。
+- $D$ 与 $W$ 必须对应同一存储层级；NVLink、PCIe 的双向聚合带宽不作为本地 HBM Roofline 的 $W$。
+- 单位按十进制 TFLOPS 与 TB/s 换算时，二者数值相除即为 FLOP/Byte；GB 与 GiB 不应混算。
+
+完整精度、容量、MIG、互联与换算表见 [[GPU算力与带宽速查]]，规格证据见 [[../sources/NVIDIA Hopper与Blackwell GPU规格核对]]。所有数字为标称或规格推导，未运行 GPU benchmark。
+
 ## LLM Attention 粗估
 
 - 对 decode 阶段的标准 `MHA`，单个新 token 需要读取历史 `K/V cache` 并做 `QK` 与 `PV`；忽略 softmax、metadata 与 cache miss 时，算术强度大约是 `4 * H * S * D / (2 * H * S * D * bytes)`，即 `FP16/BF16` 下约 `1 FLOP/byte`。
@@ -41,11 +60,15 @@ updated: 2026-06-12
 
 ## 相关来源
 
+- [[../sources/NVIDIA Hopper与Blackwell GPU规格核对]]
+
 - [[../sources/斯坦福CS336 Lecture 5 - GPUs]]
 - [[../sources/MLA与DP Attention面试整理]]
 - [[../sources/Look Ma, No Bubbles! Designing a Low-Latency Megakernel for Llama-1B]]
 
 ## 相关概念
+
+- [[GPU算力与带宽速查]]
 
 - [[算子融合]]
 - [[重计算]]

@@ -2,7 +2,7 @@
 type: entity
 entity_type: 硬件
 topic: GPU 编程
-sources: 1
+sources: 2
 updated: 2026-08-21
 ---
 
@@ -30,6 +30,10 @@ updated: 2026-08-21
 - Hopper 还增加 2× FP32 operations/cycle/SM、DPX 动态规划指令、HBM3/更大 L2/inline compression，以及第四代 NVLink、PCIe Gen 5、第二代 MIG 和 confidential computing；其中 HBM、L2、链路数量与带宽必须绑定 H100 SXM/PCIe SKU。
 - [[../concepts/Persistent Kernel]] 不是 Hopper 新增的硬件特性，而是长期驻留 worker 循环处理多个逻辑 tiles 的 kernel 组织方式；TMA、WGMMA、cluster 和 transaction barrier 让这种方式更适合构建深度异步流水。
 
+## 型号规格与估算入口
+
+H100 SXM 与 H200 SXM 的稠密 FP16/BF16 Tensor Core 峰值均约 989–990 TFLOPS；显存容量 / 带宽分别为 80 GB / 3.35 TB/s、141 GB / 4.8 TB/s。H800 用户表匹配 SXM 口径，其 FP64 与 NVLink 更低，但本轮尚未完成原厂 PDF 的逐行核实。完整多精度规格、稀疏脚注、MIG 与互联见 [[../concepts/GPU算力与带宽速查]]；不能把 SXM 数据套给 PCIe / NVL。
+
 ## 相关概念
 
 - [[../concepts/Persistent Kernel]]
@@ -45,6 +49,8 @@ updated: 2026-08-21
 - [[NVIDIA Blackwell]]
 
 ## 相关来源
+
+- [[../sources/NVIDIA Hopper与Blackwell GPU规格核对]]
 
 - [[../sources/译 NVIDIA’s GPUs - 从 Ampere, Hopper 到 Blackwell]]
 
