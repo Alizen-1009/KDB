@@ -21,6 +21,10 @@
 
 回答具体题的步骤：列成员与基类→确认哪些子对象需要多态/虚继承信息→按 ABI 布局并处理对齐→用指定编译器的 sizeof/layout dump 核对。
 
+## 运行时分派追问
+
+- [[C++ 运行时多态与虚函数表如何工作|C++ 运行时多态与虚函数表如何工作]]。本页保留对象布局与 sizeof 的独立考点。
+
 ## 参考来源与待核实
 
 - [Itanium C++ ABI：Data Layout](https://itanium-cxx-abi.github.io/cxx-abi/abi.html#data-layout)：一种具体 ABI，不能当作全部平台规则。
@@ -28,6 +32,7 @@
 
 ## 所属题单
 
+- [[../sets/SDE与强化学习岗位面经|SDE与强化学习岗位面经]]
 - [[../sets/英伟达AI Infra五面面经|英伟达 AI Infra 五面面经]]
 - [[../sets/编程、数学与算法|编程、数学与算法]]
 - [[../README|秋招问题汇总]]

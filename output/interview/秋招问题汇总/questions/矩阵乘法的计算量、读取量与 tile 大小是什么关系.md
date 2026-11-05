@@ -3,6 +3,10 @@
 - 整理状态：已整理
 - 题目出处：用户提供的 2026-10-10 面试回忆；答案根据本次对话整理
 
+## 本次题单问法
+
+10. 针对矩阵乘法运算，如何利用共享内存减少全局内存访问次数？请写出关键优化步骤及对应 tile size 的选择依据。
+
 ## 问题背景
 
 用户要求仅用 M、N、K 和 block size 表示计算量、数据量及 tile 的影响。约定 C=A B，A 为 M×K，B 为 K×N，C 为 M×N；用 b 表示 block size，即方形 tile 边长，不是 CUDA block 的线程数。CTA 计算 b×b 的输出，每轮沿 K 推进 b。先假设 M/N/K 均可被 b 整除，不读取旧 C。
@@ -85,6 +89,18 @@ $$2b^3\left\lceil\frac{M}{b}\right\rceil\left\lceil\frac{N}{b}\right\rceil\left\
 - [[../../../../wiki/concepts/Tiling|Tiling]]
 - [[../../../../wiki/concepts/Roofline 模型|Roofline 模型]]
 
+## 矩形 tile 与面试追问
+
+CTA 输出为 $B_M\times B_N$，沿 K 每步推进 $B_K$。先合作加载 A 的 $B_M B_K$ 与 B 的 $B_K B_N$ 个元素到 shared，做 $2B_MB_NB_K$ FLOPs。以 $\beta=0$、无跨 CTA 缓存复用和整除为例，令各 dtype 字节数为 $s_A,s_B,s_C$：
+
+$$
+I_{\rm CTA}=\frac{2MNK}{s_AMK\,N/B_N+s_BKN\,M/B_M+s_CMN}.
+$$
+
+忽略输出时，输入强度为 $2B_MB_N/(s_AB_M+s_BB_N)$。$B_K$ 抵消；只加大它会改变同步、指令和 staging 资源。每级 shared 用 $s_A B_M B_K+s_B B_K B_N$ 字节，另计 padding；$\beta\neq0$ 时还要加旧 C 读流量。例：64×128 的输出 tile，FP16 输入且忽略输出，强度约为 42.7 FLOPs/byte。算实际 Roofline 时用相应层级的实测 bytes，不能将 CTA 加载账本直接当 HBM 流量。
+
+追问 tile 怎么选时，依次讲 MMA 对齐与 shape、输入复用、输出寄存器、流水 stage、驻留 CTA、grid 尾部，再说用实测挑选。
+
 ## 参考来源与待核实
 
 - 本页公式为上述方形 tile、加载和缓存假设下的机制推导。
@@ -93,6 +109,8 @@ $$2b^3\left\lceil\frac{M}{b}\right\rceil\left\lceil\frac{N}{b}\right\rceil\left\
 
 ## 所属题单
 
+- [[../sets/SDE与强化学习岗位面经|SDE与强化学习岗位面经]]
+- [[../sets/英伟达高性能计算工程师26题|英伟达高性能计算工程师26题]]
 - [[../sets/10月10号面试遇到的问题|10月10号面试遇到的问题]]
 - [[../sets/GPU与算子|GPU与算子]]
 - [[../README|秋招问题汇总]]

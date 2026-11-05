@@ -22,6 +22,10 @@
 
 - [[../../../../wiki/concepts/Profiling|Profiling]]
 
+## 训练轮复习线索
+
+按输入流水线 → forward/backward → 通信 → optimizer/保存切 step 时间线。测有效 tokens/s、验证 loss、每 rank step 差异和通信暴露比例。数据饥饿看 dataloader 和 H2D，通信慢先区分负载不均、bucket 时机与链路瓶颈。面经只给轮次方向，具体题干未提供。
+
 ## 参考来源与待核实
 
 - [[../../AI Infra面试题全答（二）#9. 如何对训练任务进行性能 Profiling？通常会关注哪些指标（如 GPU 利用率、TFLOPS）？|AI Infra面试题全答（二）]]
@@ -31,5 +35,6 @@
 
 ## 所属题单
 
+- [[../sets/SDE与强化学习岗位面经|SDE与强化学习岗位面经]]
 - [[../sets/量化与性能|量化与性能]]
 - [[../README|秋招问题汇总]]

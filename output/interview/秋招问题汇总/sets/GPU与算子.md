@@ -52,3 +52,14 @@
 ## 返回
 
 - [[../README|秋招问题汇总]]
+
+## 本次面试补充
+
+- [[../questions/CUDA warp divergence 如何影响吞吐，怎样用重排优化]]
+- [[../questions/CUDA shared memory 和 L1 如何共享片上容量]]
+- [[../questions/CUDA Unified Memory 如何迁移，瓶颈在哪里]]
+- [[../questions/CUDA 多流如何用 event 重叠拷贝与计算]]
+- [[../questions/WMMA 如何使用 Tensor Core 做混合精度矩阵乘]]
+- [[../questions/CUDA bank conflict 如何产生，padding 为什么有效]]
+- [[../questions/CUDA occupancy 如何计算，block 和 grid 怎么调]]
+- [[../questions/如何并行计算大量 bounding box 的 IoU]]

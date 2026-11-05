@@ -13,6 +13,8 @@
 
 ## 专题入口
 
+- [[sets/英伟达高性能计算工程师26题|英伟达高性能计算工程师26题]]
+- [[sets/SDE与强化学习岗位面经|SDE与强化学习岗位面经]]
 - [[sets/英伟达AI Infra五面面经|英伟达 AI Infra 五面面经]]
 - [[sets/编程、数学与算法|编程、数学与算法]]
 
@@ -39,6 +41,14 @@
 
 ### GPU与算子
 
+- [[questions/CUDA warp divergence 如何影响吞吐，怎样用重排优化|CUDA warp divergence 如何影响吞吐，怎样用重排优化]]
+- [[questions/CUDA shared memory 和 L1 如何共享片上容量|CUDA shared memory 和 L1 如何共享片上容量]]
+- [[questions/CUDA Unified Memory 如何迁移，瓶颈在哪里|CUDA Unified Memory 如何迁移，瓶颈在哪里]]
+- [[questions/CUDA 多流如何用 event 重叠拷贝与计算|CUDA 多流如何用 event 重叠拷贝与计算]]
+- [[questions/WMMA 如何使用 Tensor Core 做混合精度矩阵乘|WMMA 如何使用 Tensor Core 做混合精度矩阵乘]]
+- [[questions/CUDA bank conflict 如何产生，padding 为什么有效|CUDA bank conflict 如何产生，padding 为什么有效]]
+- [[questions/CUDA occupancy 如何计算，block 和 grid 怎么调|CUDA occupancy 如何计算，block 和 grid 怎么调]]
+- [[questions/如何并行计算大量 bounding box 的 IoU|如何并行计算大量 bounding box 的 IoU]]
 - [[questions/如何用 Roofline 推导 GEMM 与 MoE 的临界 token 数|如何用 Roofline 推导 GEMM 与 MoE 的临界 token 数？]]
 - [[questions/GPU 算子有哪些优化方法，如何按瓶颈选择|GPU 算子有哪些优化方法，如何按瓶颈选择？]]
 - [[questions/如何根据 GPU 硬件特性制定 Infra 优化方案|如何根据 GPU 硬件特性制定 Infra 优化方案？]]
@@ -89,6 +99,7 @@
 
 ### 推理服务
 
+- [[questions/训练调用的分布式推理服务如何支持动态批处理与流水线|训练调用的分布式推理服务如何支持动态批处理与流水线]]
 - [[questions/MLA Chunked Prefill 如何避免历史 KV 展开导致激活显存过大|MLA Chunked Prefill 如何避免历史 KV 展开导致激活显存过大？]]
 - [[questions/Agent 场景 KV Cache 空间不足时如何优化|Agent 场景 KV Cache 空间不足时如何优化？]]
 - [[questions/PD 分离在长前缀 Agent 场景下一定更好吗|PD 分离在长前缀 Agent 场景下一定更好吗？]]
@@ -157,6 +168,7 @@
 
 ### 模型架构
 
+- [[questions/VLM 如何把图像输入接入语言模型|VLM 如何把图像输入接入语言模型]]
 - [[questions/如何区分并排查模型复读与 Lost in the Middle|如何区分并排查模型复读与 Lost in the Middle？]]
 - [[questions/MoE 的稀疏激活原理是什么，总参数与激活参数为何不同|MoE 的稀疏激活原理是什么，总参数与激活参数为何不同？]]
 - [[questions/MoE 路由器如何给 token 选择专家，为什么会负载不均|MoE 路由器如何给 token 选择专家，为什么会负载不均？]]
@@ -185,6 +197,13 @@
 
 ### 分布式训练
 
+- [[questions/NVLink 多 GPU 如何做 P2P 并安排通信|NVLink 多 GPU 如何做 P2P 并安排通信]]
+- [[questions/NVSwitch 和 InfiniBand 上如何设计分层集合通信|NVSwitch 和 InfiniBand 上如何设计分层集合通信]]
+- [[questions/千卡训练如何设计梯度同步并比较压缩与异步 SGD|千卡训练如何设计梯度同步并比较压缩与异步 SGD]]
+- [[questions/异构 GPU 显存不均时如何动态分配训练任务|异构 GPU 显存不均时如何动态分配训练任务]]
+- [[questions/训练 batch size 如何影响收敛、泛化和吞吐|训练 batch size 如何影响收敛、泛化和吞吐]]
+- [[questions/GRPO 如何估计优势，DAPO 相比它改了什么|GRPO 如何估计优势，DAPO 相比它改了什么]]
+- [[questions/PPO 为什么通常归类为 on-policy，重要性采样有什么用|PPO 为什么通常归类为 on-policy，重要性采样有什么用]]
 - [[questions/四台服务器如何在内存受限时并行计算矩阵乘法|四台服务器如何在内存受限时并行计算矩阵乘法？]]
 
 - [[questions/Ulysses Sequence Parallelism 与 Ring Attention 有什么区别|Ulysses Sequence Parallelism 与 Ring Attention 有什么区别？]]
@@ -294,6 +313,15 @@
 
 ### 编程、数学与算法
 
+- [[questions/CSR 稀疏矩阵乘法如何实现和估算复杂度|CSR 稀疏矩阵乘法如何实现和估算复杂度]]
+- [[questions/如何实现支持按 ID 删除的优先队列|如何实现支持按 ID 删除的优先队列]]
+- [[questions/无向图如何用 BFS 或 DFS 查找连通分量|无向图如何用 BFS 或 DFS 查找连通分量]]
+- [[questions/如何用三路分区实现并行快速排序|如何用三路分区实现并行快速排序]]
+- [[questions/方阵如何原地分块转置并改善缓存局部性|方阵如何原地分块转置并改善缓存局部性]]
+- [[questions/电影票选座如何按原题约束建模|电影票选座如何按原题约束建模]]
+- [[questions/C++ vector 和 list 如何选择，批量删除怎样更高效|C++ vector 和 list 如何选择，批量删除怎样更高效]]
+- [[questions/C++ 运行时多态与虚函数表如何工作|C++ 运行时多态与虚函数表如何工作]]
+- [[questions/动态规划面试如何从状态定义推到转移|动态规划面试如何从状态定义推到转移]]
 - [[questions/单核上两个线程何时可能比一个线程更快|单核上两个线程何时可能比一个线程更快？]]
 - [[questions/const int 指针的两种写法与常量指针有什么区别|const int 指针的两种写法与常量指针有什么区别？]]
 - [[questions/两个指针指向常量时如何交换它们的指向|两个指针指向常量时如何交换它们的指向？]]

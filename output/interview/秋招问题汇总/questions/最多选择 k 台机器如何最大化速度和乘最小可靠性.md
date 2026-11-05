@@ -39,6 +39,7 @@ for (speed, reliability):
 
 ## 所属题单
 
+- [[../sets/SDE与强化学习岗位面经|SDE与强化学习岗位面经]]
 - [[../sets/英伟达AI Infra五面面经|英伟达 AI Infra 五面面经]]
 - [[../sets/编程、数学与算法|编程、数学与算法]]
 - [[../README|秋招问题汇总]]
