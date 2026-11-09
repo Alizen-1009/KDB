@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: 推理服务
-sources: 6
+sources: 7
 updated: 2026-07-08
 ---
 
@@ -23,6 +23,7 @@ updated: 2026-07-08
 - Decode 引擎负责后续自回归生成
 - 通过 NVLink 或 InfiniBand 等互联传递 KV Cache
 - 在 [[../entities/RTP-LLM]] 中，PD 分离被组织成 `PD-Fusion` 与 `PD-Disaggregation` 两种部署模式；后者将 Prefill/Decode 放到专用节点上，并通过跨节点 KV cache 传输衔接两个阶段
+- [[../sources/KV Cache 研习社 · 深潜  LMCache、Mooncake、FlexKV——三条路线谁在改写 KV 的命运？]] 将 [[../entities/Mooncake]] 作为 PD 分离与跨节点 KV 传输的例子；RDMA 和 GPU 直达的可用性依赖配置。
 
 ## 同构与异构 PD
 
@@ -66,6 +67,7 @@ LLM 归纳：PD 阶段交接与跨请求持久缓存是两件事；释放 Prefil
 - [[../entities/vLLM]]
 - [[../entities/DeepEP]]
 - [[../entities/TileRT]]
+- [[../entities/Mooncake]]
 
 ## 相关来源
 
@@ -75,6 +77,7 @@ LLM 归纳：PD 阶段交接与跨请求持久缓存是两件事；释放 Prefil
 - [[../sources/vLLM AFD Plugin 发布：为 MoE 推理拆分 Attention 与 FFN，实现灵活部署]]
 - [[../sources/vLLM Large Scale Serving DeepSeek @ 2.2k toksH200 with Wide-EP]]
 - [[../sources/vLLM x TileRT Specialized Decode for Latency-Critical Serving]]
+- [[../sources/KV Cache 研习社 · 深潜  LMCache、Mooncake、FlexKV——三条路线谁在改写 KV 的命运？]]
 
 ## 相关概念
 

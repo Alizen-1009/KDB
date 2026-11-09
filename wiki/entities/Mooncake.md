@@ -2,8 +2,8 @@
 type: entity
 entity_type: 项目
 topic: 推理服务
-sources: 0
-updated:
+sources: 1
+updated: 2026-11-09
 ---
 
 # Mooncake

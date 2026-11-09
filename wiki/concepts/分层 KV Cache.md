@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: KV Cache
-sources: 2
+sources: 3
 updated: 2026-06-12
 ---
 
@@ -31,6 +31,19 @@ updated: 2026-06-12
 - 更高缓存命中率不一定自动降低端到端延迟；如果远程缓存读取或 KV 传输成本过高，收益可能被网络和调度开销抵消。
 - 它与 [[PagedAttention]]、[[RadixAttention]]、[[Prefix Caching]] 不是同一层概念：PagedAttention 更偏单机分页式 KV 管理，RadixAttention 更偏 runtime 前缀树复用，分层 KV Cache 更强调跨节点和跨存储层级的系统缓存管理。
 
+## 方案对照与选型边界
+
+[[../sources/KV Cache 研习社 · 深潜  LMCache、Mooncake、FlexKV——三条路线谁在改写 KV 的命运？]] 将 [[../entities/LMCache]] 的独立缓存层、[[../entities/Mooncake]] 的集群 KV 池、[[../entities/FlexKV]] 的多级卸载作为不同侧重点；这些能力有重叠，不是互斥类别。
+
+| 方案 | 定位与侧重点 | 选型时需核实 |
+| --- | --- | --- |
+| SGLang HiCache | SGLang 体系内的分层缓存，名称不属于 vLLM | 具体版本的存储后端、模型状态和部署支持 |
+| FlexKV | 文章描述为相对独立的多级 KV 管理组件，支持框架集成 | 对应框架 connector、版本、数据布局和生产案例 |
+| vLLM KV offloading | vLLM 运行时的卸载路径，以及外部 KV connector 集成 | 原生与外部后端在目标版本中的具体能力 |
+| LMCache / Mooncake | 前者侧重缓存管理与共享，后者侧重集群缓存和传输 | 与引擎、网络和模型布局的实际兼容性 |
+
+以上是粗粒度机制归纳，并非功能完备性、工业采用规模或性能排名。HiCache 的具体实现未由该文章验证；FlexKV 的腾讯云生产数字属于文章转述，待查一手资料。优先根据已有引擎、缓存命中率、读取成本、硬件和运维能力评估，而不是仅依据项目名称。
+
 ## 减少缓存层级的替代取舍
 
 [[../sources/谈谈 DeepInfer]] 将 DeepSeek 方案描述为削减本地持久缓存层级，以分布式存储承载可复用 KV，从而减少计算节点的缓存位置依赖。该描述来自技术评论，生产实现与开源代码范围待核实。
@@ -42,6 +55,9 @@ updated: 2026-06-12
 ## 相关实体
 
 - [[../entities/DeepInfer]]
+- [[../entities/LMCache]]
+- [[../entities/Mooncake]]
+- [[../entities/FlexKV]]
 
 - [[../entities/RTP-LLM]]
 - [[../entities/vLLM]]
@@ -50,6 +66,7 @@ updated: 2026-06-12
 ## 相关来源
 
 - [[../sources/谈谈 DeepInfer]]
+- [[../sources/KV Cache 研习社 · 深潜  LMCache、Mooncake、FlexKV——三条路线谁在改写 KV 的命运？]]
 - [[../sources/RTP-LLM]]
 
 ## 相关概念

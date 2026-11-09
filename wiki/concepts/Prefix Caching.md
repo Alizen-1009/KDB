@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: KV Cache
-sources: 5
+sources: 6
 updated: 2026-06-12
 ---
 
@@ -25,6 +25,7 @@ updated: 2026-06-12
 - 在 [[../entities/RTP-LLM]] 中，Master 使用统一哈希映射聚合 worker 缓存键，做跨 worker 前缀匹配，并把匹配结果反馈给调度器
 - 在 [[Decode Context Parallel]] 已启用时，prefix cache 命中的 KV 还需要符合 DCP 的分布式 cache layout；`vllm并行策略之DCP` 称 DCP 兼容 Prefix Cache，但该能力依赖具体 vLLM backend 和 cache manager 实现。
 - 对 KDA/GDN 等递归线性注意力，token KV 命中不足以独立恢复执行：还需要对应边界的 Conv State 与矩阵状态 checkpoint。若 KV 命中更远但递归 checkpoint 较近，统一复用长度必须回退并重新 prefill 中间区间，详见 [[递归状态 Prefix Caching]]。
+- [[../sources/KV Cache 研习社 · 深潜  LMCache、Mooncake、FlexKV——三条路线谁在改写 KV 的命运？]] 描述 LMCache MP 用共享主机内存池减少多副本缓存碎片；实际收益依赖命中和传输成本，具体实现与版本待核实。
 
 ## 关键权衡
 
@@ -45,6 +46,7 @@ updated: 2026-06-12
 - [[../sources/SGLang：LLM推理引擎发展新方向]]
 - [[../sources/RTP-LLM]]
 - [[../sources/vllm并行策略之DCP(Decode Context Parallel)]]
+- [[../sources/KV Cache 研习社 · 深潜  LMCache、Mooncake、FlexKV——三条路线谁在改写 KV 的命运？]]
 - [[../sources/SGLang的KDA管理与Prefix Cache难题]]
 
 ## 相关概念

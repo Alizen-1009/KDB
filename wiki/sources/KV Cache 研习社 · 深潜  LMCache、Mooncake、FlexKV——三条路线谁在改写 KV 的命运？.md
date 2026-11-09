@@ -2,7 +2,7 @@
 type: source
 source_kind: 文章
 topic: KV Cache
-updated:
+updated: 2026-11-09
 ---
 
 # KV Cache 研习社 · 深潜  LMCache、Mooncake、FlexKV——三条路线谁在改写 KV 的命运？

@@ -1973,3 +1973,10 @@
 - 读取原始资料：`raw/articles/SGLang 低延迟模式：Kernel 与运行时.md`
 - 创建来源页并更新 SGLang、PDL、Persistent Kernel、Megakernel、通信-计算重叠、CUDA Graph 执行模式与 DSpark 页面。
 - 未发现与已读 wiki 页面的直接冲突；性能结果及插件支持范围须按来源条件与版本核实。
+
+## [2026-11-09] ingest | KV Cache 研习社：LMCache、Mooncake、FlexKV 与分层缓存对比
+
+- 读取原始资料：`raw/articles/KV Cache 研习社 · 深潜  LMCache、Mooncake、FlexKV——三条路线谁在改写 KV 的命运？.md`
+- 创建来源页与 LMCache、Mooncake、FlexKV 实体页；更新分层 KV Cache、Prefix Caching、PD分离概念页
+- 整理 HiCache、FlexKV 与 vLLM 卸载的定位及选型边界；工业采用规模和版本支持待一手资料核实
+- 未发现与现有 wiki 的直接冲突；文章 benchmark 与组合部署论断保留待核实边界

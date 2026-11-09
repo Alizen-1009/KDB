@@ -29,8 +29,14 @@ topic: KV Cache
 - [[../concepts/缓存感知路由|缓存感知路由]]
 - [[../concepts/递归状态 Prefix Caching|递归状态 Prefix Caching]]
 
-## 来源（4）
+## 实体（2）
 
+- [[../entities/FlexKV|FlexKV]]
+- [[../entities/LMCache|LMCache]]
+
+## 来源（5）
+
+- [[../sources/KV Cache 研习社 · 深潜  LMCache、Mooncake、FlexKV——三条路线谁在改写 KV 的命运？|KV Cache 研习社 · 深潜  LMCache、Mooncake、FlexKV——三条路线谁在改写 KV 的命运？]]
 - [[../sources/PageAttention代码走读|PageAttention代码走读]]
 - [[../sources/SGLang的KDA管理与Prefix Cache难题|SGLang的KDA管理与Prefix Cache难题]]
 - [[../sources/vLLM皇冠上的明珠：深入浅出理解PagedAttention CUDA实现|vLLM皇冠上的明珠：深入浅出理解PagedAttention CUDA实现]]

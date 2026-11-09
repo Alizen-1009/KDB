@@ -25,14 +25,14 @@
 
 ## 资源统计
 
-- 原始文章：84
+- 原始文章：85
 - 原始论文：9
 - 原始仓库：0
 - 原始数据集：0
 - 原始图片：19
 - 原始代码：1
-- 来源文件：67
-- 实体文件：49
+- 来源文件：68
+- 实体文件：52
 - 概念文件：119
 - 报告文件：39
 - HTML 导出：0
@@ -194,14 +194,17 @@
 
 ## 实体页面（按类型）
 
-### 项目（10）
+### 项目（13）
 
 - [[../wiki/entities/CAKE KDA|CAKE KDA]]
 - [[../wiki/entities/DeepEP|DeepEP]]
 - [[../wiki/entities/Engram|Engram]]
 - [[../wiki/entities/FlashKDA|FlashKDA]]
+- [[../wiki/entities/FlexKV|FlexKV]]
+- [[../wiki/entities/LMCache|LMCache]]
 - [[../wiki/entities/Megakernels|Megakernels]]
 - [[../wiki/entities/MoonEP|MoonEP]]
+- [[../wiki/entities/Mooncake|Mooncake]]
 - [[../wiki/entities/NCCL Extensions|NCCL Extensions]]
 - [[../wiki/entities/TTT-LM|TTT-LM]]
 - [[../wiki/entities/vLLM AFD Plugin|vLLM AFD Plugin]]
@@ -270,7 +273,7 @@
 
 ## 来源摘要（按类型）
 
-### 文章（46）
+### 文章（47）
 
 - [[../wiki/sources/2026 年MoE 架构正在发生一次关键变化|2026 年MoE 架构正在发生一次关键变化]]
 - [[../wiki/sources/A Preview of Production-Scale Kimi K3 Support on vLLM|A Preview of Production-Scale Kimi K3 Support on vLLM]]
@@ -282,6 +285,7 @@
 - [[../wiki/sources/Flash Attention 详细解释推演与Pytorch代码实现|Flash Attention 详细解释推演与Pytorch代码实现]]
 - [[../wiki/sources/Gemma 4 核心技术深度解析：PLE、Shared KV Cache 与全模态架构|Gemma 4 核心技术深度解析：PLE、Shared KV Cache 与全模态架构]]
 - [[../wiki/sources/Gemma 4：Drafter 详解|Gemma 4：Drafter 详解]]
+- [[../wiki/sources/KV Cache 研习社 · 深潜  LMCache、Mooncake、FlexKV——三条路线谁在改写 KV 的命运？|KV Cache 研习社 · 深潜  LMCache、Mooncake、FlexKV——三条路线谁在改写 KV 的命运？]]
 - [[../wiki/sources/Kimi新作《Attention Residuals》：对Transformer中残差结构的调整|Kimi新作《Attention Residuals》：对Transformer中残差结构的调整]]
 - [[../wiki/sources/LLM推理优化核心技术|LLM推理优化核心技术]]
 - [[../wiki/sources/LLM提速利器：投机推理的原理与常见方案|LLM提速利器：投机推理的原理与常见方案]]
