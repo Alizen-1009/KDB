@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: KV Cache
-sources: 19
+sources: 20
 updated: 2026-06-21
 ---
 
@@ -108,6 +108,8 @@ KV Cache 按 token/page 保存显式历史，已保存的每行 K/V 可以作为
 
 ## 相关实体
 
+- [[../entities/DeepSeek-V4.1-Flash]]
+
 - [[../entities/vLLM]]
 - [[../entities/TensorRT-LLM]]
 - [[../entities/Nvidia Dynamo]]
@@ -117,6 +119,8 @@ KV Cache 按 token/page 保存显式历史，已保存的每行 K/V 可以作为
 - [[../entities/DeepSeek-V3.2-Exp]]
 
 ## 相关来源
+
+- [[../sources/详细分析 DeepSeek-V4.1 Flash 技术报告(1)  模型结构]]
 
 - [[../sources/LLM推理优化核心技术]]
 - [[../sources/Gemma 4 核心技术深度解析：PLE、Shared KV Cache 与全模态架构]]
@@ -139,6 +143,9 @@ KV Cache 按 token/page 保存显式历史，已保存的每行 K/V 可以作为
 - [[../sources/DeepSeek-V3.2-Exp：Boosting Long-Context Efficiency with DeepSeek Sparse Attention]]
 
 ## 相关概念
+
+- [[CSA2]]
+- [[Causal Encoder-Decoder]]
 
 - [[Continuous Batching]]
 - [[Prefix Caching]]
@@ -168,3 +175,7 @@ KV Cache 按 token/page 保存显式历史，已保存的每行 K/V 可以作为
 - 需要区分两类“共享”：Gemma 4 目标模型内部的 `Shared KV Cache` 是层间共享；MTP drafter 里的 KV cache sharing 是 target model 与 drafter 之间的复用。
 - SGLang 的 `RadixAttention` 又是另一类运行时共享：它不是模型结构内部共享，而是通过前缀树保存并复用请求或 program 分支的历史 KV。
 - RTP-LLM 的来源补入了跨节点和多级存储视角，但具体缓存评分公式、同步周期与远程缓存成本应按论文/源码复核。
+
+### V4.1 架构解读的口径补充
+
+新来源对主 KV 先称 MXFP4，后描述每 16 通道 E4M3 scale，存在命名不一致；本页保留既有技术报告与参考 kernel 核对口径，区分主 KV 与 Indexer K。原文“仅 Global KV 常驻 HBM”也不能作为完整显存账本：活跃请求仍需局部 SWA。完整机制分别见 [[CSA2]] 与 [[Causal Encoder-Decoder]]，缺失公式未据此重写既有字节账本。

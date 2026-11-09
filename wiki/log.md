@@ -1945,3 +1945,11 @@
 - 局部更新分层 KV Cache、缓存感知路由、PD分离及 DeepSeek-AI，补齐双向引用。
 - 未发现直接事实冲突；显式区分持久缓存驻留与执行期状态，保留多级缓存和集中式存储的架构取舍。
 - 开源范围、财务指标、DualPath 适用版本与模型质量归因待核实；未独立核验外链或复测性能。
+
+## [2026-11-09] ingest | 详细分析 DeepSeek-V4.1 Flash 技术报告(1)：模型结构
+
+- 完整读取 824 行剪藏；经用户确认按可读正文及既有核对结果入库，公式和配图缺失明确保留待核实。
+- 新增同名来源摘要、DeepSeek-V4.1-Flash 实体、Causal Encoder-Decoder 与 CSA2 概念页。
+- 局部更新 Shared KV Cache、KV Cache、CSA-HCA、mHC、DSpark、Engram、DeepSeek-AI，补齐双向链接。
+- 记录主 KV 的 MXFP4 命名与 E4M3 分组描述不一致、Engram 版本卷积差异、全局字节账本与局部运行状态边界；不把作者损失猜测和表达力论证当作已确认事实。
+- 未改写 raw，未复测 GPU 性能或重新核验完整技术报告；沿用已有固定 revision 的实现边界。

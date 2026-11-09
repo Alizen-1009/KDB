@@ -2,7 +2,7 @@
 type: entity
 entity_type: 公司
 topic: 模型架构
-sources: 8
+sources: 9
 updated: 2026-05-17
 ---
 
@@ -29,6 +29,9 @@ updated: 2026-05-17
 
 ## 相关概念
 
+- [[../concepts/Causal Encoder-Decoder]]
+- [[../concepts/CSA2]]
+
 - [[../concepts/分层 KV Cache]]
 - [[../concepts/缓存感知路由]]
 - [[../concepts/PD分离]]
@@ -47,6 +50,8 @@ updated: 2026-05-17
 
 ## 相关来源
 
+- [[../sources/详细分析 DeepSeek-V4.1 Flash 技术报告(1)  模型结构]]
+
 - [[../sources/谈谈 DeepInfer]]
 - [[../sources/Conditional Memory via Scalable Lookup: A New Axis of Sparsity for Large Language Models]]
 - [[../sources/mHC: Manifold-Constrained Hyper-Connections]]
@@ -55,6 +60,10 @@ updated: 2026-05-17
 - [[../sources/陈巍：DeepSeek 开源Day（1）-FlashMLA 深入分析（收录于：DeepSeek技术详解系列）]]
 - [[../sources/DSpark：结合半自回归生成与置信度调度的投机解码技术]]
 - [[../sources/DeepSeek-V3.2-Exp：Boosting Long-Context Efficiency with DeepSeek Sparse Attention]]
+
+## 相关模型
+
+- [[DeepSeek-V4.1-Flash]]：CED、CSA2 与局部状态有界重放的协同案例；本文解读的作者推测与生产实现边界分别标注。
 
 ## 冲突与备注
 

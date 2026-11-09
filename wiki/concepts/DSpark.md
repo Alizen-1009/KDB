@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: 投机解码
-sources: 2
+sources: 3
 updated: 2026-08-17
 ---
 
@@ -66,6 +66,12 @@ Scheduler 将“为某请求再增加一位验证”的候选按前缀存活概�
 - 全局贪心调度比固定长度复杂，还要考虑调度开销、公平性和 tail latency。
 - Sequential block 恢复候选间依赖，但也重新引入一部分串行成本；收益取决于该成本是否显著低于传统 autoregressive drafter。
 
+## DeepSeek-V4.1-Flash 的配置与训练边界
+
+架构解读记录：3 个 SWA-128 草稿 block，一次并行计算 5 个草稿位置的基础 logits，配合轻量 Markov head；3 是深度，5 是草稿长度，不代表每次必然接受 5 个 token。
+
+文章称草稿网络在主干预训练后单独训练；后训练中继续适配主干策略，但草稿目标不向主干回传梯度。已有 V4.1 深读记录的固定 revision minimal generate 仍走普通自回归，因此不能用配置本身证明生产投机验证和 scheduler 已执行。
+
 ## 来源 Benchmark
 
 ### vLLM 二手实测
@@ -94,11 +100,15 @@ Scheduler 将“为某请求再增加一位验证”的候选按前缀存活概�
 
 ## 相关实体
 
+- [[../entities/DeepSeek-V4.1-Flash]]
+
 - [[../entities/vLLM]]
 - [[../entities/DeepSeek V4]]
 - [[../entities/DeepSeek-AI]]
 
 ## 相关来源
+
+- [[../sources/详细分析 DeepSeek-V4.1 Flash 技术报告(1)  模型结构]]
 
 - [[../sources/并行投机解码(DFlashDSpark)的快速理解与vLLM实测]]
 - [[../sources/DSpark：结合半自回归生成与置信度调度的投机解码技术]]

@@ -2,7 +2,7 @@
 type: entity
 entity_type: 项目
 topic: 模型架构
-sources: 2
+sources: 3
 updated: 2026-05-17
 ---
 
@@ -26,12 +26,20 @@ DeepSeek 在 `Conditional Memory via Scalable Lookup` 中提出的记忆模块�
 - 官方 GitHub 仓库当前更像核心数据流演示与论文配套实现，而不是完整生产级训练栈。
 - 当前 `engram_demo_v1.py` 这份 demo 进一步说明了几个关键实现落点：词表压缩先于 hash；不同层有各自的 hash multipliers 与质数表大小；检索后的记忆通过 RMSNorm 后的 query/key 计算标量 gate，再经短卷积扩展局部感受野。
 
+## DeepSeek-V4.1-Flash 的版本差异
+
+[[DeepSeek-V4.1-Flash]] 的解读记录：使用 2/3/4-gram，在零基层号 1 和 14 注入两个模块，约 196B 表参数另计于约 552B 主干。各阶有 8 个哈希 heads、每 head 256 维，每阶合计 2048 维，三阶拼接为 6144 维；不能把 2048 当作三阶拼接总维度。
+
+该版本省去原版短因果卷积，属于架构取舍；上文论文和 demo 的卷积路径仍按原版本保留。确定性地址支持提前从主机内存预取，但整张表仍是训练参数，不是请求级 KV。具体放置与 RDMA 收益需按部署核实。
+
 ## 相关概念
 
 - [[Conditional Memory]]
 - [[Sparsity Allocation]]
 
 ## 相关来源
+
+- [[../sources/详细分析 DeepSeek-V4.1 Flash 技术报告(1)  模型结构]]
 
 - [[../sources/Conditional Memory via Scalable Lookup: A New Axis of Sparsity for Large Language Models]]
 - [[../sources/engram_demo_v1]]

@@ -25,15 +25,15 @@
 
 ## 资源统计
 
-- 原始文章：81
+- 原始文章：83
 - 原始论文：9
 - 原始仓库：0
 - 原始数据集：0
 - 原始图片：19
 - 原始代码：1
-- 来源文件：64
-- 实体文件：48
-- 概念文件：117
+- 来源文件：65
+- 实体文件：49
+- 概念文件：119
 - 报告文件：39
 - HTML 导出：0
 - 面试文件：12
@@ -42,9 +42,10 @@
 
 ## 概念页面（按主题）
 
-### 注意力机制（14）
+### 注意力机制（15）
 
 - [[../wiki/concepts/CSA-HCA|CSA-HCA]]
+- [[../wiki/concepts/CSA2|CSA2]]
 - [[../wiki/concepts/Chunked Gated Delta Rule|Chunked Gated Delta Rule]]
 - [[../wiki/concepts/DeepSeek Sparse Attention|DeepSeek Sparse Attention]]
 - [[../wiki/concepts/Flash Decoding|Flash Decoding]]
@@ -146,9 +147,10 @@
 - [[../wiki/concepts/Profiling|Profiling]]
 - [[../wiki/concepts/Roofline 模型|Roofline 模型]]
 
-### 模型架构（14）
+### 模型架构（15）
 
 - [[../wiki/concepts/Attention Residuals|Attention Residuals]]
+- [[../wiki/concepts/Causal Encoder-Decoder|Causal Encoder-Decoder]]
 - [[../wiki/concepts/Conditional Memory|Conditional Memory]]
 - [[../wiki/concepts/Double-Wide MLP|Double-Wide MLP]]
 - [[../wiki/concepts/Gated Residual|Gated Residual]]
@@ -217,10 +219,11 @@
 - [[../wiki/entities/TileRT|TileRT]]
 - [[../wiki/entities/vLLM|vLLM]]
 
-### 模型（8）
+### 模型（9）
 
 - [[../wiki/entities/DeepSeek V4|DeepSeek V4]]
 - [[../wiki/entities/DeepSeek-V3.2-Exp|DeepSeek-V3.2-Exp]]
+- [[../wiki/entities/DeepSeek-V4.1-Flash|DeepSeek-V4.1-Flash]]
 - [[../wiki/entities/GLM-5 系列|GLM-5 系列]]
 - [[../wiki/entities/GLM-5.3-Flash|GLM-5.3-Flash]]
 - [[../wiki/entities/Gemma 4|Gemma 4]]
@@ -267,7 +270,7 @@
 
 ## 来源摘要（按类型）
 
-### 文章（43）
+### 文章（44）
 
 - [[../wiki/sources/2026 年MoE 架构正在发生一次关键变化|2026 年MoE 架构正在发生一次关键变化]]
 - [[../wiki/sources/A Preview of Production-Scale Kimi K3 Support on vLLM|A Preview of Production-Scale Kimi K3 Support on vLLM]]
@@ -309,6 +312,7 @@
 - [[../wiki/sources/彻底搞懂RoPE计算原理：从1D到3D|彻底搞懂RoPE计算原理：从1D到3D]]
 - [[../wiki/sources/推理的非确定性运算及vLLMSGLang控制方式|推理的非确定性运算及vLLMSGLang控制方式]]
 - [[../wiki/sources/译 NVIDIA’s GPUs - 从 Ampere, Hopper 到 Blackwell|译 NVIDIA’s GPUs - 从 Ampere, Hopper 到 Blackwell]]
+- [[../wiki/sources/详细分析 DeepSeek-V4.1 Flash 技术报告(1)  模型结构|详细分析 DeepSeek-V4.1 Flash 技术报告(1)  模型结构]]
 - [[../wiki/sources/谈谈 DeepInfer|谈谈 DeepInfer]]
 - [[../wiki/sources/还在手写CUDA内核？CODA来了！LLM和新手也能让Transformer跑出光速|还在手写CUDA内核？CODA来了！LLM和新手也能让Transformer跑出光速]]
 - [[../wiki/sources/陈巍：DeepSeek 开源Day（1）-FlashMLA 深入分析（收录于：DeepSeek技术详解系列）|陈巍：DeepSeek 开源Day（1）-FlashMLA 深入分析（收录于：DeepSeek技术详解系列）]]

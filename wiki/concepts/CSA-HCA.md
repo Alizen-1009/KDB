@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: 注意力机制
-sources: 1
+sources: 2
 updated: 2026-05-17
 ---
 
@@ -33,6 +33,10 @@ updated: 2026-05-17
 - [V4.1 原始报告](../../raw/papers/DeepSeek_V41_Tech_Report.pdf) §2.3 把该分支简化为从主全局 latent 投影 Indexer K；生成 Indexer K 使用的是主 latent 的 pre-RoPE、pre-cache-quantization 版本，不是读取已打包主缓存后再变换。
 - 两者核心 attention 都可直接读取压缩后的主 KV 条目；这与 [[Qwen Sparse Attention]] 将选中的 index micro-block 展开后读取原始逐 token K/V 不同。HCA 不使用 Indexer，不存在 Indexer K 的来源问题。
 
+## V4.1 的跨层扩展
+
+[[CSA2]] 在本文已有 Indexer K 来源变化之外，还将全局缓存与 Top-K 的跨层复用解耦为 Full、Reindex、Reuse 三种模式。Encoder 使用二元非重叠压缩，Decoder 保留逐位置条目，后续索引通过 HSI 限定候选池。新来源属于二手解读，具体机制见对应概念页；不据此覆盖 V4 的 CSA/HCA 定义。
+
 ## HCA：重压缩后的 Dense Attention
 
 - 官方 Transformers 默认压缩率为 `m'=128`，使用 non-overlapping windows 形成更粗粒度的 compressed entries。
@@ -52,10 +56,14 @@ updated: 2026-05-17
 
 ## 相关实体
 
+- [[../entities/DeepSeek-V4.1-Flash]]
+
 - [[../entities/DeepSeek-AI]]
 - [[../entities/DeepSeek V4]]
 
 ## 相关来源
+
+- [[../sources/详细分析 DeepSeek-V4.1 Flash 技术报告(1)  模型结构]]
 
 - [[../sources/DeepSeekV4中RoPE设计解析]]
 

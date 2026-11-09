@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: 模型架构
-sources: 3
+sources: 4
 updated: 2026-04-23
 ---
 
@@ -42,6 +42,12 @@ hc_sinkhorn_iters = 20
 
 这可确认模型启用了四路 mHC 及相应数值参数，但只是配置观察；它不构成新的 mHC 机制、训练稳定性或性能收益证据，本页机制仍以 mHC 论文本体为准。
 
+## V4.1 的 Single-Pass 版本
+
+DeepSeek-V4.1-Flash 架构解读补入：输入混合系数由前一个子层产生，当前子层使用已生成系数，降低关键路径上的归约依赖，便于融合。这里的子层包括 attention 和 FFN，不宜笼统理解成只偏移一个完整 Transformer 层。
+
+它仍保留四路 residual 与混合约束；相关执行段减少激活访存不能外推为整个模型显存或耗时减半，也不等于 Engram 优化器中的 Sinkhorn balancing。
+
 ## 关键权衡
 
 - 相比原始 `HC`，训练稳定性和扩展性更强，下游效果也更稳
@@ -50,11 +56,15 @@ hc_sinkhorn_iters = 20
 
 ## 相关实体
 
+- [[../entities/DeepSeek-V4.1-Flash]]
+
 - [[../entities/DeepSeek-AI]]
 - [[../entities/Qwen3.8-Flash-Next]]
 - [[../entities/GLM-5.3-Flash]]
 
 ## 相关来源
+
+- [[../sources/详细分析 DeepSeek-V4.1 Flash 技术报告(1)  模型结构]]
 
 - [[../sources/mHC: Manifold-Constrained Hyper-Connections]]
 - [[../sources/On the Design of Qwen3.8-Next Architecture：Evaluation, Efficiency, and Training Stability]]

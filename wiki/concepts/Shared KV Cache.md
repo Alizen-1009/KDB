@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: KV Cache
-sources: 2
+sources: 3
 updated: 2026-05-07
 ---
 
@@ -23,6 +23,12 @@ updated: 2026-05-07
 - 通过层间复用而不是请求间复用来压缩缓存成本
 - 在 `MTP Drafter` 语境中还会出现另一类共享：drafter 通过 cross-attention 复用 target model 已计算的 KV cache。这和本文定义的“目标模型内部层间共享”不是同一层级，但都服务于减少重复上下文计算。
 
+## CSA2：缓存共享与索引共享分开
+
+在 DeepSeek-V4.1-Flash 的 [[CSA2]] 中，全局主 KV 与 Indexer K 只由少数来源层生成；Reindex 可共享缓存但重新选 Top-K，Reuse 同时复用缓存与选择。每层主 Q、局部 SWA KV 与主注意力仍需计算，共享选择不意味着共享权重或输出。
+
+[[Causal Encoder-Decoder]] 进一步使 Decoder 全局 KV 来自 Encoder 边界表示，改变 Prefill 的依赖；全局缓存共享不替代局部 SWA 状态恢复。这与既有 Gemma 层间共享同属减少独立 KV 副本的方向，但具体层调度与局部支路不同。
+
 ## 关键权衡
 
 - 能减少缓存占用和部分投影计算
@@ -30,9 +36,13 @@ updated: 2026-05-07
 
 ## 相关实体
 
+- [[../entities/DeepSeek-V4.1-Flash]]
+
 - [[../entities/Gemma 4]]
 
 ## 相关来源
+
+- [[../sources/详细分析 DeepSeek-V4.1 Flash 技术报告(1)  模型结构]]
 
 - [[../sources/Gemma 4 核心技术深度解析：PLE、Shared KV Cache 与全模态架构]]
 - [[../sources/Gemma 4：Drafter 详解]]
