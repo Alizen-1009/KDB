@@ -31,7 +31,7 @@
 - 原始数据集：0
 - 原始图片：19
 - 原始代码：1
-- 来源文件：65
+- 来源文件：66
 - 实体文件：49
 - 概念文件：119
 - 报告文件：39
@@ -270,10 +270,11 @@
 
 ## 来源摘要（按类型）
 
-### 文章（44）
+### 文章（45）
 
 - [[../wiki/sources/2026 年MoE 架构正在发生一次关键变化|2026 年MoE 架构正在发生一次关键变化]]
 - [[../wiki/sources/A Preview of Production-Scale Kimi K3 Support on vLLM|A Preview of Production-Scale Kimi K3 Support on vLLM]]
+- [[../wiki/sources/AI Infra 早报｜vLLM 让 MoE 下投影少搬一次数据|AI Infra 早报｜vLLM 让 MoE 下投影少搬一次数据]]
 - [[../wiki/sources/CUDA优化维度框架|CUDA优化维度框架]]
 - [[../wiki/sources/DSpark：结合半自回归生成与置信度调度的投机解码技术|DSpark：结合半自回归生成与置信度调度的投机解码技术]]
 - [[../wiki/sources/DeepSeekV4中RoPE设计解析|DeepSeekV4中RoPE设计解析]]

@@ -2,7 +2,7 @@
 type: entity
 entity_type: 框架
 topic: GPU 编程
-sources: 1
+sources: 2
 updated: 2026-06-12
 ---
 
@@ -45,8 +45,10 @@ updated: 2026-06-12
 
 ## 相关来源
 
+- [[../sources/AI Infra 早报｜vLLM 让 MoE 下投影少搬一次数据]]
 - [[../sources/REMINDER FF-KDA & CAKE KDA Highlights]]
 
 ## 备注
 
+- 2026-11-05 早报称 v0.7.3 为 Rubin 增加 MTP/NVFP4 MLA decode，为 Blackwell 优化 EP MoE decode，并为 Hopper 增加 MXFP4/NVFP4 experts。本次未独立核验 release、精度与 dispatch 矩阵，按来源声称记录；格式支持不能直接推导 GPU 原生低精度计算能力或通用性能提升。
 - FlashInfer API 和 backend 覆盖范围更新较快，引用具体 kernel 支持时需要带版本与硬件架构。

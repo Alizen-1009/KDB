@@ -1953,3 +1953,10 @@
 - 局部更新 Shared KV Cache、KV Cache、CSA-HCA、mHC、DSpark、Engram、DeepSeek-AI，补齐双向链接。
 - 记录主 KV 的 MXFP4 命名与 E4M3 分组描述不一致、Engram 版本卷积差异、全局字节账本与局部运行状态边界；不把作者损失猜测和表达力论证当作已确认事实。
 - 未改写 raw，未复测 GPU 性能或重新核验完整技术报告；沿用已有固定 revision 的实现边界。
+
+## [2026-11-09] ingest | AI Infra 早报｜vLLM 让 MoE 下投影少搬一次数据
+
+- 完整读取剪藏正文，新增同名来源摘要；未修改 raw。
+- 局部更新 MoE、算子融合、vLLM、FlashInfer，补充 expert-sorted 布局与激活量化衔接案例及双向引用。
+- 未发现直接事实冲突；性能 6.0%–7.6%、PR 合并及 release 功能均按来源声称记录，未独立核验 PR/release 或复测。
+- 明确区分布局优化、融合与 TMA 的贡献边界，以及旧 GLM 支持矩阵与后续 PR 的版本边界；LangGraph 旁支仅保留于来源页。

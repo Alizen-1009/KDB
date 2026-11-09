@@ -2,7 +2,7 @@
 type: entity
 entity_type: 框架
 topic: 推理服务
-sources: 21
+sources: 22
 updated: 2026-06-12
 ---
 
@@ -50,6 +50,8 @@ updated: 2026-06-12
 
 ## 相关概念
 
+- [[../concepts/MoE]]
+- [[../concepts/算子融合]]
 - [[Continuous Batching]]
 - [[PagedAttention]]
 - [[持久批处理]]
@@ -85,6 +87,7 @@ updated: 2026-06-12
 
 ## 相关来源
 
+- [[../sources/AI Infra 早报｜vLLM 让 MoE 下投影少搬一次数据]]
 - [[../sources/LLM推理优化核心技术]]
 - [[../sources/斯坦福CS336 Lecture 10 - Inference systems and optimization]]
 - [[../sources/美团一面：请介绍 vLLM PageAttention]]
@@ -109,6 +112,7 @@ updated: 2026-06-12
 
 ## 冲突与备注
 
+- 2026-11-05 早报转述 PR #64760：针对 GLM 5.3、H200 FP8 MoE，保持 expert-sorted 中间激活并融合 SiLU/乘法/量化，声称端到端提升 6.0%–7.6%。合并状态仅按来源发布时陈述，具体 diff、完整 benchmark 与稳定版收录待核实；不覆盖旧 commit 的 GLM 支持矩阵，不自动等同 GLM-5.3-Flash。
 - 本文只点到 vLLM 的相关能力，没有展开版本差异、调度细节和具体实现限制，后续需要结合官方文档补足
 - 目前 wiki 里的 vLLM 条目已经覆盖了 `PagedAttention`、`Continuous Batching`、`Prefix Caching` 三个面试高频锚点，但 `chunked prefill`、`disaggregated prefilling` 还可继续补
 - `MRV2` 说明 vLLM 正在把运行时架构从“功能累加”往“模块化、GPU-native、async-first”的方向收束，但截至来源发布时它仍是实验态，并未完全替代旧 runner

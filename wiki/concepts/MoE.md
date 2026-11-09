@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: 模型架构
-sources: 9
+sources: 10
 updated: 2026-06-12
 ---
 
@@ -264,6 +264,12 @@ for e in experts:
 
 这种分离不改变 `Attention[l] -> FFN[l] -> Attention[l+1]` 的模型依赖，也不保证自动提速。收益来自 Attention 与专家容量的独立配比及不同 ubatch 的通信—计算重叠，代价是每个切分层的双向激活通信。
 
+## FP8 下投影的布局衔接案例
+
+[[../sources/AI Infra 早报｜vLLM 让 MoE 下投影少搬一次数据]] 转述 vLLM PR #64760：在 GLM 5.3、H200 路径中保持中间激活的 expert-sorted 顺序，让下投影的激活和权重适配 TMA，并融合 SiLU、乘法与 FP8 量化。具体重排次数、量化布局和融合是否位于前一 GEMM epilogue 内，仍待 PR diff 核实。
+
+LLM 归纳：应把 gate/up GEMM、激活、量化、down GEMM 与 combine 看成连续数据流，优化相邻阶段的布局契约；仅有高效 grouped GEMM 不保证整个 MoE 高效。文章的 6.0%–7.6% 端到端提升缺少完整负载条件，只保留为来源声称，不等同于跨模型通用收益。
+
 ## 面试口径
 
 一句话：`MoE` 算子不是“把很多 MLP 全算一遍”，而是 `router -> top-k -> token dispatch -> expert FFN -> weighted gather` 这一条稀疏执行链。
@@ -305,6 +311,7 @@ for e in experts:
 
 ## 相关来源
 
+- [[../sources/AI Infra 早报｜vLLM 让 MoE 下投影少搬一次数据]]
 - [[../sources/LLM推理优化核心技术]]
 - [[../sources/Gemma 4 核心技术深度解析：PLE、Shared KV Cache 与全模态架构]]
 - [[../sources/Conditional Memory via Scalable Lookup: A New Axis of Sparsity for Large Language Models]]

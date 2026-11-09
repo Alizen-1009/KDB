@@ -62,8 +62,9 @@ topic: GPU 编程
 - [[../entities/NVIDIA Rubin|NVIDIA Rubin]]
 - [[../entities/阿里云 PAI 团队|阿里云 PAI 团队]]
 
-## 来源（14）
+## 来源（15）
 
+- [[../sources/AI Infra 早报｜vLLM 让 MoE 下投影少搬一次数据|AI Infra 早报｜vLLM 让 MoE 下投影少搬一次数据]]
 - [[../sources/CUDA优化维度框架|CUDA优化维度框架]]
 - [[../sources/CUDA内存层次与动态共享内存问答整理|CUDA内存层次与动态共享内存问答整理]]
 - [[../sources/Dynamic persistent tile scheduling with Cluster Launch Control (CLC) on NVIDIA Blackwell GPUs|Dynamic persistent tile scheduling with Cluster Launch Control (CLC) on NVIDIA Blackwell GPUs]]
