@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: KV Cache
-sources: 1
+sources: 2
 updated: 2026-06-12
 ---
 
@@ -31,7 +31,17 @@ updated: 2026-06-12
 - 更高缓存命中率不一定自动降低端到端延迟；如果远程缓存读取或 KV 传输成本过高，收益可能被网络和调度开销抵消。
 - 它与 [[PagedAttention]]、[[RadixAttention]]、[[Prefix Caching]] 不是同一层概念：PagedAttention 更偏单机分页式 KV 管理，RadixAttention 更偏 runtime 前缀树复用，分层 KV Cache 更强调跨节点和跨存储层级的系统缓存管理。
 
+## 减少缓存层级的替代取舍
+
+[[../sources/谈谈 DeepInfer]] 将 DeepSeek 方案描述为削减本地持久缓存层级，以分布式存储承载可复用 KV，从而减少计算节点的缓存位置依赖。该描述来自技术评论，生产实现与开源代码范围待核实。
+
+- 对照既有 RTP-LLM 来源：多级缓存强调容量与本地复用，本文强调多种 PCIe/RDMA 流量争用及调度复杂度；两者属于架构取舍，不是相互否定。
+- LLM 归纳：减少本地层级会提高对远端存储有效带宽、尾延迟和可用性的要求，应同时核算命中收益、传输与排队成本。
+- 原文“仅保留 G3.5”“计算节点无状态”不能理解为执行期不需要 HBM KV 或请求状态；G1–G4 是作者的层级命名，不是统一标准。
+
 ## 相关实体
+
+- [[../entities/DeepInfer]]
 
 - [[../entities/RTP-LLM]]
 - [[../entities/vLLM]]
@@ -39,6 +49,7 @@ updated: 2026-06-12
 
 ## 相关来源
 
+- [[../sources/谈谈 DeepInfer]]
 - [[../sources/RTP-LLM]]
 
 ## 相关概念

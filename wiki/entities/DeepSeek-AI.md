@@ -2,7 +2,7 @@
 type: entity
 entity_type: 公司
 topic: 模型架构
-sources: 7
+sources: 8
 updated: 2026-05-17
 ---
 
@@ -29,6 +29,10 @@ updated: 2026-05-17
 
 ## 相关概念
 
+- [[../concepts/分层 KV Cache]]
+- [[../concepts/缓存感知路由]]
+- [[../concepts/PD分离]]
+
 - [[Conditional Memory]]
 - [[mHC]]
 - [[Hyper-Connections]]
@@ -43,6 +47,7 @@ updated: 2026-05-17
 
 ## 相关来源
 
+- [[../sources/谈谈 DeepInfer]]
 - [[../sources/Conditional Memory via Scalable Lookup: A New Axis of Sparsity for Large Language Models]]
 - [[../sources/mHC: Manifold-Constrained Hyper-Connections]]
 - [[../sources/MLA与DP Attention面试整理]]
@@ -53,6 +58,7 @@ updated: 2026-05-17
 
 ## 冲突与备注
 
+- [[../sources/谈谈 DeepInfer]] 以 [[DeepInfer]] 为切入点，将 KV 压缩、存算分离和算子优化归纳为长期协同路线；组织文化与效率的因果关系是作者判断，开源范围、80% 毛利和 17 个月回本均待一手资料核实。
 - 后续如果补入 `DeepSeek-V3`、`DeepSeek V4`、`DualPipe`、FlashMLA 官方 repo 等更完整原始资料，这个实体页还可以继续扩充
 - DSpark 的联合开发归属、DeepSeek-V4 生产部署与线上提升需按原论文、官方仓库和生产报告继续核实。
 - DeepSeek-V3.2-Exp 的服务成本图绑定 H800 与 `$2/GPU-hour`，且真实世界大规模验证仍在进行，不应改写成稳定生产收益。

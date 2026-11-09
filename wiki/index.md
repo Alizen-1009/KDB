@@ -25,14 +25,14 @@
 
 ## 资源统计
 
-- 原始文章：80
+- 原始文章：81
 - 原始论文：9
 - 原始仓库：0
 - 原始数据集：0
 - 原始图片：19
 - 原始代码：1
-- 来源文件：63
-- 实体文件：47
+- 来源文件：64
+- 实体文件：48
 - 概念文件：117
 - 报告文件：39
 - HTML 导出：0
@@ -205,8 +205,9 @@
 - [[../wiki/entities/vLLM AFD Plugin|vLLM AFD Plugin]]
 - [[../wiki/entities/verifiers|verifiers]]
 
-### 框架（8）
+### 框架（9）
 
+- [[../wiki/entities/DeepInfer|DeepInfer]]
 - [[../wiki/entities/FlashInfer|FlashInfer]]
 - [[../wiki/entities/NCCL|NCCL]]
 - [[../wiki/entities/Nvidia Dynamo|Nvidia Dynamo]]
@@ -266,7 +267,7 @@
 
 ## 来源摘要（按类型）
 
-### 文章（42）
+### 文章（43）
 
 - [[../wiki/sources/2026 年MoE 架构正在发生一次关键变化|2026 年MoE 架构正在发生一次关键变化]]
 - [[../wiki/sources/A Preview of Production-Scale Kimi K3 Support on vLLM|A Preview of Production-Scale Kimi K3 Support on vLLM]]
@@ -308,6 +309,7 @@
 - [[../wiki/sources/彻底搞懂RoPE计算原理：从1D到3D|彻底搞懂RoPE计算原理：从1D到3D]]
 - [[../wiki/sources/推理的非确定性运算及vLLMSGLang控制方式|推理的非确定性运算及vLLMSGLang控制方式]]
 - [[../wiki/sources/译 NVIDIA’s GPUs - 从 Ampere, Hopper 到 Blackwell|译 NVIDIA’s GPUs - 从 Ampere, Hopper 到 Blackwell]]
+- [[../wiki/sources/谈谈 DeepInfer|谈谈 DeepInfer]]
 - [[../wiki/sources/还在手写CUDA内核？CODA来了！LLM和新手也能让Transformer跑出光速|还在手写CUDA内核？CODA来了！LLM和新手也能让Transformer跑出光速]]
 - [[../wiki/sources/陈巍：DeepSeek 开源Day（1）-FlashMLA 深入分析（收录于：DeepSeek技术详解系列）|陈巍：DeepSeek 开源Day（1）-FlashMLA 深入分析（收录于：DeepSeek技术详解系列）]]
 

@@ -1938,3 +1938,10 @@
 - 回填 ZeRO、FSDP、Torch Compile 三个概念页，分别补充分片通信量、前反向时序和编译边界定位。
 - 复用并更新秋招题库中 ZeRO 与 FSDP、ZeRO 各阶段与 Offload、torch.compile 三道题。
 - 通信量按 ring 与每卡单向发送推导；框架实际 collective 随版本和配置变化，未运行性能实测。依据为 ZeRO 论文、PyTorch、DeepSpeed 与 NVIDIA NCCL 文档。
+
+## [2026-11-09] ingest | 谈谈 DeepInfer
+
+- 完整读取 raw/articles/谈谈 DeepInfer.md；新增同名来源页与 DeepInfer 实体页。
+- 局部更新分层 KV Cache、缓存感知路由、PD分离及 DeepSeek-AI，补齐双向引用。
+- 未发现直接事实冲突；显式区分持久缓存驻留与执行期状态，保留多级缓存和集中式存储的架构取舍。
+- 开源范围、财务指标、DualPath 适用版本与模型质量归因待核实；未独立核验外链或复测性能。

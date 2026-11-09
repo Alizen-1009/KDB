@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: 推理服务
-sources: 5
+sources: 6
 updated: 2026-07-08
 ---
 
@@ -49,7 +49,15 @@ PD 分离不仅允许 Prefill/Decode 独立扩缩，也使 Decode backend 成为
 - 代价是更高的系统复杂度、缓存传输成本和运维投入
 - 与 [[Chunked Prefill]] 不是简单替代关系：PD 分离削弱了 chunked prefill 在同一 GPU 上保护 decode ITL 的价值，但 prefill pool 内部仍可能需要 chunking 来控制长 prompt 对 TTFT、公平性、峰值显存和 KV 传输流水的影响。
 
+## 阶段交接与持久缓存写回
+
+[[../sources/谈谈 DeepInfer]] 描述的路径是：Prefill 计算 KV 并交给 Decode，随后释放相应 GPU KV，由 Decode 写入分布式存储。这是作者对 DeepSeek 系统的描述，释放的同步条件、写回粒度与生产实现待核实，不是所有 PD 架构的固定协议。
+
+LLM 归纳：PD 阶段交接与跨请求持久缓存是两件事；释放 Prefill 副本不意味着 Decode 不需要执行期 KV。“计算节点无状态”应限定在持久缓存驻留与调度依赖语境，不能推导出无需请求元数据和故障恢复。原文还提到 DualPath 借 Decode Relay 缓解 Prefill 存储入口瓶颈；400Gbps 的配置和适用版本待核实，“V4.1 可能无需 DualPath”仍是作者猜测。
+
 ## 相关实体
+
+- [[../entities/DeepInfer]]
 
 - [[../entities/RTP-LLM]]
 - [[../entities/Nvidia Dynamo]]
@@ -61,6 +69,7 @@ PD 分离不仅允许 Prefill/Decode 独立扩缩，也使 Decode backend 成为
 
 ## 相关来源
 
+- [[../sources/谈谈 DeepInfer]]
 - [[../sources/LLM推理优化核心技术]]
 - [[../sources/RTP-LLM]]
 - [[../sources/vLLM AFD Plugin 发布：为 MoE 推理拆分 Attention 与 FFN，实现灵活部署]]
