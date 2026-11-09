@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: GPU 编程
-sources: 2
+sources: 3
 updated: 2026-06-12
 ---
 
@@ -21,6 +21,7 @@ updated: 2026-06-12
 - 后续 kernel 可在前序 kernel 运行期间被依赖式启动。
 - 前后 kernel 之间通过同步点保证数据依赖不被破坏。
 - 在 `Look Ma, No Bubbles!` 来源中，作者认为 PDL 的 `cudaGridDependencySynchronize` 粒度仍偏粗：例如 attention 需要等待所有 Q/K/V 完成，而不能按 head 或 chunk 级别尽早消费已准备好的输入。
+- SGLang NVIDIA 低延迟插件将依赖释放点提前：例如 MoE 规约开始轮询远端结果时释放下一层投影，使其先准备 barrier、tensor memory 和权重；真正消费输入前仍需等待数据就绪。PDL 并非该插件新引入，而是调整其使用方式。
 
 ## Rubin 的 Thread Block 级依赖方向
 
@@ -43,6 +44,7 @@ updated: 2026-06-12
 
 - [[../sources/Look Ma, No Bubbles! Designing a Low-Latency Megakernel for Llama-1B]]
 - [[../sources/Nvidia Rubin架构分析预览]]
+- [[../sources/SGLang 低延迟模式：Kernel 与运行时]]
 
 ## 相关概念
 

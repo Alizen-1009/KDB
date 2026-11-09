@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: GPU 编程
-sources: 1
+sources: 2
 updated: 2026-08-21
 ---
 
@@ -53,6 +53,9 @@ Resident CTA   : 下一轮继续处理新 tile，而不是退出
 | [[Megakernel]]    | 跨多个算子、层甚至整模型的指令序列             | 减少更大范围 kernel 边界和中间状态往返     |
 
 Persistent 描述的是 worker 生命周期与 work acquisition；megakernel 描述的是融合范围。一个 megakernel 往往是 persistent 的，但 persistent GEMM/attention kernel 不一定跨算子，因此不应把两者等同。
+### SGLang AMD 低延迟实例
+
+来源描述的 FlyDSL 实现将 DeepSeek-V4.1-Flash 每层大部分工作放进两次 persistent 启动：K1 处理 mHC、Q/KV 投影和 KV 写入，K2 处理 attention、输出投影、MoE 与两次跨 GPU 规约；索引层另含压缩和打分。K1/K2 边界保证 KV 写入可见，kernel 内通过带 decode 步标签的数据衔接阶段、提前加载不依赖路由的权重。它是跨算子的层级融合，而非整个模型只有一次启动。
 
 ## 调度方式
 
@@ -77,6 +80,7 @@ Persistent 描述的是 worker 生命周期与 work acquisition；megakernel 描
 ## 相关来源
 
 - [[../sources/译 NVIDIA’s GPUs - 从 Ampere, Hopper 到 Blackwell]]
+- [[../sources/SGLang 低延迟模式：Kernel 与运行时]]
 
 ## 外部一手资料
 

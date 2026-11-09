@@ -25,13 +25,13 @@
 
 ## 资源统计
 
-- 原始文章：83
+- 原始文章：84
 - 原始论文：9
 - 原始仓库：0
 - 原始数据集：0
 - 原始图片：19
 - 原始代码：1
-- 来源文件：66
+- 来源文件：67
 - 实体文件：49
 - 概念文件：119
 - 报告文件：39
@@ -270,7 +270,7 @@
 
 ## 来源摘要（按类型）
 
-### 文章（45）
+### 文章（46）
 
 - [[../wiki/sources/2026 年MoE 架构正在发生一次关键变化|2026 年MoE 架构正在发生一次关键变化]]
 - [[../wiki/sources/A Preview of Production-Scale Kimi K3 Support on vLLM|A Preview of Production-Scale Kimi K3 Support on vLLM]]
@@ -296,6 +296,7 @@
 - [[../wiki/sources/RLTraining Inference Mismatch|RLTraining Inference Mismatch]]
 - [[../wiki/sources/RTP-LLM|RTP-LLM]]
 - [[../wiki/sources/Recursive Language Models the paradigm of 2026|Recursive Language Models the paradigm of 2026]]
+- [[../wiki/sources/SGLang 低延迟模式：Kernel 与运行时|SGLang 低延迟模式：Kernel 与运行时]]
 - [[../wiki/sources/SGLang的KDA管理与Prefix Cache难题|SGLang的KDA管理与Prefix Cache难题]]
 - [[../wiki/sources/SGLang：LLM推理引擎发展新方向|SGLang：LLM推理引擎发展新方向]]
 - [[../wiki/sources/glm-5-architecture-evolution|glm-5-architecture-evolution]]

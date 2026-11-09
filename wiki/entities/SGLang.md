@@ -2,7 +2,7 @@
 type: entity
 entity_type: 框架
 topic: 推理服务
-sources: 8
+sources: 9
 updated: 2026-06-12
 ---
 
@@ -31,6 +31,7 @@ updated: 2026-06-12
 - 截至官方 `main` commit `04374ba`，SGLang 的独立全模型 `--enable-torch-compile` 仍是默认关闭的实验功能，但支持配置中的 Piecewise CUDA Graph 使用 `torch.compile(..., backend=SGLangBackend)` 捕获和分割模型图，再把 split ops 留在 eager 路径、其余区段 capture/replay。这里 [[../concepts/Torch Compile|Torch Compile]] 的主要作用可以是图捕获与分区，而不一定是让 Inductor 重写所有专用 kernel。
 - 新来源从混合 MLA/KDA serving 补充状态管理视角：Token KV Pool 保存按 token 组织的 MLA KV，MambaPool 保存按请求、按层组织的 Conv State 与递归矩阵状态；UnifiedRadixCache 在同一逻辑树上协调两类 component 的前缀匹配和生命周期。
 - 对递归状态做 Prefix Cache 时，SGLang 需要保存边界 checkpoint；如果 KV 命中位置没有对应状态快照，就回退到最近共同边界并重新 prefill。来源还描述了 speculative verification 的状态暂存/提交路径。
+- 低延迟模式通过外部插件接入模型与硬件专用 kernel：启动时检查配置、构建插件并计入显存，运行时按步骤与 token 数选择专用或通用前向；各 TP rank 的选择须一致。Graph 捕获固定该 shape 的路径，接口及支持范围仍在演进。
 
 ## 相关概念
 
@@ -61,6 +62,7 @@ updated: 2026-06-12
 - [[../sources/RTP-LLM]]
 - [[../sources/Look Ma, No Bubbles! Designing a Low-Latency Megakernel for Llama-1B]]
 - [[../sources/SGLang的KDA管理与Prefix Cache难题]]
+- [[../sources/SGLang 低延迟模式：Kernel 与运行时]]
 
 ## 冲突与备注
 
@@ -71,3 +73,4 @@ updated: 2026-06-12
 - RTP-LLM 来源中的对比不应被写成 `SGLang` 的通用弱点；SGLang 在 LLM Programs、RadixAttention、结构化输出和 DP Attention 上仍有独立设计重心。
 - `Look Ma, No Bubbles!` 中关于 SGLang 的性能差距只应作为来源实验观察，不代表 SGLang 在高 batch、长上下文或 LLM Programs workload 下的通用表现。
 - KDA 状态管理来源是二手截图式代码解读；`MambaPool`、`UnifiedRadixCache`、copy-on-write、extra-buffer tracking 与模型支持范围都应按具体 SGLang commit 核实。
+- 低延迟插件的性能结论限于来源所述模型、硬件和低并发负载；支持的服务配置内未覆盖步骤才回退通用前向，不受支持的配置可能提前失败。 

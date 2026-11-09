@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: GPU 编程
-sources: 3
+sources: 4
 updated: 2026-06-12
 ---
 
@@ -38,6 +38,7 @@ updated: 2026-06-12
 - persistent GEMM/attention 可能只处理同一种算子，因此不是 megakernel；
 - 整模型 megakernel 通常需要长期驻留 worker、内部 scheduler 和显式依赖，因而往往具有 persistent 特征；
 - 两者仍需要至少一次 kernel launch。Persistent kernel 摊销后续 tile 边界，megakernel 则进一步减少算子/层之间的 kernel 边界。
+- SGLang 的 AMD 低延迟实现将每层大部分工作分为 K1/K2 两次 persistent 启动，体现层内大范围融合与显式阶段协作，但不应称为整模型单 kernel；其 NVIDIA 插件则保留多 kernel，重点改善依赖与通信重叠。
 
 ## 与 MegaMoE 的关系
 
@@ -60,6 +61,7 @@ updated: 2026-06-12
 - [[../sources/Look Ma, No Bubbles! Designing a Low-Latency Megakernel for Llama-1B]]
 - [[../sources/MegaMoE — 让 all-to-all 消失]]
 - [[../sources/译 NVIDIA’s GPUs - 从 Ampere, Hopper 到 Blackwell]]
+- [[../sources/SGLang 低延迟模式：Kernel 与运行时]]
 
 ## 相关概念
 

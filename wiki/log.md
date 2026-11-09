@@ -1967,3 +1967,9 @@
 - 明确 GEMM1 sorted store、独立激活量化 kernel、GEMM2 sorted-A TMA load，区分 GPU 内路径与 EP All-to-All。
 - 更正初次摘要：PR 已给 TP8、输入2048、输出1、请求并发1等条件；确认 merge commit 42c043c6b0e4905d590e9cb4bf00bb644bfebb53。
 - 稳定版收录、目标EP后端、完整构建环境与独立GPU性能/精度复测仍待核实；未修改raw。
+
+## [2026-11-09] ingest | SGLang 低延迟模式：Kernel 与运行时
+
+- 读取原始资料：`raw/articles/SGLang 低延迟模式：Kernel 与运行时.md`
+- 创建来源页并更新 SGLang、PDL、Persistent Kernel、Megakernel、通信-计算重叠、CUDA Graph 执行模式与 DSpark 页面。
+- 未发现与已读 wiki 页面的直接冲突；性能结果及插件支持范围须按来源条件与版本核实。

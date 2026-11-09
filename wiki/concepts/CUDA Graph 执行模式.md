@@ -2,7 +2,7 @@
 type: concept
 topic: GPU 编程
 updated: 2026-07-27
-sources: 1
+sources: 2
 ---
 
 # CUDA Graph 执行模式
@@ -71,6 +71,9 @@ max_capture = min(max_capture, max_num_batched_tokens)
 Runtime还会把实际Token数向上Padding到最近Captured Size，例如137 tokens可使用144-token Graph。Graph Shape大于实际Batch在这种情况下也属于正常设计。
 
 若当前Step的总新Token数超过`max_cudagraph_capture_size`，Dispatcher会为本次Forward回退`NONE`；后续较小Batch仍可重新使用Graph。`FULL_DECODE_ONLY`中任何Prefill/Mixed Batch都不用Graph；`PIECEWISE/FULL_AND_PIECEWISE`的Mixed Batch只有在Token数不超上限且Backend支持时才可能Replay Piecewise Graph。这里计算的是本Step Query/Prefill Tokens，不是历史Context Length；Chunked Prefill可把长Prompt拆成多个较小Step。
+## SGLang 低延迟插件的 Graph 集成
+
+与上面的 vLLM 模式枚举分开看：SGLang 插件在初始化时准备权重和执行资源，并在确定 KV cache 大小之前计入插件显存；graph 捕获时根据插件覆盖范围选择专用或通用前向，回放时不重复 Python 层分发。受支持的配置中，未覆盖步骤可走通用路径；各 TP rank 对路径必须一致。AMD 实现使用对应平台的 decode graph runner，不能据此称其为 CUDA Graph。接口和支持范围应按版本核实。
 
 ## 选择建议
 
@@ -93,6 +96,7 @@ Runtime还会把实际Token数向上Padding到最近Captured Size，例如137 to
 ## 相关来源
 
 - [[../sources/vLLM Large Scale Serving DeepSeek @ 2.2k toksH200 with Wide-EP]]：记录 `FULL_AND_PIECEWISE` 在 Wide-EP 配置中的使用；模式精确定义以官方源码为准。
+- [[../sources/SGLang 低延迟模式：Kernel 与运行时]]
 
 ## 官方实现核对
 

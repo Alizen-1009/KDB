@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: 投机解码
-sources: 3
+sources: 4
 updated: 2026-08-17
 ---
 
@@ -71,6 +71,9 @@ Scheduler 将“为某请求再增加一位验证”的候选按前缀存活概�
 架构解读记录：3 个 SWA-128 草稿 block，一次并行计算 5 个草稿位置的基础 logits，配合轻量 Markov head；3 是深度，5 是草稿长度，不代表每次必然接受 5 个 token。
 
 文章称草稿网络在主干预训练后单独训练；后训练中继续适配主干策略，但草稿目标不向主干回传梯度。已有 V4.1 深读记录的固定 revision minimal generate 仍走普通自回归，因此不能用配置本身证明生产投机验证和 scheduler 已执行。
+### SGLang 低延迟采样实现
+
+来源描述 NVIDIA 插件把 Markov head 的 5 次顺序提议合并为每张 GPU 一次 kernel 启动，在寄存器保留 head 权重并跨 GPU 协调选 token；profile 中提议阶段从 85.1 µs 降到 34.2 µs。它不改变 SGLang 投机解码 worker 和接受逻辑；这是特定实现的 profile，而非通用端到端加速。
 
 ## 来源 Benchmark
 
@@ -112,6 +115,7 @@ Scheduler 将“为某请求再增加一位验证”的候选按前缀存活概�
 
 - [[../sources/并行投机解码(DFlashDSpark)的快速理解与vLLM实测]]
 - [[../sources/DSpark：结合半自回归生成与置信度调度的投机解码技术]]
+- [[../sources/SGLang 低延迟模式：Kernel 与运行时]]
 
 ## 相关概念
 
