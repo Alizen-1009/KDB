@@ -112,7 +112,7 @@ updated: 2026-06-12
 
 ## 冲突与备注
 
-- 2026-11-05 早报转述 PR #64760：针对 GLM 5.3、H200 FP8 MoE，保持 expert-sorted 中间激活并融合 SiLU/乘法/量化，声称端到端提升 6.0%–7.6%。合并状态仅按来源发布时陈述，具体 diff、完整 benchmark 与稳定版收录待核实；不覆盖旧 commit 的 GLM 支持矩阵，不自动等同 GLM-5.3-Flash。
+- 2026-11-05 早报转述 PR #64760：针对 GLM 5.3、H200 FP8 MoE，保持 expert-sorted 中间激活并融合 SiLU/乘法/量化，声称端到端提升 6.0%–7.6%。2026-11-09 已核对 PR：merge commit `42c043c6b0e4905d590e9cb4bf00bb644bfebb53`，GPU 内 GEMM1 sorted store、独立激活量化 kernel、GEMM2 sorted-A TMA load；部署为 TP8，报告输入 2048/输出 1/请求并发 1。稳定版收录及独立复测仍待核实；不覆盖旧 commit 的 GLM 支持矩阵，不自动等同 GLM-5.3-Flash。
 - 本文只点到 vLLM 的相关能力，没有展开版本差异、调度细节和具体实现限制，后续需要结合官方文档补足
 - 目前 wiki 里的 vLLM 条目已经覆盖了 `PagedAttention`、`Continuous Batching`、`Prefix Caching` 三个面试高频锚点，但 `chunked prefill`、`disaggregated prefilling` 还可继续补
 - `MRV2` 说明 vLLM 正在把运行时架构从“功能累加”往“模块化、GPU-native、async-first”的方向收束，但截至来源发布时它仍是实验态，并未完全替代旧 runner

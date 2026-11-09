@@ -266,9 +266,13 @@ for e in experts:
 
 ## FP8 下投影的布局衔接案例
 
-[[../sources/AI Infra 早报｜vLLM 让 MoE 下投影少搬一次数据]] 转述 vLLM PR #64760：在 GLM 5.3、H200 路径中保持中间激活的 expert-sorted 顺序，让下投影的激活和权重适配 TMA，并融合 SiLU、乘法与 FP8 量化。具体重排次数、量化布局和融合是否位于前一 GEMM epilogue 内，仍待 PR diff 核实。
+[[../sources/AI Infra 早报｜vLLM 让 MoE 下投影少搬一次数据]] 的 PR 一手核验补充：vLLM #64760（head `d5c86e9a065717f84e62af57903b9c5121725923`）优化 GPU 内专家 FFN 两次 GEMM 的衔接，不是 EP All-to-All。示例为 GLM-5.3、H200、TP8，快路径要求 `expert_map is None`，不保证任意 EP backend 可用。
 
-LLM 归纳：应把 gate/up GEMM、激活、量化、down GEMM 与 combine 看成连续数据流，优化相邻阶段的布局契约；仅有高效 grouped GEMM 不保证整个 MoE 高效。文章的 6.0%–7.6% 端到端提升缺少完整负载条件，只保留为来源声称，不等同于跨模型通用收益。
+1. gate/up GEMM 用 `C_is_sorted=True` 直接按 expert-sorted 行写出，避免恢复成 route-major 顺序。
+2. 独立 Triton kernel 完成 `SiLU(gate) × up`、FP8 量化与 scale 写出，保持排序；并非 GEMM epilogue 内融合。
+3. down GEMM 用 `A_is_sorted=True` 对连续激活块执行 TMA load，同时使用权重 TMA。它是专家 FFN 内部的第二次 GEMM。
+
+LLM 归纳：收益来自减少两次 GEMM 间的散写/间接取行和改善连续块加载，不应理解成必然删掉一个独立复制 kernel，或消除中间激活落地。PR 的 6.0%–7.6% 端到端收益对应随机输入 2048、输出 1、请求并发 1 等 Prefill 主导条件；不能视为 decode 或所有 MoE 通用收益。完整条件、触发限制与更正记录见来源页。
 
 ## 面试口径
 

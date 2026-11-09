@@ -1960,3 +1960,10 @@
 - 局部更新 MoE、算子融合、vLLM、FlashInfer，补充 expert-sorted 布局与激活量化衔接案例及双向引用。
 - 未发现直接事实冲突；性能 6.0%–7.6%、PR 合并及 release 功能均按来源声称记录，未独立核验 PR/release 或复测。
 - 明确区分布局优化、融合与 TMA 的贡献边界，以及旧 GLM 支持矩阵与后续 PR 的版本边界；LangGraph 旁支仅保留于来源页。
+
+## [2026-11-09] distill | MoE Sorted-A TMA 实现与 TP8 Prefill 测试核验
+
+- 依据 vLLM PR #64760 说明、diff 与测试命令更新既有早报来源页、MoE、算子融合和 vLLM；head d5c86e9a065717f84e62af57903b9c5121725923。
+- 明确 GEMM1 sorted store、独立激活量化 kernel、GEMM2 sorted-A TMA load，区分 GPU 内路径与 EP All-to-All。
+- 更正初次摘要：PR 已给 TP8、输入2048、输出1、请求并发1等条件；确认 merge commit 42c043c6b0e4905d590e9cb4bf00bb644bfebb53。
+- 稳定版收录、目标EP后端、完整构建环境与独立GPU性能/精度复测仍待核实；未修改raw。
