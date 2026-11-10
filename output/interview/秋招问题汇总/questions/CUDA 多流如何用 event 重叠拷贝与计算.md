@@ -34,6 +34,8 @@ cudaStreamSynchronize(d2h);
 
 示例省略初始化、错误检查和释放。等 D2H 完成后才能复用该 slot，硬件 copy engines 和资源竞争决定实际重叠。GDN prefill/decode 可以用独立 scratch、同请求 recurrent state 的真实依赖，以及消费者完成后才复用 buffer 来说明。用 Nsight Systems 验证 overlap。
 
+截图系列追问：增加 stream 数只是增加可调度工作，copy engine、SM 资源或内部工作队列饱和时可能只是排队、吞吐不再提升，不必然报错。检查真实依赖、buffer 生命周期及错误码，以时间线和端到端时间选择并发度，不承诺一定三向重叠。
+
 ## 关联知识
 
 - [[../../../../wiki/concepts/通信-计算重叠|通信-计算重叠]]
@@ -45,4 +47,5 @@ cudaStreamSynchronize(d2h);
 ## 所属题单
 
 - [[../sets/英伟达高性能计算工程师26题|英伟达高性能计算工程师26题]]
+- [[../sets/CUDA 截图系列15题|CUDA 截图系列15题]]（用户提供的截图系列摘要，第 11 题）
 - [[../README|秋招问题汇总]]

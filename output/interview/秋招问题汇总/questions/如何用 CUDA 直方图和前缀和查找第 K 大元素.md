@@ -37,6 +37,7 @@
 - [[../../../../wiki/concepts/Histogram|Histogram]]
 - [[../../../../wiki/concepts/Grid-stride Loop|Grid-stride Loop]]
 - [[../../../../wiki/concepts/Bank Conflict|Bank Conflict]]
+- [[CUDA 直方图如何用 shared memory 降低原子热点|直方图原子热点]]
 - [[../../../../wiki/concepts/CUDA内存层次|CUDA 内存层次]]
 
 ## 参考来源与待核实

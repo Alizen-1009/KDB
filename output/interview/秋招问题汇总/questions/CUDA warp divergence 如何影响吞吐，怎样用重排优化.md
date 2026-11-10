@@ -24,6 +24,8 @@ __global__ void relu(const float* x, float* y, int n) {
 ```
 用 SASS 和 profiler 确认实际分支或谓词执行。
 
+截图系列追问：按分支类别分桶或排序可提高 warp 内一致性，但预处理、重排、恢复顺序与破坏局部性都有成本，应比较完整流水。谓词化仍需发射指令、处理有效掩码，并非把分支变成零成本；结果依编译器、路径长度与数据分布实测。
+
 ## 关联知识
 
 - [[../../../../wiki/concepts/Warp Divergence|Warp Divergence]]
@@ -35,4 +37,5 @@ __global__ void relu(const float* x, float* y, int n) {
 ## 所属题单
 
 - [[../sets/英伟达高性能计算工程师26题|英伟达高性能计算工程师26题]]
+- [[../sets/CUDA 截图系列15题|CUDA 截图系列15题]]（用户提供的截图系列摘要，第 7 题）
 - [[../README|秋招问题汇总]]

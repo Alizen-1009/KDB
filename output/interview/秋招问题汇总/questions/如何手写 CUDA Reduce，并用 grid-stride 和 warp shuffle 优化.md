@@ -19,6 +19,8 @@
 
 沿文末原稿章节阅读完整机制、推导或代码；本页保留短答，不复制长篇正文。
 
+截图系列追问：非 2 幂超长输入通过越界检查和单位元填充，grid-stride 局部累加、warp/block 归约后把每 block partial 写入全局内存，再递归启动下一轮；注意有效 lane mask、浮点非结合性。cooperative launch 的 `grid.sync` 可以在满足设备支持和全 grid 可同时驻留等限制时进行同 kernel 多阶段同步，但 block 间结果仍需通过可跨 block 访问的存储交换，不能把各自 shared memory 当成全局中间存储；也可考虑原子合并及其竞争。
+
 ## 关联知识
 
 - [[../../../../wiki/concepts/GPU执行模型|GPU执行模型]]
@@ -29,6 +31,7 @@
 - [[../../字节二面高压题拆解#9. 手撕 reduce 和 reduce 的优化|字节二面高压题拆解]]
 - [[../../字节二面高压题拆解#9.4 常见追问|字节二面高压题拆解]]
 - [[../../字节二面高压题拆解#10. 这轮面试最容易被追问的 10 个点|字节二面高压题拆解]]
+- [CUDA Programming Guide：Grid Synchronization](https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#grid-synchronization)。
 
 - 待核实 / 原稿边界：两个原稿 kernel 都只输出 block 局部和，未给 host 端最终汇总。naive 的 sdata[256] 和二分树隐含 blockDim≤256、合适的二次幂条件；优化版 full-mask shuffle 与 blockDim>>5 隐含完整 warp，通常须 blockDim 为 32 的倍数且不超过 1024。本次未编译或 GPU 验证。
 - 原稿是派生备考资料，不是一手技术证据；涉及具体版本、硬件、性能数字的结论，复习时应沿原稿和 wiki 继续核对一手来源。
@@ -36,4 +39,5 @@
 ## 所属题单
 
 - [[../sets/GPU与算子|GPU与算子]]
+- [[../sets/CUDA 截图系列15题|CUDA 截图系列15题]]（用户提供的截图系列摘要，第 6 题）
 - [[../README|秋招问题汇总]]

@@ -18,6 +18,8 @@ A100/H100 上限均为 64 warps/SM。256 threads/block、64 KiB shared/CTA 时�
 
 Occupancy 高不保证更快：足够的活跃 warp 可隐藏延迟，但强行减少寄存器可能造成 spill，缩小 tile 也可能破坏数据复用。应同时看带宽、计算吞吐、stall、spill 和实际耗时。
 
+截图系列追问：寄存器压力或编译器选择可能产生 spill；local 是线程私有地址空间，通常位于设备内存并可经缓存，不是片上寄存器。缩短变量生命周期、减少同时活跃值、调整展开或拆分 kernel，再比较 block size 与 `__launch_bounds__`；限制寄存器可能提高理论 occupancy，却也可能增加 spill 或指令。用编译器资源报告、NCU local 访问和 occupancy、实际时延联合验证。
+
 ## 关联知识
 
 - [[../../../../wiki/concepts/Occupancy|Occupancy]]
@@ -29,5 +31,6 @@ Occupancy 高不保证更快：足够的活跃 warp 可隐藏延迟，但强行�
 ## 所属题单
 
 - [[../sets/英伟达高性能计算工程师26题|英伟达高性能计算工程师26题]]
+- [[../sets/CUDA 截图系列15题|CUDA 截图系列15题]]（用户提供的截图系列摘要，第 3 题）
 - [[../sets/C++与推理系统及 CUDA 面试回顾|本轮面试回顾]]
 - [[../README|秋招问题汇总]]

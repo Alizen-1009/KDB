@@ -13,6 +13,7 @@
 
 ## 专题入口
 
+- [[sets/CUDA 截图系列15题|CUDA 截图系列15题]]
 - [[sets/C++与推理系统及 CUDA 面试回顾|C++ 与推理系统及 CUDA 面试回顾]]
 - [[sets/长上下文与全局缓存调度面试题|长上下文与全局缓存调度面试题]]
 - [[sets/推理并行、昇腾调优与 MLIR 面试追问|推理并行、昇腾调优与 MLIR 面试追问]]
@@ -42,6 +43,14 @@
 - [[sets/原稿题目对照|原稿题目对照：从旧资料找题]]
 
 ## 全部通用问题
+
+### CUDA 截图系列新增题
+
+- [[questions/batch1 decode 融合算子访存不合并如何优化|batch1 decode 融合访存优化]]
+- [[questions/CUDA L2 persistence 如何设置及有哪些限制|CUDA L2 persistence]]
+- [[questions/GPU SpMM 如何应对稀疏行长不均|GPU SpMM 行长不均]]
+- [[questions/CUDA 直方图如何用 shared memory 降低原子热点|CUDA 直方图原子热点]]
+- [[questions/GPUDirect RDMA 如何注册 GPU buffer 并保证可见性|GPUDirect RDMA 注册与可见性]]
 
 ### 本轮 C++、推理与 CUDA 新增题
 

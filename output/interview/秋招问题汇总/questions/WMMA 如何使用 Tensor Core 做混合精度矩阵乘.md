@@ -16,6 +16,8 @@ WMMA 由整个 warp 共同持有 fragment，沿 K 循环执行 load_matrix_sync�
 
 所有参与 lane 必须一致执行 warp collective，fragment 的 lane 到元素映射由实现决定。遵守目标 API 的 shape、layout、ldm 和对齐要求。线程做地址、搬运和 epilogue，Tensor Core 做 MMA。预填充看 MMA 利用率，decode 同时看小 M tile 利用率和权重流量。W4A16 常见做法是 kernel 内解包反量化后再交给受支持的 MMA。
 
+截图系列追问：若某维为 123，且选用支持该数据类型的 16 元素 tile，可将该维补到 128；输入越界部分填零，输出仅写有效区域，保证不越界及结果不受填充值污染。并非所有架构或类型都支持该 tile：依目标设备、WMMA API 的 shape、指针与 leading dimension 对齐约束选择，边界搬运也要有掩码或安全 staging。
+
 ## 关联知识
 
 - [[../../../../wiki/concepts/混合精度训练与推理|混合精度训练与推理]]
@@ -27,4 +29,5 @@ WMMA 由整个 warp 共同持有 fragment，沿 K 循环执行 load_matrix_sync�
 ## 所属题单
 
 - [[../sets/英伟达高性能计算工程师26题|英伟达高性能计算工程师26题]]
+- [[../sets/CUDA 截图系列15题|CUDA 截图系列15题]]（用户提供的截图系列摘要，第 8 题）
 - [[../README|秋招问题汇总]]

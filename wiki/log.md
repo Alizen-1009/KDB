@@ -1998,3 +1998,8 @@
 
 - 新建：6 个问题页与 1 个系列题单；更新：C++ 多态、CUDA occupancy、Marlin 题页及题库入口
 - 待核实：具体框架版本、GPU 实现与性能收益需结合源码和实测
+
+## [2026-11-10] interview | CUDA 截图系列15题
+
+- 新建：output/interview/秋招问题汇总/sets/CUDA 截图系列15题.md；questions 中新增 batch1 decode、L2 persistence、SpMM、shared histogram、GPUDirect RDMA 共5题，更新10道复用题和2个相关题链接，更新题库 README。
+- 待核实：设备版本、具体实现与性能；历史 Graph 和 Reduce 原稿仍整理中。
