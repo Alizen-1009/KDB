@@ -25,15 +25,15 @@
 
 ## 资源统计
 
-- 原始文章：85
+- 原始文章：86
 - 原始论文：9
 - 原始仓库：0
 - 原始数据集：0
 - 原始图片：19
 - 原始代码：1
-- 来源文件：68
-- 实体文件：52
-- 概念文件：119
+- 来源文件：69
+- 实体文件：53
+- 概念文件：120
 - 报告文件：39
 - HTML 导出：0
 - 面试文件：12
@@ -147,7 +147,7 @@
 - [[../wiki/concepts/Profiling|Profiling]]
 - [[../wiki/concepts/Roofline 模型|Roofline 模型]]
 
-### 模型架构（15）
+### 模型架构（16）
 
 - [[../wiki/concepts/Attention Residuals|Attention Residuals]]
 - [[../wiki/concepts/Causal Encoder-Decoder|Causal Encoder-Decoder]]
@@ -164,6 +164,7 @@
 - [[../wiki/concepts/Sparsity Allocation|Sparsity Allocation]]
 - [[../wiki/concepts/TTT Layer|TTT Layer]]
 - [[../wiki/concepts/mHC|mHC]]
+- [[../wiki/concepts/全双工实时多模态交互|全双工实时多模态交互]]
 
 ### 投机解码（6）
 
@@ -222,7 +223,7 @@
 - [[../wiki/entities/TileRT|TileRT]]
 - [[../wiki/entities/vLLM|vLLM]]
 
-### 模型（9）
+### 模型（10）
 
 - [[../wiki/entities/DeepSeek V4|DeepSeek V4]]
 - [[../wiki/entities/DeepSeek-V3.2-Exp|DeepSeek-V3.2-Exp]]
@@ -230,6 +231,7 @@
 - [[../wiki/entities/GLM-5 系列|GLM-5 系列]]
 - [[../wiki/entities/GLM-5.3-Flash|GLM-5.3-Flash]]
 - [[../wiki/entities/Gemma 4|Gemma 4]]
+- [[../wiki/entities/Higgs Realtime Duplex|Higgs Realtime Duplex]]
 - [[../wiki/entities/Kimi K3|Kimi K3]]
 - [[../wiki/entities/Qwen VL|Qwen VL]]
 - [[../wiki/entities/Qwen3.8-Flash-Next|Qwen3.8-Flash-Next]]
@@ -273,7 +275,7 @@
 
 ## 来源摘要（按类型）
 
-### 文章（47）
+### 文章（48）
 
 - [[../wiki/sources/2026 年MoE 架构正在发生一次关键变化|2026 年MoE 架构正在发生一次关键变化]]
 - [[../wiki/sources/A Preview of Production-Scale Kimi K3 Support on vLLM|A Preview of Production-Scale Kimi K3 Support on vLLM]]
@@ -317,6 +319,7 @@
 - [[../wiki/sources/并行投机解码(DFlashDSpark)的快速理解与vLLM实测|并行投机解码(DFlashDSpark)的快速理解与vLLM实测]]
 - [[../wiki/sources/彻底搞懂RoPE计算原理：从1D到3D|彻底搞懂RoPE计算原理：从1D到3D]]
 - [[../wiki/sources/推理的非确定性运算及vLLMSGLang控制方式|推理的非确定性运算及vLLMSGLang控制方式]]
+- [[../wiki/sources/李沐：我带着新模型回来了！|李沐：我带着新模型回来了！]]
 - [[../wiki/sources/译 NVIDIA’s GPUs - 从 Ampere, Hopper 到 Blackwell|译 NVIDIA’s GPUs - 从 Ampere, Hopper 到 Blackwell]]
 - [[../wiki/sources/详细分析 DeepSeek-V4.1 Flash 技术报告(1)  模型结构|详细分析 DeepSeek-V4.1 Flash 技术报告(1)  模型结构]]
 - [[../wiki/sources/谈谈 DeepInfer|谈谈 DeepInfer]]

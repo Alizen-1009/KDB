@@ -16,6 +16,8 @@
 
 A100/H100 上限均为 64 warps/SM。256 threads/block、64 KiB shared/CTA 时，只按 164/228 KiB 容量估算，驻留至多 2/3 个 block，对应 25%/37.5%。实际核对 carveout、资源分配粒度、寄存器和 CUDA occupancy API。小 grid 可试小输出 tile 或 split-K，后者付出归约代价。比较 eligible warps、spill 和实测时延。
 
+Occupancy 高不保证更快：足够的活跃 warp 可隐藏延迟，但强行减少寄存器可能造成 spill，缩小 tile 也可能破坏数据复用。应同时看带宽、计算吞吐、stall、spill 和实际耗时。
+
 ## 关联知识
 
 - [[../../../../wiki/concepts/Occupancy|Occupancy]]
@@ -27,4 +29,5 @@ A100/H100 上限均为 64 warps/SM。256 threads/block、64 KiB shared/CTA 时�
 ## 所属题单
 
 - [[../sets/英伟达高性能计算工程师26题|英伟达高性能计算工程师26题]]
+- [[../sets/C++与推理系统及 CUDA 面试回顾|本轮面试回顾]]
 - [[../README|秋招问题汇总]]

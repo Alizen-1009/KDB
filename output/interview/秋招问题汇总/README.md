@@ -13,6 +13,8 @@
 
 ## 专题入口
 
+- [[sets/C++与推理系统及 CUDA 面试回顾|C++ 与推理系统及 CUDA 面试回顾]]
+- [[sets/长上下文与全局缓存调度面试题|长上下文与全局缓存调度面试题]]
 - [[sets/推理并行、昇腾调优与 MLIR 面试追问|推理并行、昇腾调优与 MLIR 面试追问]]
 
 - [[sets/英伟达高性能计算工程师26题|英伟达高性能计算工程师26题]]
@@ -40,6 +42,34 @@
 - [[sets/原稿题目对照|原稿题目对照：从旧资料找题]]
 
 ## 全部通用问题
+
+### 本轮 C++、推理与 CUDA 新增题
+
+- [[questions/PD 分离中调度队列与 KV 传输如何衔接|PD 队列与 KV 传输]]
+- [[questions/如何系统推进未量化模型的部署量化|模型部署量化流程]]
+- [[questions/动态图和静态图如何支持融合及摊销编译成本|动态图、静态图与融合]]
+- [[questions/小 M N K 的矩阵乘如何提高效率|小矩阵乘优化]]
+- [[questions/CUDA 原子操作何时需要及如何降低竞争|CUDA 原子操作]]
+- [[questions/CUDA 循环展开如何影响 ILP 与寄存器压力|CUDA 循环展开]]
+
+### 本次长上下文与缓存调度新增题
+
+- [[questions/Ring Attention 与 AllGather KV 如何比较|Ring Attention 与 AllGather KV]]
+- [[questions/多 stream 如何重叠分布式通信与计算|多 stream 通信计算重叠]]
+- [[questions/请求进入推理引擎的完整流程|请求进入推理引擎流程]]
+- [[questions/吞吐提升而 TTFT 尾延迟恶化如何排查|吞吐与 TTFT 尾延迟]]
+- [[questions/MLA 的 KV Cache 容量如何计算|MLA KV 容量计算]]
+- [[questions/四台八卡 B300 如何部署大模型服务|四台八卡 B300 部署]]
+- [[questions/多服务器如何提供统一 HTTP 推理入口|统一 HTTP 入口]]
+- [[questions/Global Router 与引擎 Scheduler 如何分工|Global Router 与 Scheduler]]
+- [[questions/无共享 KV pool 如何全局调度|无共享 KV pool 全局调度]]
+- [[questions/Redis 存 KV 元数据还是张量|Redis 与 KV 数据位置]]
+- [[questions/vLLM 本地前缀缓存为什么还需要全局路由|vLLM 本地缓存与全局路由]]
+- [[questions/何时复制热点前缀 KV 到其他节点|热点 KV 复制条件]]
+- [[questions/跨节点 KV 复制与重算如何选择|跨节点复制与重算]]
+- [[questions/KV 复制时如何防止源块被淘汰|复制期间防止源块淘汰]]
+- [[questions/调度后复制前 KV 已淘汰如何处理|调度后 KV 已淘汰]]
+- [[questions/数组分成 k 段如何最小化最大段和|数组连续 k 段最小化最大段和]]
 
 ### GPU与算子
 

@@ -1980,3 +1980,21 @@
 - 创建来源页与 LMCache、Mooncake、FlexKV 实体页；更新分层 KV Cache、Prefix Caching、PD分离概念页
 - 整理 HiCache、FlexKV 与 vLLM 卸载的定位及选型边界；工业采用规模和版本支持待一手资料核实
 - 未发现与现有 wiki 的直接冲突；文章 benchmark 与组合部署论断保留待核实边界
+
+## [2026-11-10] ingest | 李沐：我带着新模型回来了！
+
+- 读取原始资料：`raw/articles/李沐：我带着新模型回来了！.md`
+- 创建来源页：`wiki/sources/李沐：我带着新模型回来了！.md`
+- 创建概念页：`wiki/concepts/全双工实时多模态交互.md`
+- 创建实体页：`wiki/entities/Higgs Realtime Duplex.md`
+- 未发现与现有 wiki 的直接冲突；官方资料、评测口径及产品状态待核实
+
+## [2026-11-10] interview | 长上下文与全局缓存调度面试题
+
+- 新建：output/interview/秋招问题汇总/sets/长上下文与全局缓存调度面试题.md 及16个问题页；更新题库 README 和3个既有问题页
+- 待整理/待核实：三道个人经历题待本人提供；系统方案、版本及性能需实际验证
+
+## [2026-11-10] interview | C++与推理系统及 CUDA 面试回顾
+
+- 新建：6 个问题页与 1 个系列题单；更新：C++ 多态、CUDA occupancy、Marlin 题页及题库入口
+- 待核实：具体框架版本、GPU 实现与性能收益需结合源码和实测
