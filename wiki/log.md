@@ -2003,3 +2003,18 @@
 
 - 新建：output/interview/秋招问题汇总/sets/CUDA 截图系列15题.md；questions 中新增 batch1 decode、L2 persistence、SpMM、shared histogram、GPUDirect RDMA 共5题，更新10道复用题和2个相关题链接，更新题库 README。
 - 待核实：设备版本、具体实现与性能；历史 Graph 和 Reduce 原稿仍整理中。
+
+## [2026-11-10] ingest | Taking vLLM Apart A Practical Guide to Disaggregated Serving
+
+- 读取原始资料：`raw/articles/Taking vLLM Apart A Practical Guide to Disaggregated Serving.md`
+- 创建来源页：`wiki/sources/Taking vLLM Apart A Practical Guide to Disaggregated Serving.md`
+- 更新概念页：`wiki/concepts/PD分离.md`
+- 更新实体页：`wiki/entities/vLLM.md`
+- 未发现与现有 wiki 的直接冲突；接口版本和修复状态待核实
+
+## [2026-11-11] ingest | DWDP: Distributed Weight Data Parallelism for High-Performance LLM Inference on NVL72
+
+- 读取原始资料：`raw/papers/DWDP.pdf`；核对关键图表与实验边界
+- 创建来源页和 DWDP 概念页
+- 更新 DP Attention、Expert Parallelism、PD分离交叉引用
+- 未发现与既有相关页面直接冲突；上游实现状态待核实

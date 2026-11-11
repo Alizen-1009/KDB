@@ -2,7 +2,7 @@
 type: entity
 entity_type: 框架
 topic: 推理服务
-sources: 22
+sources: 23
 updated: 2026-06-12
 ---
 
@@ -48,6 +48,9 @@ updated: 2026-06-12
 - GLM 架构整理核对 commit `94d96e2446d6`：[[GLM-5 系列|GLM-5 / 5.1 / 5.2]] 注册为 `GlmMoeDsaForCausalLM`，CUDA 路径复用 `vllm/models/deepseek_v32/` 的 DSA 实现；通用兼容类位于 `vllm/model_executor/models/deepseek_v2.py`，其中 GLM 类是 `DeepseekV2ForCausalLM` 子类。`index_topk_freq`、`index_topk_pattern`、`index_skip_topk_offset` 的读取位置见该来源列出的 `deepseek_v32/attention.py` 与 `deepseek_v2.py`。
 - 同一 commit 已有面向 Kimi K3 的 NVIDIA / AMD 通用 KDA 路径及 `third_party/flash_linear_attention` 实现，但没有找到 [[GLM-5.3-Flash]] 的 `Glm5NextForConditionalGeneration` / `glm5_next` 原生注册。因此这只能证明“已有通用 KDA”，不能证明该 commit 支持 GLM-5.3-Flash；未来版本需重新核实。
 
+- `Taking vLLM Apart` 描述 GPU-less frontend：CPU render 将请求模板化并转为 token IDs，token-only engine 执行推理，derender 将输出恢复为响应；该切分可与 PD 分离叠加。render、engine、derender 的模型、tokenizer、模板和 parser 配置需一致。
+- 原文指出流式 derender 的 reasoning/tool parser 重放可能成为 CPU 与网络瓶颈；相关实现、修复状态和 v0.31.0 起的示例接口应按实际版本核实，不能把特定 parser 的复杂度推广到所有实现。
+
 ## 相关概念
 
 - [[../concepts/MoE]]
@@ -86,6 +89,8 @@ updated: 2026-06-12
 - [[../concepts/MLA]]
 
 ## 相关来源
+
+- [[../sources/Taking vLLM Apart A Practical Guide to Disaggregated Serving]]
 
 - [[../sources/AI Infra 早报｜vLLM 让 MoE 下投影少搬一次数据]]
 - [[../sources/LLM推理优化核心技术]]

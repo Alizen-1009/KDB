@@ -26,14 +26,14 @@
 ## 资源统计
 
 - 原始文章：87
-- 原始论文：9
+- 原始论文：10
 - 原始仓库：0
 - 原始数据集：0
 - 原始图片：19
 - 原始代码：1
-- 来源文件：69
+- 来源文件：71
 - 实体文件：53
-- 概念文件：120
+- 概念文件：121
 - 报告文件：39
 - HTML 导出：0
 - 面试文件：12
@@ -89,10 +89,11 @@
 - [[../wiki/concepts/持久批处理|持久批处理]]
 - [[../wiki/concepts/确定性推理|确定性推理]]
 
-### 并行与分布式（19）
+### 并行与分布式（20）
 
 - [[../wiki/concepts/DDP|DDP]]
 - [[../wiki/concepts/DP Attention|DP Attention]]
+- [[../wiki/concepts/DWDP|DWDP]]
 - [[../wiki/concepts/Decode Context Parallel|Decode Context Parallel]]
 - [[../wiki/concepts/DeepSpeed Ulysses|DeepSpeed Ulysses]]
 - [[../wiki/concepts/Dual Batch Overlap|Dual Batch Overlap]]
@@ -275,7 +276,7 @@
 
 ## 来源摘要（按类型）
 
-### 文章（48）
+### 文章（49）
 
 - [[../wiki/sources/2026 年MoE 架构正在发生一次关键变化|2026 年MoE 架构正在发生一次关键变化]]
 - [[../wiki/sources/A Preview of Production-Scale Kimi K3 Support on vLLM|A Preview of Production-Scale Kimi K3 Support on vLLM]]
@@ -305,6 +306,7 @@
 - [[../wiki/sources/SGLang 低延迟模式：Kernel 与运行时|SGLang 低延迟模式：Kernel 与运行时]]
 - [[../wiki/sources/SGLang的KDA管理与Prefix Cache难题|SGLang的KDA管理与Prefix Cache难题]]
 - [[../wiki/sources/SGLang：LLM推理引擎发展新方向|SGLang：LLM推理引擎发展新方向]]
+- [[../wiki/sources/Taking vLLM Apart A Practical Guide to Disaggregated Serving|Taking vLLM Apart A Practical Guide to Disaggregated Serving]]
 - [[../wiki/sources/glm-5-architecture-evolution|glm-5-architecture-evolution]]
 - [[../wiki/sources/vLLM AFD Plugin 发布：为 MoE 推理拆分 Attention 与 FFN，实现灵活部署|vLLM AFD Plugin 发布：为 MoE 推理拆分 Attention 与 FFN，实现灵活部署]]
 - [[../wiki/sources/vLLM Large Scale Serving DeepSeek @ 2.2k toksH200 with Wide-EP|vLLM Large Scale Serving DeepSeek @ 2.2k toksH200 with Wide-EP]]
@@ -326,10 +328,11 @@
 - [[../wiki/sources/还在手写CUDA内核？CODA来了！LLM和新手也能让Transformer跑出光速|还在手写CUDA内核？CODA来了！LLM和新手也能让Transformer跑出光速]]
 - [[../wiki/sources/陈巍：DeepSeek 开源Day（1）-FlashMLA 深入分析（收录于：DeepSeek技术详解系列）|陈巍：DeepSeek 开源Day（1）-FlashMLA 深入分析（收录于：DeepSeek技术详解系列）]]
 
-### 论文（6）
+### 论文（7）
 
 - [[../wiki/sources/Attention Residuals|Attention Residuals]]
 - [[../wiki/sources/Conditional Memory via Scalable Lookup: A New Axis of Sparsity for Large Language Models|Conditional Memory via Scalable Lookup: A New Axis of Sparsity for Large Language Models]]
+- [[../wiki/sources/DWDP Distributed Weight Data Parallelism for High-Performance LLM Inference on NVL72|DWDP Distributed Weight Data Parallelism for High-Performance LLM Inference on NVL72]]
 - [[../wiki/sources/DeepSeek-V3.2-Exp：Boosting Long-Context Efficiency with DeepSeek Sparse Attention|DeepSeek-V3.2-Exp：Boosting Long-Context Efficiency with DeepSeek Sparse Attention]]
 - [[../wiki/sources/Look Ma, No Bubbles! Designing a Low-Latency Megakernel for Llama-1B|Look Ma, No Bubbles! Designing a Low-Latency Megakernel for Llama-1B]]
 - [[../wiki/sources/On the Design of Qwen3.8-Next Architecture：Evaluation, Efficiency, and Training Stability|On the Design of Qwen3.8-Next Architecture：Evaluation, Efficiency, and Training Stability]]

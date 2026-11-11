@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: 并行与分布式
-sources: 2
+sources: 3
 updated: 2026-06-12
 ---
 
@@ -26,6 +26,8 @@ updated: 2026-06-12
 ## 与 Wide-EP 的组合
 
 在 [[Wide Expert Parallelism]] 中，Attention 侧按 DP replicas 独立处理请求并保存 MLA KV Cache，MoE 侧则共享跨 ranks 分布的 expert pool。这样把“请求/KV 容量扩展”和“专家权重分片”放在不同维度上；代价是每个 MoE 层都需要在 Attention ranks 与 EP group 间完成 dispatch/combine。
+
+[[DWDP]] 同样保留 attention 数据并行，但 MoE 不走逐层 token dispatch/combine；它预取远程专家权重并在请求所在 rank 计算，以权重传输换取避免 collective 等待。
 
 ## 关键权衡
 
@@ -63,11 +65,13 @@ updated: 2026-06-12
 - [[KV Cache]]
 - [[Continuous Batching]]
 - [[Wide Expert Parallelism]]
+- [[DWDP]]
 
 ## 相关来源
 
 - [[../sources/MLA与DP Attention面试整理]]
 - [[../sources/vLLM Large Scale Serving DeepSeek @ 2.2k toksH200 with Wide-EP]]
+- [[../sources/DWDP Distributed Weight Data Parallelism for High-Performance LLM Inference on NVL72]]
 
 ## 研究备注
 

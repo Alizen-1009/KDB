@@ -1,7 +1,7 @@
 ---
 type: concept
 topic: 并行与分布式
-sources: 7
+sources: 8
 updated: 2026-06-12
 ---
 
@@ -40,6 +40,8 @@ EP 下每个 rank 都可能产生要发给任意 expert 的 token，而这些 ex
 3. `combine all-to-all`：把 expert 输出送回 token 原来的 rank / 顺序，再按 routing weight 合并。
 
 所以 `all-to-all` 的本质是“按 token 的动态路由做多对多交换”。它搬运的通常是 activation，不是 expert 权重；expert 权重常驻在持有该 expert 的 rank 上。
+
+[[DWDP]] 提供另一种权衡：分布存放专家但按层把远程权重拉到请求所在 rank，避免 EP 的逐层 token dispatch/combine collective；代价是权重预取流量、缓冲区和潜在争用。
 
 ## 和 TP / DPA 的关系
 
@@ -110,6 +112,7 @@ EP 下每个 rank 都可能产生要发给任意 expert 的 token，而这些 ex
 - [[Expert Parallel Load Balancing]]
 - [[MegaMoE]]
 - [[通信-计算重叠]]
+- [[DWDP]]
 
 ## 相关来源
 
@@ -120,6 +123,7 @@ EP 下每个 rank 都可能产生要发给任意 expert 的 token，而这些 ex
 - [[../sources/2026 年MoE 架构正在发生一次关键变化]]
 - [[../sources/vLLM Large Scale Serving DeepSeek @ 2.2k toksH200 with Wide-EP]]
 - [[../sources/MegaMoE — 让 all-to-all 消失]]
+- [[../sources/DWDP Distributed Weight Data Parallelism for High-Performance LLM Inference on NVL72]]
 
 ## 研究备注
 
